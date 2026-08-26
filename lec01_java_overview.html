@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class 1 — Welcome to Java: Overview and First Programs | CSCI 212</title>
+<style>
+:root{
+  --ink:#0f172a; --ink2:#334155; --muted:#64748b; --line:#e2e8f0;
+  --bg:#ffffff; --bg2:#f8fafc;
+  --obj:#4f46e5; --def:#2563eb; --ex:#059669; --alg:#7c3aed;
+  --key:#b45309; --warn:#dc2626; --qc:#0891b2; --prac:#be185d; --sum:#475569;
+  --edit:#ea580c; --edit-bg:#fff7ed;
+  --code-bg:#0d1117; --code-bd:#000000;   /* read-only listings: black */
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px 80px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:#0f172a;color:#e2e8f0;font-size:13.5px;
+  border-bottom:3px solid var(--obj);
+}
+.topbar .inner{max-width:900px;margin:0 auto;padding:10px 22px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.topbar a{color:#e2e8f0;text-decoration:none;border-bottom:1px solid transparent}
+.topbar a:hover{border-bottom-color:#94a3b8}
+.topbar .course{font-weight:700;letter-spacing:.02em}
+.topbar .sep{color:#475569}
+.topbar .spacer{flex:1}
+
+/* ---------- title block ---------- */
+.titleblock{padding:34px 0 10px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.eyebrow{
+  font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--obj);margin-bottom:8px;
+}
+.titleblock h1{font-size:33px;line-height:1.2;margin:0 0 10px;letter-spacing:-.015em}
+.titleblock .sub{margin:0;color:var(--muted);font-size:17px;line-height:1.5}
+
+h2{
+  font-size:24px;margin:46px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line);letter-spacing:-.01em;scroll-margin-top:14px;
+}
+h2 .num{color:var(--obj);font-weight:800;margin-right:11px}
+h3{font-size:18.5px;margin:30px 0 10px;color:var(--ink)}
+h4{font-size:16px;margin:20px 0 8px;color:var(--ink2)}
+p{margin:12px 0}
+ul,ol{margin:12px 0;padding-left:26px}
+li{margin:6px 0}
+a{color:var(--def)}
+hr{border:0;border-top:1px solid var(--line);margin:30px 0}
+strong{color:var(--ink)}
+.muted{color:var(--muted)}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--bg2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 20px 16px;margin:22px 0;
+}
+.toc .th{
+  font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;
+}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:30px}
+.toc li{margin:3px 0;font-size:14.5px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- show all / hide all ---------- */
+.tools{
+  display:flex;gap:9px;align-items:center;flex-wrap:wrap;
+  padding:11px 15px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:9px;margin:22px 0;font-size:13.5px;
+}
+.tools .lab{font-weight:700;color:var(--ink2)}
+.tools button{
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  background:#fff;color:var(--ink2);border:1px solid #cbd5e1;
+  border-radius:6px;padding:4px 12px;
+}
+.tools button:hover{background:var(--obj);border-color:var(--obj);color:#fff}
+.tools .muted{font-size:12.5px}
+
+/* ---------- boxes ---------- */
+.box{border:1px solid var(--line);border-left:5px solid var(--muted);border-radius:8px;margin:22px 0;overflow:hidden;background:#fff}
+.box>.hd{
+  padding:9px 16px;font-size:12.5px;font-weight:700;
+  letter-spacing:.075em;text-transform:uppercase;color:#fff;background:var(--muted);
+}
+.box>.hd .tag{margin-left:5px;font-weight:500;text-transform:none;letter-spacing:0;opacity:.92;font-size:13px}
+.box>.bd{padding:4px 18px 14px}
+.box>.bd>:first-child{margin-top:12px}
+.box>.bd>:last-child{margin-bottom:2px}
+
+.box.obj{border-left-color:var(--obj)}  .box.obj>.hd{background:var(--obj)}
+.box.def{border-left-color:var(--def)}  .box.def>.hd{background:var(--def)}
+.box.ex{border-left-color:var(--ex)}    .box.ex>.hd{background:var(--ex)}
+.box.alg{border-left-color:var(--alg)}  .box.alg>.hd{background:var(--alg)}
+.box.key{border-left-color:var(--key)}  .box.key>.hd{background:var(--key)}
+.box.warn{border-left-color:var(--warn)}.box.warn>.hd{background:var(--warn)}
+.box.qc{border-left-color:var(--qc)}    .box.qc>.hd{background:var(--qc)}
+.box.prac{border-left-color:var(--prac)}.box.prac>.hd{background:var(--prac)}
+.box.sum{border-left-color:var(--sum)}  .box.sum>.hd{background:var(--sum)}
+
+.box.obj{background:#f5f5ff}
+.box.qc{background:#f0fbfe}
+.box.warn{background:#fff7f7}
+.box.key{background:#fffbf2}
+.box.sum{background:#f8fafc}
+
+/* ---------- code ---------- */
+/* Read-only listings sit on black, matching CSCI 211, so a code block is never
+   mistaken for the editable live-coding box. */
+pre{
+  margin:14px 0;padding:13px 15px;overflow-x:auto;
+  background:var(--code-bg);border:1px solid var(--code-bd);border-radius:8px;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;color:#c9d1d9;
+}
+pre code{font-family:inherit;font-size:inherit;background:none;padding:0;border:0;color:inherit;display:block}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef2f7;
+  border:1px solid #e2e8f0;border-radius:4px;padding:1px 5px;color:#0b3a5b;
+}
+.filename{
+  font-family:var(--mono);font-size:12px;color:#475569;
+  margin:16px 0 -9px;font-weight:600;
+}
+
+/* comparison block: another language, never syntax-highlighted. Dark like the
+   Java listings, but desaturated and dashed so it reads as "not this course". */
+pre.cmp{background:#161b22;border-style:dashed;border-color:#3f4650;color:#9aa4b2}
+pre.cmp code{color:#9aa4b2}
+
+/* shell commands you type */
+pre.sh{background:#1e293b;border-color:#1e293b;color:#e2e8f0;position:relative;padding-top:26px}
+pre.sh code{color:#e2e8f0}
+pre.sh::before{
+  content:"Terminal";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#86efac;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* output / terminal blocks */
+pre.out{background:#111d33;border-color:#111d33;color:#e2e8f0;position:relative;padding-top:26px}
+pre.out code{color:#e2e8f0}
+pre.out::before{
+  content:"Output";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#7dd3fc;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+pre.err{background:#1f1416;border-color:#7f1d1d;color:#fecdd3;padding-top:26px;position:relative}
+pre.err code{color:#fecdd3}
+pre.err::before{
+  content:"Compiler message";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#fda4af;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* ---- highlight.js, GitHub-dark palette (hand-written, no external file) ---- */
+.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-template-tag,
+.hljs-template-variable,.hljs-type,.hljs-variable.language_{color:#ff7b72}
+.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#d2a8ff}
+.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,
+.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable{color:#79c0ff}
+.hljs-meta .hljs-string,.hljs-regexp,.hljs-string{color:#a5d6ff}
+.hljs-built_in,.hljs-symbol{color:#ffa657}
+.hljs-code,.hljs-comment,.hljs-formula{color:#8b949e;font-style:italic}
+.hljs-name,.hljs-quote,.hljs-selector-pseudo,.hljs-selector-tag{color:#7ee787}
+.hljs-subst{color:#c9d1d9}
+.hljs-section{color:#1f6feb;font-weight:700}
+.hljs-bullet{color:#f2cc60}
+.hljs-emphasis{color:#c9d1d9;font-style:italic}
+.hljs-strong{color:#c9d1d9;font-weight:700}
+
+/* ---------- trace tables ---------- */
+table{border-collapse:collapse;margin:16px 0;font-size:14px;width:100%}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg2);font-weight:700;font-size:13px}
+table.trace td:first-child,table.trace th:first-child{white-space:nowrap}
+table code{font-size:.88em}
+
+/* ---------- multi-part questions ---------- */
+.part{margin:16px 0;padding-left:14px;border-left:2px solid #cbd5e1}
+.part .q{margin:0 0 8px}
+.part .pl{font-weight:700;color:var(--qc);margin-right:6px}
+
+/* ---------- collapsible solutions ---------- */
+details.soln{margin:10px 0 4px}
+details.soln>summary{
+  list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  font-size:12.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:#fff;background:var(--sum);border-radius:6px;padding:5px 13px;
+  user-select:none;
+}
+details.soln>summary::-webkit-details-marker{display:none}
+details.soln>summary::before{content:"\25B6";font-size:9px;transition:transform .15s}
+details.soln[open]>summary::before{transform:rotate(90deg)}
+details.soln>summary::after{content:"Show Answer"}
+details.soln[open]>summary::after{content:"Hide Answer"}
+details.soln>summary:hover{filter:brightness(1.18)}
+
+details.soln.reveal>summary{background:var(--ex)}
+details.soln.reveal>summary::after{content:"Show Output & Explanation"}
+details.soln.reveal[open]>summary::after{content:"Hide Output & Explanation"}
+details.soln.reveal.noout>summary::after{content:"Show Explanation"}
+details.soln.reveal.noout[open]>summary::after{content:"Hide Explanation"}
+
+.ans{
+  margin-top:11px;padding:2px 16px 10px;background:#fff;
+  border:1px solid var(--line);border-left:3px solid var(--sum);border-radius:7px;
+}
+details.soln.reveal .ans{border-left-color:var(--ex)}
+.ans>:first-child{margin-top:12px}
+.ans>:last-child{margin-bottom:6px}
+
+/* ---------- live coding editor ---------- */
+.editor{
+  margin:18px 0;border:2px dashed var(--edit);border-radius:9px;
+  background:var(--edit-bg);overflow:hidden;
+}
+.editor .ehd{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:7px 13px;background:var(--edit);color:#fff;
+  font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+}
+.editor .ehd .etitle{flex:1}
+.editor .ehd button{
+  font:inherit;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  cursor:pointer;background:rgba(255,255,255,.16);color:#fff;
+  border:1px solid rgba(255,255,255,.5);border-radius:5px;padding:3px 10px;
+}
+.editor .ehd button:hover{background:#fff;color:var(--edit)}
+.editor textarea{
+  display:block;width:100%;border:0;outline:0;resize:vertical;
+  padding:12px 15px;background:var(--edit-bg);color:#431407;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;
+  tab-size:4;-moz-tab-size:4;min-height:150px;
+}
+.editor textarea:focus{background:#fff}
+.editor .foot{
+  padding:5px 13px 7px;font-size:11.5px;color:#9a3412;background:#ffedd5;
+  border-top:1px solid #fed7aa;
+}
+
+/* ---------- prev/next nav ---------- */
+.pagenav{display:flex;gap:14px;margin:52px 0 0;flex-wrap:wrap}
+.pagenav a,.pagenav span.disabled{
+  flex:1 1 260px;display:block;text-decoration:none;
+  border:1px solid var(--line);border-radius:9px;padding:12px 16px;background:#fff;
+}
+.pagenav a:hover{border-color:var(--obj);background:var(--bg2)}
+.pagenav .dir{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.pagenav .ttl{font-size:15px;font-weight:600;color:var(--ink);margin-top:3px}
+.pagenav .next{text-align:right}
+.pagenav span.disabled{opacity:.4}
+.pagenav span.disabled .ttl{color:var(--muted)}
+
+footer.pf{
+  margin-top:40px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--muted);text-align:center;
+}
+
+/* ---------- index page ---------- */
+table.sched{font-size:14.5px}
+table.sched th{background:#0f172a;color:#fff;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+table.sched td:first-child{white-space:nowrap;font-weight:700;color:var(--muted);width:60px}
+table.sched tr.examrow td{background:#fff1f2}
+table.sched tr.revrow td{background:#fffbeb}
+table.sched a{font-weight:600;text-decoration:none}
+table.sched a:hover{text-decoration:underline}
+
+
+/* ---------- release gating ---------- */
+.pending{
+  margin-top:4px;font-size:11.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:#b45309;
+}
+.pagenav span.disabled .pending{color:#b45309}
+table.sched tr.pendingrow td{background:#fcfcfd}
+table.sched .unrel{color:var(--muted)}
+table.sched .pending{display:block;margin-top:2px}
+table.sched td.cn{white-space:nowrap;width:52px;font-weight:700;color:var(--muted)}
+table.sched td.dt{white-space:nowrap;width:104px;color:var(--muted);font-size:13.5px}
+table.sched tr.offrow td{background:#f1f5f9;color:var(--muted);font-style:italic}
+.refcard{
+  display:block;text-decoration:none;border:1px solid var(--line);
+  border-left:5px solid var(--alg);border-radius:9px;padding:13px 17px;
+  margin:22px 0;background:#faf9ff;
+}
+.refcard:hover{background:#f5f3ff;border-color:var(--alg)}
+.refcard .rl{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--alg)}
+.refcard .rt{font-size:16px;font-weight:600;color:var(--ink);margin-top:3px}
+.refcard .rd{font-size:14px;color:var(--muted);margin-top:4px}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,.tools,.pagenav,.pending{display:none !important}
+  html,body{width:100%;font-size:10pt}
+  .wrap{max-width:100%;width:100%;padding:0}
+  /* a wide <pre> must wrap rather than widen the page and clip every other
+     element at the paper edge */
+  /* Screen shows code on black; paper does not. Restore a dark-on-light palette
+     for print only, or the dark theme's light tokens vanish on white. */
+  pre{white-space:pre-wrap;overflow:visible;overflow-wrap:anywhere;font-size:8.6pt;
+      background:#f8fafc !important;color:#24292e !important;border-color:#cbd5e1 !important;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  pre code{color:#24292e !important}
+  pre.cmp{background:#fff !important;color:#475569 !important;border-color:#94a3b8 !important}
+  pre.cmp code{color:#475569 !important}
+  pre .hljs-doctag,pre .hljs-keyword,pre .hljs-meta .hljs-keyword,pre .hljs-template-tag,
+  pre .hljs-template-variable,pre .hljs-type,pre .hljs-variable.language_{color:#d73a49 !important}
+  pre .hljs-title,pre .hljs-title.class_,pre .hljs-title.class_.inherited__,
+  pre .hljs-title.function_{color:#6f42c1 !important}
+  pre .hljs-attr,pre .hljs-attribute,pre .hljs-literal,pre .hljs-meta,pre .hljs-number,
+  pre .hljs-operator,pre .hljs-selector-attr,pre .hljs-selector-class,pre .hljs-selector-id,
+  pre .hljs-variable{color:#005cc5 !important}
+  pre .hljs-meta .hljs-string,pre .hljs-regexp,pre .hljs-string{color:#032f62 !important}
+  pre .hljs-built_in,pre .hljs-symbol{color:#e36209 !important}
+  pre .hljs-code,pre .hljs-comment,pre .hljs-formula{color:#6a737d !important}
+  pre .hljs-name,pre .hljs-quote,pre .hljs-selector-pseudo,
+  pre .hljs-selector-tag{color:#22863a !important}
+  pre .hljs-subst,pre .hljs-emphasis,pre .hljs-strong{color:#24292e !important}
+  .filename{color:#475569 !important}
+  table{table-layout:fixed;width:100%;word-wrap:break-word;overflow-wrap:anywhere}
+  .box,.toc{max-width:100%}
+  a{color:var(--ink);text-decoration:none}
+  .box,.part,pre,table,.editor{break-inside:avoid;page-break-inside:avoid}
+  h2{break-after:avoid;page-break-after:avoid}
+  details.soln>summary{display:none !important}
+  details.soln:not([open])>.ans{display:none !important}
+  details.soln::before{
+    content:"Answer withheld — see the online notes.";
+    display:block;font-size:9pt;font-style:italic;color:#64748b;margin:6px 0;
+  }
+  details.soln[open]::before{content:""}
+  .editor textarea{display:none !important}
+  .editor{border:1.5px solid #fdba74 !important;background:#fff;border-style:solid}
+  .editor .ehd{background:#fff !important;color:#9a3412 !important;border-bottom:1px solid #fdba74}
+  .editor .ehd button{display:none}
+  .editor .foot{display:none}
+  .editor::after{content:"";display:block;height:2.1in;background:#fff}
+  pre.out,pre.sh{background:#f1f5f9 !important;color:#0f172a !important;border-color:#94a3b8 !important}
+  pre.err{background:#fef2f2 !important;color:#7f1d1d !important;border-color:#fca5a5 !important}
+  pre.out code,pre.sh code{color:#0f172a !important}
+  pre.err code{color:#7f1d1d !important}
+  pre.out::before,pre.sh::before{color:#475569}
+  pre.err::before{color:#b91c1c}
+  .box>.hd{color:#000;background:#fff !important;border-bottom:1px solid #cbd5e1}
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="inner">
+<span class="course">CSCI 212</span>
+<span class="sep">|</span>
+<a href="index.html">Course index</a>
+<span class="sep">|</span>
+<span>Class 1 of 28</span>
+<span class="sep">|</span>
+<span>Tuesday, September 1</span>
+<span class="spacer"></span>
+<span>Queens College, CUNY</span>
+</div></div>
+<div class="wrap">
+<div class="titleblock">
+  <div class="eyebrow">Session 1 &middot; Lecture 1</div>
+  <h1>Welcome to Java: Overview and First Programs</h1>
+  <p class="sub">What Java is, why it looks the way it does, and how to get a program from a text file to a running result.</p>
+</div>
+
+<div class="box obj">
+  <div class="hd">Learning Objectives</div>
+  <div class="bd">
+    <p>By the end of today's session you should be able to:</p>
+    <ol>
+      <li>Explain what the Java Virtual Machine is and why the same compiled program runs on Windows, macOS and Linux without being recompiled.</li>
+      <li>Write the standard Java program skeleton from memory &mdash; the <code>class</code> header and the <code>main</code> method &mdash; and say what each word in it means.</li> <li>Compile a program with <code>javac</code> and run it with <code>java</code>, and explain why those are two separate commands.</li> <li>Read a <code>javac</code> error message and locate the line it is complaining about.</li> <li>Name the eight primitive types and choose an appropriate one for a given piece of data.</li> <li>Predict the result of integer division and explain why <code>7 / 3</code> is <code>2</code>.</li> <li>Predict what <code>+</code> does when one of its operands is a <code>String</code>, and place parentheses to control it.</li> <li>Write <code>for</code>, <code>while</code> and <code>if</code> statements in Java and explain how they differ from the C++ versions you already know.</li> </ol> </div> </div> <div class="toc"> <div class="th">On this page</div> <ol> <li><a href="#s1">What Java is, and what makes it different</a></li> <li><a href="#s2">The shape of a Java program</a></li> <li><a href="#s3">Compiling and running</a></li> <li><a href="#s4">The eight primitive types</a></li> <li><a href="#s5">Arithmetic, and the division trap</a></li> <li><a href="#s6">Printing, and what <code>+</code> really does</a></li> <li><a href="#s7">Loops and decisions</a></li> <li><a href="#prac">Practice Problems</a></li> <li><a href="#summary">Lecture Summary</a></li> </ol> </div> <div class="tools"> <span class="lab">Answers</span> <button id="showAll" type="button">Show all</button> <button id="hideAll" type="button">Hide all</button> <span class="muted">&mdash; every worked-example output and every solution is hidden when the page loads. Work it out first, then reveal.</span> </div> <hr> <h2 id="s1"><span class="num">1.</span>What Java is, and what makes it different</h2> <p>You already know how to program. In CSCI 111 you wrote variables, loops, decisions, arrays and functions in C++. Almost none of that knowledge is going to be thrown away this semester &mdash; a <code>for</code> loop in Java looks exactly like a <code>for</code> loop in C++. What changes is the world the code lives in.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; Java</span></div> <div class="bd"> <p><strong>Java</strong> is a high-level, object-oriented programming language created by James Gosling at Sun Microsystems and released in 1995. It was designed around the principle <em>"write once, run anywhere"</em> (WORA): a Java program is compiled once, and the result runs unchanged on any machine that has a Java Virtual Machine.</p> <p>Java is used for Android apps, desktop applications, web back-ends and large enterprise systems. It is one of the most widely deployed languages in the world, which is a large part of why it is the language of this course.</p> </div> </div> <p>The WORA promise is the single most important design decision in Java, and everything else follows from it. To understand it you need one more term.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; bytecode and the JVM</span></div> <div class="bd"> <p>When you compile C++, the compiler produces <strong>machine code</strong> &mdash; instructions for one specific processor and one specific operating system. An executable built on a Mac will not run on Windows.</p> <p>When you compile Java, the compiler produces <strong>bytecode</strong> instead: instructions for an imaginary computer. Bytecode is stored in a <code>.class</code> file. The <strong>Java Virtual Machine (JVM)</strong> is a program that reads bytecode and carries out those instructions on your real machine. There is a JVM for Windows, one for macOS, one for Linux, one for Android. They all read the same bytecode.</p> </div> </div> <div class="box key"> <div class="hd">Key Idea</div> <div class="bd"> <p>C++ says: <em>compile it separately for every machine.</em> Java says: <em>compile it once, and ship a different JVM to every machine.</em> Your <code>.class</code> file is the thing that travels; the JVM is the thing that already lives on the target computer.</p> </div> </div> <p>Four more features of Java follow from that same design, and they are worth naming now because we will keep bumping into them:</p> <ul> <li><strong>Object-oriented.</strong> Java is thoroughly object-oriented. Apart from the eight primitive types we meet in &sect;4, <em>everything</em> in Java is an object. There is no such thing as a free-floating function in Java &mdash; every method lives inside a class. That is why even "hello world" needs a class around it.</li> <li><strong>Simplicity.</strong> Java's syntax is deliberately modelled on C and C++, but the low-level facilities are gone: no pointer arithmetic, no manual <code>delete</code>, no header files, no preprocessor.</li> <li><strong>Automatic memory management.</strong> Java has a <em>garbage collector</em>. You create objects with <code>new</code>; you never free them. When nothing refers to an object any more, the collector reclaims it. The whole category of memory-leak bugs you had to worry about in C++ largely disappears.</li> <li><strong>Security.</strong> Because your code runs inside the JVM rather than directly on the hardware, the JVM can check what it is doing &mdash; array bounds, type safety, access permissions &mdash; and stop it.</li> </ul> <p>Here is the shape of the semester. The left column is CSCI 111 material you already have; the right column is what this course is actually about.</p> <table> <tr><th>Programming fundamentals (from CSCI 111)</th><th>Object-oriented programming (CSCI 212)</th></tr> <tr><td>Variables, data types</td><td>Classes</td></tr> <tr><td>Input and output</td><td>Objects</td></tr> <tr><td>Arithmetic</td><td>Abstraction</td></tr> <tr><td>Decisions</td><td>Encapsulation</td></tr> <tr><td>Loops</td><td>Inheritance</td></tr> <tr><td>Arrays</td><td>Polymorphism</td></tr> <tr><td>Methods / functions</td><td>Abstract classes and interfaces</td></tr> <tr><td></td><td>Exceptions, generics, data structures</td></tr> </table> <p>The first handful of lectures translate the left column into Java. Everything from Lecture 7 onward is the right column.</p> <div class="box qc"> <div class="hd">Quick Check 1.1</div> <div class="bd"> <p>Your friend compiles a Java program on a Windows laptop and emails you the <code>.class</code> file. You have a Mac. Will it run? What would the answer be if it had been a C++ program compiled to an <code>.exe</code>?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The question is really "what is inside the file, and who reads it?" Decide what each compiler produced, then decide whether your machine has something that can read it.</p> <p><strong>The Java case: yes, it runs.</strong> <code>javac</code> on Windows produced bytecode, not Windows machine code. Bytecode is instructions for the JVM, and your Mac has a macOS JVM. You type <code>java ClassName</code> and the macOS JVM reads exactly the same bytecode the Windows JVM would have read.</p> <p><strong>The C++ case: no, it does not run.</strong> The <code>.exe</code> contains machine code addressed to an x86 processor <em>and</em> Windows operating-system calls. Your Mac has no idea what to do with it. To run that program you would need the C++ source code and a compiler on your own machine.</p> <p><strong>Things to notice.</strong> The Java program is not magic &mdash; something platform-specific still had to be written. It is just that Oracle wrote it (the JVM), once per platform, instead of you writing it. Notice also what has to already be on your Mac: not the Java compiler, just the JVM. That is why a user who runs your program needs a Java <em>runtime</em>, while you as a developer need a Java <em>development kit</em>.</p> </div></details> </div> </div> <h2 id="s2"><span class="num">2.</span>The shape of a Java program</h2> <p>In C++ you could write a function that belonged to nothing in particular. Java does not allow that. Every method must be inside a class, so the smallest legal Java program is still a class.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; class, method, main</span></div> <div class="bd"> <p>A <strong>class</strong> is a named container for data and methods. For the next few lectures we will use classes purely as a place to park our code; from Lecture 7 onward they become the centre of everything.</p> <p>A <strong>method</strong> is Java's word for a function. The difference from C++ is not behaviour, it is location: a method always lives inside a class.</p> <p><strong><code>main</code></strong> is the method the JVM calls when you run a program. Its signature is fixed &mdash; if you get one word wrong, the program compiles but will not start.</p> </div> </div> <p>Here is the template. Memorise it; you will type it several hundred times this semester.</p> <p class="filename">Example.java</p>
+<pre><code class="language-java">public class Example {
+    public static void main(String args[]) {
+
+    }
+}</code></pre> <p>Read it word by word, because every word is doing a job:</p> <table> <tr><th>Word</th><th>What it means</th></tr> <tr><td><code>public</code></td><td>Visible to code outside this class. The JVM is outside your class, so <code>main</code> must be public or the JVM cannot call it.</td></tr> <tr><td><code>class Example</code></td><td>Declares a class named <code>Example</code>. <strong>The file must be named <code>Example.java</code>.</strong></td></tr> <tr><td><code>static</code></td><td>The method belongs to the class itself, not to any object of the class. This matters because when the JVM starts there are no objects yet &mdash; it has nothing to call <code>main</code> <em>on</em>. We come back to <code>static</code> properly in Lecture 9.</td></tr> <tr><td><code>void</code></td><td><code>main</code> returns nothing. (In C++ you wrote <code>return 0;</code>. Java does not want it.)</td></tr> <tr><td><code>String args[]</code></td><td>An array of the command-line arguments. You may ignore it for now, but it must be in the signature.</td></tr> </table> <div class="box warn"> <div class="hd">Common Mistake</div> <div class="bd"> <p><code>String args[]</code> and <code>String[] args</code> mean exactly the same thing, and both are legal. What is <em>not</em> optional is the parameter itself. If you write <code>public static void main()</code> the program will compile perfectly and then refuse to run, because the JVM looks for a <code>main</code> that takes a <code>String</code> array and finds none. A compile that succeeds is not proof that the program starts.</p> </div> </div> <p>Now the smallest useful program. This is the Java translation of the first C++ program you ever wrote.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; hello, in both languages</span></div> <div class="bd"> <p>For comparison, here is the CSCI 111 version you already know. It is here only so you can see what maps onto what &mdash; we will not write any more C++ after this lecture.</p> <p class="filename">C++ (CSCI 111) &mdash; for comparison only</p>
+<pre class="cmp"><code>// example1.cpp
+#include &lt;iostream&gt;
+using namespace std;
+int main() {
+    cout &lt;&lt; "Hello ";
+    cout &lt;&lt; "CSCI 212" &lt;&lt; endl;
+    return 0;
+}</code></pre> <p>And the Java version. Note that there is no <code>#include</code>, no <code>using namespace</code>, and no <code>return 0</code>. <code>System.out</code> is the standard output stream; it is always available.</p> <p class="filename">Example1.java</p>
+<pre><code class="language-java">public class Example1 {
+    public static void main(String args[]) {
+        System.out.print("Hello ");
+        System.out.println("CSCI 212");
+    }
+}</code></pre> <p>Before you open the toggle: how many lines does this print?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Hello CSCI 212</code></pre> <p>One line. <code>print</code> writes its argument and stops. <code>println</code> writes its argument <em>and then a newline</em>. So the two calls land on the same line, and the line ends because the second call was <code>println</code>.</p> <table class="trace"> <tr><th>C++</th><th>Java</th></tr> <tr><td><code>cout &lt;&lt; x</code></td><td><code>System.out.print(x)</code></td></tr> <tr><td><code>cout &lt;&lt; x &lt;&lt; endl</code></td><td><code>System.out.println(x)</code></td></tr> <tr><td><code>#include &lt;iostream&gt;</code></td><td>nothing needed</td></tr> <tr><td><code>return 0;</code> at the end of <code>main</code></td><td>nothing needed &mdash; <code>main</code> is <code>void</code></td></tr> </table> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 1.2</div> <div class="bd"> <p>Consider this program.</p> <pre><code class="language-java">public class PrintDemo {
+    public static void main(String args[]) {
+        System.out.print("A");
+        System.out.print("B");
+        System.out.println("C");
+        System.out.println("D");
+        System.out.print("E");
+        System.out.println();
+        System.out.println("F");
+    }
+}</code></pre> <p>Write down the exact output, line by line, before you look.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Track a single "current line" as you read downward. A <code>print</code> appends to it. A <code>println</code> appends to it and then ends the line. An empty <code>println()</code> just ends the line.</p> <pre class="out"><code>ABC
+D
+E
+F</code></pre> <p><strong>Things to notice.</strong> <code>System.out.println()</code> with no argument is the Java equivalent of <code>cout &lt;&lt; endl;</code> on its own &mdash; it is how you produce a line break after a series of <code>print</code> calls, and it is how you produce a blank line. Students most often trip on the <code>E</code> line: <code>print("E")</code> alone would have left <code>E</code> dangling with no newline, and the following <code>println("F")</code> would have produced <code>EF</code> on one line. The bare <code>println()</code> is what separates them.</p> </div></details> </div> </div> <h2 id="s3"><span class="num">3.</span>Compiling and running</h2> <p>In C++ there was one step you cared about: turn source into an executable, then run the executable. Java splits this differently, and the two commands have confusingly similar names.</p> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; from source file to output</span></div> <div class="bd"> <ol> <li>Save your source in a file whose name matches the public class exactly, including capitalisation: class <code>Example1</code> goes in <code>Example1.java</code>.</li> <li><strong>Compile.</strong> Run <code>javac Example1.java</code>. If it succeeds it prints nothing at all and creates <code>Example1.class</code>. Silence means success.</li> <li><strong>Run.</strong> Run <code>java Example1</code>. Note carefully: the <em>class name</em>, with no <code>.java</code> and no <code>.class</code> extension. You are telling the JVM which class to look for, not which file to open.</li> </ol> </div> </div> <p>Side by side with the C++ workflow you already know:</p> <table> <tr><th></th><th>C++ (CSCI 111)</th><th>Java (CSCI 212)</th></tr> <tr><td>Compile</td><td><code>g++ example1.cpp -o example1</code></td><td><code>javac Example1.java</code></td></tr> <tr><td>Produces</td><td><code>example1</code> &mdash; machine code</td><td><code>Example1.class</code> &mdash; bytecode</td></tr> <tr><td>Run</td><td><code>./example1</code></td><td><code>java Example1</code></td></tr> </table> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; the file name must match the class name</span></div> <div class="bd"> <p>This is the single most common first-week error, and the compiler is unusually helpful about it. Save a class called <code>Greeting</code> in a file called <code>Hello.java</code> and <code>javac Hello.java</code> answers:</p> <pre class="err"><code>Hello.java:1: error: class Greeting is public, should be declared in a file named Greeting.java
+public class Greeting {
+       ^
+1 error</code></pre> <p>The rule applies to <em>public</em> classes, and it is case-sensitive: <code>example1.java</code> will not do for class <code>Example1</code>. Read the message &mdash; it tells you the exact file name it wants.</p> </div> </div> <p>You will see a lot of <code>javac</code> messages this semester, so start reading them properly now. Every one has the same four parts: the file and line number, the word <code>error</code>, a description, and a caret <code>^</code> pointing at the offending column. Here is the most common one of all:</p> <pre class="err"><code>Semi.java:3: error: ';' expected
+        System.out.println("one")
+                                 ^
+1 error</code></pre> <div class="box qc"> <div class="hd">Quick Check 1.3</div> <div class="bd"> <p>You have written a class called <code>Average</code> and saved it as <code>Average.java</code>.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> You type <code>javac Average.java</code> and nothing at all is printed. Did it work?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Ask what the compiler prints on success versus on failure.</p> <p>Yes, it worked. <code>javac</code> is silent on success; the only evidence is the new file <code>Average.class</code> sitting next to your source. If there had been a problem you would have seen at least one <code>error:</code> line and a count.</p> <p><strong>Things to notice.</strong> This unnerves people coming from environments that say "Build succeeded". Get used to checking for the <code>.class</code> file, or just move straight on to running it.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> You then type <code>java Average.java</code>. What is wrong with that command?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Recall what the argument to <code>java</code> denotes.</p> <p>The argument to <code>java</code> is a <em>class name</em>, not a file name, so the correct command is <code>java Average</code>. Writing <code>java Average.java</code> asks the JVM to find a class literally named <code>java</code> inside a package called <code>Average</code>.</p> <p><strong>Things to notice.</strong> Modern JDKs will actually accept <code>java Average.java</code> &mdash; single-file source mode compiles and runs in one step. That is convenient but it is not what we are doing here, and it will confuse you when you move to a project with more than one file. Learn the two-step version: <code>javac Average.java</code> then <code>java Average</code>.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 1.4</div> <div class="bd"> <p>Write a complete program, saved as <code>Intro.java</code>, that prints your name on one line and <code>CSCI 212</code> on the next &mdash; without using <code>println</code> at all. Use only <code>System.out.print</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> <code>println</code> does two things: print the argument, then end the line. If we are only allowed <code>print</code>, we have to produce the line break ourselves. Java uses the same escape sequence C++ does: <code>\n</code> inside a string literal is a newline character.</p> <p class="filename">Intro.java</p>
+<pre><code class="language-java">public class Intro {
+    public static void main(String args[]) {
+        System.out.print("Xinying Chyn");
+        System.out.print("\n");
+        System.out.print("CSCI 212");
+        System.out.print("\n");
+    }
+}</code></pre> <pre class="out"><code>Xinying Chyn
+CSCI 212</code></pre> <p><strong>Things to notice.</strong> You could also fold the newline into one string: <code>System.out.print("Xinying Chyn\nCSCI 212\n");</code> prints exactly the same two lines from a single call. Both are correct. The point of the exercise is that <code>println(x)</code> is nothing more than <code>print(x)</code> followed by <code>print("\n")</code> &mdash; there is no magic in it. The other escape sequences carry over from C++ too: <code>\t</code> tab, <code>\"</code> a literal quote, <code>\\</code> a literal backslash.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 1.4</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="9" aria-label="Live coding - Quick Check 1.4">public class Intro {
+    public static void main(String args[]) {
+        // Print your name, then CSCI 212 on the next line.
+        // You may only use System.out.print
+
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s4"><span class="num">4.</span>The eight primitive types</h2> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; primitive type</span></div> <div class="bd"> <p>A <strong>primitive type</strong> is one of eight built-in types that hold a plain value directly, rather than a reference to an object. They are the only things in Java that are not objects, and their names are all lowercase &mdash; that lowercase is how you spot a primitive at a glance.</p> </div> </div> <p>They come in four families: whole numbers, decimals, a single character, and a truth value.</p> <table> <tr><th>Type</th><th>Family</th><th>Size</th><th>Range or values</th></tr> <tr><td><code>byte</code></td><td>integer</td><td>8 bits</td><td>&minus;128 to 127</td></tr> <tr><td><code>short</code></td><td>integer</td><td>16 bits</td><td>&minus;32,768 to 32,767</td></tr> <tr><td><code>int</code></td><td>integer</td><td>32 bits</td><td>&minus;2,147,483,648 to 2,147,483,647</td></tr> <tr><td><code>long</code></td><td>integer</td><td>64 bits</td><td>about &plusmn;9.2 &times; 10<sup>18</sup></td></tr> <tr><td><code>float</code></td><td>decimal</td><td>32 bits</td><td>about 7 significant digits</td></tr> <tr><td><code>double</code></td><td>decimal</td><td>64 bits</td><td>about 15 significant digits</td></tr> <tr><td><code>char</code></td><td>character</td><td>16 bits</td><td>one Unicode character, written in single quotes: <code>'J'</code></td></tr> <tr><td><code>boolean</code></td><td>truth value</td><td>&mdash;</td><td><code>true</code> or <code>false</code> only</td></tr> </table> <p>Two differences from C++ are worth flagging immediately.</p> <ul> <li><strong>The sizes are fixed.</strong> In C++, <code>int</code> is "whatever is natural on this machine". In Java an <code>int</code> is <em>always</em> 32 bits, on every platform. That is part of the WORA promise: arithmetic must give the same answer everywhere.</li> <li><strong><code>boolean</code> is not a number.</strong> In C++ you could write <code>if (n)</code> and rely on nonzero meaning true. Java refuses. A condition must be an actual <code>boolean</code>.</li> </ul> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; all eight, and their limits</span></div> <div class="bd"> <p>Each primitive type has a matching <em>wrapper class</em> that carries useful constants; <code>Integer.MAX_VALUE</code> is the largest value an <code>int</code> can hold. Notice the <code>L</code> suffix on the <code>long</code> literal and the <code>f</code> suffix on the <code>float</code> literal &mdash; without them Java reads <code>9000000000</code> as an <code>int</code> (too big) and <code>3.14</code> as a <code>double</code> (too wide).</p> <p class="filename">PrimitiveDemo.java</p>
+<pre><code class="language-java">public class PrimitiveDemo {
+    public static void main(String args[]) {
+        byte    b = 100;
+        short   s = 30000;
+        int     i = 2000000000;
+        long    l = 9000000000L;
+        float   f = 3.14f;
+        double  d = 3.141592653589793;
+        char    c = 'J';
+        boolean t = true;
+
+        System.out.println("byte    " + b + "   max " + Byte.MAX_VALUE);
+        System.out.println("short   " + s + " max " + Short.MAX_VALUE);
+        System.out.println("int     " + i + " max " + Integer.MAX_VALUE);
+        System.out.println("long    " + l + " max " + Long.MAX_VALUE);
+        System.out.println("float   " + f);
+        System.out.println("double  " + d);
+        System.out.println("char    " + c + "   as a number " + (int) c);
+        System.out.println("boolean " + t);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>byte    100   max 127
+short   30000 max 32767
+int     2000000000 max 2147483647
+long    9000000000 max 9223372036854775807
+float   3.14
+double  3.141592653589793
+char    J   as a number 74
+boolean true</code></pre> <p>The line that surprises people is the <code>char</code> one. A <code>char</code> <em>is</em> a number &mdash; it stores the Unicode code point, and <code>'J'</code> is 74. Printing it normally shows the character; casting it to <code>int</code> shows the number. Keep that fact in mind, because it explains a puzzle in &sect;6.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 1.5</div> <div class="bd"> <p>Choose the most appropriate primitive type for each of the following, and say why.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> A student's age in whole years.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>int</code>. A <code>byte</code> would technically fit any human age (max 127) but there is nothing to gain: you are not storing millions of them, and using <code>byte</code> invites arithmetic surprises. <code>int</code> is the default choice for whole numbers in Java, and you should need a reason to pick anything else.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> A GPA such as 3.47.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>double</code>. It has a fractional part, so it must be <code>float</code> or <code>double</code>, and <code>double</code> is Java's default for decimals &mdash; an unadorned literal like <code>3.47</code> <em>is</em> a <code>double</code>. Choosing <code>float</code> means writing <code>3.47f</code> everywhere and getting roughly seven digits of precision instead of fifteen, for no benefit.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Whether a student has submitted an assignment.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>boolean</code>. It has exactly two states. Resist the C habit of using an <code>int</code> that is <code>0</code> or <code>1</code>; Java will not let you use that <code>int</code> as a condition anyway.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> A student's letter grade, one of A, B, C, D, F.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>char</code>, written with <em>single</em> quotes: <code>char grade = 'A';</code>. Double quotes would make it a <code>String</code>, which is a whole different kind of thing &mdash; an object, not a primitive &mdash; and we take that up in Lecture 4.</p> <p><strong>Things to notice across all four parts.</strong> The question "which type?" is really two questions: what shape is the data (whole? fractional? one character? yes/no?), and only then, how big does it need to be. Answer them in that order and you will almost always land on <code>int</code>, <code>double</code>, <code>char</code> or <code>boolean</code> &mdash; which is exactly as it should be. <code>byte</code>, <code>short</code>, <code>float</code> and <code>long</code> exist for specific reasons (memory-constrained arrays, values beyond two billion) that you will rarely hit in this course.</p> </div></details> </div> </div> </div> <h2 id="s5"><span class="num">5.</span>Arithmetic, and the division trap</h2> <p>The operators are the ones you already know: <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>%</code>, and the shorthands <code>+=</code>, <code>-=</code>, <code>++</code>, <code>--</code>. There is one rule about <code>/</code> that causes more wrong answers on exams than anything else in the first month.</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; the type of the operands decides the operation</span></div> <div class="bd"> <p>If <em>both</em> operands of <code>/</code> are integers, Java performs <strong>integer division</strong>: it divides and throws the remainder away. If <em>either</em> operand is a <code>double</code>, Java performs real division. The type of the result is decided by the operands, never by what you are about to assign it to.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; eight divisions</span></div> <div class="bd"> <p>Predict every line before you reveal. Pay particular attention to the last two.</p> <p class="filename">DivisionDemo.java</p>
+<pre><code class="language-java">public class DivisionDemo {
+    public static void main(String args[]) {
+        System.out.println(7 / 3);
+        System.out.println(7 % 3);
+        System.out.println(7.0 / 3);
+        System.out.println(7 / 3.0);
+        System.out.println((double) 7 / 3);
+        System.out.println((double) (7 / 3));
+        System.out.println(-7 / 3);
+        System.out.println(-7 % 3);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>2
+1
+2.3333333333333335
+2.3333333333333335
+2.3333333333333335
+2.0
+-2
+-1</code></pre> <table class="trace"> <tr><th>Expression</th><th>Result</th><th>Why</th></tr> <tr><td><code>7 / 3</code></td><td><code>2</code></td><td>Both <code>int</code>. Integer division; the 0.333 is discarded, not rounded.</td></tr> <tr><td><code>7 % 3</code></td><td><code>1</code></td><td>The remainder that <code>/</code> threw away.</td></tr> <tr><td><code>7.0 / 3</code></td><td><code>2.3333333333333335</code></td><td>One operand is a <code>double</code>, so the <code>3</code> is promoted and real division happens.</td></tr> <tr><td><code>7 / 3.0</code></td><td><code>2.3333333333333335</code></td><td>Same thing; it does not matter which side the <code>double</code> is on.</td></tr> <tr><td><code>(double) 7 / 3</code></td><td><code>2.3333333333333335</code></td><td>The cast binds tighter than <code>/</code>, so this is <code>(7.0) / 3</code>. This is the standard fix.</td></tr> <tr><td><code>(double) (7 / 3)</code></td><td><code>2.0</code></td><td><strong>The trap.</strong> The parentheses force integer division to happen <em>first</em>; casting 2 to a <code>double</code> afterwards cannot recover the lost third.</td></tr> <tr><td><code>-7 / 3</code></td><td><code>-2</code></td><td>Java truncates toward zero, so &minus;2.33 becomes &minus;2, not &minus;3.</td></tr> <tr><td><code>-7 % 3</code></td><td><code>-1</code></td><td>The remainder takes the sign of the left operand.</td></tr> </table> <p>The tail <code>...35</code> on 2.3333333333333335 is not a mistake in the notes. A <code>double</code> stores a binary fraction, and one third is not exactly representable in binary, any more than it is in decimal. Java prints enough digits to identify the stored value uniquely, and those digits include the error. This is normal floating-point behaviour and it is the same in C++.</p> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; averaging integers</span></div> <div class="bd"> <p>The classic version of this bug is an average:</p> <pre><code class="language-java">int a = 90, b = 85, c = 78;
+double average = (a + b + c) / 3;      // WRONG: prints 84.0</code></pre> <p>Declaring <code>average</code> as a <code>double</code> changes nothing. By the time the assignment happens, <code>(a + b + c) / 3</code> has already been computed as the <code>int</code> 84. The fix is to make one operand a <code>double</code> <em>inside</em> the expression:</p> <pre><code class="language-java">double average = (a + b + c) / 3.0;    // right: 84.33333333333333</code></pre> <p>Writing <code>3.0</code> instead of <code>3</code> is the smallest possible fix, and it is the one to reach for. <code>(double) (a + b + c) / 3</code> also works.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 1.6</div> <div class="bd"> <p>Give the exact value and the type of each expression.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>17 / 5</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>3</code>, an <code>int</code>. Both operands are integers, so the 0.4 is discarded.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>17 % 5</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>2</code>, an <code>int</code>. 17 = 3&times;5 + 2.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>17 / 5.0</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>3.4</code>, a <code>double</code>. The right operand is a <code>double</code>, so the left is promoted and real division happens.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>(double) (17 / 5)</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>3.0</code>, a <code>double</code>. The parentheses make the integer division happen first; the cast then widens the <code>int</code> 3 into the <code>double</code> 3.0. The 0.4 was gone before the cast ever ran.</p> <p><strong>Things to notice.</strong> Parts (c) and (d) are the whole lesson: the cast has to be applied to an <em>operand</em>, not to the finished result. When you see a cast in someone's code, look immediately at what is inside its parentheses.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 1.7</div> <div class="bd"> <p>Write a complete program <code>Average.java</code> that stores three test scores in three <code>int</code> variables and prints their average as a decimal. Then add a second line that prints what you would have got with integer division, so you can see the difference.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Sum the three <code>int</code> values &mdash; that part is genuinely integer arithmetic and should be. The division is where the type has to change, so divide by <code>3.0</code> rather than <code>3</code>. For the second line, deliberately divide by <code>3</code> and store the result in an <code>int</code> so the truncation is visible.</p> <p class="filename">Average.java</p>
+<pre><code class="language-java">public class Average {
+    public static void main(String args[]) {
+        int a = 90, b = 85, c = 78;
+
+        double average = (a + b + c) / 3.0;
+        System.out.println("The average is " + average);
+
+        int wrong = (a + b + c) / 3;
+        System.out.println("Integer division gives " + wrong);
+    }
+}</code></pre> <pre class="out"><code>The average is 84.33333333333333
+Integer division gives 84</code></pre> <p><strong>Things to notice.</strong> The sum 253 divided by 3 is 84.33..., so integer division loses a third of a point &mdash; small here, but the same bug in a program that averages a hundred assignments quietly costs students real grade points. Notice also that <code>84.33333333333333</code> has fourteen 3s, not fifteen: <code>double</code> gives you about fifteen significant digits in total, and the leading <code>84.</code> uses two of them. Later, when we want to print money or a GPA to two places, we will use <code>DecimalFormat</code> instead of showing every digit.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 1.7</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="12" aria-label="Live coding - Quick Check 1.7">public class Average {
+    public static void main(String args[]) {
+        int a = 90, b = 85, c = 78;
+
+        // 1. Print the average as a decimal.
+
+        // 2. Print what integer division would have given.
+
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s6"><span class="num">6.</span>Printing, and what <code>+</code> really does</h2> <p>In C++ you chained values onto <code>cout</code> with <code>&lt;&lt;</code>. Java has no such operator for output. Instead you build one <code>String</code> and hand it to <code>println</code>, and you build it with <code>+</code>.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; string concatenation</span></div> <div class="bd"> <p>The <code>+</code> operator is <strong>overloaded</strong>. If both operands are numbers it adds them. If <em>either</em> operand is a <code>String</code>, it converts the other one to text and joins them &mdash; this is called <strong>concatenation</strong>. And <code>+</code> evaluates strictly left to right.</p> </div> </div> <p>Those two facts together &mdash; overloaded meaning, left-to-right order &mdash; produce results that look wrong until you trace them one step at a time.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; six uses of one operator</span></div> <div class="bd"> <p>Predict all six lines. At least one of them will surprise you.</p> <p class="filename">ConcatDemo.java</p>
+<pre><code class="language-java">public class ConcatDemo {
+    public static void main(String args[]) {
+        System.out.println("Sum: " + 1 + 2);
+        System.out.println("Sum: " + (1 + 2));
+        System.out.println(1 + 2 + " is the sum");
+        System.out.println('A' + 1);
+        System.out.println("" + 'A' + 1);
+        System.out.println(1 + 2 + "3" + 4 + 5);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Sum: 12
+Sum: 3
+3 is the sum
+66
+A1
+3345</code></pre> <table class="trace"> <tr><th>Expression</th><th>Left-to-right trace</th><th>Result</th></tr> <tr><td><code>"Sum: " + 1 + 2</code></td><td><code>"Sum: " + 1</code> is a <code>String</code> <code>"Sum: 1"</code>; then <code>+ 2</code> appends the 2</td><td><code>Sum: 12</code></td></tr> <tr><td><code>"Sum: " + (1 + 2)</code></td><td>parentheses force <code>1 + 2</code> to be numeric addition first</td><td><code>Sum: 3</code></td></tr> <tr><td><code>1 + 2 + " is the sum"</code></td><td><code>1 + 2</code> are both numbers, so they add to 3; only then does a <code>String</code> appear</td><td><code>3 is the sum</code></td></tr> <tr><td><code>'A' + 1</code></td><td>no <code>String</code> anywhere, and a <code>char</code> is a number: 65 + 1</td><td><code>66</code></td></tr> <tr><td><code>"" + 'A' + 1</code></td><td>the empty <code>String</code> makes the first <code>+</code> a concatenation, so <code>'A'</code> becomes text</td><td><code>A1</code></td></tr> <tr><td><code>1 + 2 + "3" + 4 + 5</code></td><td><code>1+2</code> = 3 numerically; <code>3 + "3"</code> = <code>"33"</code>; then <code>"334"</code>, then <code>"3345"</code></td><td><code>3345</code></td></tr> </table> <p>The rule that explains every row: <em>scan left to right, and at each <code>+</code> ask whether a <code>String</code> has appeared yet.</em> Before the first <code>String</code>, <code>+</code> means addition. From the first <code>String</code> onward, everything is concatenation and there is no way back.</p> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake</div> <div class="bd"> <p><code>System.out.println("Total: " + a + b);</code> almost never means what its author intended. If <code>a</code> is 9 and <code>b</code> is 4 it prints <code>Total: 94</code>, not <code>Total: 13</code>. Whenever you are concatenating a label onto a computed value, put the computation in parentheses: <code>"Total: " + (a + b)</code>.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 1.8</div> <div class="bd"> <p>Let <code>int x = 5, y = 3;</code>. Give the exact output of each statement.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>System.out.println(x + y + "!");</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>8!</code> &mdash; <code>x + y</code> are both <code>int</code>, so they add to 8 before any <code>String</code> is met.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>System.out.println("!" + x + y);</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>!53</code> &mdash; the <code>String</code> comes first, so both <code>+</code> operators concatenate.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>System.out.println("!" + (x + y));</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>!8</code> &mdash; the parentheses are evaluated first, giving the number 8, which is then concatenated.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>System.out.println(x + y + x + "!" + x + y + x);</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>13!535</code>. Trace it: <code>5 + 3</code> = 8, <code>8 + 5</code> = 13 (all numeric so far), then <code>13 + "!"</code> = <code>"13!"</code>, and from there <code>"13!5"</code>, <code>"13!53"</code>, <code>"13!535"</code>.</p> <p><strong>Things to notice across all four parts.</strong> The same three variables in the same order give four different answers depending on where the <code>String</code> sits. This is exactly the kind of question that appears on Exam 1 as a line-by-line "what is the output" problem, and the reliable technique is always the same: put your finger on the leftmost <code>+</code> and work rightward, writing down the running value and its type at each step.</p> </div></details> </div> </div> </div> <h2 id="s7"><span class="num">7.</span>Loops and decisions</h2> <p>This is the shortest section in the lecture, and that is the point: <code>for</code>, <code>while</code>, <code>do-while</code>, <code>if</code>, <code>else</code> and <code>switch</code> are written in Java exactly as you wrote them in C++. The braces, the semicolons in the <code>for</code> header, the <code>else if</code> chain &mdash; all identical.</p> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; the one real difference</span></div> <div class="bd"> <p>A Java condition must be a <code>boolean</code>. Two C++ habits stop working:</p> <ul> <li><code>if (n)</code> meaning "if n is nonzero" &mdash; not legal in Java. Write <code>if (n != 0)</code>.</li> <li><code>if (n = 5)</code> &mdash; the classic typo for <code>==</code>. In C++ this compiles and is always true. In Java the compiler catches it, because <code>n = 5</code> produces an <code>int</code> and an <code>int</code> is not a <code>boolean</code>:</li> </ul> <pre class="err"><code>Asg.java:4: error: incompatible types: int cannot be converted to boolean
+        if (n = 5) System.out.println("five");
+              ^
+1 error</code></pre> <p>This is a small example of a large theme: Java's type system is deliberately stricter than C++'s, and the payoff is that a whole class of bugs becomes a compile error instead of a wrong answer at 2am.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the harmonic sum, ported from CSCI 111</span></div> <div class="bd"> <p>This is the C++ program from your CSCI 111 notes, alongside its Java translation. It exercises division, a <code>for</code> loop, a <code>while</code> loop and an <code>if</code>/<code>else</code>, so it is a complete tour of the lecture in one file.</p> <p class="filename">C++ (CSCI 111) &mdash; for comparison only</p>
+<pre class="cmp"><code>#include &lt;iostream&gt;
+using namespace std;
+int main() {
+    cout &lt;&lt; "7 / 3 = " &lt;&lt; 7/3 &lt;&lt; endl;
+    cout &lt;&lt; "7.0 / 3 = " &lt;&lt; 7.0/3 &lt;&lt; endl;
+    double sum = 0.0;
+    for (int i = 1; i &lt;= 100; i++) sum += 1.0 / i;
+    cout &lt;&lt; "The sum of first 100 reciprocals is: " &lt;&lt; sum &lt;&lt; endl;
+    int n = 101;
+    while (sum &lt; 10) {
+        sum += 1.0 / n;
+        n++;
+    }
+    cout &lt;&lt; "We need " &lt;&lt; n &lt;&lt; " reciprocals to get a sum of 10" &lt;&lt; endl;
+    if (n % 2 == 0) cout &lt;&lt; n &lt;&lt; " is even." &lt;&lt; endl;
+    else cout &lt;&lt; n &lt;&lt; " is odd." &lt;&lt; endl;
+    return 0;
+}</code></pre> <p class="filename">Example2.java</p>
+<pre><code class="language-java">public class Example2 {
+    public static void main(String args[]) {
+        System.out.println("7 / 3 = " + 7/3);
+        System.out.println("7.0 / 3 = " + 7.0/3);
+
+        double sum = 0.0;
+        for (int i = 1; i &lt;= 100; i++)
+            sum += 1.0 / i;
+        System.out.println("The sum of first 100 reciprocals is: " + sum);
+
+        int n = 101;
+        while (sum &lt; 10) {
+            sum += 1.0 / n;
+            n++;
+        }
+        System.out.println("We need " + n + " reciprocals to get a sum of 10");
+        if (n % 2 == 0) System.out.println(n + " is even.");
+        else System.out.println(n + " is odd.");
+    }
+}</code></pre> <p>Two questions before you reveal. First: is the second line going to print <code>2.33</code> or something longer? Second: roughly how big will <code>n</code> be?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>7 / 3 = 2
+7.0 / 3 = 2.3333333333333335
+The sum of first 100 reciprocals is: 5.187377517639621
+We need 12368 reciprocals to get a sum of 10
+12368 is even.</code></pre> <p>Three things worth pulling out.</p> <ul> <li><strong><code>sum += 1.0 / i</code>, not <code>1 / i</code>.</strong> If that had been <code>1 / i</code>, then for every <code>i</code> greater than 1 integer division would give 0, and the sum would come out as a flat 1.0. Writing the numerator as <code>1.0</code> is the entire difference between a correct program and a silently wrong one.</li> <li><strong>The harmonic series grows brutally slowly.</strong> One hundred terms only reach about 5.19. Getting to 10 takes 12,368 terms &mdash; more than a hundred times as many for less than double the sum. That is the logarithm at work.</li> <li><strong><code>n</code> is 12368 when the loop stops</strong>, and 12368 is even, so the <code>if</code> takes the first branch. Note that the loop increments <code>n</code> after adding, so at exit <code>n</code> is one past the last term used &mdash; a classic off-by-one worth being deliberate about.</li> </ul> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 1.9</div> <div class="bd"> <p>What does this print? Be careful with the second loop.</p> <pre><code class="language-java">public class LoopDemo {
+    public static void main(String args[]) {
+        for (int i = 1; i &lt;= 5; i++) System.out.print(i * i + " ");
+        System.out.println();
+
+        int n = 1;
+        while (n &lt; 100) n = n * 3;
+        System.out.println("First power of 3 at least 100: " + n);
+
+        int count = 0;
+        for (int i = 1; i &lt;= 30; i++) {
+            if (i % 3 == 0 &amp;&amp; i % 5 == 0) count++;
+        }
+        System.out.println("Multiples of 15 up to 30: " + count);
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Take the three pieces separately. The <code>for</code> loop prints five squares on one line. The <code>while</code> loop multiplies by 3 until the value reaches 100 &mdash; run the powers: 1, 3, 9, 27, 81, 243. It exits the first time the condition fails, so the answer is the first power of 3 that is <em>not</em> less than 100. The counting loop needs <code>i</code> divisible by both 3 and 5, which means divisible by 15.</p> <pre class="out"><code>1 4 9 16 25
+First power of 3 at least 100: 243
+Multiples of 15 up to 30: 2</code></pre> <p><strong>Things to notice.</strong> <code>81</code> is less than 100, so the loop body runs once more and jumps to 243 &mdash; it overshoots, and that is correct behaviour for <code>while (n &lt; 100)</code>. If you wanted the last power below 100 you would have to remember the previous value.</p> <p>In the first line, <code>i * i + " "</code> works because <code>*</code> binds tighter than <code>+</code>, so the square is computed before the space is concatenated. Had you written <code>"" + i * i</code> it would still be fine, but <code>i + i + " "</code> would print the double, not the square.</p> <p>The multiples are 15 and 30, so <code>count</code> is 2. Java's <code>&amp;&amp;</code> short-circuits exactly as C++'s does: if <code>i % 3 == 0</code> is false, <code>i % 5 == 0</code> is never evaluated.</p> </div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 1.10</div> <div class="bd"> <p>Adapt the harmonic-sum program. Write <code>Harmonic.java</code> that finds how many terms of 1 + 1/2 + 1/3 + &hellip; are needed before the sum first exceeds 5, and prints both the number of terms and the sum at that moment. Start the count at zero rather than hard-coding 100 terms first.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> A <code>while</code> loop is right here because we do not know in advance how many iterations we need &mdash; that is the thing we are trying to find out. Keep two variables: the running <code>sum</code> and the number of <code>terms</code> used so far. Loop while the sum has not yet passed 5. Increment <code>terms</code> <em>before</em> adding <code>1.0 / terms</code>, so the divisor is never zero and <code>terms</code> ends up holding exactly the number of terms added.</p> <p class="filename">Harmonic.java</p>
+<pre><code class="language-java">public class Harmonic {
+    public static void main(String args[]) {
+        double sum = 0.0;
+        int terms = 0;
+
+        while (sum &lt;= 5.0) {
+            terms++;
+            sum += 1.0 / terms;
+        }
+
+        System.out.println("Terms needed: " + terms);
+        System.out.println("Sum is now:   " + sum);
+    }
+}</code></pre> <pre class="out"><code>Terms needed: 83
+Sum is now:   5.002068272680166</code></pre> <p><strong>Things to notice.</strong> The order inside the loop matters. Incrementing first means <code>terms</code> counts the term just added, so no adjustment is needed after the loop. Had you written <code>sum += 1.0 / terms; terms++;</code> you would divide by zero on the first pass &mdash; and because these are <code>double</code> values, Java would not even throw an error: <code>1.0 / 0</code> is <code>Infinity</code>, and the loop would exit immediately with a nonsense answer. Integer division by zero throws an exception; floating-point division by zero does not. That difference will catch you again in Lecture 20.</p> <p>Choosing <code>sum &lt;= 5.0</code> rather than <code>sum &lt; 5.0</code> matters only in the unlikely event the sum lands exactly on 5. Using <code>while (sum &lt; 5.0)</code> here gives the same 83 terms.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 1.10</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="12" aria-label="Live coding - Quick Check 1.10">public class Harmonic {
+    public static void main(String args[]) {
+        double sum = 0.0;
+        int terms = 0;
+
+        // Keep adding 1/1, 1/2, 1/3, ... until sum passes 5.
+        // Then print how many terms it took, and the sum.
+
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 1.11</div> <div class="bd"> <p>Each of these three lines has a problem. Say what the compiler will tell you, or if it compiles, what goes wrong at run time.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>int n = 3.5;</code></p> <details class="soln"><summary></summary><div class="ans"> <p>A compile error. <code>3.5</code> is a <code>double</code>, and squeezing a <code>double</code> into an <code>int</code> would throw away the fractional part, so Java refuses to do it silently:</p> <pre class="err"><code>Lossy.java:3: error: incompatible types: possible lossy conversion from double to int
+        int n = 3.5;
+                ^
+1 error</code></pre> <p>If you genuinely want the truncation, say so with a cast: <code>int n = (int) 3.5;</code> gives 3.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>if (count = 5) System.out.println("five");</code></p> <details class="soln"><summary></summary><div class="ans"> <p>A compile error, and a welcome one. <code>count = 5</code> is an assignment whose value is the <code>int</code> 5, and Java will not treat an <code>int</code> as a condition:</p> <pre class="err"><code>Asg.java:4: error: incompatible types: int cannot be converted to boolean
+        if (n = 5) System.out.println("five");
+              ^
+1 error</code></pre> <p>The author meant <code>==</code>. In C++ this same typo compiles cleanly, always takes the <code>if</code> branch, and quietly overwrites <code>count</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>double half = 1 / 2;</code></p> <details class="soln"><summary></summary><div class="ans"> <p>This one compiles. That is exactly why it is dangerous. <code>1 / 2</code> is integer division giving <code>0</code>, and widening the <code>int</code> 0 to a <code>double</code> is perfectly legal, so <code>half</code> becomes <code>0.0</code>. There is no warning and no error &mdash; just a wrong answer.</p> <p>Write <code>1 / 2.0</code>, or <code>1.0 / 2</code>.</p> <p><strong>Things to notice across all three parts.</strong> Two of these three the compiler catches for you; the third it does not. That is the shape of most real debugging. When a number comes out as <code>0</code> or <code>0.0</code> and you cannot see why, look for an integer division you did not intend &mdash; it is the first thing to check, every time.</p> </div></details> </div> </div> </div> <h2 id="prac"><span class="num">&#9733;</span>Practice Problems</h2> <div class="box prac"> <div class="hd">Practice Problems<span class="tag">&mdash; exam-style, Lecture 1 material only</span></div> <div class="bd"> <p>These four are written in the format of the CSCI 212 exams: a line-by-line output prediction, a complete program, a find-the-errors question, and a translation. Work them on paper first &mdash; the exam is closed book and there is no compiler in the room.</p> </div> </div> <h3>Problem 1 &mdash; What is the output?</h3> <p>Consider the following Java program.</p> <p class="filename">Output1.java</p>
+<pre><code class="language-java">public class Output1 {
+    public static void main(String args[]) {
+        int a = 9, b = 4;
+        double x = 9;
+        char g = 'B';
+
+        System.out.println(a / b);              // line (a)
+        System.out.println(a % b);              // line (b)
+        System.out.println(x / b);              // line (c)
+        System.out.println(a / (double) b);     // line (d)
+        System.out.println((double) (a / b));   // line (e)
+        System.out.println("a/b = " + a / b);   // line (f)
+        System.out.println("a/b = " + a + b);   // line (g)
+        System.out.println(g + 1);              // line (h)
+        System.out.println("" + g + 1);         // line (i)
+
+        int n = 0, s = 0;
+        while (s &lt; 10) { n++; s += n; }
+        System.out.println(n + " " + s);        // line (j)
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> What is the output at line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>2</code>. Both <code>a</code> and <code>b</code> are <code>int</code>, so integer division: 9 &divide; 4 = 2 remainder 1.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What is the output at line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>1</code>. The remainder that line (a) discarded.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> What is the output at line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>2.25</code>. <code>x</code> is a <code>double</code>, so <code>b</code> is promoted and real division happens. 9.0 &divide; 4 is exactly 2.25 &mdash; a quarter is representable in binary, so there is no trailing noise here.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> What is the output at line (d)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>2.25</code>. The cast applies to <code>b</code> alone, so this is 9 &divide; 4.0.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> What is the output at line (e)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>2.0</code>. The parentheses make <code>a / b</code> an integer division that yields 2; the cast then widens 2 to 2.0. Compare this line with (d) &mdash; same symbols, different parentheses, different answer.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(f)</span> What is the output at line (f)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>a/b = 2</code>. <code>/</code> binds tighter than <code>+</code>, so <code>a / b</code> is computed as the <code>int</code> 2 first, and only then concatenated.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(g)</span> What is the output at line (g)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>a/b = 94</code>. There is no arithmetic here at all. Left to right: <code>"a/b = " + a</code> is already a <code>String</code>, so <code>+ b</code> just appends the character <code>4</code> after the character <code>9</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(h)</span> What is the output at line (h)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>67</code>. No <code>String</code> is involved, and a <code>char</code> is a number: <code>'B'</code> is 66, so <code>'B' + 1</code> is 67. Java prints it as a number because the type of the expression is <code>int</code>, not <code>char</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(i)</span> What is the output at line (i)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>B1</code>. The empty <code>String</code> at the front turns the first <code>+</code> into a concatenation, so <code>'B'</code> is converted to text as the character <code>B</code>, and then <code>1</code> is appended.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(j)</span> What is the output at line (j)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>4 10</code>. Trace the loop: it accumulates 1, 3, 6, 10 into <code>s</code> while <code>n</code> goes 1, 2, 3, 4. After <code>s</code> becomes 10 the condition <code>s &lt; 10</code> is false and the loop stops, leaving <code>n</code> at 4.</p> <table class="trace"> <tr><th>Iteration</th><th><code>n</code> after <code>n++</code></th><th><code>s</code> after <code>s += n</code></th><th><code>s &lt; 10</code>?</th></tr> <tr><td>1</td><td>1</td><td>1</td><td>yes</td></tr> <tr><td>2</td><td>2</td><td>3</td><td>yes</td></tr> <tr><td>3</td><td>3</td><td>6</td><td>yes</td></tr> <tr><td>4</td><td>4</td><td>10</td><td>no &mdash; exit</td></tr> </table> <p><strong>Things to notice across the whole problem.</strong> Lines (d) and (e) differ only in parentheses; lines (f) and (g) differ only in parentheses that are not there. On an exam these pairs are worth a point each and cost nothing but care. Build the habit of annotating the type of each subexpression as you read: writing a small <code>int</code> or <code>String</code> above each <code>+</code> turns this from a memory exercise into bookkeeping.</p> </div></details> </div> <h3>Problem 2 &mdash; Write a complete program</h3> <p>Write a complete Java program in <code>Squares.java</code> that prints the squares of the integers 1 through 10 on a single line separated by spaces, and then, on separate lines, their total and their average. The average must be printed as a decimal.</p> <p>A sample output of this program:</p> <pre class="out"><code>1 4 9 16 25 36 49 64 81 100
+Total:   385
+Average: 38.5</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> One <code>for</code> loop does both jobs: print each square with <code>print</code> (not <code>println</code>, so they stay on one line) and accumulate into a running total. After the loop, a bare <code>println()</code> closes the line. The total is a genuine <code>int</code>, so keep it as one. The average is a total divided by 10 and must not be integer division &mdash; write <code>10.0</code>.</p> <p class="filename">Squares.java</p>
+<pre><code class="language-java">public class Squares {
+    public static void main(String args[]) {
+        int total = 0;
+        for (int i = 1; i &lt;= 10; i++) {
+            System.out.print(i * i + " ");
+            total += i * i;
+        }
+        System.out.println();
+        System.out.println("Total:   " + total);
+        System.out.println("Average: " + total / 10.0);
+    }
+}</code></pre> <pre class="out"><code>1 4 9 16 25 36 49 64 81 100
+Total:   385
+Average: 38.5</code></pre> <p><strong>Things to notice.</strong> There is a trailing space after <code>100</code> because every square is followed by <code>" "</code>. That matches the sample output, but if you wanted to avoid it you would print the separator <em>before</em> every square except the first.</p> <p><code>total / 10.0</code> gives 38.5 exactly. Had you written <code>total / 10</code> you would have got <code>38</code> &mdash; and because <code>385 / 10</code> is 38.5, this is a case where the truncation loses a visible half-point rather than a rounding error you might not notice.</p> <p>Computing <code>i * i</code> twice is slightly wasteful; a local <code>int sq = i * i;</code> inside the loop would be cleaner. At this scale it makes no measurable difference, but the habit of naming a value you use more than once is worth forming now.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 2</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="12" aria-label="Live coding - Practice Problem 2">public class Squares {
+    public static void main(String args[]) {
+        int total = 0;
+
+        // Loop 1..10: print each square on one line, and add it to total.
+
+        // Then print the total and the average (as a decimal).
+
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 3 &mdash; Find the three errors</h3> <p>Consider the following Java code, saved in a file called <code>Grades.java</code>. Exactly 3 of the numbered lines have errors. Identify the 3 different errors by giving the numbers of the incorrect lines. For each error also give a corrected version of the line. Any line without a number is correct as written and is not to be changed. Make sure that your corrections lead to the indicated output.</p> <p class="filename">Grades.java</p>
+<pre><code class="language-java">public class Grades {
+    public static void main(String args[]) {
+        int count = 0;
+        int total = 0.0;                              // line 1
+        for (int i = 1; i &lt;= 5; i++) {
+            total = total + i * 10                    // line 2
+            count++;                                  // line 3
+        }
+        System.out.println("count = " + count);       // line 4
+        // The output from the last line should be:  count = 5
+        if (count = 5)                                // line 5
+            System.out.println("total = " + total);   // line 6
+        // The output from the last line should be:  total = 150
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Read for three separate kinds of trouble: a type that does not fit, a missing piece of punctuation, and a condition that is not a <code>boolean</code>. Do not be distracted by lines 3, 4 and 6 &mdash; they are correct, and the required output tells you they must stay as they are.</p> <p><strong>Error 1 &mdash; line 1.</strong> <code>int total = 0.0;</code> tries to put a <code>double</code> into an <code>int</code>.</p> <pre class="err"><code>error: incompatible types: possible lossy conversion from double to int
+        int total = 0.0;
+                    ^</code></pre> <p>Corrected: <code>int total = 0;</code></p> <p>(Declaring <code>double total = 0.0;</code> would also compile, but then line 6 would print <code>total = 150.0</code>, which is not the required output. The stated output is what decides between the two fixes.)</p> <p><strong>Error 2 &mdash; line 2.</strong> The statement has no semicolon.</p> <pre class="err"><code>Grades.java:6: error: ';' expected
+            total = total + i * 10                    // line 2
+                                  ^
+1 error</code></pre> <p>Corrected: <code>total = total + i * 10;</code></p> <p><strong>Error 3 &mdash; line 5.</strong> <code>if (count = 5)</code> assigns rather than compares, and an <code>int</code> is not a condition.</p> <pre class="err"><code>error: incompatible types: int cannot be converted to boolean
+        if (count = 5)
+                  ^</code></pre> <p>Corrected: <code>if (count == 5)</code></p> <p>With all three fixed:</p> <p class="filename">Grades.java</p>
+<pre><code class="language-java">public class Grades {
+    public static void main(String args[]) {
+        int count = 0;
+        int total = 0;                                // line 1
+        for (int i = 1; i &lt;= 5; i++) {
+            total = total + i * 10;                   // line 2
+            count++;                                  // line 3
+        }
+        System.out.println("count = " + count);       // line 4
+        if (count == 5)                               // line 5
+            System.out.println("total = " + total);   // line 6
+    }
+}</code></pre> <pre class="out"><code>count = 5
+total = 150</code></pre> <p><strong>Things to notice.</strong> <code>javac</code> reported only <em>one</em> error when this file was first compiled &mdash; the missing semicolon on line 2. A syntax error early in the file stops the parser, so the other two problems were not even reached. Fixing one error and recompiling only to be handed a brand-new error is completely normal; it does not mean your fix was wrong.</p> <p>The loop adds 10 + 20 + 30 + 40 + 50 = 150, and <code>count</code> reaches 5, so both stated outputs are consistent with the corrections. Always check your fixes against the required output the way we just did &mdash; on an exam that is what separates a defensible answer from a guess.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 3</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="15" aria-label="Live coding - Practice Problem 3">public class Grades {
+    public static void main(String args[]) {
+        int count = 0;
+        int total = 0.0;                              // line 1
+        for (int i = 1; i &lt;= 5; i++) {
+            total = total + i * 10                    // line 2
+            count++;                                  // line 3
+        }
+        System.out.println("count = " + count);       // line 4
+        if (count = 5)                                // line 5
+            System.out.println("total = " + total);   // line 6
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 4 &mdash; Translate from CSCI 111</h3> <p>Below is a C++ program of the kind you wrote in CSCI 111. Write the equivalent complete Java program in <code>Countdown.java</code>. It must produce the same output.</p> <p class="filename">C++ (CSCI 111) &mdash; translate this</p>
+<pre class="cmp"><code>#include &lt;iostream&gt;
+using namespace std;
+int main() {
+    int n = 5;
+    while (n &gt; 0) {
+        cout &lt;&lt; n &lt;&lt; "... ";
+        n--;
+    }
+    cout &lt;&lt; "liftoff!" &lt;&lt; endl;
+    int evens = 0;
+    for (int i = 1; i &lt;= 20; i++)
+        if (i % 2 == 0) evens++;
+    cout &lt;&lt; "Even numbers from 1 to 20: " &lt;&lt; evens &lt;&lt; endl;
+    cout &lt;&lt; "Half of them is " &lt;&lt; evens / 2.0 &lt;&lt; endl;
+    return 0;
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Work through the differences mechanically rather than rewriting from scratch. Drop <code>#include</code> and <code>using namespace</code>. Wrap everything in a <code>public class Countdown</code> whose file is <code>Countdown.java</code>. Turn <code>int main()</code> into <code>public static void main(String args[])</code> and delete <code>return 0;</code>. Replace every <code>cout &lt;&lt; ... &lt;&lt; endl</code> with a <code>println</code> whose argument is a single <code>String</code> built with <code>+</code>, and every <code>cout &lt;&lt;</code> without <code>endl</code> with a <code>print</code>. The loops, the <code>if</code>, and the arithmetic transfer unchanged.</p> <p class="filename">Countdown.java</p>
+<pre><code class="language-java">public class Countdown {
+    public static void main(String args[]) {
+        int n = 5;
+        while (n &gt; 0) {
+            System.out.print(n + "... ");
+            n--;
+        }
+        System.out.println("liftoff!");
+
+        int evens = 0;
+        for (int i = 1; i &lt;= 20; i++)
+            if (i % 2 == 0) evens++;
+        System.out.println("Even numbers from 1 to 20: " + evens);
+        System.out.println("Half of them is " + evens / 2.0);
+    }
+}</code></pre> <pre class="out"><code>5... 4... 3... 2... 1... liftoff!
+Even numbers from 1 to 20: 10
+Half of them is 5.0</code></pre> <p><strong>Things to notice.</strong> <code>System.out.print(n + "... ")</code> is the direct translation of <code>cout &lt;&lt; n &lt;&lt; "... "</code>, and it works because <code>n</code> is joined to a <code>String</code>. If you had written two separate calls, <code>print(n)</code> then <code>print("... ")</code>, the output would be identical &mdash; either is fine.</p> <p>The last line is the one to be careful with. <code>evens / 2.0</code> prints <code>5.0</code>; <code>evens / 2</code> would print <code>5</code>. Both are arithmetically right here because 10 is even, but the <em>types</em> differ, and the C++ original prints <code>5</code> because <code>cout</code> drops the trailing <code>.0</code> on a whole <code>double</code>. This is a genuine difference in output formatting between the two languages, not a translation error &mdash; Java always shows a <code>double</code> with a decimal point.</p> <p>Notice too that the <code>for</code> loop body is a bare <code>if</code> with no braces, which is legal in both languages. It is also how single-statement bodies get accidentally broken when someone adds a second line later. Bracing every loop body is a habit worth having.</p> </div></details> <div class="box sum" id="summary"> <div class="hd">Lecture Summary</div> <div class="bd"> <ul> <li>Java compiles to <strong>bytecode</strong>, not machine code. The <strong>JVM</strong> reads bytecode, and that is what makes one compiled program run everywhere.</li> <li>Everything lives in a class. The skeleton is <code>public class Name { public static void main(String args[]) { } }</code>, and the file must be called <code>Name.java</code>.</li> <li>Two commands, not one: <code>javac Name.java</code> compiles (silence means success), <code>java Name</code> runs. The second takes a class name, not a file name.</li> <li>Eight primitive types. Default to <code>int</code>, <code>double</code>, <code>char</code>, <code>boolean</code> unless you have a reason not to. Sizes are fixed on every platform.</li> <li>If both operands of <code>/</code> are integers you get <strong>integer division</strong>. Fix it by making one operand a <code>double</code> &mdash; inside the expression, not at the assignment.</li> <li><code>+</code> means addition until the first <code>String</code> appears, and concatenation from then on. Parenthesise the arithmetic you actually want.</li> <li>Loops and decisions are exactly as in C++, except that a condition must be a real <code>boolean</code> &mdash; which is why Java catches <code>if (n = 5)</code> and C++ does not.</li> </ul> <p><strong>Coming up in Lecture 2.</strong> Right now everything we write lives inside <code>main</code>. Next time we break programs into <em>methods</em> &mdash; Java's word for functions &mdash; learn why they are nearly always declared <code>static</code> at this stage, see how two methods can
+    share one name through overloading, and write our first recursive method.</p>
+  </div>
+</div>
+
+<nav class="pagenav">
+<span class="disabled"><div class="dir">&larr; Previous</div><div class="ttl">This is the first class</div></span>
+<span class="disabled next"><div class="dir">Next &rarr;</div><div class="ttl">Lecture 2 &mdash; Methods, Overloading and Recursion</div><div class="pending">posts Thu Sep 3</div></span>
+</nav>
+<footer class="pf">CSCI 212 &middot; Object-Oriented Programming in Java &middot; Queens College, CUNY</footer>
+</div>
+<script>
+(()=>{var ut=Object.create;var xe=Object.defineProperty;var ft=Object.getOwnPropertyDescriptor;var gt=Object.getOwnPropertyNames;var ht=Object.getPrototypeOf,dt=Object.prototype.hasOwnProperty;var pt=(e,t)=>()=>{try{return t||e((t={exports:{}}).exports,t),t.exports}catch(n){throw t=0,n}};var Et=(e,t,n,l)=>{if(t&&typeof t=="object"||typeof t=="function")for(let d of gt(t))!dt.call(e,d)&&d!==n&&xe(e,d,{get:()=>t[d],enumerable:!(l=ft(t,d))||l.enumerable});return e};var bt=(e,t,n)=>(n=e!=null?ut(ht(e)):{},Et(t||!e||!e.__esModule?xe(n,"default",{value:e,enumerable:!0}):n,e));var Ke=pt((ln,Ge)=>{function Ie(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(t=>{let n=e[t],l=typeof n;(l==="object"||l==="function")&&!Object.isFrozen(n)&&Ie(n)}),e}var Z=class{constructor(t){t.data===void 0&&(t.data={}),this.data=t.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function Ce(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function k(e,...t){let n=Object.create(null);for(let l in e)n[l]=e[l];return t.forEach(function(l){for(let d in l)n[d]=l[d]}),n}var _t="</span>",Ne=e=>!!e.scope,Mt=(e,{prefix:t})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let n=e.split(".");return[`${t}${n.shift()}`,...n.map((l,d)=>`${l}${"_".repeat(d+1)}`)].join(" ")}return`${t}${e}`},oe=class{constructor(t,n){this.buffer="",this.classPrefix=n.classPrefix,t.walk(this)}addText(t){this.buffer+=Ce(t)}openNode(t){if(!Ne(t))return;let n=Mt(t.scope,{prefix:this.classPrefix});this.span(n)}closeNode(t){Ne(t)&&(this.buffer+=_t)}value(){return this.buffer}span(t){this.buffer+=`<span class="${t}">`}},Re=(e={})=>{let t={children:[]};return Object.assign(t,e),t},ae=class e{constructor(){this.rootNode=Re(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(t){this.top.children.push(t)}openNode(t){let n=Re({scope:t});this.add(n),this.stack.push(n)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(t){return this.constructor._walk(t,this.rootNode)}static _walk(t,n){return typeof n=="string"?t.addText(n):n.children&&(t.openNode(n),n.children.forEach(l=>this._walk(t,l)),t.closeNode(n)),t}static _collapse(t){typeof t!="string"&&t.children&&(t.children.every(n=>typeof n=="string")?t.children=[t.children.join("")]:t.children.forEach(n=>{e._collapse(n)}))}},le=class extends ae{constructor(t){super(),this.options=t}addText(t){t!==""&&this.add(t)}startScope(t){this.openNode(t)}endScope(){this.closeNode()}__addSublanguage(t,n){let l=t.root;n&&(l.scope=`language:${n}`),this.add(l)}toHTML(){return new oe(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function G(e){return e?typeof e=="string"?e:e.source:null}function De(e){return B("(?=",e,")")}function Ot(e){return B("(?:",e,")*")}function wt(e){return B("(?:",e,")?")}function B(...e){return e.map(n=>G(n)).join("")}function xt(e){let t=e[e.length-1];return typeof t=="object"&&t.constructor===Object?(e.splice(e.length-1,1),t):{}}function V(...e){return"("+(xt(e).capture?"":"?:")+e.map(l=>G(l)).join("|")+")"}function ke(e){return new RegExp(e.toString()+"|").exec("").length-1}function Nt(e,t){let n=e&&e.exec(t);return n&&n.index===0}var Rt=new RegExp(V(/\[(?:[^\\\]]|\\.)*\]/,/\(\?<(?![=!])[^>]+>/,/\(\?'[^']+'/,/\(\??/,/\\([1-9][0-9]*)/,/\\./));function fe(e,{joinWith:t}){let n=0;return e.map(l=>{n+=1;let d=n,_=G(l),c="";for(;_.length>0;){let r=Rt.exec(_);if(!r){c+=_;break}c+=_.substring(0,r.index),_=_.substring(r.index+r[0].length),r[0][0]==="\\"&&r[1]?c+="\\"+String(Number(r[1])+d):(c+=r[0],(r[0]==="("||/^\(\?[<']/.test(r[0]))&&n++)}return c}).map(l=>`(${l})`).join(t)}var yt=/\b\B/,ve="[a-zA-Z]\\w*",ge="[a-zA-Z_]\\w*",Le="\\b\\d+(\\.\\d+)?",Be="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Pe="\\b(0b[01]+)",St="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",At=(e={})=>{let t=/^#![ ]*\//;return e.binary&&(e.begin=B(t,/.*\b/,e.binary,/\b.*/)),k({scope:"meta",begin:t,end:/$/,relevance:0,"on:begin":(n,l)=>{n.index!==0&&l.ignoreMatch()}},e)},K={begin:"\\\\[\\s\\S]",relevance:0},Tt={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[K]},It={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[K]},Ct={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},Q=function(e,t,n={}){let l=k({scope:"comment",begin:e,end:t,contains:[]},n);l.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let d=V("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return l.contains.push({begin:B(/[ ]+/,"(",d,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),l},Dt=Q("//","$"),kt=Q("/\\*","\\*/"),vt=Q("#","$"),Lt={scope:"number",begin:Le,relevance:0},Bt={scope:"number",begin:Be,relevance:0},Pt={scope:"number",begin:Pe,relevance:0},$t={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[K,{begin:/\[/,end:/\]/,relevance:0,contains:[K]}]},Ht={scope:"title",begin:ve,relevance:0},Ut={scope:"title",begin:ge,relevance:0},jt={begin:"\\.\\s*"+ge,relevance:0},Gt=function(e){return Object.assign(e,{"on:begin":(t,n)=>{n.data._beginMatch=t[1]},"on:end":(t,n)=>{n.data._beginMatch!==t[1]&&n.ignoreMatch()}})},X=Object.freeze({__proto__:null,APOS_STRING_MODE:Tt,BACKSLASH_ESCAPE:K,BINARY_NUMBER_MODE:Pt,BINARY_NUMBER_RE:Pe,COMMENT:Q,C_BLOCK_COMMENT_MODE:kt,C_LINE_COMMENT_MODE:Dt,C_NUMBER_MODE:Bt,C_NUMBER_RE:Be,END_SAME_AS_BEGIN:Gt,HASH_COMMENT_MODE:vt,IDENT_RE:ve,MATCH_NOTHING_RE:yt,METHOD_GUARD:jt,NUMBER_MODE:Lt,NUMBER_RE:Le,PHRASAL_WORDS_MODE:Ct,QUOTE_STRING_MODE:It,REGEXP_MODE:$t,RE_STARTERS_RE:St,SHEBANG:At,TITLE_MODE:Ht,UNDERSCORE_IDENT_RE:ge,UNDERSCORE_TITLE_MODE:Ut});function Kt(e,t){e.input[e.index-1]==="."&&t.ignoreMatch()}function mt(e,t){e.className!==void 0&&(e.scope=e.className,delete e.className)}function Wt(e,t){t&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=Kt,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function Ft(e,t){Array.isArray(e.illegal)&&(e.illegal=V(...e.illegal))}function zt(e,t){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function Yt(e,t){e.relevance===void 0&&(e.relevance=1)}var Xt=(e,t)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let n=Object.assign({},e);Object.keys(e).forEach(l=>{delete e[l]}),e.keywords=n.keywords,e.begin=B(n.beforeMatch,De(n.begin)),e.starts={relevance:0,contains:[Object.assign(n,{endsParent:!0})]},e.relevance=0,delete n.beforeMatch},Zt=["of","and","for","in","not","or","if","then","parent","list","value"],Jt="keyword";function $e(e,t,n=Jt){let l=Object.create(null);return typeof e=="string"?d(n,e.split(" ")):Array.isArray(e)?d(n,e):Object.keys(e).forEach(function(_){Object.assign(l,$e(e[_],t,_))}),l;function d(_,c){t&&(c=c.map(r=>r.toLowerCase())),c.forEach(function(r){let u=r.split("|");l[u[0]]=[_,Vt(u[0],u[1])]})}}function Vt(e,t){return t?Number(t):Qt(e)?0:1}function Qt(e){return Zt.includes(e.toLowerCase())}var ye={},L=e=>{console.error(e)},Se=(e,...t)=>{console.log(`WARN: ${e}`,...t)},H=(e,t)=>{ye[`${e}/${t}`]||(console.log(`Deprecated as of ${e}. ${t}`),ye[`${e}/${t}`]=!0)},J=new Error;function He(e,t,{key:n}){let l=0,d=e[n],_={},c={};for(let r=1;r<=t.length;r++)c[r+l]=d[r],_[r+l]=!0,l+=ke(t[r-1]);e[n]=c,e[n]._emit=_,e[n]._multi=!0}function qt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw L("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),J;if(typeof e.beginScope!="object"||e.beginScope===null)throw L("beginScope must be object"),J;He(e,e.begin,{key:"beginScope"}),e.begin=fe(e.begin,{joinWith:""})}}function en(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw L("skip, excludeEnd, returnEnd not compatible with endScope: {}"),J;if(typeof e.endScope!="object"||e.endScope===null)throw L("endScope must be object"),J;He(e,e.end,{key:"endScope"}),e.end=fe(e.end,{joinWith:""})}}function tn(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function nn(e){tn(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),qt(e),en(e)}function sn(e){function t(c,r){return new RegExp(G(c),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(r?"g":""))}class n{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(r,u){u.position=this.position++,this.matchIndexes[this.matchAt]=u,this.regexes.push([u,r]),this.matchAt+=ke(r)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let r=this.regexes.map(u=>u[1]);this.matcherRe=t(fe(r,{joinWith:"|"}),!0),this.lastIndex=0}exec(r){this.matcherRe.lastIndex=this.lastIndex;let u=this.matcherRe.exec(r);if(!u)return null;let O=u.findIndex((P,I)=>I>0&&P!==void 0),M=this.matchIndexes[O];return u.splice(0,O),Object.assign(u,M)}}class l{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(r){if(this.multiRegexes[r])return this.multiRegexes[r];let u=new n;return this.rules.slice(r).forEach(([O,M])=>u.addRule(O,M)),u.compile(),this.multiRegexes[r]=u,u}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(r,u){this.rules.push([r,u]),u.type==="begin"&&this.count++}exec(r){let u=this.getMatcher(this.regexIndex);u.lastIndex=this.lastIndex;let O=u.exec(r);if(this.resumingScanAtSamePosition()&&!(O&&O.index===this.lastIndex)){let M=this.getMatcher(0);M.lastIndex=this.lastIndex+1,O=M.exec(r)}return O&&(this.regexIndex+=O.position+1,this.regexIndex===this.count&&this.considerAll()),O}}function d(c){let r=new l;return c.contains.forEach(u=>r.addRule(u.begin,{rule:u,type:"begin"})),c.terminatorEnd&&r.addRule(c.terminatorEnd,{type:"end"}),c.illegal&&r.addRule(c.illegal,{type:"illegal"}),r}function _(c,r){let u=c;if(c.isCompiled)return u;[mt,zt,nn,Xt].forEach(M=>M(c,r)),e.compilerExtensions.forEach(M=>M(c,r)),c.__beforeBegin=null,[Wt,Ft,Yt].forEach(M=>M(c,r)),c.isCompiled=!0;let O=null;return typeof c.keywords=="object"&&c.keywords.$pattern&&(c.keywords=Object.assign({},c.keywords),O=c.keywords.$pattern,delete c.keywords.$pattern),O=O||/\w+/,c.keywords&&(c.keywords=$e(c.keywords,e.case_insensitive)),u.keywordPatternRe=t(O,!0),r&&(c.begin||(c.begin=/\B|\b/),u.beginRe=t(u.begin),!c.end&&!c.endsWithParent&&(c.end=/\B|\b/),c.end&&(u.endRe=t(u.end)),u.terminatorEnd=G(u.end)||"",c.endsWithParent&&r.terminatorEnd&&(u.terminatorEnd+=(c.end?"|":"")+r.terminatorEnd)),c.illegal&&(u.illegalRe=t(c.illegal)),c.contains||(c.contains=[]),c.contains=[].concat(...c.contains.map(function(M){return rn(M==="self"?c:M)})),c.contains.forEach(function(M){_(M,u)}),c.starts&&_(c.starts,r),u.matcher=d(u),u}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=k(e.classNameAliases||{}),_(e)}function Ue(e){return e?e.endsWithParent||Ue(e.starts):!1}function rn(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(t){return k(e,{variants:null},t)})),e.cachedVariants?e.cachedVariants:Ue(e)?k(e,{starts:e.starts?k(e.starts):null}):Object.isFrozen(e)?k(e):e}var cn="11.12.0",ue=class extends Error{constructor(t,n){super(t),this.name="HTMLInjectionError",this.html=n}},ce=Ce,Ae=k,Te=Symbol("nomatch"),on=7,je=function(e){let t=Object.create(null),n=Object.create(null),l=[],d=!0,_="Could not find the language '{}', did you forget to load/include a language module?",c={disableAutodetect:!0,name:"Plain text",contains:[]},r={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:le};function u(i){return r.noHighlightRe.test(i)}function O(i){let a=i.className+" ";a+=i.parentNode?i.parentNode.className:"";let h=r.languageDetectRe.exec(a);if(h){let E=C(h[1]);return E||(Se(_.replace("{}",h[1])),Se("Falling back to no-highlight mode for this block.",i)),E?h[1]:"no-highlight"}return a.split(/\s+/).find(E=>u(E)||C(E))}function M(i,a,h){let E="",w="";typeof a=="object"?(E=i,h=a.ignoreIllegals,w=a.language):(H("10.7.0","highlight(lang, code, ...args) has been deprecated."),H("10.7.0",`Please use highlight(code, options) instead.
+(see the highlight.js issue tracker)`),w=i,E=a),h===void 0&&(h=!0);let y={code:E,language:w};W("before:highlight",y);let D=y.result?y.result:P(y.language,y.code,h);return D.code=y.code,W("after:highlight",D),D}function P(i,a,h,E){let w=Object.create(null);function y(s,o){return s.keywords[o]}function D(){if(!f.keywords){x.addText(b);return}let s=0;f.keywordPatternRe.lastIndex=0;let o=f.keywordPatternRe.exec(b),g="";for(;o;){g+=b.substring(s,o.index);let p=A.case_insensitive?o[0].toLowerCase():o[0],N=y(f,p);if(N){let[T,at]=N;if(x.addText(g),g="",w[p]=(w[p]||0)+1,w[p]<=on&&(Y+=at),T.startsWith("_"))g+=o[0];else{let lt=A.classNameAliases[T]||T;S(o[0],lt)}}else g+=o[0];s=f.keywordPatternRe.lastIndex,o=f.keywordPatternRe.exec(b)}g+=b.substring(s),x.addText(g)}function F(){if(b==="")return;let s=null;if(typeof f.subLanguage=="string"){if(!t[f.subLanguage]){x.addText(b);return}s=P(f.subLanguage,b,!0,we[f.subLanguage]),we[f.subLanguage]=s._top}else s=$(b,f.subLanguage.length?f.subLanguage:null);f.relevance>0&&(Y+=s.relevance),x.__addSublanguage(s._emitter,s.language)}function R(){f.subLanguage!=null?F():D(),b=""}function S(s,o){s!==""&&(x.startScope(o),x.addText(s),x.endScope())}function be(s,o){let g=1,p=o.length-1;for(;g<=p;){if(!s._emit[g]){g++;continue}let N=A.classNameAliases[s[g]]||s[g],T=o[g];N?S(T,N):(b=T,D(),b=""),g++}}function _e(s,o){return s.scope&&typeof s.scope=="string"&&x.openNode(A.classNameAliases[s.scope]||s.scope),s.beginScope&&(s.beginScope._wrap?(S(b,A.classNameAliases[s.beginScope._wrap]||s.beginScope._wrap),b=""):s.beginScope._multi&&(be(s.beginScope,o),b="")),f=Object.create(s,{parent:{value:f}}),f}function Me(s,o,g){let p=Nt(s.endRe,g);if(p){if(s["on:end"]){let N=new Z(s);s["on:end"](o,N),N.isMatchIgnored&&(p=!1)}if(p){for(;s.endsParent&&s.parent;)s=s.parent;return s}}if(s.endsWithParent)return Me(s.parent,o,g)}function it(s){return f.matcher.regexIndex===0?(b+=s[0],1):(re=!0,0)}function st(s){let o=s[0],g=s.rule,p=new Z(g),N=[g.__beforeBegin,g["on:begin"]];for(let T of N)if(T&&(T(s,p),p.isMatchIgnored))return it(o);return g.skip?b+=o:(g.excludeBegin&&(b+=o),R(),!g.returnBegin&&!g.excludeBegin&&(b=o)),_e(g,s),g.returnBegin?0:o.length}function rt(s){let o=s[0],g=a.substring(s.index),p=Me(f,s,g);if(!p)return Te;let N=f;f.endScope&&f.endScope._wrap?(R(),S(o,f.endScope._wrap)):f.endScope&&f.endScope._multi?(R(),be(f.endScope,s)):N.skip?b+=o:(N.returnEnd||N.excludeEnd||(b+=o),R(),N.excludeEnd&&(b=o));do f.scope&&x.closeNode(),!f.skip&&!f.subLanguage&&(Y+=f.relevance),f=f.parent;while(f!==p.parent);return p.starts&&_e(p.starts,s),N.returnEnd?0:o.length}function ct(){let s=[];for(let o=f;o!==A;o=o.parent)o.scope&&s.unshift(o.scope);s.forEach(o=>x.openNode(o))}let z={};function Oe(s,o){let g=o&&o[0];if(b+=s,g==null)return R(),0;if(z.type==="begin"&&o.type==="end"&&z.index===o.index&&g===""){if(b+=a.slice(o.index,o.index+1),!d){let p=new Error(`0 width match regex (${i})`);throw p.languageName=i,p.badRule=z.rule,p}return 1}if(z=o,o.type==="begin")return st(o);if(o.type==="illegal"&&!h){let p=new Error('Illegal lexeme "'+g+'" for mode "'+(f.scope||"<unnamed>")+'"');throw p.mode=f,p}else if(o.type==="end"){let p=rt(o);if(p!==Te)return p}if(o.type==="illegal"&&g==="")return o.index===a.length||(b+=`
+`),1;if(se>1e5&&se>o.index*3)throw new Error("potential infinite loop, way more iterations than matches");return b+=g,g.length}let A=C(i);if(!A)throw L(_.replace("{}",i)),new Error('Unknown language: "'+i+'"');let ot=sn(A),ie="",f=E||ot,we={},x=new r.__emitter(r);ct();let b="",Y=0,v=0,se=0,re=!1;try{if(A.__emitTokens)A.__emitTokens(a,x);else{for(f.matcher.considerAll();;){se++,re?re=!1:f.matcher.considerAll(),f.matcher.lastIndex=v;let s=f.matcher.exec(a);if(!s)break;let o=a.substring(v,s.index),g=Oe(o,s);v=s.index+g}Oe(a.substring(v))}return x.finalize(),ie=x.toHTML(),{language:i,value:ie,relevance:Y,illegal:!1,_emitter:x,_top:f}}catch(s){if(s.message&&s.message.includes("Illegal"))return{language:i,value:ce(a),illegal:!0,relevance:0,_illegalBy:{message:s.message,index:v,context:a.slice(v-100,v+100),mode:s.mode,resultSoFar:ie},_emitter:x};if(d)return{language:i,value:ce(a),illegal:!1,relevance:0,errorRaised:s,_emitter:x,_top:f};throw s}}function I(i){let a={value:ce(i),illegal:!1,relevance:0,_top:c,_emitter:new r.__emitter(r)};return a._emitter.addText(i),a}function $(i,a){a=a||r.languages||Object.keys(t);let h=I(i),E=a.filter(C).filter(Ee).map(R=>P(R,i,!1));E.unshift(h);let w=E.sort((R,S)=>{if(R.relevance!==S.relevance)return S.relevance-R.relevance;if(R.language&&S.language){if(C(R.language).supersetOf===S.language)return 1;if(C(S.language).supersetOf===R.language)return-1}return 0}),[y,D]=w,F=y;return F.secondBest=D,F}function te(i,a,h){let E=a&&n[a]||h;i.classList.add("hljs"),i.classList.add(`language-${E}`)}function ne(i){let a=null,h=O(i);if(u(h))return;if(W("before:highlightElement",{el:i,language:h}),i.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",i);return}if(i.children.length>0&&(r.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("(see the highlight.js security wiki)"),console.warn("The element with unescaped HTML:"),console.warn(i)),r.throwUnescapedHTML))throw new ue("One of your code blocks includes unescaped HTML.",i.innerHTML);a=i;let E=a.textContent,w=h?M(E,{language:h,ignoreIllegals:!0}):$(E);i.innerHTML=w.value,i.dataset.highlighted="yes",te(i,h,w.language),i.result={language:w.language,re:w.relevance,relevance:w.relevance},w.secondBest&&(i.secondBest={language:w.secondBest.language,relevance:w.secondBest.relevance}),W("after:highlightElement",{el:i,result:w,text:E})}function Ye(i){r=Ae(r,i)}let Xe=()=>{m(),H("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function Ze(){m(),H("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let de=!1;function m(){function i(){m()}if(document.readyState==="loading"){de||window.addEventListener("DOMContentLoaded",i,!1),de=!0;return}document.querySelectorAll(r.cssSelector).forEach(ne)}function Je(i,a){let h=null;try{h=a(e)}catch(E){if(L("Language definition for '{}' could not be registered.".replace("{}",i)),d)L(E);else throw E;h=c}h.name||(h.name=i),t[i]=h,h.rawDefinition=a.bind(null,e),h.aliases&&pe(h.aliases,{languageName:i})}function Ve(i){delete t[i];for(let a of Object.keys(n))n[a]===i&&delete n[a]}function Qe(){return Object.keys(t)}function C(i){return i=(i||"").toLowerCase(),t[i]||t[n[i]]}function pe(i,{languageName:a}){typeof i=="string"&&(i=[i]),i.forEach(h=>{n[h.toLowerCase()]=a})}function Ee(i){let a=C(i);return a&&!a.disableAutodetect}function qe(i){i["before:highlightBlock"]&&!i["before:highlightElement"]&&(i["before:highlightElement"]=a=>{i["before:highlightBlock"](Object.assign({block:a.el},a))}),i["after:highlightBlock"]&&!i["after:highlightElement"]&&(i["after:highlightElement"]=a=>{i["after:highlightBlock"](Object.assign({block:a.el},a))})}function et(i){qe(i),l.push(i)}function tt(i){let a=l.indexOf(i);a!==-1&&l.splice(a,1)}function W(i,a){let h=i;l.forEach(function(E){E[h]&&E[h](a)})}function nt(i){return H("10.7.0","highlightBlock will be removed entirely in v12.0"),H("10.7.0","Please use highlightElement now."),ne(i)}Object.assign(e,{highlight:M,highlightAuto:$,highlightAll:m,highlightElement:ne,highlightBlock:nt,configure:Ye,initHighlighting:Xe,initHighlightingOnLoad:Ze,registerLanguage:Je,unregisterLanguage:Ve,listLanguages:Qe,getLanguage:C,registerAliases:pe,autoDetection:Ee,inherit:Ae,addPlugin:et,removePlugin:tt}),e.debugMode=function(){d=!1},e.safeMode=function(){d=!0},e.versionString=cn,e.regex={concat:B,lookahead:De,either:V,optional:wt,anyNumberOfTimes:Ot};for(let i in X)typeof X[i]=="object"&&Ie(X[i]);return Object.assign(e,X),e},U=je({});U.newInstance=()=>je({});Ge.exports=U;U.HighlightJS=U;U.default=U});var me=bt(Ke(),1);var he=me.default;var j="[0-9](_*[0-9])*",q=`\\.(${j})`,ee="[0-9a-fA-F](_*[0-9a-fA-F])*",We={className:"number",variants:[{begin:`(\\b(${j})((${q})|\\.)?|(${q}))[eE][+-]?(${j})[fFdD]?\\b`},{begin:`\\b(${j})((${q})[fFdD]?\\b|\\.([fFdD]\\b)?)`},{begin:`(${q})[fFdD]?\\b`},{begin:`\\b(${j})[fFdD]\\b`},{begin:`\\b0[xX]((${ee})\\.?|(${ee})?\\.(${ee}))[pP][+-]?(${j})[fFdD]?\\b`},{begin:"\\b(0|[1-9](_*[0-9])*)[lL]?\\b"},{begin:`\\b0[xX](${ee})[lL]?\\b`},{begin:"\\b0(_*[0-7])*[lL]?\\b"},{begin:"\\b0[bB][01](_*[01])*[lL]?\\b"}],relevance:0};function Fe(e,t,n){return n===-1?"":e.replace(t,l=>Fe(e,t,n-1))}function ze(e){let t=e.regex,n="[\xC0-\u02B8a-zA-Z_$][\xC0-\u02B8a-zA-Z_$0-9]*",l="(?:(?:\\s*\\[\\s*])+)?",d=n+"<@@@>"+l,c="(?:"+("\\?(?:\\s+(?:extends|super)\\s+"+d+")?")+"|"+d+")",r=Fe("(?:\\s*<\\s*"+c+"(?:\\s*,\\s*"+c+")*\\s*>)?",/<@@@>/g,2),I={keyword:["synchronized","abstract","private","var","static","if","const ","for","while","strictfp","finally","protected","import","native","final","void","enum","else","break","transient","catch","instanceof","volatile","case","assert","package","default","public","try","switch","continue","throws","protected","public","private","module","requires","exports","do","sealed","yield","permits","goto","when"],literal:["false","true","null"],type:["char","boolean","long","float","int","byte","short","double"],built_in:["super","this"]},$={className:"meta",begin:"@"+n,contains:[{begin:/\(/,end:/\)/,contains:["self"]}]},te={className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[e.C_BLOCK_COMMENT_MODE],endsParent:!0};return{name:"Java",aliases:["jsp"],keywords:I,illegal:/<\/|#/,contains:[e.COMMENT("/\\*\\*","\\*/",{relevance:0,contains:[{begin:/\w+@/,relevance:0},{className:"doctag",begin:"@[A-Za-z]+"}]}),{begin:/import java\.[a-z]+\./,keywords:"import",relevance:2},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE,{begin:/"""/,end:/"""/,className:"string",contains:[e.BACKSLASH_ESCAPE]},e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,{match:[/\b(?:class|interface|enum|extends|implements|new)/,/\s+/,n],className:{1:"keyword",3:"title.class"}},{match:/non-sealed/,scope:"keyword"},{beginKeywords:"new throw return else yield assert",relevance:0},{begin:[n,t.concat(r,l,/\s+/),n,l,/\s*/,/=(?!=)/],className:{1:"type",3:"variable",6:"operator"}},{begin:[/record/,/\s+/,n],className:{1:"keyword",3:"title.class"},contains:[te,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},{begin:[n,t.concat(r,l,/\s+/),n,/\s*(?=\()/],className:{1:"type",3:"title.function"},keywords:I,contains:[{className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[$,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,We,e.C_BLOCK_COMMENT_MODE]},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},We,$]}}he.registerLanguage("java",ze);window.hljs=he;})();
+</script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---- 1. syntax highlighting -------------------------------------- */
+  function highlight() {
+    if (!window.hljs) return;
+    var blocks = document.querySelectorAll('pre code.language-java');
+    for (var i = 0; i < blocks.length; i++) {
+      try { window.hljs.highlightElement(blocks[i]); } catch (e) {}
+    }
+  }
+
+  /* ---- 2. every solution / reveal starts closed --------------------- */
+  function closeAll() {
+    var d = document.querySelectorAll('details.soln');
+    for (var i = 0; i < d.length; i++) { d[i].open = false; }
+  }
+
+  /* ---- 3. show all / hide all -------------------------------------- */
+  function wireToolbar() {
+    var show = document.getElementById('showAll');
+    var hide = document.getElementById('hideAll');
+    function setAll(v) {
+      var d = document.querySelectorAll('details.soln');
+      for (var i = 0; i < d.length; i++) { d[i].open = v; }
+    }
+    if (show) show.addEventListener('click', function () { setAll(true); });
+    if (hide) hide.addEventListener('click', function () { setAll(false); });
+  }
+
+  /* ---- 4. live-coding editors -------------------------------------- */
+  var INDENT = '    ';
+
+  function wireEditors() {
+    var eds = document.querySelectorAll('.editor');
+    for (var i = 0; i < eds.length; i++) { wireOne(eds[i]); }
+  }
+
+  function wireOne(box) {
+    var ta = box.querySelector('textarea');
+    if (!ta) return;
+    var starter = ta.value;
+
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Tab' || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+      ev.preventDefault();
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+
+      if (s === e && !ev.shiftKey) {
+        ta.value = v.slice(0, s) + INDENT + v.slice(e);
+        ta.selectionStart = ta.selectionEnd = s + INDENT.length;
+        return;
+      }
+      /* block indent / outdent over the selected lines */
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var le = v.indexOf('\n', e);
+      if (le === -1) le = v.length;
+      var seg = v.slice(ls, le);
+      var lines = seg.split('\n');
+      var delta0 = 0, total = 0;
+
+      for (var i = 0; i < lines.length; i++) {
+        if (ev.shiftKey) {
+          var m = lines[i].match(/^(\t| {1,4})/);
+          if (m) {
+            lines[i] = lines[i].slice(m[0].length);
+            if (i === 0) delta0 = -m[0].length;
+            total -= m[0].length;
+          }
+        } else {
+          lines[i] = INDENT + lines[i];
+          if (i === 0) delta0 = INDENT.length;
+          total += INDENT.length;
+        }
+      }
+      ta.value = v.slice(0, ls) + lines.join('\n') + v.slice(le);
+      ta.selectionStart = Math.max(ls, s + delta0);
+      ta.selectionEnd = Math.max(ta.selectionStart, e + total);
+    });
+
+    /* keep the indent of the current line when Enter is pressed */
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Enter' || ev.shiftKey || ev.ctrlKey || ev.metaKey) return;
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+      if (s !== e) return;
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var lead = (v.slice(ls, s).match(/^[ \t]*/) || [''])[0];
+      var extra = /[{(\[]\s*$/.test(v.slice(ls, s)) ? INDENT : '';
+      if (!lead && !extra) return;
+      ev.preventDefault();
+      var ins = '\n' + lead + extra;
+      ta.value = v.slice(0, s) + ins + v.slice(e);
+      ta.selectionStart = ta.selectionEnd = s + ins.length;
+    });
+
+    var rst = box.querySelector('[data-act="reset"]');
+    if (rst) rst.addEventListener('click', function () {
+      ta.value = starter;
+      ta.focus();
+      flash(box, 'Reset to starter code');
+    });
+
+    var cpy = box.querySelector('[data-act="copy"]');
+    if (cpy) cpy.addEventListener('click', function () {
+      var done = function () { flash(box, 'Copied — paste it into your IDE'); };
+      var fail = function () { flash(box, 'Copy failed — select the text and press Ctrl/Cmd+C'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value).then(done, function () { legacy(ta, done, fail); });
+      } else {
+        legacy(ta, done, fail);
+      }
+    });
+  }
+
+  function legacy(ta, done, fail) {
+    try {
+      var st = ta.selectionStart, en = ta.selectionEnd;
+      ta.select();
+      var ok = document.execCommand('copy');
+      ta.selectionStart = st; ta.selectionEnd = en;
+      ok ? done() : fail();
+    } catch (e) { fail(); }
+  }
+
+  function flash(box, msg) {
+    var f = box.querySelector('.foot');
+    if (!f) return;
+    if (f.getAttribute('data-base') === null || f.getAttribute('data-base') === undefined) {
+      f.setAttribute('data-base', f.textContent);
+    }
+    f.textContent = msg;
+    window.setTimeout(function () { f.textContent = f.getAttribute('data-base'); }, 2200);
+  }
+
+  /* ---- go ----------------------------------------------------------- */
+  function init() {
+    highlight();
+    closeAll();
+    wireToolbar();
+    wireEditors();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  /* belt and braces: some browsers restore <details> state on soft reload */
+  window.addEventListener('pageshow', closeAll);
+})();
+</script>
+</body>
+</html>
