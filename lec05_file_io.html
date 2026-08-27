@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class 5 — File Input and Output | CSCI 212</title>
+<style>
+:root{
+  --ink:#0f172a; --ink2:#334155; --muted:#64748b; --line:#e2e8f0;
+  --bg:#ffffff; --bg2:#f8fafc;
+  --obj:#4f46e5; --def:#2563eb; --ex:#059669; --alg:#7c3aed;
+  --key:#b45309; --warn:#dc2626; --qc:#0891b2; --prac:#be185d; --sum:#475569;
+  --edit:#ea580c; --edit-bg:#fff7ed;
+  --code-bg:#0d1117; --code-bd:#000000;   /* read-only listings: black */
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px 80px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:#0f172a;color:#e2e8f0;font-size:13.5px;
+  border-bottom:3px solid var(--obj);
+}
+.topbar .inner{max-width:900px;margin:0 auto;padding:10px 22px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.topbar a{color:#e2e8f0;text-decoration:none;border-bottom:1px solid transparent}
+.topbar a:hover{border-bottom-color:#94a3b8}
+.topbar .course{font-weight:700;letter-spacing:.02em}
+.topbar .sep{color:#475569}
+.topbar .spacer{flex:1}
+
+/* ---------- title block ---------- */
+.titleblock{padding:34px 0 10px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.eyebrow{
+  font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--obj);margin-bottom:8px;
+}
+.titleblock h1{font-size:33px;line-height:1.2;margin:0 0 10px;letter-spacing:-.015em}
+.titleblock .sub{margin:0;color:var(--muted);font-size:17px;line-height:1.5}
+
+h2{
+  font-size:24px;margin:46px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line);letter-spacing:-.01em;scroll-margin-top:14px;
+}
+h2 .num{color:var(--obj);font-weight:800;margin-right:11px}
+h3{font-size:18.5px;margin:30px 0 10px;color:var(--ink)}
+h4{font-size:16px;margin:20px 0 8px;color:var(--ink2)}
+p{margin:12px 0}
+ul,ol{margin:12px 0;padding-left:26px}
+li{margin:6px 0}
+a{color:var(--def)}
+hr{border:0;border-top:1px solid var(--line);margin:30px 0}
+strong{color:var(--ink)}
+.muted{color:var(--muted)}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--bg2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 20px 16px;margin:22px 0;
+}
+.toc .th{
+  font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;
+}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:30px}
+.toc li{margin:3px 0;font-size:14.5px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- show all / hide all ---------- */
+.tools{
+  display:flex;gap:9px;align-items:center;flex-wrap:wrap;
+  padding:11px 15px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:9px;margin:22px 0;font-size:13.5px;
+}
+.tools .lab{font-weight:700;color:var(--ink2)}
+.tools button{
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  background:#fff;color:var(--ink2);border:1px solid #cbd5e1;
+  border-radius:6px;padding:4px 12px;
+}
+.tools button:hover{background:var(--obj);border-color:var(--obj);color:#fff}
+.tools .muted{font-size:12.5px}
+
+/* ---------- boxes ---------- */
+.box{border:1px solid var(--line);border-left:5px solid var(--muted);border-radius:8px;margin:22px 0;overflow:hidden;background:#fff}
+.box>.hd{
+  padding:9px 16px;font-size:12.5px;font-weight:700;
+  letter-spacing:.075em;text-transform:uppercase;color:#fff;background:var(--muted);
+}
+.box>.hd .tag{margin-left:5px;font-weight:500;text-transform:none;letter-spacing:0;opacity:.92;font-size:13px}
+.box>.bd{padding:4px 18px 14px}
+.box>.bd>:first-child{margin-top:12px}
+.box>.bd>:last-child{margin-bottom:2px}
+
+.box.obj{border-left-color:var(--obj)}  .box.obj>.hd{background:var(--obj)}
+.box.def{border-left-color:var(--def)}  .box.def>.hd{background:var(--def)}
+.box.ex{border-left-color:var(--ex)}    .box.ex>.hd{background:var(--ex)}
+.box.alg{border-left-color:var(--alg)}  .box.alg>.hd{background:var(--alg)}
+.box.key{border-left-color:var(--key)}  .box.key>.hd{background:var(--key)}
+.box.warn{border-left-color:var(--warn)}.box.warn>.hd{background:var(--warn)}
+.box.qc{border-left-color:var(--qc)}    .box.qc>.hd{background:var(--qc)}
+.box.prac{border-left-color:var(--prac)}.box.prac>.hd{background:var(--prac)}
+.box.sum{border-left-color:var(--sum)}  .box.sum>.hd{background:var(--sum)}
+
+.box.obj{background:#f5f5ff}
+.box.qc{background:#f0fbfe}
+.box.warn{background:#fff7f7}
+.box.key{background:#fffbf2}
+.box.sum{background:#f8fafc}
+
+/* ---------- code ---------- */
+/* Read-only listings sit on black, matching CSCI 211, so a code block is never
+   mistaken for the editable live-coding box. */
+pre{
+  margin:14px 0;padding:13px 15px;overflow-x:auto;
+  background:var(--code-bg);border:1px solid var(--code-bd);border-radius:8px;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;color:#c9d1d9;
+}
+pre code{font-family:inherit;font-size:inherit;background:none;padding:0;border:0;color:inherit;display:block}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef2f7;
+  border:1px solid #e2e8f0;border-radius:4px;padding:1px 5px;color:#0b3a5b;
+}
+.filename{
+  font-family:var(--mono);font-size:12px;color:#475569;
+  margin:16px 0 -9px;font-weight:600;
+}
+
+/* comparison block: another language, never syntax-highlighted. Dark like the
+   Java listings, but desaturated and dashed so it reads as "not this course". */
+pre.cmp{background:#161b22;border-style:dashed;border-color:#3f4650;color:#9aa4b2}
+pre.cmp code{color:#9aa4b2}
+
+/* shell commands you type */
+pre.sh{background:#1e293b;border-color:#1e293b;color:#e2e8f0;position:relative;padding-top:26px}
+pre.sh code{color:#e2e8f0}
+pre.sh::before{
+  content:"Terminal";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#86efac;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* output / terminal blocks */
+pre.out{background:#111d33;border-color:#111d33;color:#e2e8f0;position:relative;padding-top:26px}
+pre.out code{color:#e2e8f0}
+pre.out::before{
+  content:"Output";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#7dd3fc;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+pre.err{background:#1f1416;border-color:#7f1d1d;color:#fecdd3;padding-top:26px;position:relative}
+pre.err code{color:#fecdd3}
+pre.err::before{
+  content:"Compiler message";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#fda4af;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* ---- highlight.js, GitHub-dark palette (hand-written, no external file) ---- */
+.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-template-tag,
+.hljs-template-variable,.hljs-type,.hljs-variable.language_{color:#ff7b72}
+.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#d2a8ff}
+.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,
+.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable{color:#79c0ff}
+.hljs-meta .hljs-string,.hljs-regexp,.hljs-string{color:#a5d6ff}
+.hljs-built_in,.hljs-symbol{color:#ffa657}
+.hljs-code,.hljs-comment,.hljs-formula{color:#8b949e;font-style:italic}
+.hljs-name,.hljs-quote,.hljs-selector-pseudo,.hljs-selector-tag{color:#7ee787}
+.hljs-subst{color:#c9d1d9}
+.hljs-section{color:#1f6feb;font-weight:700}
+.hljs-bullet{color:#f2cc60}
+.hljs-emphasis{color:#c9d1d9;font-style:italic}
+.hljs-strong{color:#c9d1d9;font-weight:700}
+
+/* ---------- trace tables ---------- */
+table{border-collapse:collapse;margin:16px 0;font-size:14px;width:100%}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg2);font-weight:700;font-size:13px}
+table.trace td:first-child,table.trace th:first-child{white-space:nowrap}
+table code{font-size:.88em}
+
+/* ---------- multi-part questions ---------- */
+.part{margin:16px 0;padding-left:14px;border-left:2px solid #cbd5e1}
+.part .q{margin:0 0 8px}
+.part .pl{font-weight:700;color:var(--qc);margin-right:6px}
+
+/* ---------- collapsible solutions ---------- */
+details.soln{margin:10px 0 4px}
+details.soln>summary{
+  list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  font-size:12.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:#fff;background:var(--sum);border-radius:6px;padding:5px 13px;
+  user-select:none;
+}
+details.soln>summary::-webkit-details-marker{display:none}
+details.soln>summary::before{content:"\25B6";font-size:9px;transition:transform .15s}
+details.soln[open]>summary::before{transform:rotate(90deg)}
+details.soln>summary::after{content:"Show Answer"}
+details.soln[open]>summary::after{content:"Hide Answer"}
+details.soln>summary:hover{filter:brightness(1.18)}
+
+details.soln.reveal>summary{background:var(--ex)}
+details.soln.reveal>summary::after{content:"Show Output & Explanation"}
+details.soln.reveal[open]>summary::after{content:"Hide Output & Explanation"}
+details.soln.reveal.noout>summary::after{content:"Show Explanation"}
+details.soln.reveal.noout[open]>summary::after{content:"Hide Explanation"}
+
+.ans{
+  margin-top:11px;padding:2px 16px 10px;background:#fff;
+  border:1px solid var(--line);border-left:3px solid var(--sum);border-radius:7px;
+}
+details.soln.reveal .ans{border-left-color:var(--ex)}
+.ans>:first-child{margin-top:12px}
+.ans>:last-child{margin-bottom:6px}
+
+/* ---------- live coding editor ---------- */
+.editor{
+  margin:18px 0;border:2px dashed var(--edit);border-radius:9px;
+  background:var(--edit-bg);overflow:hidden;
+}
+.editor .ehd{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:7px 13px;background:var(--edit);color:#fff;
+  font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+}
+.editor .ehd .etitle{flex:1}
+.editor .ehd button{
+  font:inherit;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  cursor:pointer;background:rgba(255,255,255,.16);color:#fff;
+  border:1px solid rgba(255,255,255,.5);border-radius:5px;padding:3px 10px;
+}
+.editor .ehd button:hover{background:#fff;color:var(--edit)}
+.editor textarea{
+  display:block;width:100%;border:0;outline:0;resize:vertical;
+  padding:12px 15px;background:var(--edit-bg);color:#431407;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;
+  tab-size:4;-moz-tab-size:4;min-height:150px;
+}
+.editor textarea:focus{background:#fff}
+.editor .foot{
+  padding:5px 13px 7px;font-size:11.5px;color:#9a3412;background:#ffedd5;
+  border-top:1px solid #fed7aa;
+}
+
+/* ---------- prev/next nav ---------- */
+.pagenav{display:flex;gap:14px;margin:52px 0 0;flex-wrap:wrap}
+.pagenav a,.pagenav span.disabled{
+  flex:1 1 260px;display:block;text-decoration:none;
+  border:1px solid var(--line);border-radius:9px;padding:12px 16px;background:#fff;
+}
+.pagenav a:hover{border-color:var(--obj);background:var(--bg2)}
+.pagenav .dir{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.pagenav .ttl{font-size:15px;font-weight:600;color:var(--ink);margin-top:3px}
+.pagenav .next{text-align:right}
+.pagenav span.disabled{opacity:.4}
+.pagenav span.disabled .ttl{color:var(--muted)}
+
+footer.pf{
+  margin-top:40px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--muted);text-align:center;
+}
+
+/* ---------- index page ---------- */
+table.sched{font-size:14.5px}
+table.sched th{background:#0f172a;color:#fff;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+table.sched td:first-child{white-space:nowrap;font-weight:700;color:var(--muted);width:60px}
+table.sched tr.examrow td{background:#fff1f2}
+table.sched tr.revrow td{background:#fffbeb}
+table.sched a{font-weight:600;text-decoration:none}
+table.sched a:hover{text-decoration:underline}
+
+
+/* ---------- release gating ---------- */
+.pending{
+  margin-top:4px;font-size:11.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:#b45309;
+}
+.pagenav span.disabled .pending{color:#b45309}
+table.sched tr.pendingrow td{background:#fcfcfd}
+table.sched .unrel{color:var(--muted)}
+table.sched .pending{display:block;margin-top:2px}
+table.sched td.cn{white-space:nowrap;width:52px;font-weight:700;color:var(--muted)}
+table.sched td.dt{white-space:nowrap;width:104px;color:var(--muted);font-size:13.5px}
+table.sched tr.offrow td{background:#f1f5f9;color:var(--muted);font-style:italic}
+.refcard{
+  display:block;text-decoration:none;border:1px solid var(--line);
+  border-left:5px solid var(--alg);border-radius:9px;padding:13px 17px;
+  margin:22px 0;background:#faf9ff;
+}
+.refcard:hover{background:#f5f3ff;border-color:var(--alg)}
+.refcard .rl{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--alg)}
+.refcard .rt{font-size:16px;font-weight:600;color:var(--ink);margin-top:3px}
+.refcard .rd{font-size:14px;color:var(--muted);margin-top:4px}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,.tools,.pagenav,.pending{display:none !important}
+  html,body{width:100%;font-size:10pt}
+  .wrap{max-width:100%;width:100%;padding:0}
+  /* a wide <pre> must wrap rather than widen the page and clip every other
+     element at the paper edge */
+  /* Screen shows code on black; paper does not. Restore a dark-on-light palette
+     for print only, or the dark theme's light tokens vanish on white. */
+  pre{white-space:pre-wrap;overflow:visible;overflow-wrap:anywhere;font-size:8.6pt;
+      background:#f8fafc !important;color:#24292e !important;border-color:#cbd5e1 !important;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  pre code{color:#24292e !important}
+  pre.cmp{background:#fff !important;color:#475569 !important;border-color:#94a3b8 !important}
+  pre.cmp code{color:#475569 !important}
+  pre .hljs-doctag,pre .hljs-keyword,pre .hljs-meta .hljs-keyword,pre .hljs-template-tag,
+  pre .hljs-template-variable,pre .hljs-type,pre .hljs-variable.language_{color:#d73a49 !important}
+  pre .hljs-title,pre .hljs-title.class_,pre .hljs-title.class_.inherited__,
+  pre .hljs-title.function_{color:#6f42c1 !important}
+  pre .hljs-attr,pre .hljs-attribute,pre .hljs-literal,pre .hljs-meta,pre .hljs-number,
+  pre .hljs-operator,pre .hljs-selector-attr,pre .hljs-selector-class,pre .hljs-selector-id,
+  pre .hljs-variable{color:#005cc5 !important}
+  pre .hljs-meta .hljs-string,pre .hljs-regexp,pre .hljs-string{color:#032f62 !important}
+  pre .hljs-built_in,pre .hljs-symbol{color:#e36209 !important}
+  pre .hljs-code,pre .hljs-comment,pre .hljs-formula{color:#6a737d !important}
+  pre .hljs-name,pre .hljs-quote,pre .hljs-selector-pseudo,
+  pre .hljs-selector-tag{color:#22863a !important}
+  pre .hljs-subst,pre .hljs-emphasis,pre .hljs-strong{color:#24292e !important}
+  .filename{color:#475569 !important}
+  table{table-layout:fixed;width:100%;word-wrap:break-word;overflow-wrap:anywhere}
+  .box,.toc{max-width:100%}
+  a{color:var(--ink);text-decoration:none}
+  .box,.part,pre,table,.editor{break-inside:avoid;page-break-inside:avoid}
+  h2{break-after:avoid;page-break-after:avoid}
+  details.soln>summary{display:none !important}
+  details.soln:not([open])>.ans{display:none !important}
+  details.soln::before{
+    content:"Answer withheld — see the online notes.";
+    display:block;font-size:9pt;font-style:italic;color:#64748b;margin:6px 0;
+  }
+  details.soln[open]::before{content:""}
+  .editor textarea{display:none !important}
+  .editor{border:1.5px solid #fdba74 !important;background:#fff;border-style:solid}
+  .editor .ehd{background:#fff !important;color:#9a3412 !important;border-bottom:1px solid #fdba74}
+  .editor .ehd button{display:none}
+  .editor .foot{display:none}
+  .editor::after{content:"";display:block;height:2.1in;background:#fff}
+  pre.out,pre.sh{background:#f1f5f9 !important;color:#0f172a !important;border-color:#94a3b8 !important}
+  pre.err{background:#fef2f2 !important;color:#7f1d1d !important;border-color:#fca5a5 !important}
+  pre.out code,pre.sh code{color:#0f172a !important}
+  pre.err code{color:#7f1d1d !important}
+  pre.out::before,pre.sh::before{color:#475569}
+  pre.err::before{color:#b91c1c}
+  .box>.hd{color:#000;background:#fff !important;border-bottom:1px solid #cbd5e1}
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="inner">
+<span class="course">CSCI 212</span>
+<span class="sep">|</span>
+<a href="index.html">Course index</a>
+<span class="sep">|</span>
+<span>Class 5 of 28</span>
+<span class="sep">|</span>
+<span>Tuesday, September 15</span>
+<span class="spacer"></span>
+<span>Queens College, CUNY</span>
+</div></div>
+<div class="wrap">
+<div class="titleblock">
+  <div class="eyebrow">Session 5 &middot; Lecture 5</div>
+  <h1>File Input and Output</h1>
+  <p class="sub">How a Java program reads a text file and writes one &mdash; and why a forgotten <code>close()</code> leaves you staring at an empty file.</p> </div> <div class="box obj"> <div class="hd">Learning Objectives</div> <div class="bd"> <p>By the end of today's session you should be able to:</p> <ol> <li>Explain what a <code>File</code> object actually holds &mdash; a pathname, not the contents of a file &mdash; and why <code>new File(...)</code> never touches the disk.</li> <li>Inspect a file before opening it with <code>exists()</code>, <code>length()</code>, <code>getName()</code>, <code>getAbsolutePath()</code>, <code>canRead()</code> and <code>canWrite()</code>.</li> <li>Read a text file with a <code>Scanner</code> built over a <code>File</code>, token by token with <code>next()</code> and line by line with <code>nextLine()</code>.</li> <li>Write a text file with a <code>PrintWriter</code>, using either the <code>PrintWriter(String)</code> or the <code>PrintWriter(File)</code> constructor.</li> <li>Explain why <code>close()</code> is not optional, and recognise the empty-file symptom of forgetting it.</li> <li>Say why any program that opens a file needs <code>throws FileNotFoundException</code> on <code>main</code>, or a <code>try</code>/<code>catch</code>.</li> <li>Read a whole file and process every word in it &mdash; trim, split, filter, collect.</li> <li>Copy one file to another while transforming the text on the way.</li> </ol> </div> </div> <div class="toc"> <div class="th">On this page</div> <ol> <li><a href="#s1">From the keyboard to the disk</a></li> <li><a href="#s2">The <code>File</code> class &mdash; a name, not the contents</a></li> <li><a href="#s3">Reading a file with <code>Scanner</code></a></li> <li><a href="#s4">Writing a file with <code>PrintWriter</code></a></li> <li><a href="#s5"><code>close()</code>, and the empty-file bug</a></li> <li><a href="#s6">Worked program: every word in a file</a></li> <li><a href="#s7">Worked program: copying a file and splitting long lines</a></li> <li><a href="#prac">Practice Problems</a></li> <li><a href="#summary">Lecture Summary</a></li> </ol> </div> <div class="tools"> <span class="lab">Answers</span> <button id="showAll" type="button">Show all</button> <button id="hideAll" type="button">Hide all</button> <span class="muted">&mdash; every worked-example output and every solution is hidden when the page loads. Work it out first, then reveal.</span> </div> <hr> <h2 id="s1"><span class="num">1.</span>From the keyboard to the disk</h2> <p>In Lecture 3 you learned to read input with a <code>Scanner</code>:</p> <pre><code class="language-java">Scanner scanner = new Scanner(System.in);</code></pre> <p>That object reads characters typed at the keyboard, hands you the next token with <code>next()</code>, the next whole number with <code>nextInt()</code>, the next line with <code>nextLine()</code>, and tells you whether there is any more with <code>hasNext()</code>. In Lecture 4 you learned the <code>String</code> methods &mdash; <code>trim</code>, <code>split</code>, <code>substring</code>, <code>toLowerCase</code>, <code>indexOf</code> &mdash; that turn a line of text into something you can compute with.</p> <p>Today those two things meet. Almost every real program gets its data from a file rather than from a person typing, and produces a file rather than a screenful of text that disappears when the terminal closes. The good news is that you already know most of it.</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; <code>Scanner</code> does not care where the characters come from</span></div> <div class="bd"> <p><code>new Scanner(System.in)</code> reads from the keyboard. <code>new Scanner(new File("input.txt"))</code> reads from a file. <em>Everything after that line is identical.</em> The same <code>hasNext()</code>, the same <code>next()</code>, the same <code>nextInt()</code>, the same <code>nextLine()</code>. You are not learning a new way to read input today; you are learning a new place to point the reader you already have.</p> </div> </div> <p>For output there is a matching idea. <code>System.out</code> writes to the screen with <code>print</code> and <code>println</code>; a <code>PrintWriter</code> writes to a file with <code>print</code> and <code>println</code>. Same two method names, different destination.</p> <table> <tr><th></th><th>Console</th><th>File</th></tr> <tr><td>Reading</td><td><code>new Scanner(System.in)</code></td><td><code>new Scanner(new File("input.txt"))</code></td></tr> <tr><td>Writing</td><td><code>System.out.println(x)</code></td><td><code>output.println(x)</code> where <code>output</code> is a <code>PrintWriter</code></td></tr> <tr><td>When you are done</td><td>nothing to do</td><td><strong>you must call <code>close()</code></strong></td></tr> </table> <p>The last row is the one that costs people an afternoon, and &sect;5 is entirely about it.</p> <div class="box warn"> <div class="hd">Warning<span class="tag">&mdash; the word <code>throws</code> you are about to see</span></div> <div class="bd"> <p>Every file program in this lecture has <code>throws FileNotFoundException</code> written on its <code>main</code> method, or wraps the file code in a <code>try</code>/<code>catch</code>. That is because opening a file can fail &mdash; the file may not be there &mdash; and Java refuses to let you ignore the possibility. Leave it off and the program does not compile:</p> <pre class="err"><code>MissingNoThrows.java:6: error: unreported exception FileNotFoundException; must be caught or declared to be thrown
+        Scanner input = new Scanner(new File("input.txt"));
+                        ^
+1 error</code></pre> <p>For now, treat <code>throws FileNotFoundException</code> as a required piece of punctuation on any <code>main</code> that opens a file, exactly as the lecture notes do. The machinery behind it &mdash; what an exception is, what <code>try</code>, <code>catch</code> and <code>throw</code> really do &mdash; is explained properly in Lecture 20.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 5.1</div> <div class="bd"> <p>You have a working program that reads five integers from the keyboard with <code>Scanner input = new Scanner(System.in);</code> and prints their sum. You now want it to read those five integers from a file called <code>data.txt</code> instead. How much of the program has to change?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Ask which lines mention the <em>source</em> of the input, and which lines merely use the <code>Scanner</code>.</p> <p>Exactly one line changes:</p> <pre><code class="language-java">Scanner input = new Scanner(new File("data.txt"));</code></pre> <p>Plus two supporting edits that are not really part of the logic: you add <code>import java.io.File;</code> and <code>import java.io.FileNotFoundException;</code> at the top, and you add <code>throws FileNotFoundException</code> to the <code>main</code> header. The loop, the <code>nextInt()</code> calls, the accumulator and the <code>println</code> at the end are untouched.</p> <p><strong>Things to notice.</strong> This is the whole reason <code>Scanner</code> was designed the way it is. It is a <em>parser</em>, not a keyboard driver: you hand it a source of characters and it hands you tokens. Later in the course you will see the same idea everywhere in Java &mdash; a class that does one job well, connected to a source or a destination you choose at construction time.</p> </div></details> </div> </div> <h2 id="s2"><span class="num">2.</span>The <code>File</code> class &mdash; a name, not the contents</h2> <p>Before you can read or write a file you have to say <em>which</em> file. That is the job of the <code>File</code> class, and its one genuinely surprising property is what it does <em>not</em> do.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the <code>File</code> class</span></div> <div class="bd"> <p>The <code>File</code> class, from the package <code>java.io</code>, <strong>represents file and directory pathnames in an abstract manner</strong>. A <code>File</code> object holds a <em>path</em> &mdash; a piece of text naming a location in the file system. It does not hold the file's contents, and creating one does not create, open, read or modify anything on disk.</p> <p><strong>Constructors</strong></p> <ul> <li><code>File(String pathname)</code> &mdash; the one you will use in this course: <code>File f = new File("path to file");</code></li> <li><code>File(URI uri)</code> &mdash; the same idea, given a <code>URI</code> object instead of a string.</li> </ul> <p><strong>Important methods</strong></p> <table> <tr><th>Method</th><th>Returns</th><th>What it tells you</th></tr> <tr><td><code>boolean exists()</code></td><td><code>boolean</code></td><td>whether there really is a file at this path</td></tr> <tr><td><code>long length()</code></td><td><code>long</code></td><td>the size of the file in bytes</td></tr> <tr><td><code>String getName()</code></td><td><code>String</code></td><td>the name of the file or directory, without the directories in front of it</td></tr> <tr><td><code>String getAbsolutePath()</code></td><td><code>String</code></td><td>the full path, starting from the root of the file system</td></tr> <tr><td><code>boolean canRead()</code></td><td><code>boolean</code></td><td>whether this program is allowed to read it</td></tr> <tr><td><code>boolean canWrite()</code></td><td><code>boolean</code></td><td>whether this program is allowed to write to it</td></tr> </table> </div> </div> <div class="box key"> <div class="hd">Key Idea</div> <div class="bd"> <p><code>new File("report.txt")</code> is no more magical than <code>String s = "report.txt";</code>. It records a name. Nothing is opened, nothing is created, and the file does not have to exist. The disk is not consulted until you call a method like <code>exists()</code> &mdash; or hand the <code>File</code> to a <code>Scanner</code> or a <code>PrintWriter</code>.</p> </div> </div> <p>Here is a program that makes the point. It builds two <code>File</code> objects: one for a file that really is sitting in the folder, one for a name I invented.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; what a <code>File</code> object knows</span></div> <div class="bd"> <p>The folder this program runs in contains one file, <code>input.txt</code>:</p> <p class="filename">input.txt</p>
+<pre class="cmp"><code>Ada Lovelace 95
+Grace Hopper 98
+Alan Turing 91</code></pre> <p>There is no file called <code>nosuchfile.txt</code> anywhere. Before you reveal the output, answer two questions. Does running this program <em>create</em> <code>nosuchfile.txt</code>? And what can <code>length()</code> possibly return for a file that is not there?</p> <p class="filename">FileFacts.java</p>
+<pre><code class="language-java">import java.io.File;
+
+public class FileFacts {
+    public static void main(String args[]) {
+        File f = new File("input.txt");
+        File g = new File("nosuchfile.txt");
+
+        System.out.println("--- input.txt ---");
+        System.out.println("getName()         " + f.getName());
+        System.out.println("exists()          " + f.exists());
+        System.out.println("length()          " + f.length());
+        System.out.println("canRead()         " + f.canRead());
+        System.out.println("canWrite()        " + f.canWrite());
+        System.out.println("getAbsolutePath() " + f.getAbsolutePath());
+
+        System.out.println("--- nosuchfile.txt ---");
+        System.out.println("getName()         " + g.getName());
+        System.out.println("exists()          " + g.exists());
+        System.out.println("length()          " + g.length());
+        System.out.println("canRead()         " + g.canRead());
+        System.out.println("getAbsolutePath() " + g.getAbsolutePath());
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>--- input.txt ---
+getName()         input.txt
+exists()          true
+length()          47
+canRead()         true
+canWrite()        true
+getAbsolutePath() /home/claude/java/lec05/input.txt
+--- nosuchfile.txt ---
+getName()         nosuchfile.txt
+exists()          false
+length()          0
+canRead()         false
+getAbsolutePath() /home/claude/java/lec05/nosuchfile.txt</code></pre> <p>The two <code>getAbsolutePath()</code> lines are <em>representative</em> &mdash; they show the folder this program happened to run in, and yours will be different. Everything else on the page is the same wherever you run it.</p> <p>Four things to take away:</p> <ul> <li><strong>No file was created.</strong> After this program finishes, <code>nosuchfile.txt</code> still does not exist. <code>new File(...)</code> only recorded the name.</li> <li><strong><code>length()</code> is 0 for a file that is not there.</strong> That is a trap: <code>length() == 0</code> does <em>not</em> mean "the file exists and is empty". It could equally mean "there is no such file". Ask <code>exists()</code> first; you will see in &sect;5 that a real file of length 0 is a distinct and very common bug.</li> <li><strong><code>canRead()</code> is <code>false</code> for a missing file</strong>, for the same reason.</li> <li><strong><code>getAbsolutePath()</code> works on a name that does not exist.</strong> It is pure string arithmetic &mdash; the current folder glued in front of the name you gave.</li> </ul> <p><code>input.txt</code> reports 47 bytes. Count the visible characters and you get 44; the other three are the newline characters at the end of the three lines. Every line of a text file ends with a character you cannot see, and <code>length()</code> counts it.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 5.2</div> <div class="bd"> <p>Write a complete program <code>FileReport.java</code> with a <code>private static void report(String name)</code> method that prints, for the file named by its parameter: the file's name, and then &mdash; only if the file exists &mdash; its size in bytes, whether it is readable, and whether it is writable. If the file does not exist it should print <code>(no such file)</code> instead. Call it twice from <code>main</code>, once on <code>poem.txt</code> (which exists, and is 83 bytes) and once on <code>missing.txt</code> (which does not).</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The whole point of the exercise is the <code>if (f.exists())</code> guard. Asking a missing file for its <code>length()</code> is not an error &mdash; it quietly answers 0 &mdash; so nothing forces you to check. You have to remember to. Build the <code>File</code> object once at the top of the method and reuse it; there is no reason to construct it three times.</p> <p class="filename">FileReport.java</p>
+<pre><code class="language-java">import java.io.File;
+
+public class FileReport {
+    public static void main(String args[]) {
+        report("poem.txt");
+        report("missing.txt");
+    }
+
+    private static void report(String name) {
+        File f = new File(name);
+        System.out.println("Name:     " + f.getName());
+        if (f.exists()) {
+            System.out.println("Size:     " + f.length() + " bytes");
+            System.out.println("Readable: " + f.canRead());
+            System.out.println("Writable: " + f.canWrite());
+        } else {
+            System.out.println("          (no such file)");
+        }
+        System.out.println();
+    }
+}</code></pre> <pre class="out"><code>Name:     poem.txt
+Size:     83 bytes
+Readable: true
+Writable: true
+
+Name:     missing.txt
+          (no such file)</code></pre> <p><strong>Things to notice.</strong> There is no <code>throws FileNotFoundException</code> here and none is needed. Nothing in this program <em>opens</em> a file &mdash; <code>exists()</code>, <code>length()</code> and friends just ask the operating system a question about a path, and asking about a path that is not there is a perfectly ordinary answer, not a failure. The moment you add a <code>Scanner</code> or a <code>PrintWriter</code>, the <code>throws</code> becomes mandatory.</p> <p>Checking <code>exists()</code> before opening a file is the polite version of a program that would otherwise crash with a stack trace. We use it in almost every program from here on.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 5.2</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="18" aria-label="Live coding - Quick Check 5.2">import java.io.File;
+
+public class FileReport {
+    public static void main(String args[]) {
+        report("poem.txt");
+        report("missing.txt");
+    }
+
+    private static void report(String name) {
+        // 1. Build a File object for `name`.
+        // 2. Print its getName().
+        // 3. If it exists, print length(), canRead(), canWrite().
+        //    Otherwise print "          (no such file)".
+
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s3"><span class="num">3.</span>Reading a file with <code>Scanner</code></h2> <p>To read a file, hand the <code>File</code> object to a <code>Scanner</code>. From then on the <code>Scanner</code> behaves exactly as it did with <code>System.in</code>.</p> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; reading a text file</span></div> <div class="bd"> <ol> <li><code>import java.io.File;</code>, <code>import java.io.FileNotFoundException;</code> and <code>import java.util.Scanner;</code>.</li> <li>Add <code>throws FileNotFoundException</code> to the <code>main</code> header.</li> <li>Build the scanner: <code>Scanner input = new Scanner(new File("input.txt"));</code></li> <li>Loop while there is more input: <code>while (input.hasNext())</code> for tokens, or <code>while (input.hasNextLine())</code> for lines.</li> <li>Take one item per pass: <code>input.next()</code>, <code>input.nextInt()</code>, <code>input.nextLine()</code>.</li> <li>Call <code>input.close()</code> when the loop is finished.</li> </ol> </div> </div> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; token</span></div> <div class="bd"> <p>A <strong>token</strong> is a run of characters with no whitespace in it. By default a <code>Scanner</code> splits its input at whitespace &mdash; spaces, tabs and newlines &mdash; so <code>next()</code> hands you one word at a time and does not care which line that word was on. <code>nextLine()</code> ignores tokens entirely and hands you everything up to the next newline, spaces and all.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; one token at a time</span></div> <div class="bd"> <p>The file being read is the same three-line <code>input.txt</code> from &sect;2:</p> <p class="filename">input.txt</p>
+<pre class="cmp"><code>Ada Lovelace 95
+Grace Hopper 98
+Alan Turing 91</code></pre> <p>Before you reveal: how many times does the loop body run?</p> <p class="filename">ReadTokens.java</p>
+<pre><code class="language-java">import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+public class ReadTokens {
+    public static void main(String args[]) throws FileNotFoundException {
+        Scanner input = new Scanner(new File("input.txt"));
+        int count = 0;
+        while (input.hasNext()) {
+            String token = input.next();
+            count++;
+            System.out.println(count + ": " + token);
+        }
+        input.close();
+        System.out.println("Tokens read: " + count);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>1: Ada
+2: Lovelace
+3: 95
+4: Grace
+5: Hopper
+6: 98
+7: Alan
+8: Turing
+9: 91
+Tokens read: 9</code></pre> <p>Nine times &mdash; three tokens on each of three lines. Notice what is <em>missing</em> from the output: any trace of where the lines ended. To <code>next()</code>, the newline between <code>95</code> and <code>Grace</code> is just another piece of whitespace. If the whole file had been written on one line the output would have been identical.</p> <p>Notice also that <code>95</code> came back as the <code>String</code> <code>"95"</code>, not the number 95. <code>next()</code> always returns a <code>String</code>. If you want the number you either ask for it directly with <code>nextInt()</code>, or convert afterwards with <code>Integer.parseInt(token)</code>.</p> 
+</div></details> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; one line at a time</span></div> <div class="bd"> <p>Now the same file read with <code>hasNextLine()</code> and <code>nextLine()</code>. Each line is <code>name surname score</code>, so the score is the last piece after splitting on spaces. This version also guards the file with <code>exists()</code> before opening it &mdash; the habit from &sect;2.</p> <p class="filename">ReadLines.java</p>
+<pre><code class="language-java">import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+public class ReadLines {
+    public static void main(String args[]) throws FileNotFoundException {
+        File f = new File("input.txt");
+        if (!f.exists()) {
+            System.out.println("Cannot find " + f.getName());
+            return;
+        }
+        Scanner input = new Scanner(f);
+        int lineNo = 0;
+        int total = 0;
+        while (input.hasNextLine()) {
+            String line = input.nextLine();
+            lineNo++;
+            System.out.println(lineNo + " | " + line);
+            String parts[] = line.split(" ");
+            total += Integer.parseInt(parts[parts.length - 1]);
+        }
+        input.close();
+        System.out.println("Average score: " + total / (double) lineNo);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>1 | Ada Lovelace 95
+2 | Grace Hopper 98
+3 | Alan Turing 91
+Average score: 94.66666666666667</code></pre> <p>Three passes this time instead of nine, and each pass sees a whole record. That is the reason to prefer <code>nextLine()</code> whenever the file has a <em>row-and-column</em> shape: the line is the record, and <code>split</code> from Lecture 4 breaks it into fields.</p> <p><code>parts[parts.length - 1]</code> is the last field. Writing <code>parts[2]</code> would have worked for this file too, but it would break the day somebody has a middle name. Indexing from the end is the more honest expression of "the score is the last thing on the line".</p> <p><code>total / (double) lineNo</code> is the Lecture 1 division trap again. <code>total</code> is 284 and <code>lineNo</code> is 3; without the cast you would get the <code>int</code> 94 and never notice.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 5.3</div> <div class="bd"> <p>This program opens the same three-line <code>input.txt</code> twice &mdash; once with a token loop, once with a line loop. What does it print?</p> <pre><code class="language-java">public class CountBoth {
+    public static void main(String args[]) throws FileNotFoundException {
+        Scanner a = new Scanner(new File("input.txt"));
+        int tokens = 0;
+        while (a.hasNext()) { a.next(); tokens++; }
+        a.close();
+
+        Scanner b = new Scanner(new File("input.txt"));
+        int lines = 0;
+        while (b.hasNextLine()) { b.nextLine(); lines++; }
+        b.close();
+
+        System.out.println("tokens = " + tokens);
+        System.out.println("lines  = " + lines);
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Count the whitespace-separated words in the file, then count the newline-terminated lines. They are two different questions about the same bytes.</p> <pre class="out"><code>tokens = 9
+lines  = 3</code></pre> <p><strong>Things to notice.</strong> The interesting part is why the program needs <em>two</em> <code>Scanner</code> objects. A <code>Scanner</code> is a one-way street: once it has consumed the file there is no <code>rewind()</code> and no <code>reset()</code>. If you need to walk the same file twice you open it twice &mdash; or, far more often, you read it once into memory (an array, or the <code>ArrayList</code> of Lecture 6) and walk that.</p> <p>Notice too that <code>b</code> is opened from a fresh <code>new File("input.txt")</code>. That is not wasteful: <code>File</code> objects are tiny name-holders, and reusing the same one would have worked equally well. It is the <code>Scanner</code> that is used up, not the <code>File</code>.</p> </div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; <code>new Scanner("input.txt")</code></span></div> <div class="bd"> <p>Watch the missing <code>new File</code>:</p> <pre><code class="language-java">Scanner input = new Scanner("input.txt");          // compiles. reads the wrong thing.
+Scanner input = new Scanner(new File("input.txt")); // reads the file</code></pre> <p><code>Scanner</code> has a constructor that takes a <code>String</code>, and it scans <em>that string</em>. So the first line builds a scanner over the eleven characters <code>input.txt</code>. Your loop runs once, hands you the token <code>"input.txt"</code>, and stops. There is no error message of any kind &mdash; the program compiles and runs and produces confident nonsense. If your file-reading loop mysteriously produces exactly one line of output, and that line is the name of your file, this is why.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 5.4</div> <div class="bd"> <p>The file <code>scores.txt</code> contains five numbers, one per line:</p> <p class="filename">scores.txt</p>
+<pre class="cmp"><code>88
+94
+71
+100
+65</code></pre> <p>Write a complete program <code>SumFile.java</code> that reads the numbers with <code>hasNextInt()</code> and <code>nextInt()</code>, and prints how many it read and their sum. Print a message and stop cleanly if the file is not there.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> <code>hasNextInt()</code> is the loop condition: it is <code>true</code> while the next token is something that can be parsed as an <code>int</code>, so the loop stops at the end of the file <em>and</em> stops at the first non-numeric token. Guard with <code>exists()</code> first and <code>return</code> from <code>main</code> if the file is missing.</p> <p class="filename">SumFile.java</p>
+<pre><code class="language-java">import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+public class SumFile {
+    public static void main(String args[]) throws FileNotFoundException {
+        File f = new File("scores.txt");
+        if (!f.exists()) {
+            System.out.println("Cannot find " + f.getName());
+            return;
+        }
+        Scanner input = new Scanner(f);
+        int sum = 0, count = 0;
+        while (input.hasNextInt()) {
+            sum += input.nextInt();
+            count++;
+        }
+        input.close();
+        System.out.println("Read " + count + " numbers");
+        System.out.println("Sum is " + sum);
+    }
+}</code></pre> <pre class="out"><code>Read 5 numbers
+Sum is 418</code></pre> <p><strong>Things to notice.</strong> Because the loop is driven by <code>hasNextInt()</code> rather than <code>hasNext()</code>, this program is also safe against a file that ends with a stray word: it simply stops counting there. That is a feature when the numbers come first and commentary follows, and a silent bug when the stray token is in the <em>middle</em> of the data &mdash; everything after it is ignored without a word. If you need to know that happened, loop on <code>hasNext()</code> and test each token yourself.</p> <p>The <code>return;</code> in the middle of <code>main</code> is not a special file-handling trick. <code>main</code> returns <code>void</code>, so a bare <code>return</code> just means "stop here".</p> </div></details> </div> </div> <h2 id="s4"><span class="num">4.</span>Writing a file with <code>PrintWriter</code></h2> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the <code>PrintWriter</code> class</span></div> <div class="bd"> <p><code>PrintWriter</code>, also from <code>java.io</code>, <strong>provides methods to write formatted data to an underlying Writer</strong>. In practice: it is <code>System.out</code>, pointed at a file.</p> <p><strong>Constructors</strong></p> <ul> <li><code>PrintWriter(String fileName)</code> &mdash; name the file directly.</li> <li><code>PrintWriter(File file)</code> &mdash; hand it a <code>File</code> object you have already built and inspected.</li> </ul> <p>The two are interchangeable; use the second when you want to call <code>exists()</code> on the file first, and the first when you do not.</p> <p><strong>Important methods</strong></p> <ul> <li><code>void print(data)</code> &mdash; writes the data.</li> <li><code>void println(data)</code> &mdash; writes the data followed by a line separator.</li> <li><code>void close()</code> &mdash; closes the stream. <strong>Not optional.</strong> See &sect;5.</li> </ul> </div> </div> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; a <code>PrintWriter</code> creates and empties the file</span></div> <div class="bd"> <p>Constructing a <code>PrintWriter</code> on a path does two things immediately. If no file is there, it <strong>creates</strong> one. If a file <em>is</em> there, it <strong>throws away everything in it</strong> and starts from an empty file. There is no confirmation prompt and no undo.</p> </div> </div> <p>That truncation is worth seeing rather than being told about.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the second writer wins</span></div> <div class="bd"> <p>This program writes three lines to <code>log.txt</code>, closes the writer, then opens a <em>second</em> <code>PrintWriter</code> on the same file and writes one short line. Before you reveal: how many lines does <code>log.txt</code> contain at the end &mdash; four, or one?</p> <p class="filename">Overwrite.java</p>
+<pre><code class="language-java">import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.Scanner;
+
+public class Overwrite {
+    public static void main(String args[]) throws FileNotFoundException {
+        PrintWriter first = new PrintWriter("log.txt");
+        first.println("line one");
+        first.println("line two");
+        first.println("line three");
+        first.close();
+        System.out.println("after first writer:  " + new File("log.txt").length() + " bytes");
+
+        PrintWriter second = new PrintWriter("log.txt");
+        second.println("oops");
+        second.close();
+        System.out.println("after second writer: " + new File("log.txt").length() + " bytes");
+
+        Scanner in = new Scanner(new File("log.txt"));
+        while (in.hasNextLine()) System.out.println("    " + in.nextLine());
+        in.close();
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>after first writer:  29 bytes
+after second writer: 5 bytes
+    oops</code></pre> <p>One line. The three lines written by <code>first</code> are gone &mdash; not appended to, not preserved: gone. 29 bytes became 5 (four letters plus one newline) the instant the second <code>PrintWriter</code> was constructed, before <code>println</code> was called even once.</p> <p>This is not a bug you can work around with the classes in this lecture. <code>PrintWriter</code> always starts fresh. If you want to <em>add</em> to an existing file you need a <code>FileWriter</code> opened in append mode, which is outside today's scope; the more common answer in this course is to read the old file, keep what you want, and write everything back out in one pass.</p> 
+</div></details> </div> </div> <p>Which is exactly why the instructor's own output example starts with a guard. Here is her program, unchanged except for the file name.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; saving data to a file, safely</span></div> <div class="bd"> <p>The array of colors is written one per line to <code>colors.txt</code>, but only if that file is not already there. Before you reveal, predict two things: what the program prints on a clean folder, and what it prints if you run it a second time.</p> <p class="filename">FileOutput.java</p>
+<pre><code class="language-java">import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+
+public class FileOutput {
+    public static void main(String[] args) throws FileNotFoundException {
+        String colors[] = {"red", "orange", "yellow", "green", "blue"};
+        File out = new File("colors.txt");
+        if (out.exists()) {
+            System.out.println("That file already exists. Be careful!");
+            System.exit(0);
+        }
+        PrintWriter output = new PrintWriter(out);
+        for (int i = 0; i &lt; colors.length; i++) {
+            output.println(colors[i]);
+        }
+        output.close();
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <p>The first run prints <strong>nothing at all</strong>. Not a single character reaches the screen &mdash; every <code>println</code> in the loop is a <code>PrintWriter</code> method, and the <code>PrintWriter</code> writes to the file. Like <code>javac</code>, silence means it worked. The evidence is the new file:</p> <p class="filename">colors.txt &mdash; after the first run</p>
+<pre class="cmp"><code>red
+orange
+yellow
+green
+blue</code></pre> <p>The second run reaches the guard, finds the file, and stops:</p> <pre class="out"><code>That file already exists. Be careful!</code></pre> <p><code>System.exit(0)</code> ends the program immediately, wherever it is called from &mdash; the <code>0</code> is the "no problems" status code that the operating system sees. It is a blunt instrument. In a <code>main</code> this short you could equally have written <code>return;</code>, and in a method that is called from somewhere else you would <em>have</em> to, because <code>System.exit</code> gives the caller no chance to recover.</p> <p>Notice the two shapes of <code>println</code> sitting side by side in one program: <code>System.out.println(...)</code> goes to the screen, <code>output.println(...)</code> goes to the file. The method name is the same because the idea is the same; the receiver before the dot is what decides the destination.</p> 
+</div></details> </div> </div> <p>And now the round trip. The file we just wrote is a perfectly ordinary text file, so the <code>Scanner</code> from &sect;3 can read it straight back. This is the instructor's Example 2.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; reading back what we wrote</span></div> <div class="bd"> <p class="filename">FileInput.java</p>
+<pre><code class="language-java">import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+public class FileInput {
+    public static void main(String args[]) throws FileNotFoundException {
+        Scanner input = new Scanner(new File("colors.txt"));
+        while (input.hasNext()) {
+            System.out.println(input.next());
+        }
+        input.close();
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>red
+orange
+yellow
+green
+blue</code></pre> <p>Five tokens, five lines of output. Here <code>next()</code> and <code>nextLine()</code> would have given the same answer, because each line of <code>colors.txt</code> holds exactly one whitespace-free word. That is a property of this particular file, not a general rule &mdash; go back to <code>input.txt</code> in &sect;3, where the two loops gave 9 and 3.</p> <p><code>FileOutput</code> and <code>FileInput</code> together are the shape of an enormous number of real programs: compute something, write it to a file, and let a different program &mdash; possibly written by someone else, possibly written next year &mdash; read it back.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 5.5</div> <div class="bd"> <p>Suppose you delete the four lines of the <code>exists()</code> guard from <code>FileOutput</code>, so the program goes straight to <code>new PrintWriter(out)</code>.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> What happens the first time you run it in a folder with no <code>colors.txt</code>?</p> <details class="soln"><summary></summary><div class="ans"> <p>Exactly what happened before: the file is created and the five colors are written to it. The guard never fired on the first run anyway, so removing it changes nothing here.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> You now edit <code>colors.txt</code> by hand, adding <code>purple</code> and <code>black</code>, and run the program again. What is in the file afterwards?</p> <details class="soln"><summary></summary><div class="ans"> <p>The original five colors and nothing else. Constructing the <code>PrintWriter</code> truncated the file to zero bytes, destroying both of your additions, and then the loop wrote <code>red</code> through <code>blue</code> again.</p> <p><strong>Things to notice across both parts.</strong> The guard is not there to protect the <em>program</em> &mdash; the program runs fine without it. It is there to protect <em>your data</em>. Any time a program writes to a file whose name it did not just invent, ask what happens if that file already contains something a human cares about. This is also why real tools ask "overwrite?" and why <code>PrintWriter</code>, which never asks, should be pointed at output files rather than at files you are also editing by hand.</p> </div></details> </div> </div> </div> <h2 id="s5"><span class="num">5.</span><code>close()</code>, and the empty-file bug</h2> <p>Every <code>Scanner</code> and every <code>PrintWriter</code> in this lecture ends with a call to <code>close()</code>. For a <code>Scanner</code> that is good manners &mdash; it releases the operating system's handle on the file. For a <code>PrintWriter</code> it is the difference between a file with your data in it and a file with nothing in it.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; buffering</span></div> <div class="bd"> <p>Writing to a disk is thousands of times slower than writing to memory, so a <code>PrintWriter</code> does not send your characters to the disk one at a time. It collects them in a <strong>buffer</strong> &mdash; a block of memory, several thousand characters wide &mdash; and only writes the whole block out when the buffer fills up, or when you tell it to.</p> <p><code>close()</code> is how you tell it to. It empties the buffer to the disk (this is called <strong>flushing</strong>) and then releases the file. Skip it, and whatever was still in the buffer when your program ended is simply never written.</p> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; the file is there and it is empty</span></div> <div class="bd"> <p>This is the single most common file-output bug, and its symptom is peculiar enough to be worth memorising: <strong>the file exists, it has the right name, and it is zero bytes long.</strong> Here are two programs that differ by one line.</p> <p class="filename">ForgotClose.java</p>
+<pre><code class="language-java">import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+
+public class ForgotClose {
+    public static void main(String args[]) throws FileNotFoundException {
+        PrintWriter output = new PrintWriter("forgot.txt");
+        output.println("red");
+        output.println("orange");
+        output.println("yellow");
+        // no output.close();
+
+        File f = new File("forgot.txt");
+        System.out.println("exists() = " + f.exists());
+        System.out.println("length() = " + f.length());
+    }
+}</code></pre> <pre class="out"><code>exists() = true
+length() = 0</code></pre> <p class="filename">ClosedProperly.java</p>
+<pre><code class="language-java">import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+
+public class ClosedProperly {
+    public static void main(String args[]) throws FileNotFoundException {
+        PrintWriter output = new PrintWriter("closed.txt");
+        output.println("red");
+        output.println("orange");
+        output.println("yellow");
+        output.close();
+
+        File f = new File("closed.txt");
+        System.out.println("exists() = " + f.exists());
+        System.out.println("length() = " + f.length());
+    }
+}</code></pre> <pre class="out"><code>exists() = true
+length() = 18</code></pre> <p>Eighteen bytes: <code>red</code>, <code>orange</code> and <code>yellow</code> are 15 characters, plus three newlines. The version without <code>close()</code> produced a file of length 0 &mdash; the three <code>println</code> calls really did run, and their output really is gone.</p> </div> </div> <p>You might reasonably suspect that the buffer gets flushed when the program ends, and that <code>length()</code> was merely asked too early. It does not, and it was not. Here is a <em>separate</em> program, run after both of the above had finished, which opens the two files from scratch and prints what is in them.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the evidence, after the fact</span></div> <div class="bd"> <p class="filename">ShowFile.java</p>
+<pre><code class="language-java">import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+public class ShowFile {
+    public static void main(String args[]) throws FileNotFoundException {
+        report("forgot.txt");
+        report("closed.txt");
+    }
+
+    private static void report(String name) throws FileNotFoundException {
+        File f = new File(name);
+        System.out.println(name + ": exists=" + f.exists() + ", length=" + f.length());
+        Scanner in = new Scanner(f);
+        int lines = 0;
+        while (in.hasNextLine()) {
+            lines++;
+            System.out.println("    " + in.nextLine());
+        }
+        in.close();
+        System.out.println("    (" + lines + " lines)");
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>forgot.txt: exists=true, length=0
+    (0 lines)
+closed.txt: exists=true, length=18
+    red
+    orange
+    yellow
+    (3 lines)</code></pre> <p><code>forgot.txt</code> really is empty, permanently. The JVM exited, the operating system reclaimed the process's memory, and the buffer went with it. Nothing rescues you afterwards.</p> <p>Two practical consequences:</p> <ul> <li><strong>Write the <code>close()</code> at the same moment you write the <code>new PrintWriter</code>.</strong> Type both lines, then go back and fill in the middle. This is the same discipline as typing a closing brace as soon as you type an opening one.</li> <li><strong>A zero-byte output file is a missing <code>close()</code> until proven otherwise.</strong> Do not start debugging your loop. Check the bottom of the method first.</li> </ul> <p>Notice that <code>report</code> also declares <code>throws FileNotFoundException</code>, not just <code>main</code>. A method that can fail has to say so, and <code>main</code> &mdash; which calls it &mdash; has to say so too. Lecture 20 explains what that chain of declarations really means.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 5.6</div> <div class="bd"> <p>This program is supposed to write the numbers 1 through 5 into <code>nums.txt</code>, one per line. It runs without any error message, but <code>nums.txt</code> comes out empty. Find the bug, then write the corrected program.</p> <pre><code class="language-java">import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+
+public class WriteNums {
+    public static void main(String args[]) throws FileNotFoundException {
+        PrintWriter output = new PrintWriter("nums.txt");
+        for (int i = 1; i &lt;= 5; i++) {
+            output.println(i);
+        }
+        System.out.println("Wrote nums.txt, size = " + new File("nums.txt").length());
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> There is nothing wrong with the loop: it runs five times and calls <code>println</code> five times. Look instead for the step that moves characters from the buffer to the disk. There isn't one.</p> <p>As written, the program prints its own diagnosis:</p> <pre class="out"><code>Wrote nums.txt, size = 0</code></pre> <p>The fix is one line, <code>output.close();</code>, placed after the loop and before anything that reads the file back:</p> <p class="filename">WriteNums.java</p>
+<pre><code class="language-java">import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+
+public class WriteNums {
+    public static void main(String args[]) throws FileNotFoundException {
+        PrintWriter output = new PrintWriter("nums.txt");
+        for (int i = 1; i &lt;= 5; i++) {
+            output.println(i);
+        }
+        output.close();
+        System.out.println("Wrote nums.txt, size = " + new File("nums.txt").length());
+    }
+}</code></pre> <pre class="out"><code>Wrote nums.txt, size = 10</code></pre> <p class="filename">nums.txt</p>
+<pre class="cmp"><code>1
+2
+3
+4
+5</code></pre> <p><strong>Things to notice.</strong> Ten bytes for five numbers: five digits and five newlines. And <code>output.println(i)</code> happily takes an <code>int</code> &mdash; <code>print</code> and <code>println</code> are overloaded for every primitive type and for <code>String</code>, exactly like the <code>System.out</code> versions you have been using since Lecture 1.</p> <p>Placement matters as much as presence. Putting <code>output.close()</code> <em>after</em> the <code>System.out.println</code> would still write the file correctly, but the size reported on the screen would be 0, because at that moment it really would still be 0.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 5.6</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="16" aria-label="Live coding - Quick Check 5.6">import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+
+public class WriteNums {
+    public static void main(String args[]) throws FileNotFoundException {
+        PrintWriter output = new PrintWriter("nums.txt");
+        for (int i = 1; i &lt;= 5; i++) {
+            output.println(i);
+        }
+        // Fix the bug here.
+        System.out.println("Wrote nums.txt, size = " + new File("nums.txt").length());
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 5.7</div> <div class="bd"> <p>A program calls <code>new PrintWriter("results/output.txt")</code> in a folder that contains no subfolder called <code>results</code>. What happens?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> <code>PrintWriter</code> creates <em>files</em>. Ask whether that includes creating the <em>folders</em> those files live in.</p> <p>It does not. The program compiles, starts, and then fails at run time the moment the <code>PrintWriter</code> is constructed:</p> <pre class="out"><code>Exception in thread "main" java.io.FileNotFoundException: results/output.txt (No such file or directory)
+	at java.base/java.io.FileOutputStream.open0(Native Method)
+	at java.base/java.io.FileOutputStream.open(FileOutputStream.java:289)
+	at java.base/java.io.FileOutputStream.&lt;init&gt;(FileOutputStream.java:230)
+	at java.base/java.io.FileOutputStream.&lt;init&gt;(FileOutputStream.java:118)
+	at java.base/java.io.PrintWriter.&lt;init&gt;(PrintWriter.java:207)
+	at BadDir.main(BadDir.java:6)</code></pre> <p><strong>Things to notice.</strong> The exception is called <code>FileNotFoundException</code> even though we were trying to <em>create</em> a file. The thing that was not found is the folder. This is the same exception, with the same name, that you get when reading a file that is not there &mdash; which is why one <code>throws FileNotFoundException</code> on <code>main</code> covers both the <code>Scanner</code> and the <code>PrintWriter</code> in a program that does input and output.</p> <p>Read the stack trace from the bottom up: the last line names <em>your</em> code and the line number in it, and everything above it is library code you did not write. That bottom line is almost always the only one you need.</p> </div></details> </div> </div> <h2 id="s6"><span class="num">6.</span>Worked program: every word in a file</h2> <p>Everything so far has been machinery. This section and the next put it to work on the two text-processing programs from the Spring 2025 notes. Both do the same three things a great many real programs do: open a file, take it apart line by line with the <code>String</code> methods from Lecture 4, and produce something new.</p> <p>The first one collects every word in a file, folded to lower case, with duplicates removed and the result in alphabetical order. It uses one library class we have not met.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; <code>TreeSet</code></span></div> <div class="bd"> <p>A <code>TreeSet&lt;String&gt;</code> is a library container that holds a <em>set</em> of <code>String</code> values: adding a value that is already in it does nothing, and iterating over it always visits the values in sorted order. You get de-duplication and sorting for free, without writing a line of either.</p> <p>You do not need to know how it works to use it here. Its close relative <code>ArrayList</code> is the subject of Lecture 6, and the angle brackets in <code>TreeSet&lt;String&gt;</code> &mdash; which say "a <code>TreeSet</code> of <code>String</code>" &mdash; are explained properly in Lecture 22.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; print all the words in the file</span></div> <div class="bd"> <p>The file to be processed is four lines long. There is a detail you cannot see: between <code>lazy</code> and <code>dogs!</code> on the second line there are <em>two</em> spaces, not one.</p> <p class="filename">poem.txt</p>
+<pre class="cmp"><code>The Quick brown fox
+jumps over 2 lazy  dogs!
+the quick brown fox
+again, and again.</code></pre> <p>Read the program carefully before revealing, and answer three questions. Which of the sixteen words survive <code>isWord</code>? What does the double space do? And in what order do the survivors come out?</p> <p class="filename">LongWords.java</p>
+<pre><code class="language-java">import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+import java.util.TreeSet;
+
+public class LongWords {
+    public static void main(String args[]) throws FileNotFoundException {
+        Scanner input = new Scanner(new File("poem.txt"));
+        TreeSet&lt;String&gt; dictionary = new TreeSet&lt;String&gt;();
+        while (input.hasNextLine()) {
+            String line = input.nextLine();
+            line = line.trim();
+            String []words = line.split("\\s", -1);
+            for (int i = 0; i &lt; words.length; i++) {
+                if (!words[i].isEmpty() &amp;&amp; isWord(words[i]))
+                    dictionary.add(words[i].toLowerCase());
+            }
+        }
+        input.close();
+        for (String s : dictionary)
+            System.out.println(s);
+    }
+
+    private static boolean isWord(String s) {
+        for (int i = 0; i &lt; s.length(); i++) {
+            char c = s.charAt(i);
+            if ('a' &lt;= c &amp;&amp; c &lt;= 'z') continue;
+            if ('A' &lt;= c &amp;&amp; c &lt;= 'Z') continue;
+            return false;
+        }
+        return true;
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>and
+brown
+fox
+jumps
+lazy
+over
+quick
+the</code></pre> <p>Eight words out of sixteen tokens. Here is where the other eight went:</p> <table class="trace"> <tr><th>Token</th><th>Kept?</th><th>Why</th></tr> <tr><td><code>The</code>, <code>the</code></td><td>kept, once</td><td>both become <code>the</code> after <code>toLowerCase()</code>, and a <code>TreeSet</code> stores it once</td></tr> <tr><td><code>Quick</code>, <code>quick</code></td><td>kept, once</td><td>same</td></tr> <tr><td><code>brown</code>, <code>fox</code></td><td>kept, once each</td><td>each appears twice in the file, identically</td></tr> <tr><td><code>2</code></td><td>rejected</td><td><code>isWord</code> sees <code>'2'</code>, which is neither <code>a</code>&ndash;<code>z</code> nor <code>A</code>&ndash;<code>Z</code></td></tr> <tr><td><code>dogs!</code></td><td>rejected</td><td>the <code>!</code> is not a letter, so the whole token fails</td></tr> <tr><td><code>again,</code></td><td>rejected</td><td>the comma is not a letter</td></tr> <tr><td><code>again.</code></td><td>rejected</td><td>the period is not a letter</td></tr> <tr><td><code>""</code> (empty)</td><td>rejected</td><td>produced by the double space; caught by <code>!words[i].isEmpty()</code></td></tr> </table> <p>Four points worth pulling out of this program.</p> <ul> <li><strong><code>split("\\s", -1)</code> splits on a single whitespace character.</strong> Two spaces in a row therefore produce an <em>empty string</em> between them &mdash; there is nothing between the first space and the second. That is why the <code>!words[i].isEmpty()</code> test is there, and it is not optional: without it, the empty string sails through <code>isWord</code> (a loop over zero characters returns <code>true</code>) and lands in the dictionary as a blank entry. Writing <code>split("\\s+", -1)</code> instead would collapse runs of whitespace and avoid the problem at the source.</li> <li><strong><code>trim()</code> handles the ends, <code>isEmpty()</code> handles the middle.</strong> <code>line.trim()</code> removes leading and trailing whitespace so the split does not produce an empty first or last token; the <code>isEmpty()</code> guard catches the ones in the interior.</li> <li><strong><code>isWord</code> is all-or-nothing.</strong> One non-letter anywhere in the token rejects the whole thing. That is why <code>dogs!</code> disappears entirely rather than being trimmed to <code>dogs</code>. If you wanted <code>dogs</code>, you would strip the punctuation before the test rather than tightening the test.</li> <li><strong>The <code>continue</code> statements read as "this character is fine, move on".</strong> Any character that reaches the end of the loop body without hitting a <code>continue</code> triggers <code>return false</code>. It is a compact way to write "reject unless one of these holds".</li> </ul> <p>One honest note about the name. The class is called <code>LongWords</code>, but as written it keeps every word regardless of length &mdash; the instructor's own comment on it is "print all the words in the file". Quick Check 5.9 makes the name true.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 5.8</div> <div class="bd"> <p>Questions about <code>isWord</code> and the split.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> What does <code>isWord("")</code> return, and why does that matter?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>true</code>. The <code>for</code> loop runs zero times, so control falls straight through to <code>return true</code>. It matters because an empty string is not a word by anybody's definition, so <code>isWord</code> alone would let it into the dictionary. The guard <code>!words[i].isEmpty()</code> in the caller is what actually keeps it out.</p> <p>This is a general pattern with "do all the elements satisfy P?" loops: they always answer <code>true</code> for an empty collection. That is usually the mathematically right answer and almost never the one your program wants.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> The line <code>"can't stop"</code> is split with <code>split("\\s", -1)</code> and each piece is passed to <code>isWord</code>. What ends up in the dictionary?</p> <details class="soln"><summary></summary><div class="ans"> <p>Only <code>stop</code>. The split gives the two tokens <code>can't</code> and <code>stop</code>; the apostrophe in <code>can't</code> is not in <code>a</code>&ndash;<code>z</code> or <code>A</code>&ndash;<code>Z</code>, so <code>isWord</code> returns <code>false</code> at the fourth character and the token is dropped.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> The file contains <code>Fox</code> on one line and <code>fox</code> on another. How many entries do they contribute?</p> <details class="soln"><summary></summary><div class="ans"> <p>One. <code>toLowerCase()</code> turns both into <code>fox</code> before <code>add</code> is called, and a <code>TreeSet</code> refuses to store the same value twice.</p> <p><strong>Things to notice across all three parts.</strong> Each of the three filters in this program does exactly one job, and none of them can do another's: <code>isEmpty()</code> rejects nothing-at-all, <code>isWord</code> rejects not-all-letters, <code>toLowerCase()</code> plus the <code>TreeSet</code> rejects duplicates. When a text-processing program gives you a surprising answer, work out which of your filters let the surprise through rather than rewriting all of them.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 5.9</div> <div class="bd"> <p>Make the name honest. Modify <code>LongWords</code> so that it keeps only words of five or more letters, and call the result <code>LongWordsOnly.java</code>. Everything else stays the same. Run against the same <code>poem.txt</code>, what should it print?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The decision about whether to keep a token is already in one place &mdash; the <code>if</code> inside the inner loop &mdash; so the change belongs there and nowhere else. Add a third condition, <code>words[i].length() &gt;= 5</code>, joined with <code>&amp;&amp;</code>. Because <code>&amp;&amp;</code> short-circuits, put the cheap length test where it will save work: after the <code>isEmpty()</code> check is fine, and putting it before <code>isWord</code> avoids scanning long punctuation-laden tokens character by character. Either order gives the same answer.</p> <p class="filename">LongWordsOnly.java</p>
+<pre><code class="language-java">import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+import java.util.TreeSet;
+
+public class LongWordsOnly {
+    public static void main(String args[]) throws FileNotFoundException {
+        Scanner input = new Scanner(new File("poem.txt"));
+        TreeSet&lt;String&gt; dictionary = new TreeSet&lt;String&gt;();
+        while (input.hasNextLine()) {
+            String line = input.nextLine().trim();
+            String words[] = line.split("\\s", -1);
+            for (int i = 0; i &lt; words.length; i++) {
+                if (!words[i].isEmpty() &amp;&amp; isWord(words[i]) &amp;&amp; words[i].length() &gt;= 5)
+                    dictionary.add(words[i].toLowerCase());
+            }
+        }
+        input.close();
+        for (String s : dictionary)
+            System.out.println(s);
+    }
+
+    private static boolean isWord(String s) {
+        for (int i = 0; i &lt; s.length(); i++) {
+            char c = s.charAt(i);
+            if ('a' &lt;= c &amp;&amp; c &lt;= 'z') continue;
+            if ('A' &lt;= c &amp;&amp; c &lt;= 'Z') continue;
+            return false;
+        }
+        return true;
+    }
+}</code></pre> <pre class="out"><code>brown
+jumps
+quick</code></pre> <p><strong>Things to notice.</strong> Three words survive: <code>brown</code>, <code>jumps</code> and <code>quick</code>. <code>again</code> is five letters long and would have qualified &mdash; but it only ever appears in the file as <code>again,</code> and <code>again.</code>, and <code>isWord</code> had already thrown both away before the length test could see them.</p> <p>The line <code>String line = input.nextLine().trim();</code> chains two calls where the original used two statements. Both are correct; chaining is compact and idiomatic once you are comfortable reading right to left: read the line, then trim it.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 5.9</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="28" aria-label="Live coding - Quick Check 5.9">import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+import java.util.TreeSet;
+
+public class LongWordsOnly {
+    public static void main(String args[]) throws FileNotFoundException {
+        Scanner input = new Scanner(new File("poem.txt"));
+        TreeSet&lt;String&gt; dictionary = new TreeSet&lt;String&gt;();
+        while (input.hasNextLine()) {
+            String line = input.nextLine().trim();
+            String words[] = line.split("\\s", -1);
+            for (int i = 0; i &lt; words.length; i++) {
+                // Keep the word only if it is non-empty, all letters,
+                // AND at least 5 characters long.
+
+            }
+        }
+        input.close();
+        for (String s : dictionary)
+            System.out.println(s);
+    }
+
+    private static boolean isWord(String s) {
+        for (int i = 0; i &lt; s.length(); i++) {
+            char c = s.charAt(i);
+            if ('a' &lt;= c &amp;&amp; c &lt;= 'z') continue;
+            if ('A' &lt;= c &amp;&amp; c &lt;= 'Z') continue;
+            return false;
+        }
+        return true;
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s7"><span class="num">7.</span>Worked program: copying a file and splitting long lines</h2> <p>The second program from the Spring 2025 notes is the first one in this lecture that reads <em>and</em> writes at the same time: a <code>Scanner</code> on one file, a <code>PrintWriter</code> on another, both open at once. Its job is to copy the input to the output, breaking any line longer than 40 characters at a space so that nothing runs off the edge of the page.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; wrap the lines at 40 characters</span></div> <div class="bd"> <p>The input has three lines, of 77, 80 and 11 characters. The second one begins with four spaces of indentation.</p> <p class="filename">wrapme.txt</p>
+<pre class="cmp"><code>Java reads a file one line at a time, and each line can be any length at all.
+    An indented line stays indented when it is split, and gains two more spaces.
+Short line.</code></pre> <p>The program keeps two loops. The outer one walks the input file line by line; the inner one keeps chopping pieces off the front of the current line until nothing is left. Before you reveal: how many lines will the output file have?</p> <p class="filename">SplitLines.java</p>
+<pre><code class="language-java">import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.Scanner;
+
+public class SplitLines {
+    public static void main(String args[]) throws FileNotFoundException {
+        Scanner input = new Scanner(new File("wrapme.txt"));
+        PrintWriter output = new PrintWriter(new File("wrapped.txt"));
+        while (input.hasNextLine()) {
+            String line = input.nextLine();
+            line = line.replaceAll("\t", "  ");
+            while (line.trim().length() &gt; 0) {
+                if (line.length() &lt;= 40) {
+                    output.println(line);
+                    line = "";
+                }
+                else {
+                    String indent = indentationOf(line);
+                    int cutAt = cut(line, indent, 40);
+                    if (cutAt &lt; indent.length()) {
+                        output.println(line);
+                        line = "";
+                    } else {
+                        output.println(line.substring(0, cutAt));
+                        line = indent + "  " + line.substring(cutAt);
+                    }
+                }
+            }
+        }
+        input.close();
+        output.close();
+    }
+
+    private static int cut(String line, String indent, int desiredLength) {
+        if (desiredLength &lt; indent.length()) desiredLength = indent.length() + 1;
+        int index = line.lastIndexOf(" ", desiredLength);
+        if (index &lt; indent.length()) index = line.indexOf(" ", desiredLength);
+        return index;
+    }
+
+    private static String indentationOf(String line) {
+        String answer = "";
+        int i = 0;
+        while (i &lt; line.length() &amp;&amp; line.charAt(i) == ' ') {
+            answer += " ";
+            i++;
+        }
+        return answer;
+    }
+}</code></pre> <details class="soln reveal noout"><summary></summary><div class="ans">
+ <p>Seven. The program prints nothing to the screen; the result is the new file:</p> <p class="filename">wrapped.txt</p>
+<pre class="cmp"><code>Java reads a file one line at a time,
+   and each line can be any length at
+      all.
+    An indented line stays indented when
+       it is split, and gains two more
+          spaces.
+Short line.</code></pre> <p>Follow the first input line through the inner loop:</p> <table class="trace"> <tr><th>Pass</th><th><code>line</code> at the top of the pass</th><th>length</th><th>what happens</th></tr> <tr><td>1</td><td><code>Java reads a file one line at a time, and each ... at all.</code></td><td>77</td><td>too long. <code>indent</code> is <code>""</code>. <code>cut</code> finds the last space at or before position 40 &mdash; index 37 &mdash; and the text up to there is written out.</td></tr> <tr><td>2</td><td><code>   and each line can be any length at all.</code></td><td>42</td><td>still too long. <code>indent</code> is now three spaces. Cut again, write again.</td></tr> <tr><td>3</td><td><code>      all.</code></td><td>10</td><td>40 or shorter, so it is written whole and <code>line</code> is set to <code>""</code>, ending the inner loop.</td></tr> </table> <p>The helper methods are worth a moment each.</p> <ul> <li><code>indentationOf</code> counts the leading spaces and returns a <code>String</code> of exactly that many spaces, so the continuation lines can be lined up under the original.</li> <li><code>cut</code> finds where to break. <code>line.lastIndexOf(" ", 40)</code> searches <em>backwards</em> from position 40 for a space, which gives the longest piece that still fits. If there is no space that early &mdash; a single enormous word &mdash; it falls back to <code>line.indexOf(" ", 40)</code>, searching forwards, and accepts a line that is too long rather than cutting a word in half.</li> <li><code>replaceAll("\t", "  ")</code> turns every tab into two spaces first, so that counting characters means something. A tab is one character but occupies eight columns on screen, and no amount of <code>length()</code> arithmetic can account for that.</li> </ul> <p>The <code>if (cutAt &lt; indent.length())</code> test is the safety valve. If <code>cut</code> came back with <code>-1</code> (no space anywhere after the indent) the program gives up on splitting, writes the long line as it is, and moves on. Without that branch, <code>substring(0, -1)</code> would throw and the program would stop.</p> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Warning<span class="tag">&mdash; the continuation lines creep to the right</span></div> <div class="bd"> <p>Look at the output above again. The first line's continuations are indented by 3 spaces and then 6; the second line's by 7 and then 10. Each continuation is indented further than the last, which is almost certainly not what was wanted &mdash; the intent is clearly a fixed two-space hanging indent.</p> <p>Two things combine to cause it. First, <code>line.substring(cutAt)</code> starts <em>at</em> the space the cut was made on, so that space is carried over to the new line on top of the two that are added. Second, <code>indentationOf(line)</code> is recomputed inside the inner loop, so on the next pass it measures the indentation of the already-indented continuation and adds two more spaces to that.</p> <p>Both are fixed by hoisting <code>indent</code> out of the inner loop, where it belongs &mdash; the indentation of a line is a property of the line, not of the piece you are currently chopping &mdash; and by skipping the space with <code>substring(cutAt + 1)</code>:</p> <pre><code class="language-java">String line = input.nextLine();
+line = line.replaceAll("\t", "  ");
+String indent = indentationOf(line);          // moved out of the inner loop
+while (line.trim().length() &gt; 0) {
+    if (line.length() &lt;= 40) {
+        output.println(line);
+        line = "";
+    } else {
+        int cutAt = cut(line, indent, 40);
+        if (cutAt &lt; indent.length()) {
+            output.println(line);
+            line = "";
+        } else {
+            output.println(line.substring(0, cutAt));
+            line = indent + "  " + line.substring(cutAt + 1);   // skip the space
+        }
+    }
+}</code></pre> <p>With those two changes, the same input produces a steady hanging indent:</p> <p class="filename">wrapped.txt &mdash; corrected version</p>
+<pre class="cmp"><code>Java reads a file one line at a time,
+  and each line can be any length at
+  all.
+    An indented line stays indented when
+      it is split, and gains two more
+      spaces.
+Short line.</code></pre> <p>The original is not wrong in the sense of crashing or losing text &mdash; every word survives, and no line exceeds the limit by more than the fallback allows. It is wrong in the sense that the output does not look like what the code was trying to produce. Those bugs are the hard ones to spot, because the program never complains.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 5.10</div> <div class="bd"> <p>The input file to <code>SplitLines</code> contains a completely blank line between two paragraphs. What does the output file contain at that point?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Trace a blank line through the code. <code>nextLine()</code> returns <code>""</code>. <code>replaceAll</code> leaves it as <code>""</code>. Then the inner loop tests <code>while (line.trim().length() &gt; 0)</code> &mdash; and <code>"".trim().length()</code> is 0.</p> <p>The loop body never runs, so <strong>nothing is written at all</strong>. The blank line vanishes from the copy. So does any line consisting only of spaces or tabs, for the same reason. Here is the behaviour reduced to its essentials &mdash; the same two loops with the wrapping taken out, copying a three-line file whose middle line is blank, and then echoing the result with each line in square brackets so you can see exactly what survived:</p> <p class="filename">BlankTest.java</p>
+<pre><code class="language-java">import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.Scanner;
+
+public class BlankTest {
+    public static void main(String args[]) throws FileNotFoundException {
+        Scanner input = new Scanner(new File("blanks.txt"));
+        PrintWriter output = new PrintWriter(new File("blanksout.txt"));
+        while (input.hasNextLine()) {
+            String line = input.nextLine();
+            while (line.trim().length() &gt; 0) {
+                output.println(line);
+                line = "";
+            }
+        }
+        input.close();
+        output.close();
+
+        Scanner check = new Scanner(new File("blanksout.txt"));
+        int n = 0;
+        while (check.hasNextLine()) { System.out.println("[" + check.nextLine() + "]"); n++; }
+        check.close();
+        System.out.println("lines written: " + n);
+    }
+}</code></pre> <p class="filename">blanks.txt</p>
+<pre class="cmp"><code>first
+
+second</code></pre> <pre class="out"><code>[first]
+[second]
+lines written: 2</code></pre> <p>Three lines in, two lines out.</p> <p><strong>Things to notice.</strong> This is a design decision hiding inside a loop condition. Whoever wrote <code>while (line.trim().length() &gt; 0)</code> was thinking "keep going while there is text left to place", which is right for the <em>inner</em> job of chopping a long line up. The side effect on empty input lines was probably not considered at all.</p> <p>The fix is to handle the empty case before entering the inner loop: <code>if (line.trim().isEmpty()) { output.println(); }</code> and then <code>else</code> the rest. Whether you want that depends on whether blank lines are meaningful in your file &mdash; in a source file or a poem they certainly are.</p> </div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 5.11</div> <div class="bd"> <p><code>SplitLines</code> keeps a <code>Scanner</code> and a <code>PrintWriter</code> open at the same time and closes both at the end.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> What would go wrong if the two file names were the same &mdash; input and output both <code>wrapme.txt</code>?</p> <details class="soln"><summary></summary><div class="ans"> <p>You would destroy the input before reading a byte of it. Constructing the <code>PrintWriter</code> truncates its file to zero length, and that happens on the line <em>before</em> the reading loop starts. The <code>Scanner</code> then finds an empty file, <code>hasNextLine()</code> is <code>false</code> immediately, and you are left with an empty <code>wrapme.txt</code> and no way back.</p> <p>This is the single most destructive mistake in this lecture, and it is a two-character typo. When a program reads one file and writes another, read the two names side by side before you run it.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> The program calls <code>input.close()</code> and then <code>output.close()</code>. Does the order matter?</p> <details class="soln"><summary></summary><div class="ans"> <p>Not here. They are two independent files; closing one has no effect on the other. What <em>does</em> matter is that <code>output.close()</code> happens at all, and that it happens before anything tries to read <code>wrapped.txt</code>.</p> <p><strong>Things to notice across both parts.</strong> The two closes are also doing different amounts of work. <code>input.close()</code> releases a resource. <code>output.close()</code> releases a resource <em>and</em> flushes the buffer &mdash; it is the line that actually puts your data on the disk. If you are ever short of patience for one of them, it is not the writer's.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 5.12</div> <div class="bd"> <p>Write a complete program <code>FileStats.java</code> that reports on <code>poem.txt</code> the way the Unix <code>wc</code> command does: the number of lines, the number of words (whitespace-separated, ignoring the empty strings a double space produces), and the number of characters counted by <code>String.length()</code>. Also print <code>f.length()</code> from the <code>File</code> object, and be ready to explain why the two character counts differ.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> One <code>nextLine()</code> loop does all three counts. Lines: count the passes. Characters: add <code>line.length()</code> each pass. Words: <code>split("\\s", -1)</code> and count the pieces that are not empty &mdash; the same guard <code>LongWords</code> needed, for the same reason. Guard the file with <code>exists()</code> first.</p> <p class="filename">FileStats.java</p>
+<pre><code class="language-java">import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+public class FileStats {
+    public static void main(String args[]) throws FileNotFoundException {
+        File f = new File("poem.txt");
+        if (!f.exists()) {
+            System.out.println("No such file: " + f.getName());
+            return;
+        }
+
+        Scanner input = new Scanner(f);
+        int lines = 0, words = 0, chars = 0;
+        while (input.hasNextLine()) {
+            String line = input.nextLine();
+            lines++;
+            chars += line.length();
+            String parts[] = line.split("\\s", -1);
+            for (int i = 0; i &lt; parts.length; i++) {
+                if (!parts[i].isEmpty()) words++;
+            }
+        }
+        input.close();
+
+        System.out.println("File:       " + f.getName());
+        System.out.println("Lines:      " + lines);
+        System.out.println("Words:      " + words);
+        System.out.println("Characters: " + chars);
+        System.out.println("Bytes on disk (length()): " + f.length());
+    }
+}</code></pre> <pre class="out"><code>File:       poem.txt
+Lines:      4
+Words:      16
+Characters: 79
+Bytes on disk (length()): 83</code></pre> <p><strong>Things to notice.</strong> 79 against 83 &mdash; a difference of exactly 4, the number of lines. <code>nextLine()</code> hands you the line <em>without</em> its terminating newline, so summing <code>line.length()</code> counts every character in the file except the line breaks. <code>f.length()</code> counts the bytes actually stored, newlines included. Neither is wrong; they answer different questions, and the gap between them is one of the standard ways a character count comes out slightly short.</p> <p>The 16 words include <code>2</code>, <code>dogs!</code>, <code>again,</code> and <code>again.</code> &mdash; this program counts whitespace-separated tokens, not English words, so it makes no judgement about what is in them. Compare that with <code>LongWords</code>, which applied <code>isWord</code> and kept 8.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 5.12</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="15" aria-label="Live coding - Quick Check 5.12">import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+public class FileStats {
+    public static void main(String args[]) throws FileNotFoundException {
+        // 1. Guard: if poem.txt does not exist, say so and return.
+        // 2. Read it with a nextLine() loop, counting
+        //    lines, non-empty whitespace-separated words, and characters.
+        // 3. Print all three, plus the File object's length().
+
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="prac"><span class="num">&#9733;</span>Practice Problems</h2> <div class="box prac"> <div class="hd">Practice Problems<span class="tag">&mdash; exam-style, Lecture 5 material</span></div> <div class="bd"> <p>Problem 1 is the instructor's own file question, which has appeared on both the Exam 1 practice set and the Midterm practice set. The other three are written for these notes and target the ideas that cost the most marks: the <code>close()</code> buffer, the <code>new Scanner("name")</code> trap, and the read-transform-write shape. Work them on paper first &mdash; the exam is closed book and there is no compiler in the room.</p> </div> </div> <h3>Problem 1 &mdash; Strings and files, two methods <span class="muted">(from Exam 1 Practice Problems, also Midterm Practice Problems)</span></h3> <p>This question is related to Strings and Files. It is a two-part question that requires code for two methods.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Write a private method called <code>removeDuplicates</code> that accepts a <code>String</code> parameter and returns a new <code>String</code> in which consecutive occurrences of a character are removed. If <code>removeDuplicates("football")</code> is called, it returns <code>fotbal</code> after replacing the consecutive <code>o</code>s by a single <code>o</code> and the consecutive <code>l</code>s by a single <code>l</code>. Similarly if we pass <code>cookbook!!!</code> as a parameter, it returns <code>cokbok!</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Walk the string comparing each character with the one before it, and delete the later of any equal pair. Walk <em>backwards</em>, from the end towards the front: if you delete while walking forwards, every deletion shifts the remaining characters left and your index no longer means what you thought it meant. Going backwards, the part you have not looked at yet is in front of <code>i</code> and is never disturbed.</p> <p>Deleting character <code>i</code> is <code>str.substring(0, i) + str.substring(i + 1)</code> &mdash; everything before it, joined to everything after it. <code>String</code> is immutable (Lecture 4), so this builds a new string and reassigns <code>str</code> rather than editing in place.</p> <pre><code class="language-java">private static String removeDuplicates(String str) {
+    if (str == null || str.length() &lt;= 1) return str;
+    for (int i = str.length() - 1; i &gt; 0; i--) {
+        if (str.charAt(i) == str.charAt(i - 1)) {
+            str = str.substring(0, i) + str.substring(i + 1);
+        }
+    }
+    return str;
+}</code></pre> <p>Trace <code>"football"</code>: at <code>i = 7</code> the pair <code>l</code>,<code>l</code> matches, so one <code>l</code> goes and the string becomes <code>footbal</code>; at <code>i = 2</code> the pair <code>o</code>,<code>o</code> matches and the string becomes <code>fotbal</code>. No other adjacent pair is equal, so <code>fotbal</code> is the answer &mdash; matching the required output.</p> <p>The <code>str.length() &lt;= 1</code> guard is what makes <code>i - 1</code> safe: a string of length 0 or 1 has no adjacent pairs, and the loop condition <code>i &gt; 0</code> never lets <code>i - 1</code> go negative anyway. Both belt and braces, and neither costs anything.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Write a private method called <code>removeDuplicatesFromFile</code> that accepts a <code>String</code> parameter naming a text file. It reads the file line by line and removes from each word of the file any consecutive occurrences of a character. It prints the entire modified text with words separated by spaces, and punctuation marks. You may assume the file exists and the words are separated by single spaces.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The hard part is already done in part (a); this method is pure file plumbing. Open a <code>Scanner</code> on the named file, loop with <code>hasNextLine()</code>, split each line into words, run <code>removeDuplicates</code> on each word, rebuild the line with single spaces, and print it. Note that the output goes to the <em>screen</em> &mdash; the question says "prints" and never mentions an output file, so there is no <code>PrintWriter</code> here at all.</p> <p>This is the one place in the lecture where the instructor's solution uses <code>try</code>/<code>catch</code> rather than <code>throws</code>. The effect is the same: Java is told what to do if the file is not there. Lecture 20 explains the mechanism.</p> <p class="filename">RemoveDup.java</p>
+<pre><code class="language-java">import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+public class RemoveDup {
+    public static void main(String args[]) {
+        removeDuplicatesFromFile("myFile.txt");
+    }
+
+    private static String removeDuplicates(String str) {
+        if (str == null || str.length() &lt;= 1) return str;
+        for (int i = str.length() - 1; i &gt; 0; i--) {
+            if (str.charAt(i) == str.charAt(i - 1)) {
+                str = str.substring(0, i) + str.substring(i + 1);
+            }
+        }
+        return str;
+    }
+
+    private static void removeDuplicatesFromFile(String fileName) {
+        try {
+            File inputFile = new File(fileName);
+            Scanner scanner = new Scanner(inputFile);
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] words = line.split("\\s", -1);
+                String modifiedLine = "";
+                for (String word : words) {
+                    modifiedLine += removeDuplicates(word) + " ";
+                }
+                System.out.println(modifiedLine.trim());
+            }
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            System.err.println("Error: File not found - " + e.getMessage());
+        }
+    }
+}</code></pre> <p>With this input file:</p> <p class="filename">myFile.txt</p>
+<pre class="cmp"><code>The sky is a deep red!!!
+Calvin's skin is a pale green!!
+Yellow flowers are now blue!!!!
+Theee eeend.</code></pre> <pre class="out"><code>The sky is a dep red!
+Calvin's skin is a pale gren!
+Yelow flowers are now blue!
+The end.</code></pre> <p><strong>Things to notice across both parts.</strong> The method does not know or care that <code>deep</code> is a word and <code>!!!</code> is punctuation &mdash; it collapses runs of <em>any</em> repeated character, which is why <code>red!!!</code> becomes <code>red!</code> in the same breath as <code>deep</code> becoming <code>dep</code>. The last line is the giveaway: <code>Theee eeend.</code> becomes <code>The end.</code>, which reads like a deliberate joke and is really just the same rule applied twice.</p> <p><code>modifiedLine += removeDuplicates(word) + " "</code> appends a trailing space after every word, including the last, and <code>trim()</code> on the way out removes it. That is the standard cheap fix for the separator problem; the alternative is to append the space <em>before</em> every word except the first.</p> <p>Building a <code>String</code> with <code>+=</code> inside a loop creates a brand-new <code>String</code> on every pass, because <code>String</code> is immutable. For a line of text that is invisible. For a loop over a million items it is a genuine performance problem, and the standard answer is <code>StringBuilder</code>. Worth knowing the name now; you will meet it again.</p> </div></details> </div> <h3>Problem 2 &mdash; Read a file, write a report <span class="muted">(added for these notes)</span></h3> <p>The file <code>scores.txt</code> contains one integer per line:</p> <p class="filename">scores.txt</p>
+<pre class="cmp"><code>88
+94
+71
+100
+65</code></pre> <p>Write a complete program <code>ScoreReport.java</code> that reads those numbers and <em>writes</em> a file called <code>report.txt</code> containing five lines: how many scores were read, their total, their average as a decimal, the highest and the lowest. Then, to prove the file was really written, read <code>report.txt</code> back and print it to the screen. Print a message and stop if <code>scores.txt</code> is not there.</p> <p>A sample of what the program should print:</p> <pre class="out"><code>Scores read: 5
+Total:       418
+Average:     83.6
+High:        100
+Low:         65</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> This is the read-transform-write shape, done in three separate stages so nothing overlaps. Stage one: <code>Scanner</code> on <code>scores.txt</code>, loop on <code>hasNextInt()</code>, accumulate count, total, high and low, then <code>close()</code>. Stage two: <code>PrintWriter</code> on <code>report.txt</code>, five <code>println</code> calls, then <code>close()</code> &mdash; and the <code>close()</code> has to come before stage three or there will be nothing to read. Stage three: a fresh <code>Scanner</code> on <code>report.txt</code>, echoing it line by line.</p> <p>Seed <code>high</code> with <code>Integer.MIN_VALUE</code> and <code>low</code> with <code>Integer.MAX_VALUE</code> so that the very first score, whatever it is, replaces both. Seeding them with 0 is the classic bug: a file of negative scores would report a high of 0 that never appeared in the data.</p> <p class="filename">ScoreReport.java</p>
+<pre><code class="language-java">import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.Scanner;
+
+public class ScoreReport {
+    public static void main(String args[]) throws FileNotFoundException {
+        File in = new File("scores.txt");
+        if (!in.exists()) {
+            System.out.println("Cannot find " + in.getName());
+            return;
+        }
+
+        Scanner input = new Scanner(in);
+        PrintWriter output = new PrintWriter("report.txt");
+
+        int count = 0, total = 0;
+        int high = Integer.MIN_VALUE, low = Integer.MAX_VALUE;
+        while (input.hasNextInt()) {
+            int score = input.nextInt();
+            count++;
+            total += score;
+            if (score &gt; high) high = score;
+            if (score &lt; low) low = score;
+        }
+        input.close();
+
+        output.println("Scores read: " + count);
+        output.println("Total:       " + total);
+        output.println("Average:     " + total / (double) count);
+        output.println("High:        " + high);
+        output.println("Low:         " + low);
+        output.close();
+
+        Scanner back = new Scanner(new File("report.txt"));
+        while (back.hasNextLine()) System.out.println(back.nextLine());
+        back.close();
+    }
+}</code></pre> <pre class="out"><code>Scores read: 5
+Total:       418
+Average:     83.6
+High:        100
+Low:         65</code></pre> <p>And the file itself, which is what actually matters:</p> <p class="filename">report.txt</p>
+<pre class="cmp"><code>Scores read: 5
+Total:       418
+Average:     83.6
+High:        100
+Low:         65</code></pre> <p><strong>Things to notice.</strong> <code>total / (double) count</code> gives <code>83.6</code>; without the cast you would get <code>83</code> and never see the <code>.6</code>. Integer division has now cost somebody marks in every lecture of this course, and it will keep doing so.</p> <p>Delete <code>output.close()</code> and this program does not merely produce a wrong file &mdash; the echo stage prints nothing at all, because <code>report.txt</code> is zero bytes and <code>hasNextLine()</code> is <code>false</code> on the first test. A program that suddenly falls silent at the end is worth checking for exactly this.</p> <p>Notice that <code>input</code> and <code>output</code> are both open at the same time, on different files. That is fine, and it is what <code>SplitLines</code> does too. What you must never do is open a <code>PrintWriter</code> on the file you are simultaneously reading.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 2</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="21" aria-label="Live coding - Practice Problem 2">import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.Scanner;
+
+public class ScoreReport {
+    public static void main(String args[]) throws FileNotFoundException {
+        // 1. Guard: does scores.txt exist?
+
+        // 2. Scanner on scores.txt; PrintWriter on report.txt.
+
+        // 3. Loop on hasNextInt(): count, total, high, low.
+
+        // 4. Write the five report lines. Close BOTH.
+
+        // 5. Read report.txt back and echo it to the screen.
+
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 3 &mdash; Find the three errors <span class="muted">(added for these notes)</span></h3> <p>The following program is meant to copy <code>input.txt</code> to <code>copy.txt</code>, line for line, and then print <code>Copied.</code>. Exactly 3 of the numbered lines are wrong &mdash; one of them stops the program compiling, and two of them let it compile and run and then do the wrong thing. Identify the 3 errors by line number, and give a corrected version of each line. Any line without a number is correct as written.</p> <p class="filename">CopyFile.java</p>
+<pre><code class="language-java">import java.io.File;
+import java.io.PrintWriter;
+import java.util.Scanner;
+
+public class CopyFile {
+    public static void main(String args[]) {                   // line 1
+        Scanner input = new Scanner("input.txt");              // line 2
+        PrintWriter output = new PrintWriter("copy.txt");      // line 3
+        while (input.hasNextLine()) {                          // line 4
+            output.println(input.nextLine());                  // line 5
+        }
+        input.close();                                         // line 6
+        System.out.println("Copied.");                         // line 7
+    }
+}</code></pre> <p>For reference, <code>input.txt</code> is the three-line file from &sect;2:</p> <p class="filename">input.txt</p>
+<pre class="cmp"><code>Ada Lovelace 95
+Grace Hopper 98
+Alan Turing 91</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Compile it first, in your head: which line mentions something that can fail? Then, assuming it compiled, ask the two questions this lecture keeps asking. Where do the characters come from? And where do the characters go?</p> <p><strong>Error 1 &mdash; line 1.</strong> <code>main</code> opens files, so it must declare that opening them can fail. This is the error that stops the compile:</p> <pre class="err"><code>CopyFile.java:8: error: unreported exception FileNotFoundException; must be caught or declared to be thrown
+        PrintWriter output = new PrintWriter("copy.txt");      // line 3
+                             ^
+1 error</code></pre> <p>Corrected: <code>public static void main(String args[]) throws FileNotFoundException {</code>, together with <code>import java.io.FileNotFoundException;</code> at the top. Note that <code>javac</code> pointed at line 3, where the failure could happen, not at line 1, where the fix goes &mdash; a good reminder that the caret shows you the symptom, not always the cure.</p> <p><strong>Error 2 &mdash; line 2.</strong> <code>new Scanner("input.txt")</code> scans the eleven-character string <code>input.txt</code>, not the file of that name. It compiles and it is silent about it. Add the <code>File</code>:</p> <p>Corrected: <code>Scanner input = new Scanner(new File("input.txt"));</code></p> <p><strong>Error 3 &mdash; line 7 (a missing line, really).</strong> There is no <code>output.close()</code> anywhere, so whatever the loop writes stays in the buffer and is discarded when the program ends.</p> <p>Corrected: insert <code>output.close();</code> immediately after line 6.</p> <p>To see that errors 2 and 3 really are independent of the compiler, here is the program with <em>only</em> error 1 fixed, plus a line at the end reporting the size of <code>copy.txt</code>:</p> <pre><code class="language-java">public static void main(String args[]) throws FileNotFoundException {
+    Scanner input = new Scanner("input.txt");
+    PrintWriter output = new PrintWriter("copy.txt");
+    while (input.hasNextLine()) {
+        output.println(input.nextLine());
+    }
+    input.close();
+    System.out.println("Copied.");
+    System.out.println("copy.txt length = " + new File("copy.txt").length());
+}</code></pre> <pre class="out"><code>Copied.
+copy.txt length = 0</code></pre> <p>It compiles, it runs, it announces success, and it produced an empty file. With all three fixed:</p> <p class="filename">CopyFile.java</p>
+<pre><code class="language-java">import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.Scanner;
+
+public class CopyFile {
+    public static void main(String args[]) throws FileNotFoundException {
+        Scanner input = new Scanner(new File("input.txt"));
+        PrintWriter output = new PrintWriter("copy.txt");
+        while (input.hasNextLine()) {
+            output.println(input.nextLine());
+        }
+        input.close();
+        output.close();
+        System.out.println("Copied.");
+        System.out.println("copy.txt length = " + new File("copy.txt").length());
+    }
+}</code></pre> <pre class="out"><code>Copied.
+copy.txt length = 47</code></pre> <p>47 bytes &mdash; exactly the size of <code>input.txt</code>, which is what "copy" ought to mean.</p> <p><strong>Things to notice.</strong> One error out of three was caught by the compiler. The other two produced a program that ran to completion and printed a cheerful <code>Copied.</code> Compiling is the beginning of testing, not the end of it, and "it ran without errors" is not evidence that it did anything.</p> <p>Both of the silent errors have the same shape: a plausible line that points at the wrong thing or stops one step short. Those are the errors worth building habits against &mdash; <code>new File</code> inside every <code>Scanner</code>, <code>close()</code> typed at the same time as <code>new PrintWriter</code>.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 3</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="17" aria-label="Live coding - Practice Problem 3">import java.io.File;
+import java.io.PrintWriter;
+import java.util.Scanner;
+
+public class CopyFile {
+    public static void main(String args[]) {                   // line 1
+        Scanner input = new Scanner("input.txt");              // line 2
+        PrintWriter output = new PrintWriter("copy.txt");      // line 3
+        while (input.hasNextLine()) {                          // line 4
+            output.println(input.nextLine());                  // line 5
+        }
+        input.close();                                         // line 6
+        System.out.println("Copied.");                         // line 7
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 4 &mdash; What does each expression give? <span class="muted">(added for these notes)</span></h3> <p>A folder contains one file, <code>input.txt</code>, whose contents are the three lines shown in Problem 3, and nothing else. For each expression, give the value and the type, or say that the line does not compile.</p> <pre><code class="language-java">File f = new File("input.txt");
+File g = new File("report.txt");</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>f.getName()</code></p> <details class="soln"><summary></summary><div class="ans"> <p>The <code>String</code> <code>"input.txt"</code>. <code>getName()</code> returns the last component of the path, so it would still be <code>"input.txt"</code> if you had written <code>new File("/home/data/input.txt")</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>g.exists()</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>false</code>, a <code>boolean</code>. Constructing <code>g</code> did not create anything &mdash; a <code>File</code> object is a name, and there is no <code>report.txt</code> in the folder.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>g.length()</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>0</code>, a <code>long</code>. Not an error and not a crash &mdash; a missing file reports a length of zero. This is precisely why <code>length() == 0</code> is not a usable test for "the file is empty": ask <code>exists()</code> first.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>f.length()</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>47</code>, a <code>long</code>. Three lines of 15, 15 and 14 visible characters is 44, plus one newline character at the end of each line, is 47.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> <code>new Scanner(f).nextLine()</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Does not compile on its own &mdash; <code>new Scanner(File)</code> can throw <code>FileNotFoundException</code>, so the enclosing method needs <code>throws FileNotFoundException</code> or a <code>try</code>/<code>catch</code>. Given that, the value is the <code>String</code> <code>"Ada Lovelace 95"</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(f)</span> <code>new Scanner("input.txt").next()</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compiles with no <code>throws</code> at all, and gives the <code>String</code> <code>"input.txt"</code>. This is the <code>Scanner</code>-over-a-<code>String</code> constructor: it scans the characters you handed it, and those characters happen to spell a file name. The absence of a required <code>throws</code> is the tell &mdash; if the compiler is not making you promise anything, you are not opening a file.</p> <p><strong>Things to notice across all six parts.</strong> Parts (b), (c) and (f) are the three ways this topic goes quietly wrong: a <code>File</code> that does not correspond to anything, a length that means two different things, and a <code>Scanner</code> pointed at a name instead of a file. None of them produces an error message. All three produce confident, wrong answers.</p> </div></details> </div> <div class="box sum" id="summary"> <div class="hd">Lecture Summary</div> <div class="bd"> <ul> <li>A <code>File</code> object holds a <strong>pathname, not the contents</strong>. <code>new File(...)</code> touches nothing on disk. Its constructors are <code>File(String pathname)</code> and <code>File(URI uri)</code>; its useful questions are <code>exists()</code>, <code>length()</code>, <code>getName()</code>, <code>getAbsolutePath()</code>, <code>canRead()</code> and <code>canWrite()</code>.</li> <li>To read a file, point a <code>Scanner</code> at it: <code>new Scanner(new File("input.txt"))</code>. Everything after that is the <code>Scanner</code> you already knew &mdash; <code>hasNext</code>/<code>next</code> for tokens, <code>hasNextLine</code>/<code>nextLine</code> for lines, <code>hasNextInt</code>/<code>nextInt</code> for numbers.</li> <li><code>new Scanner("input.txt")</code> compiles and scans <em>the string</em>. Never omit the <code>new File</code>.</li> <li>To write a file, use a <code>PrintWriter</code>, built from either a name or a <code>File</code>. It has <code>print</code>, <code>println</code> and <code>close</code>, and it writes to the file what <code>System.out</code> writes to the screen.</li> <li>Constructing a <code>PrintWriter</code> <strong>creates the file, or empties an existing one</strong>. Guard it with <code>exists()</code> when the file might matter.</li> <li><strong><code>close()</code> is not optional on a <code>PrintWriter</code>.</strong> Output sits in a buffer until it is flushed; without <code>close()</code> the file is left existing, correctly named, and zero bytes long.</li> <li>Anything that opens a file may fail, so <code>main</code> needs <code>throws FileNotFoundException</code> or a <code>try</code>/<code>catch</code>. Lecture 20 explains what that really means.</li> <li>Reading a whole file is a <code>nextLine()</code> loop plus the Lecture 4 <code>String</code> methods: <code>trim</code>, <code>split</code>, <code>isEmpty</code>, <code>toLowerCase</code>, <code>substring</code>, <code>charAt</code>.</li> </ul> <p><strong>Coming up in Lecture 6.</strong> Every program today either processed each line and threw it away, or leaned on a <code>TreeSet</code> we had not been introduced to. Next time we meet <code>ArrayList</code> &mdash; an array that grows &mdash; so a program can read a whole file into memory, keep it, and go back over it as many times as it likes. We will also meet the wrapper classes <code>Integer</code>, <code>Double</code>, <code>Character</code> and <code>Boolean</code>, and find out why an <code>ArrayList</code> cannot hold an <code>int</code>.</p>
+  </div>
+</div>
+
+<nav class="pagenav">
+<span class="disabled"><div class="dir">&larr; Previous</div><div class="ttl">Lecture 4 &mdash; The String Class</div><div class="pending">posts Thu Sep 10</div></span>
+<span class="disabled next"><div class="dir">Next &rarr;</div><div class="ttl">Lecture 6 &mdash; ArrayList</div><div class="pending">posts Thu Sep 17</div></span>
+</nav>
+<footer class="pf">CSCI 212 &middot; Object-Oriented Programming in Java &middot; Queens College, CUNY</footer>
+</div>
+<script>
+(()=>{var ut=Object.create;var xe=Object.defineProperty;var ft=Object.getOwnPropertyDescriptor;var gt=Object.getOwnPropertyNames;var ht=Object.getPrototypeOf,dt=Object.prototype.hasOwnProperty;var pt=(e,t)=>()=>{try{return t||e((t={exports:{}}).exports,t),t.exports}catch(n){throw t=0,n}};var Et=(e,t,n,l)=>{if(t&&typeof t=="object"||typeof t=="function")for(let d of gt(t))!dt.call(e,d)&&d!==n&&xe(e,d,{get:()=>t[d],enumerable:!(l=ft(t,d))||l.enumerable});return e};var bt=(e,t,n)=>(n=e!=null?ut(ht(e)):{},Et(t||!e||!e.__esModule?xe(n,"default",{value:e,enumerable:!0}):n,e));var Ke=pt((ln,Ge)=>{function Ie(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(t=>{let n=e[t],l=typeof n;(l==="object"||l==="function")&&!Object.isFrozen(n)&&Ie(n)}),e}var Z=class{constructor(t){t.data===void 0&&(t.data={}),this.data=t.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function Ce(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function k(e,...t){let n=Object.create(null);for(let l in e)n[l]=e[l];return t.forEach(function(l){for(let d in l)n[d]=l[d]}),n}var _t="</span>",Ne=e=>!!e.scope,Mt=(e,{prefix:t})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let n=e.split(".");return[`${t}${n.shift()}`,...n.map((l,d)=>`${l}${"_".repeat(d+1)}`)].join(" ")}return`${t}${e}`},oe=class{constructor(t,n){this.buffer="",this.classPrefix=n.classPrefix,t.walk(this)}addText(t){this.buffer+=Ce(t)}openNode(t){if(!Ne(t))return;let n=Mt(t.scope,{prefix:this.classPrefix});this.span(n)}closeNode(t){Ne(t)&&(this.buffer+=_t)}value(){return this.buffer}span(t){this.buffer+=`<span class="${t}">`}},Re=(e={})=>{let t={children:[]};return Object.assign(t,e),t},ae=class e{constructor(){this.rootNode=Re(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(t){this.top.children.push(t)}openNode(t){let n=Re({scope:t});this.add(n),this.stack.push(n)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(t){return this.constructor._walk(t,this.rootNode)}static _walk(t,n){return typeof n=="string"?t.addText(n):n.children&&(t.openNode(n),n.children.forEach(l=>this._walk(t,l)),t.closeNode(n)),t}static _collapse(t){typeof t!="string"&&t.children&&(t.children.every(n=>typeof n=="string")?t.children=[t.children.join("")]:t.children.forEach(n=>{e._collapse(n)}))}},le=class extends ae{constructor(t){super(),this.options=t}addText(t){t!==""&&this.add(t)}startScope(t){this.openNode(t)}endScope(){this.closeNode()}__addSublanguage(t,n){let l=t.root;n&&(l.scope=`language:${n}`),this.add(l)}toHTML(){return new oe(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function G(e){return e?typeof e=="string"?e:e.source:null}function De(e){return B("(?=",e,")")}function Ot(e){return B("(?:",e,")*")}function wt(e){return B("(?:",e,")?")}function B(...e){return e.map(n=>G(n)).join("")}function xt(e){let t=e[e.length-1];return typeof t=="object"&&t.constructor===Object?(e.splice(e.length-1,1),t):{}}function V(...e){return"("+(xt(e).capture?"":"?:")+e.map(l=>G(l)).join("|")+")"}function ke(e){return new RegExp(e.toString()+"|").exec("").length-1}function Nt(e,t){let n=e&&e.exec(t);return n&&n.index===0}var Rt=new RegExp(V(/\[(?:[^\\\]]|\\.)*\]/,/\(\?<(?![=!])[^>]+>/,/\(\?'[^']+'/,/\(\??/,/\\([1-9][0-9]*)/,/\\./));function fe(e,{joinWith:t}){let n=0;return e.map(l=>{n+=1;let d=n,_=G(l),c="";for(;_.length>0;){let r=Rt.exec(_);if(!r){c+=_;break}c+=_.substring(0,r.index),_=_.substring(r.index+r[0].length),r[0][0]==="\\"&&r[1]?c+="\\"+String(Number(r[1])+d):(c+=r[0],(r[0]==="("||/^\(\?[<']/.test(r[0]))&&n++)}return c}).map(l=>`(${l})`).join(t)}var yt=/\b\B/,ve="[a-zA-Z]\\w*",ge="[a-zA-Z_]\\w*",Le="\\b\\d+(\\.\\d+)?",Be="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Pe="\\b(0b[01]+)",St="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",At=(e={})=>{let t=/^#![ ]*\//;return e.binary&&(e.begin=B(t,/.*\b/,e.binary,/\b.*/)),k({scope:"meta",begin:t,end:/$/,relevance:0,"on:begin":(n,l)=>{n.index!==0&&l.ignoreMatch()}},e)},K={begin:"\\\\[\\s\\S]",relevance:0},Tt={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[K]},It={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[K]},Ct={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},Q=function(e,t,n={}){let l=k({scope:"comment",begin:e,end:t,contains:[]},n);l.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let d=V("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return l.contains.push({begin:B(/[ ]+/,"(",d,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),l},Dt=Q("//","$"),kt=Q("/\\*","\\*/"),vt=Q("#","$"),Lt={scope:"number",begin:Le,relevance:0},Bt={scope:"number",begin:Be,relevance:0},Pt={scope:"number",begin:Pe,relevance:0},$t={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[K,{begin:/\[/,end:/\]/,relevance:0,contains:[K]}]},Ht={scope:"title",begin:ve,relevance:0},Ut={scope:"title",begin:ge,relevance:0},jt={begin:"\\.\\s*"+ge,relevance:0},Gt=function(e){return Object.assign(e,{"on:begin":(t,n)=>{n.data._beginMatch=t[1]},"on:end":(t,n)=>{n.data._beginMatch!==t[1]&&n.ignoreMatch()}})},X=Object.freeze({__proto__:null,APOS_STRING_MODE:Tt,BACKSLASH_ESCAPE:K,BINARY_NUMBER_MODE:Pt,BINARY_NUMBER_RE:Pe,COMMENT:Q,C_BLOCK_COMMENT_MODE:kt,C_LINE_COMMENT_MODE:Dt,C_NUMBER_MODE:Bt,C_NUMBER_RE:Be,END_SAME_AS_BEGIN:Gt,HASH_COMMENT_MODE:vt,IDENT_RE:ve,MATCH_NOTHING_RE:yt,METHOD_GUARD:jt,NUMBER_MODE:Lt,NUMBER_RE:Le,PHRASAL_WORDS_MODE:Ct,QUOTE_STRING_MODE:It,REGEXP_MODE:$t,RE_STARTERS_RE:St,SHEBANG:At,TITLE_MODE:Ht,UNDERSCORE_IDENT_RE:ge,UNDERSCORE_TITLE_MODE:Ut});function Kt(e,t){e.input[e.index-1]==="."&&t.ignoreMatch()}function mt(e,t){e.className!==void 0&&(e.scope=e.className,delete e.className)}function Wt(e,t){t&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=Kt,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function Ft(e,t){Array.isArray(e.illegal)&&(e.illegal=V(...e.illegal))}function zt(e,t){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function Yt(e,t){e.relevance===void 0&&(e.relevance=1)}var Xt=(e,t)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let n=Object.assign({},e);Object.keys(e).forEach(l=>{delete e[l]}),e.keywords=n.keywords,e.begin=B(n.beforeMatch,De(n.begin)),e.starts={relevance:0,contains:[Object.assign(n,{endsParent:!0})]},e.relevance=0,delete n.beforeMatch},Zt=["of","and","for","in","not","or","if","then","parent","list","value"],Jt="keyword";function $e(e,t,n=Jt){let l=Object.create(null);return typeof e=="string"?d(n,e.split(" ")):Array.isArray(e)?d(n,e):Object.keys(e).forEach(function(_){Object.assign(l,$e(e[_],t,_))}),l;function d(_,c){t&&(c=c.map(r=>r.toLowerCase())),c.forEach(function(r){let u=r.split("|");l[u[0]]=[_,Vt(u[0],u[1])]})}}function Vt(e,t){return t?Number(t):Qt(e)?0:1}function Qt(e){return Zt.includes(e.toLowerCase())}var ye={},L=e=>{console.error(e)},Se=(e,...t)=>{console.log(`WARN: ${e}`,...t)},H=(e,t)=>{ye[`${e}/${t}`]||(console.log(`Deprecated as of ${e}. ${t}`),ye[`${e}/${t}`]=!0)},J=new Error;function He(e,t,{key:n}){let l=0,d=e[n],_={},c={};for(let r=1;r<=t.length;r++)c[r+l]=d[r],_[r+l]=!0,l+=ke(t[r-1]);e[n]=c,e[n]._emit=_,e[n]._multi=!0}function qt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw L("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),J;if(typeof e.beginScope!="object"||e.beginScope===null)throw L("beginScope must be object"),J;He(e,e.begin,{key:"beginScope"}),e.begin=fe(e.begin,{joinWith:""})}}function en(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw L("skip, excludeEnd, returnEnd not compatible with endScope: {}"),J;if(typeof e.endScope!="object"||e.endScope===null)throw L("endScope must be object"),J;He(e,e.end,{key:"endScope"}),e.end=fe(e.end,{joinWith:""})}}function tn(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function nn(e){tn(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),qt(e),en(e)}function sn(e){function t(c,r){return new RegExp(G(c),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(r?"g":""))}class n{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(r,u){u.position=this.position++,this.matchIndexes[this.matchAt]=u,this.regexes.push([u,r]),this.matchAt+=ke(r)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let r=this.regexes.map(u=>u[1]);this.matcherRe=t(fe(r,{joinWith:"|"}),!0),this.lastIndex=0}exec(r){this.matcherRe.lastIndex=this.lastIndex;let u=this.matcherRe.exec(r);if(!u)return null;let O=u.findIndex((P,I)=>I>0&&P!==void 0),M=this.matchIndexes[O];return u.splice(0,O),Object.assign(u,M)}}class l{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(r){if(this.multiRegexes[r])return this.multiRegexes[r];let u=new n;return this.rules.slice(r).forEach(([O,M])=>u.addRule(O,M)),u.compile(),this.multiRegexes[r]=u,u}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(r,u){this.rules.push([r,u]),u.type==="begin"&&this.count++}exec(r){let u=this.getMatcher(this.regexIndex);u.lastIndex=this.lastIndex;let O=u.exec(r);if(this.resumingScanAtSamePosition()&&!(O&&O.index===this.lastIndex)){let M=this.getMatcher(0);M.lastIndex=this.lastIndex+1,O=M.exec(r)}return O&&(this.regexIndex+=O.position+1,this.regexIndex===this.count&&this.considerAll()),O}}function d(c){let r=new l;return c.contains.forEach(u=>r.addRule(u.begin,{rule:u,type:"begin"})),c.terminatorEnd&&r.addRule(c.terminatorEnd,{type:"end"}),c.illegal&&r.addRule(c.illegal,{type:"illegal"}),r}function _(c,r){let u=c;if(c.isCompiled)return u;[mt,zt,nn,Xt].forEach(M=>M(c,r)),e.compilerExtensions.forEach(M=>M(c,r)),c.__beforeBegin=null,[Wt,Ft,Yt].forEach(M=>M(c,r)),c.isCompiled=!0;let O=null;return typeof c.keywords=="object"&&c.keywords.$pattern&&(c.keywords=Object.assign({},c.keywords),O=c.keywords.$pattern,delete c.keywords.$pattern),O=O||/\w+/,c.keywords&&(c.keywords=$e(c.keywords,e.case_insensitive)),u.keywordPatternRe=t(O,!0),r&&(c.begin||(c.begin=/\B|\b/),u.beginRe=t(u.begin),!c.end&&!c.endsWithParent&&(c.end=/\B|\b/),c.end&&(u.endRe=t(u.end)),u.terminatorEnd=G(u.end)||"",c.endsWithParent&&r.terminatorEnd&&(u.terminatorEnd+=(c.end?"|":"")+r.terminatorEnd)),c.illegal&&(u.illegalRe=t(c.illegal)),c.contains||(c.contains=[]),c.contains=[].concat(...c.contains.map(function(M){return rn(M==="self"?c:M)})),c.contains.forEach(function(M){_(M,u)}),c.starts&&_(c.starts,r),u.matcher=d(u),u}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=k(e.classNameAliases||{}),_(e)}function Ue(e){return e?e.endsWithParent||Ue(e.starts):!1}function rn(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(t){return k(e,{variants:null},t)})),e.cachedVariants?e.cachedVariants:Ue(e)?k(e,{starts:e.starts?k(e.starts):null}):Object.isFrozen(e)?k(e):e}var cn="11.12.0",ue=class extends Error{constructor(t,n){super(t),this.name="HTMLInjectionError",this.html=n}},ce=Ce,Ae=k,Te=Symbol("nomatch"),on=7,je=function(e){let t=Object.create(null),n=Object.create(null),l=[],d=!0,_="Could not find the language '{}', did you forget to load/include a language module?",c={disableAutodetect:!0,name:"Plain text",contains:[]},r={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:le};function u(i){return r.noHighlightRe.test(i)}function O(i){let a=i.className+" ";a+=i.parentNode?i.parentNode.className:"";let h=r.languageDetectRe.exec(a);if(h){let E=C(h[1]);return E||(Se(_.replace("{}",h[1])),Se("Falling back to no-highlight mode for this block.",i)),E?h[1]:"no-highlight"}return a.split(/\s+/).find(E=>u(E)||C(E))}function M(i,a,h){let E="",w="";typeof a=="object"?(E=i,h=a.ignoreIllegals,w=a.language):(H("10.7.0","highlight(lang, code, ...args) has been deprecated."),H("10.7.0",`Please use highlight(code, options) instead.
+(see the highlight.js issue tracker)`),w=i,E=a),h===void 0&&(h=!0);let y={code:E,language:w};W("before:highlight",y);let D=y.result?y.result:P(y.language,y.code,h);return D.code=y.code,W("after:highlight",D),D}function P(i,a,h,E){let w=Object.create(null);function y(s,o){return s.keywords[o]}function D(){if(!f.keywords){x.addText(b);return}let s=0;f.keywordPatternRe.lastIndex=0;let o=f.keywordPatternRe.exec(b),g="";for(;o;){g+=b.substring(s,o.index);let p=A.case_insensitive?o[0].toLowerCase():o[0],N=y(f,p);if(N){let[T,at]=N;if(x.addText(g),g="",w[p]=(w[p]||0)+1,w[p]<=on&&(Y+=at),T.startsWith("_"))g+=o[0];else{let lt=A.classNameAliases[T]||T;S(o[0],lt)}}else g+=o[0];s=f.keywordPatternRe.lastIndex,o=f.keywordPatternRe.exec(b)}g+=b.substring(s),x.addText(g)}function F(){if(b==="")return;let s=null;if(typeof f.subLanguage=="string"){if(!t[f.subLanguage]){x.addText(b);return}s=P(f.subLanguage,b,!0,we[f.subLanguage]),we[f.subLanguage]=s._top}else s=$(b,f.subLanguage.length?f.subLanguage:null);f.relevance>0&&(Y+=s.relevance),x.__addSublanguage(s._emitter,s.language)}function R(){f.subLanguage!=null?F():D(),b=""}function S(s,o){s!==""&&(x.startScope(o),x.addText(s),x.endScope())}function be(s,o){let g=1,p=o.length-1;for(;g<=p;){if(!s._emit[g]){g++;continue}let N=A.classNameAliases[s[g]]||s[g],T=o[g];N?S(T,N):(b=T,D(),b=""),g++}}function _e(s,o){return s.scope&&typeof s.scope=="string"&&x.openNode(A.classNameAliases[s.scope]||s.scope),s.beginScope&&(s.beginScope._wrap?(S(b,A.classNameAliases[s.beginScope._wrap]||s.beginScope._wrap),b=""):s.beginScope._multi&&(be(s.beginScope,o),b="")),f=Object.create(s,{parent:{value:f}}),f}function Me(s,o,g){let p=Nt(s.endRe,g);if(p){if(s["on:end"]){let N=new Z(s);s["on:end"](o,N),N.isMatchIgnored&&(p=!1)}if(p){for(;s.endsParent&&s.parent;)s=s.parent;return s}}if(s.endsWithParent)return Me(s.parent,o,g)}function it(s){return f.matcher.regexIndex===0?(b+=s[0],1):(re=!0,0)}function st(s){let o=s[0],g=s.rule,p=new Z(g),N=[g.__beforeBegin,g["on:begin"]];for(let T of N)if(T&&(T(s,p),p.isMatchIgnored))return it(o);return g.skip?b+=o:(g.excludeBegin&&(b+=o),R(),!g.returnBegin&&!g.excludeBegin&&(b=o)),_e(g,s),g.returnBegin?0:o.length}function rt(s){let o=s[0],g=a.substring(s.index),p=Me(f,s,g);if(!p)return Te;let N=f;f.endScope&&f.endScope._wrap?(R(),S(o,f.endScope._wrap)):f.endScope&&f.endScope._multi?(R(),be(f.endScope,s)):N.skip?b+=o:(N.returnEnd||N.excludeEnd||(b+=o),R(),N.excludeEnd&&(b=o));do f.scope&&x.closeNode(),!f.skip&&!f.subLanguage&&(Y+=f.relevance),f=f.parent;while(f!==p.parent);return p.starts&&_e(p.starts,s),N.returnEnd?0:o.length}function ct(){let s=[];for(let o=f;o!==A;o=o.parent)o.scope&&s.unshift(o.scope);s.forEach(o=>x.openNode(o))}let z={};function Oe(s,o){let g=o&&o[0];if(b+=s,g==null)return R(),0;if(z.type==="begin"&&o.type==="end"&&z.index===o.index&&g===""){if(b+=a.slice(o.index,o.index+1),!d){let p=new Error(`0 width match regex (${i})`);throw p.languageName=i,p.badRule=z.rule,p}return 1}if(z=o,o.type==="begin")return st(o);if(o.type==="illegal"&&!h){let p=new Error('Illegal lexeme "'+g+'" for mode "'+(f.scope||"<unnamed>")+'"');throw p.mode=f,p}else if(o.type==="end"){let p=rt(o);if(p!==Te)return p}if(o.type==="illegal"&&g==="")return o.index===a.length||(b+=`
+`),1;if(se>1e5&&se>o.index*3)throw new Error("potential infinite loop, way more iterations than matches");return b+=g,g.length}let A=C(i);if(!A)throw L(_.replace("{}",i)),new Error('Unknown language: "'+i+'"');let ot=sn(A),ie="",f=E||ot,we={},x=new r.__emitter(r);ct();let b="",Y=0,v=0,se=0,re=!1;try{if(A.__emitTokens)A.__emitTokens(a,x);else{for(f.matcher.considerAll();;){se++,re?re=!1:f.matcher.considerAll(),f.matcher.lastIndex=v;let s=f.matcher.exec(a);if(!s)break;let o=a.substring(v,s.index),g=Oe(o,s);v=s.index+g}Oe(a.substring(v))}return x.finalize(),ie=x.toHTML(),{language:i,value:ie,relevance:Y,illegal:!1,_emitter:x,_top:f}}catch(s){if(s.message&&s.message.includes("Illegal"))return{language:i,value:ce(a),illegal:!0,relevance:0,_illegalBy:{message:s.message,index:v,context:a.slice(v-100,v+100),mode:s.mode,resultSoFar:ie},_emitter:x};if(d)return{language:i,value:ce(a),illegal:!1,relevance:0,errorRaised:s,_emitter:x,_top:f};throw s}}function I(i){let a={value:ce(i),illegal:!1,relevance:0,_top:c,_emitter:new r.__emitter(r)};return a._emitter.addText(i),a}function $(i,a){a=a||r.languages||Object.keys(t);let h=I(i),E=a.filter(C).filter(Ee).map(R=>P(R,i,!1));E.unshift(h);let w=E.sort((R,S)=>{if(R.relevance!==S.relevance)return S.relevance-R.relevance;if(R.language&&S.language){if(C(R.language).supersetOf===S.language)return 1;if(C(S.language).supersetOf===R.language)return-1}return 0}),[y,D]=w,F=y;return F.secondBest=D,F}function te(i,a,h){let E=a&&n[a]||h;i.classList.add("hljs"),i.classList.add(`language-${E}`)}function ne(i){let a=null,h=O(i);if(u(h))return;if(W("before:highlightElement",{el:i,language:h}),i.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",i);return}if(i.children.length>0&&(r.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("(see the highlight.js security wiki)"),console.warn("The element with unescaped HTML:"),console.warn(i)),r.throwUnescapedHTML))throw new ue("One of your code blocks includes unescaped HTML.",i.innerHTML);a=i;let E=a.textContent,w=h?M(E,{language:h,ignoreIllegals:!0}):$(E);i.innerHTML=w.value,i.dataset.highlighted="yes",te(i,h,w.language),i.result={language:w.language,re:w.relevance,relevance:w.relevance},w.secondBest&&(i.secondBest={language:w.secondBest.language,relevance:w.secondBest.relevance}),W("after:highlightElement",{el:i,result:w,text:E})}function Ye(i){r=Ae(r,i)}let Xe=()=>{m(),H("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function Ze(){m(),H("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let de=!1;function m(){function i(){m()}if(document.readyState==="loading"){de||window.addEventListener("DOMContentLoaded",i,!1),de=!0;return}document.querySelectorAll(r.cssSelector).forEach(ne)}function Je(i,a){let h=null;try{h=a(e)}catch(E){if(L("Language definition for '{}' could not be registered.".replace("{}",i)),d)L(E);else throw E;h=c}h.name||(h.name=i),t[i]=h,h.rawDefinition=a.bind(null,e),h.aliases&&pe(h.aliases,{languageName:i})}function Ve(i){delete t[i];for(let a of Object.keys(n))n[a]===i&&delete n[a]}function Qe(){return Object.keys(t)}function C(i){return i=(i||"").toLowerCase(),t[i]||t[n[i]]}function pe(i,{languageName:a}){typeof i=="string"&&(i=[i]),i.forEach(h=>{n[h.toLowerCase()]=a})}function Ee(i){let a=C(i);return a&&!a.disableAutodetect}function qe(i){i["before:highlightBlock"]&&!i["before:highlightElement"]&&(i["before:highlightElement"]=a=>{i["before:highlightBlock"](Object.assign({block:a.el},a))}),i["after:highlightBlock"]&&!i["after:highlightElement"]&&(i["after:highlightElement"]=a=>{i["after:highlightBlock"](Object.assign({block:a.el},a))})}function et(i){qe(i),l.push(i)}function tt(i){let a=l.indexOf(i);a!==-1&&l.splice(a,1)}function W(i,a){let h=i;l.forEach(function(E){E[h]&&E[h](a)})}function nt(i){return H("10.7.0","highlightBlock will be removed entirely in v12.0"),H("10.7.0","Please use highlightElement now."),ne(i)}Object.assign(e,{highlight:M,highlightAuto:$,highlightAll:m,highlightElement:ne,highlightBlock:nt,configure:Ye,initHighlighting:Xe,initHighlightingOnLoad:Ze,registerLanguage:Je,unregisterLanguage:Ve,listLanguages:Qe,getLanguage:C,registerAliases:pe,autoDetection:Ee,inherit:Ae,addPlugin:et,removePlugin:tt}),e.debugMode=function(){d=!1},e.safeMode=function(){d=!0},e.versionString=cn,e.regex={concat:B,lookahead:De,either:V,optional:wt,anyNumberOfTimes:Ot};for(let i in X)typeof X[i]=="object"&&Ie(X[i]);return Object.assign(e,X),e},U=je({});U.newInstance=()=>je({});Ge.exports=U;U.HighlightJS=U;U.default=U});var me=bt(Ke(),1);var he=me.default;var j="[0-9](_*[0-9])*",q=`\\.(${j})`,ee="[0-9a-fA-F](_*[0-9a-fA-F])*",We={className:"number",variants:[{begin:`(\\b(${j})((${q})|\\.)?|(${q}))[eE][+-]?(${j})[fFdD]?\\b`},{begin:`\\b(${j})((${q})[fFdD]?\\b|\\.([fFdD]\\b)?)`},{begin:`(${q})[fFdD]?\\b`},{begin:`\\b(${j})[fFdD]\\b`},{begin:`\\b0[xX]((${ee})\\.?|(${ee})?\\.(${ee}))[pP][+-]?(${j})[fFdD]?\\b`},{begin:"\\b(0|[1-9](_*[0-9])*)[lL]?\\b"},{begin:`\\b0[xX](${ee})[lL]?\\b`},{begin:"\\b0(_*[0-7])*[lL]?\\b"},{begin:"\\b0[bB][01](_*[01])*[lL]?\\b"}],relevance:0};function Fe(e,t,n){return n===-1?"":e.replace(t,l=>Fe(e,t,n-1))}function ze(e){let t=e.regex,n="[\xC0-\u02B8a-zA-Z_$][\xC0-\u02B8a-zA-Z_$0-9]*",l="(?:(?:\\s*\\[\\s*])+)?",d=n+"<@@@>"+l,c="(?:"+("\\?(?:\\s+(?:extends|super)\\s+"+d+")?")+"|"+d+")",r=Fe("(?:\\s*<\\s*"+c+"(?:\\s*,\\s*"+c+")*\\s*>)?",/<@@@>/g,2),I={keyword:["synchronized","abstract","private","var","static","if","const ","for","while","strictfp","finally","protected","import","native","final","void","enum","else","break","transient","catch","instanceof","volatile","case","assert","package","default","public","try","switch","continue","throws","protected","public","private","module","requires","exports","do","sealed","yield","permits","goto","when"],literal:["false","true","null"],type:["char","boolean","long","float","int","byte","short","double"],built_in:["super","this"]},$={className:"meta",begin:"@"+n,contains:[{begin:/\(/,end:/\)/,contains:["self"]}]},te={className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[e.C_BLOCK_COMMENT_MODE],endsParent:!0};return{name:"Java",aliases:["jsp"],keywords:I,illegal:/<\/|#/,contains:[e.COMMENT("/\\*\\*","\\*/",{relevance:0,contains:[{begin:/\w+@/,relevance:0},{className:"doctag",begin:"@[A-Za-z]+"}]}),{begin:/import java\.[a-z]+\./,keywords:"import",relevance:2},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE,{begin:/"""/,end:/"""/,className:"string",contains:[e.BACKSLASH_ESCAPE]},e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,{match:[/\b(?:class|interface|enum|extends|implements|new)/,/\s+/,n],className:{1:"keyword",3:"title.class"}},{match:/non-sealed/,scope:"keyword"},{beginKeywords:"new throw return else yield assert",relevance:0},{begin:[n,t.concat(r,l,/\s+/),n,l,/\s*/,/=(?!=)/],className:{1:"type",3:"variable",6:"operator"}},{begin:[/record/,/\s+/,n],className:{1:"keyword",3:"title.class"},contains:[te,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},{begin:[n,t.concat(r,l,/\s+/),n,/\s*(?=\()/],className:{1:"type",3:"title.function"},keywords:I,contains:[{className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[$,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,We,e.C_BLOCK_COMMENT_MODE]},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},We,$]}}he.registerLanguage("java",ze);window.hljs=he;})();
+</script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---- 1. syntax highlighting -------------------------------------- */
+  function highlight() {
+    if (!window.hljs) return;
+    var blocks = document.querySelectorAll('pre code.language-java');
+    for (var i = 0; i < blocks.length; i++) {
+      try { window.hljs.highlightElement(blocks[i]); } catch (e) {}
+    }
+  }
+
+  /* ---- 2. every solution / reveal starts closed --------------------- */
+  function closeAll() {
+    var d = document.querySelectorAll('details.soln');
+    for (var i = 0; i < d.length; i++) { d[i].open = false; }
+  }
+
+  /* ---- 3. show all / hide all -------------------------------------- */
+  function wireToolbar() {
+    var show = document.getElementById('showAll');
+    var hide = document.getElementById('hideAll');
+    function setAll(v) {
+      var d = document.querySelectorAll('details.soln');
+      for (var i = 0; i < d.length; i++) { d[i].open = v; }
+    }
+    if (show) show.addEventListener('click', function () { setAll(true); });
+    if (hide) hide.addEventListener('click', function () { setAll(false); });
+  }
+
+  /* ---- 4. live-coding editors -------------------------------------- */
+  var INDENT = '    ';
+
+  function wireEditors() {
+    var eds = document.querySelectorAll('.editor');
+    for (var i = 0; i < eds.length; i++) { wireOne(eds[i]); }
+  }
+
+  function wireOne(box) {
+    var ta = box.querySelector('textarea');
+    if (!ta) return;
+    var starter = ta.value;
+
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Tab' || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+      ev.preventDefault();
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+
+      if (s === e && !ev.shiftKey) {
+        ta.value = v.slice(0, s) + INDENT + v.slice(e);
+        ta.selectionStart = ta.selectionEnd = s + INDENT.length;
+        return;
+      }
+      /* block indent / outdent over the selected lines */
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var le = v.indexOf('\n', e);
+      if (le === -1) le = v.length;
+      var seg = v.slice(ls, le);
+      var lines = seg.split('\n');
+      var delta0 = 0, total = 0;
+
+      for (var i = 0; i < lines.length; i++) {
+        if (ev.shiftKey) {
+          var m = lines[i].match(/^(\t| {1,4})/);
+          if (m) {
+            lines[i] = lines[i].slice(m[0].length);
+            if (i === 0) delta0 = -m[0].length;
+            total -= m[0].length;
+          }
+        } else {
+          lines[i] = INDENT + lines[i];
+          if (i === 0) delta0 = INDENT.length;
+          total += INDENT.length;
+        }
+      }
+      ta.value = v.slice(0, ls) + lines.join('\n') + v.slice(le);
+      ta.selectionStart = Math.max(ls, s + delta0);
+      ta.selectionEnd = Math.max(ta.selectionStart, e + total);
+    });
+
+    /* keep the indent of the current line when Enter is pressed */
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Enter' || ev.shiftKey || ev.ctrlKey || ev.metaKey) return;
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+      if (s !== e) return;
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var lead = (v.slice(ls, s).match(/^[ \t]*/) || [''])[0];
+      var extra = /[{(\[]\s*$/.test(v.slice(ls, s)) ? INDENT : '';
+      if (!lead && !extra) return;
+      ev.preventDefault();
+      var ins = '\n' + lead + extra;
+      ta.value = v.slice(0, s) + ins + v.slice(e);
+      ta.selectionStart = ta.selectionEnd = s + ins.length;
+    });
+
+    var rst = box.querySelector('[data-act="reset"]');
+    if (rst) rst.addEventListener('click', function () {
+      ta.value = starter;
+      ta.focus();
+      flash(box, 'Reset to starter code');
+    });
+
+    var cpy = box.querySelector('[data-act="copy"]');
+    if (cpy) cpy.addEventListener('click', function () {
+      var done = function () { flash(box, 'Copied — paste it into your IDE'); };
+      var fail = function () { flash(box, 'Copy failed — select the text and press Ctrl/Cmd+C'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value).then(done, function () { legacy(ta, done, fail); });
+      } else {
+        legacy(ta, done, fail);
+      }
+    });
+  }
+
+  function legacy(ta, done, fail) {
+    try {
+      var st = ta.selectionStart, en = ta.selectionEnd;
+      ta.select();
+      var ok = document.execCommand('copy');
+      ta.selectionStart = st; ta.selectionEnd = en;
+      ok ? done() : fail();
+    } catch (e) { fail(); }
+  }
+
+  function flash(box, msg) {
+    var f = box.querySelector('.foot');
+    if (!f) return;
+    if (f.getAttribute('data-base') === null || f.getAttribute('data-base') === undefined) {
+      f.setAttribute('data-base', f.textContent);
+    }
+    f.textContent = msg;
+    window.setTimeout(function () { f.textContent = f.getAttribute('data-base'); }, 2200);
+  }
+
+  /* ---- go ----------------------------------------------------------- */
+  function init() {
+    highlight();
+    closeAll();
+    wireToolbar();
+    wireEditors();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  /* belt and braces: some browsers restore <details> state on soft reload */
+  window.addEventListener('pageshow', closeAll);
+})();
+</script>
+</body>
+</html>

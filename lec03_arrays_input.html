@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class 3 — Arrays and Reading Input with Scanner | CSCI 212</title>
+<style>
+:root{
+  --ink:#0f172a; --ink2:#334155; --muted:#64748b; --line:#e2e8f0;
+  --bg:#ffffff; --bg2:#f8fafc;
+  --obj:#4f46e5; --def:#2563eb; --ex:#059669; --alg:#7c3aed;
+  --key:#b45309; --warn:#dc2626; --qc:#0891b2; --prac:#be185d; --sum:#475569;
+  --edit:#ea580c; --edit-bg:#fff7ed;
+  --code-bg:#0d1117; --code-bd:#000000;   /* read-only listings: black */
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px 80px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:#0f172a;color:#e2e8f0;font-size:13.5px;
+  border-bottom:3px solid var(--obj);
+}
+.topbar .inner{max-width:900px;margin:0 auto;padding:10px 22px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.topbar a{color:#e2e8f0;text-decoration:none;border-bottom:1px solid transparent}
+.topbar a:hover{border-bottom-color:#94a3b8}
+.topbar .course{font-weight:700;letter-spacing:.02em}
+.topbar .sep{color:#475569}
+.topbar .spacer{flex:1}
+
+/* ---------- title block ---------- */
+.titleblock{padding:34px 0 10px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.eyebrow{
+  font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--obj);margin-bottom:8px;
+}
+.titleblock h1{font-size:33px;line-height:1.2;margin:0 0 10px;letter-spacing:-.015em}
+.titleblock .sub{margin:0;color:var(--muted);font-size:17px;line-height:1.5}
+
+h2{
+  font-size:24px;margin:46px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line);letter-spacing:-.01em;scroll-margin-top:14px;
+}
+h2 .num{color:var(--obj);font-weight:800;margin-right:11px}
+h3{font-size:18.5px;margin:30px 0 10px;color:var(--ink)}
+h4{font-size:16px;margin:20px 0 8px;color:var(--ink2)}
+p{margin:12px 0}
+ul,ol{margin:12px 0;padding-left:26px}
+li{margin:6px 0}
+a{color:var(--def)}
+hr{border:0;border-top:1px solid var(--line);margin:30px 0}
+strong{color:var(--ink)}
+.muted{color:var(--muted)}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--bg2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 20px 16px;margin:22px 0;
+}
+.toc .th{
+  font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;
+}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:30px}
+.toc li{margin:3px 0;font-size:14.5px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- show all / hide all ---------- */
+.tools{
+  display:flex;gap:9px;align-items:center;flex-wrap:wrap;
+  padding:11px 15px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:9px;margin:22px 0;font-size:13.5px;
+}
+.tools .lab{font-weight:700;color:var(--ink2)}
+.tools button{
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  background:#fff;color:var(--ink2);border:1px solid #cbd5e1;
+  border-radius:6px;padding:4px 12px;
+}
+.tools button:hover{background:var(--obj);border-color:var(--obj);color:#fff}
+.tools .muted{font-size:12.5px}
+
+/* ---------- boxes ---------- */
+.box{border:1px solid var(--line);border-left:5px solid var(--muted);border-radius:8px;margin:22px 0;overflow:hidden;background:#fff}
+.box>.hd{
+  padding:9px 16px;font-size:12.5px;font-weight:700;
+  letter-spacing:.075em;text-transform:uppercase;color:#fff;background:var(--muted);
+}
+.box>.hd .tag{margin-left:5px;font-weight:500;text-transform:none;letter-spacing:0;opacity:.92;font-size:13px}
+.box>.bd{padding:4px 18px 14px}
+.box>.bd>:first-child{margin-top:12px}
+.box>.bd>:last-child{margin-bottom:2px}
+
+.box.obj{border-left-color:var(--obj)}  .box.obj>.hd{background:var(--obj)}
+.box.def{border-left-color:var(--def)}  .box.def>.hd{background:var(--def)}
+.box.ex{border-left-color:var(--ex)}    .box.ex>.hd{background:var(--ex)}
+.box.alg{border-left-color:var(--alg)}  .box.alg>.hd{background:var(--alg)}
+.box.key{border-left-color:var(--key)}  .box.key>.hd{background:var(--key)}
+.box.warn{border-left-color:var(--warn)}.box.warn>.hd{background:var(--warn)}
+.box.qc{border-left-color:var(--qc)}    .box.qc>.hd{background:var(--qc)}
+.box.prac{border-left-color:var(--prac)}.box.prac>.hd{background:var(--prac)}
+.box.sum{border-left-color:var(--sum)}  .box.sum>.hd{background:var(--sum)}
+
+.box.obj{background:#f5f5ff}
+.box.qc{background:#f0fbfe}
+.box.warn{background:#fff7f7}
+.box.key{background:#fffbf2}
+.box.sum{background:#f8fafc}
+
+/* ---------- code ---------- */
+/* Read-only listings sit on black, matching CSCI 211, so a code block is never
+   mistaken for the editable live-coding box. */
+pre{
+  margin:14px 0;padding:13px 15px;overflow-x:auto;
+  background:var(--code-bg);border:1px solid var(--code-bd);border-radius:8px;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;color:#c9d1d9;
+}
+pre code{font-family:inherit;font-size:inherit;background:none;padding:0;border:0;color:inherit;display:block}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef2f7;
+  border:1px solid #e2e8f0;border-radius:4px;padding:1px 5px;color:#0b3a5b;
+}
+.filename{
+  font-family:var(--mono);font-size:12px;color:#475569;
+  margin:16px 0 -9px;font-weight:600;
+}
+
+/* comparison block: another language, never syntax-highlighted. Dark like the
+   Java listings, but desaturated and dashed so it reads as "not this course". */
+pre.cmp{background:#161b22;border-style:dashed;border-color:#3f4650;color:#9aa4b2}
+pre.cmp code{color:#9aa4b2}
+
+/* shell commands you type */
+pre.sh{background:#1e293b;border-color:#1e293b;color:#e2e8f0;position:relative;padding-top:26px}
+pre.sh code{color:#e2e8f0}
+pre.sh::before{
+  content:"Terminal";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#86efac;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* output / terminal blocks */
+pre.out{background:#111d33;border-color:#111d33;color:#e2e8f0;position:relative;padding-top:26px}
+pre.out code{color:#e2e8f0}
+pre.out::before{
+  content:"Output";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#7dd3fc;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+pre.err{background:#1f1416;border-color:#7f1d1d;color:#fecdd3;padding-top:26px;position:relative}
+pre.err code{color:#fecdd3}
+pre.err::before{
+  content:"Compiler message";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#fda4af;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* ---- highlight.js, GitHub-dark palette (hand-written, no external file) ---- */
+.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-template-tag,
+.hljs-template-variable,.hljs-type,.hljs-variable.language_{color:#ff7b72}
+.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#d2a8ff}
+.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,
+.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable{color:#79c0ff}
+.hljs-meta .hljs-string,.hljs-regexp,.hljs-string{color:#a5d6ff}
+.hljs-built_in,.hljs-symbol{color:#ffa657}
+.hljs-code,.hljs-comment,.hljs-formula{color:#8b949e;font-style:italic}
+.hljs-name,.hljs-quote,.hljs-selector-pseudo,.hljs-selector-tag{color:#7ee787}
+.hljs-subst{color:#c9d1d9}
+.hljs-section{color:#1f6feb;font-weight:700}
+.hljs-bullet{color:#f2cc60}
+.hljs-emphasis{color:#c9d1d9;font-style:italic}
+.hljs-strong{color:#c9d1d9;font-weight:700}
+
+/* ---------- trace tables ---------- */
+table{border-collapse:collapse;margin:16px 0;font-size:14px;width:100%}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg2);font-weight:700;font-size:13px}
+table.trace td:first-child,table.trace th:first-child{white-space:nowrap}
+table code{font-size:.88em}
+
+/* ---------- multi-part questions ---------- */
+.part{margin:16px 0;padding-left:14px;border-left:2px solid #cbd5e1}
+.part .q{margin:0 0 8px}
+.part .pl{font-weight:700;color:var(--qc);margin-right:6px}
+
+/* ---------- collapsible solutions ---------- */
+details.soln{margin:10px 0 4px}
+details.soln>summary{
+  list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  font-size:12.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:#fff;background:var(--sum);border-radius:6px;padding:5px 13px;
+  user-select:none;
+}
+details.soln>summary::-webkit-details-marker{display:none}
+details.soln>summary::before{content:"\25B6";font-size:9px;transition:transform .15s}
+details.soln[open]>summary::before{transform:rotate(90deg)}
+details.soln>summary::after{content:"Show Answer"}
+details.soln[open]>summary::after{content:"Hide Answer"}
+details.soln>summary:hover{filter:brightness(1.18)}
+
+details.soln.reveal>summary{background:var(--ex)}
+details.soln.reveal>summary::after{content:"Show Output & Explanation"}
+details.soln.reveal[open]>summary::after{content:"Hide Output & Explanation"}
+details.soln.reveal.noout>summary::after{content:"Show Explanation"}
+details.soln.reveal.noout[open]>summary::after{content:"Hide Explanation"}
+
+.ans{
+  margin-top:11px;padding:2px 16px 10px;background:#fff;
+  border:1px solid var(--line);border-left:3px solid var(--sum);border-radius:7px;
+}
+details.soln.reveal .ans{border-left-color:var(--ex)}
+.ans>:first-child{margin-top:12px}
+.ans>:last-child{margin-bottom:6px}
+
+/* ---------- live coding editor ---------- */
+.editor{
+  margin:18px 0;border:2px dashed var(--edit);border-radius:9px;
+  background:var(--edit-bg);overflow:hidden;
+}
+.editor .ehd{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:7px 13px;background:var(--edit);color:#fff;
+  font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+}
+.editor .ehd .etitle{flex:1}
+.editor .ehd button{
+  font:inherit;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  cursor:pointer;background:rgba(255,255,255,.16);color:#fff;
+  border:1px solid rgba(255,255,255,.5);border-radius:5px;padding:3px 10px;
+}
+.editor .ehd button:hover{background:#fff;color:var(--edit)}
+.editor textarea{
+  display:block;width:100%;border:0;outline:0;resize:vertical;
+  padding:12px 15px;background:var(--edit-bg);color:#431407;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;
+  tab-size:4;-moz-tab-size:4;min-height:150px;
+}
+.editor textarea:focus{background:#fff}
+.editor .foot{
+  padding:5px 13px 7px;font-size:11.5px;color:#9a3412;background:#ffedd5;
+  border-top:1px solid #fed7aa;
+}
+
+/* ---------- prev/next nav ---------- */
+.pagenav{display:flex;gap:14px;margin:52px 0 0;flex-wrap:wrap}
+.pagenav a,.pagenav span.disabled{
+  flex:1 1 260px;display:block;text-decoration:none;
+  border:1px solid var(--line);border-radius:9px;padding:12px 16px;background:#fff;
+}
+.pagenav a:hover{border-color:var(--obj);background:var(--bg2)}
+.pagenav .dir{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.pagenav .ttl{font-size:15px;font-weight:600;color:var(--ink);margin-top:3px}
+.pagenav .next{text-align:right}
+.pagenav span.disabled{opacity:.4}
+.pagenav span.disabled .ttl{color:var(--muted)}
+
+footer.pf{
+  margin-top:40px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--muted);text-align:center;
+}
+
+/* ---------- index page ---------- */
+table.sched{font-size:14.5px}
+table.sched th{background:#0f172a;color:#fff;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+table.sched td:first-child{white-space:nowrap;font-weight:700;color:var(--muted);width:60px}
+table.sched tr.examrow td{background:#fff1f2}
+table.sched tr.revrow td{background:#fffbeb}
+table.sched a{font-weight:600;text-decoration:none}
+table.sched a:hover{text-decoration:underline}
+
+
+/* ---------- release gating ---------- */
+.pending{
+  margin-top:4px;font-size:11.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:#b45309;
+}
+.pagenav span.disabled .pending{color:#b45309}
+table.sched tr.pendingrow td{background:#fcfcfd}
+table.sched .unrel{color:var(--muted)}
+table.sched .pending{display:block;margin-top:2px}
+table.sched td.cn{white-space:nowrap;width:52px;font-weight:700;color:var(--muted)}
+table.sched td.dt{white-space:nowrap;width:104px;color:var(--muted);font-size:13.5px}
+table.sched tr.offrow td{background:#f1f5f9;color:var(--muted);font-style:italic}
+.refcard{
+  display:block;text-decoration:none;border:1px solid var(--line);
+  border-left:5px solid var(--alg);border-radius:9px;padding:13px 17px;
+  margin:22px 0;background:#faf9ff;
+}
+.refcard:hover{background:#f5f3ff;border-color:var(--alg)}
+.refcard .rl{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--alg)}
+.refcard .rt{font-size:16px;font-weight:600;color:var(--ink);margin-top:3px}
+.refcard .rd{font-size:14px;color:var(--muted);margin-top:4px}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,.tools,.pagenav,.pending{display:none !important}
+  html,body{width:100%;font-size:10pt}
+  .wrap{max-width:100%;width:100%;padding:0}
+  /* a wide <pre> must wrap rather than widen the page and clip every other
+     element at the paper edge */
+  /* Screen shows code on black; paper does not. Restore a dark-on-light palette
+     for print only, or the dark theme's light tokens vanish on white. */
+  pre{white-space:pre-wrap;overflow:visible;overflow-wrap:anywhere;font-size:8.6pt;
+      background:#f8fafc !important;color:#24292e !important;border-color:#cbd5e1 !important;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  pre code{color:#24292e !important}
+  pre.cmp{background:#fff !important;color:#475569 !important;border-color:#94a3b8 !important}
+  pre.cmp code{color:#475569 !important}
+  pre .hljs-doctag,pre .hljs-keyword,pre .hljs-meta .hljs-keyword,pre .hljs-template-tag,
+  pre .hljs-template-variable,pre .hljs-type,pre .hljs-variable.language_{color:#d73a49 !important}
+  pre .hljs-title,pre .hljs-title.class_,pre .hljs-title.class_.inherited__,
+  pre .hljs-title.function_{color:#6f42c1 !important}
+  pre .hljs-attr,pre .hljs-attribute,pre .hljs-literal,pre .hljs-meta,pre .hljs-number,
+  pre .hljs-operator,pre .hljs-selector-attr,pre .hljs-selector-class,pre .hljs-selector-id,
+  pre .hljs-variable{color:#005cc5 !important}
+  pre .hljs-meta .hljs-string,pre .hljs-regexp,pre .hljs-string{color:#032f62 !important}
+  pre .hljs-built_in,pre .hljs-symbol{color:#e36209 !important}
+  pre .hljs-code,pre .hljs-comment,pre .hljs-formula{color:#6a737d !important}
+  pre .hljs-name,pre .hljs-quote,pre .hljs-selector-pseudo,
+  pre .hljs-selector-tag{color:#22863a !important}
+  pre .hljs-subst,pre .hljs-emphasis,pre .hljs-strong{color:#24292e !important}
+  .filename{color:#475569 !important}
+  table{table-layout:fixed;width:100%;word-wrap:break-word;overflow-wrap:anywhere}
+  .box,.toc{max-width:100%}
+  a{color:var(--ink);text-decoration:none}
+  .box,.part,pre,table,.editor{break-inside:avoid;page-break-inside:avoid}
+  h2{break-after:avoid;page-break-after:avoid}
+  details.soln>summary{display:none !important}
+  details.soln:not([open])>.ans{display:none !important}
+  details.soln::before{
+    content:"Answer withheld — see the online notes.";
+    display:block;font-size:9pt;font-style:italic;color:#64748b;margin:6px 0;
+  }
+  details.soln[open]::before{content:""}
+  .editor textarea{display:none !important}
+  .editor{border:1.5px solid #fdba74 !important;background:#fff;border-style:solid}
+  .editor .ehd{background:#fff !important;color:#9a3412 !important;border-bottom:1px solid #fdba74}
+  .editor .ehd button{display:none}
+  .editor .foot{display:none}
+  .editor::after{content:"";display:block;height:2.1in;background:#fff}
+  pre.out,pre.sh{background:#f1f5f9 !important;color:#0f172a !important;border-color:#94a3b8 !important}
+  pre.err{background:#fef2f2 !important;color:#7f1d1d !important;border-color:#fca5a5 !important}
+  pre.out code,pre.sh code{color:#0f172a !important}
+  pre.err code{color:#7f1d1d !important}
+  pre.out::before,pre.sh::before{color:#475569}
+  pre.err::before{color:#b91c1c}
+  .box>.hd{color:#000;background:#fff !important;border-bottom:1px solid #cbd5e1}
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="inner">
+<span class="course">CSCI 212</span>
+<span class="sep">|</span>
+<a href="index.html">Course index</a>
+<span class="sep">|</span>
+<span>Class 3 of 28</span>
+<span class="sep">|</span>
+<span>Tuesday, September 8</span>
+<span class="spacer"></span>
+<span>Queens College, CUNY</span>
+</div></div>
+<div class="wrap">
+<div class="titleblock">
+  <div class="eyebrow">Session 3 &middot; Lecture 3</div>
+  <h1>Arrays and Reading Input with Scanner</h1>
+  <p class="sub">Storing many values in one variable, and getting values into a program from the person running it.</p>
+</div>
+
+<div class="box obj">
+  <div class="hd">Learning Objectives</div>
+  <div class="bd">
+    <p>By the end of today's session you should be able to:</p>
+    <ol>
+      <li>Declare and create an array in each of the forms Java allows, and say which forms need a size and which do not.</li>
+      <li>Explain why an array's size is written <code>a.length</code> with no parentheses while a string's length is <code>s.length()</code> with them, and recognise the compiler error each mistake produces.</li> <li>Read and write individual elements with <code>a[i]</code>, and say what <code>ArrayIndexOutOfBoundsException</code> is telling you.</li> <li>Walk an array with an indexed <code>for</code> loop and with the enhanced for-each loop, and say when only the indexed version will do.</li> <li>Pass an array to a method and predict whether the caller sees the change.</li> <li>Create and iterate a two-dimensional array, including one whose rows have different lengths.</li> <li>Explain what it means to say a <code>Scanner</code> is an <em>object</em>, and create one with <code>new Scanner(System.in)</code>.</li> <li>Read numbers, single words and whole lines with <code>nextInt</code>, <code>next</code> and <code>nextLine</code>, and avoid the leftover-newline trap that catches everybody once.</li> </ol> </div> </div> <div class="toc"> <div class="th">On this page</div> <ol> <li><a href="#s1">Arrays: declaring one and creating one</a></li> <li><a href="#s2"><code>length</code>, indexing, and running off the end</a></li> <li><a href="#s3">Walking an array: <code>for</code> and for-each</a></li> <li><a href="#s4">Arrays and methods</a></li> <li><a href="#s5">Two-dimensional arrays</a></li> <li><a href="#s6">Your first object: the <code>Scanner</code> class</a></li> <li><a href="#s7">Reading input, token by token and line by line</a></li> <li><a href="#prac">Practice Problems</a></li> <li><a href="#summary">Lecture Summary</a></li> </ol> </div> <div class="tools"> <span class="lab">Answers</span> <button id="showAll" type="button">Show all</button> <button id="hideAll" type="button">Hide all</button> <span class="muted">&mdash; every worked-example output and every solution is hidden when the page loads. Work it out first, then reveal.</span> </div> <hr> <h2 id="s1"><span class="num">1.</span>Arrays: declaring one and creating one</h2> <p>Last time we learned to write a function as a Java <em>static method</em>: a title line of the form <code>public static result_type method_name(parameters)</code>, called from <code>main</code> by name, from another class as <code>ClassName.method(...)</code>, and from itself when it is recursive. Everything we write today gets passed to methods, so keep that shape in mind.</p> <p>So far every variable we have declared holds exactly one value. If you need five test scores you declare five variables; if you need a hundred, you are in trouble. An array is Java's answer, and it is very close to the C++ array you already know &mdash; with one important difference we will get to in &sect;2.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; array</span></div> <div class="bd"> <p>An <strong>array</strong> is a single variable that holds a numbered sequence of values, all of the same type. The values are called <strong>elements</strong>; the number identifying an element is its <strong>index</strong>, and indices start at <strong>0</strong>.</p> <p>An array of five <code>int</code> values has indices 0, 1, 2, 3 and 4 &mdash; there is no element 5. You read element <code>i</code> with <code>a[i]</code> and you write it with <code>a[i] = value;</code>.</p> </div> </div> <p>Declaring an array and <em>creating</em> it are two separate things in Java, and the notes for today make the point twice: array declaration can be done in several ways, <em>depending on when you want to allocate memory and initialize the array</em>. Here are the forms.</p> <table> <tr><th>Form</th><th>What it does</th></tr> <tr><td><code>int[] a;</code></td><td>Declares the variable only. No memory for elements yet; <code>a</code> refers to nothing.</td></tr> <tr><td><code>int a[];</code></td><td>Exactly the same thing. The brackets may go after the type or after the variable name.</td></tr> <tr><td><code>a = new int[5];</code></td><td>Allocates room for five <code>int</code> values and fills them with the default value.</td></tr> <tr><td><code>int[] a = new int[5];</code></td><td>Declare and allocate on one line. The usual choice when you know the size but not yet the values.</td></tr> <tr><td><code>int[] c = {3, 1, 4, 1, 5};</code></td><td>An <strong>initializer list</strong>: declare, allocate and fill in one step. You do <em>not</em> write a size &mdash; Java counts the values for you.</td></tr> <tr><td><code>a = new int[]{10, 20, 30};</code></td><td>An initializer list used somewhere other than a declaration. The <code>new int[]</code> part is required here.</td></tr> </table> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; the size rule</span></div> <div class="bd"> <p>The size must be given when you allocate memory, <em>except</em> when you use an initializer list &mdash; then the list itself supplies the size. Those are the only two possibilities. Writing a size in the declaration itself, as C does with <code>int a[5];</code>, is not Java.</p> </div> </div> <p>Every element of a newly allocated array is set to a definite default value: <code>0</code> for the integer types, <code>0.0</code> for <code>double</code>, <code>false</code> for <code>boolean</code>, and <code>null</code> for anything that is an object. Java never hands you an array full of garbage the way C++ can.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; every declaration form, and the defaults</span></div> <div class="bd"> <p>This program uses all six forms from the table and then prints the defaults for four different element types. Before you open the toggle, decide what <code>a[0]</code> holds, and what <code>names[0]</code> holds.</p> <p class="filename">ArrayDeclare.java</p>
+<pre><code class="language-java">public class ArrayDeclare {
+    public static void main(String args[]) {
+        int[] a = new int[5];
+        int b[] = new int[5];
+        int[] c = {3, 1, 4, 1, 5};
+        int d[] = {2, 7, 1};
+        int[] e;
+        e = new int[]{10, 20, 30};
+
+        System.out.println("a[0] = " + a[0] + "   a.length = " + a.length);
+        System.out.println("b[4] = " + b[4] + "   b.length = " + b.length);
+        System.out.println("c[0] = " + c[0] + "   c.length = " + c.length);
+        System.out.println("d[2] = " + d[2] + "   d.length = " + d.length);
+        System.out.println("e[1] = " + e[1] + "   e.length = " + e.length);
+
+        double[] money = new double[3];
+        boolean[] flags = new boolean[3];
+        String[] names = new String[3];
+        System.out.println("double  default: " + money[0]);
+        System.out.println("boolean default: " + flags[0]);
+        System.out.println("String  default: " + names[0]);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>a[0] = 0   a.length = 5
+b[4] = 0   b.length = 5
+c[0] = 3   c.length = 5
+d[2] = 1   d.length = 3
+e[1] = 20   e.length = 3
+double  default: 0.0
+boolean default: false
+String  default: null</code></pre> <p>Three things to pull out of this.</p> <ul> <li><code>int[] a</code> and <code>int b[]</code> produce identical arrays. The first form is preferred in modern Java because it keeps the type in one piece &mdash; "<code>a</code> is an array-of-int" reads better than "<code>b</code> is an int, sort of, with brackets". Your instructor's own code uses both, and so do the exams, so you must be able to read either.</li> <li><code>c</code> got a length of 5 without anyone writing a 5. That is the initializer list counting its own values.</li> <li><code>names[0]</code> is <code>null</code>, not the empty string. <code>null</code> means "this slot refers to no object at all". Calling a method on it &mdash; <code>names[0].length()</code> &mdash; would throw a <code>NullPointerException</code>. Allocating a <code>String[]</code> gives you the slots; it does not give you any strings.</li> </ul> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; three declarations that will not compile</span></div> <div class="bd"> <p>The C habit of putting the size in the declaration does not survive the trip:</p> <pre><code class="language-java">int a[5]; </code></pre> <pre class="err"><code>Bad1.java:3: error: ']' expected int a[5];
+^
+1 error</code></pre> <p>Supplying a size <em>and</em> an initializer list is a contradiction, and Java says so almost in English:</p> <pre><code class="language-java">int[] a = new int[3]{
+    1, 2, 3}
+;</code></pre> <pre class="err"><code>Bad2.java:3: error: array creation with both dimension expression and initialization is illegal int[] a = new int[3]{1, 2, 3};
+^
+1 error</code></pre> <p>And the bare initializer list is only legal in a <em>declaration</em>. In a later assignment you must say <code>new int[]</code> in front of it:</p> <pre><code class="language-java">int[] a;
+a = {
+    1, 2, 3}
+;</code></pre> <pre class="err"><code>Bad3.java:4: error: illegal start of expression a = {1, 2, 3};
+^
+Bad3.java:4: error: not a statement a = {1, 2, 3};
+^
+Bad3.java:4: error: ';' expected a = {1, 2, 3};
+^
+3 errors</code></pre> <p>Notice that one small mistake produced three error messages. When the parser loses its place, the errors after the first are often noise &mdash; always fix the topmost one first and recompile.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 3.1</div> <div class="bd"> <p>For each line, say whether it compiles, and if it does, how many elements the array ends up with.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>int[] p = new int[4];</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compiles. Four elements, every one of them <code>0</code>. This is the "I know the size, I do not yet know the values" form, and it is the one you will use most.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>int q[] = {5, 6, 7, 8, 9};</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compiles. Five elements, already holding 5 through 9. The brackets after the variable name are legal; the missing size is not a mistake, because the initializer list supplies it.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>int r[10];</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Does not compile &mdash; <code>error: ']' expected</code>. This is the C++ form. In Java the size belongs to <code>new</code>, not to the declaration. Write <code>int[] r = new int[10];</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>int[] s; s = new int[]{1, 2};</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compiles. Two elements. The declaration and the allocation happen on separate lines, which is exactly what you need when the values are decided somewhere else &mdash; inside an <code>if</code>, say, or returned by a method.</p> <p><strong>Things to notice across all four parts.</strong> Every legal form answers the same two questions in some order: <em>how big?</em> and <em>what is in it?</em> If you answer "how big" with a number you use <code>new type[n]</code>; if you answer "what is in it" with a list, the size comes free. Trouble only starts when you try to answer both at once, or neither.</p> </div></details> </div> </div> </div> <p>One more property of arrays, and it is the one that eventually pushes people towards <code>ArrayList</code> in Lecture 6: <strong>the size of an array is fixed once it is created.</strong> There is no way to append a sixth element to a five-element array. What you can do is build a bigger array and copy across.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; "growing" an array, which really means replacing it</span></div> <div class="bd"> <p>The variable <code>a</code> ends up describing a four-element array, but the three-element array it started with was never resized &mdash; a second array was built and <code>a</code> was pointed at it.</p> <p class="filename">FixedSize.java</p>
+<pre><code class="language-java">public class FixedSize {
+    public static void main(String args[]) {
+        int[] a = {3, 1, 4};
+        System.out.println("a has " + a.length + " slots: " + a[0] + " " + a[1] + " " + a[2]);
+
+        int[] bigger = new int[a.length + 1];
+        for (int i = 0; i &lt; a.length; i++) bigger[i] = a[i];
+        bigger[a.length] = 1;
+
+        a = bigger;
+
+        System.out.print("a now has " + a.length + " slots:");
+        for (int v : a) System.out.print(" " + v);
+        System.out.println();
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>a has 3 slots: 3 1 4 a now has 4 slots: 3 1 4 1 </code></pre> <p><code>bigger[a.length] = 1;</code> writes to index 3, which is the first slot past the end of the old array and the last slot of the new one. Writing it as <code>a.length</code> rather than <code>3</code> means the line stays correct if the original array changes size.</p> <p>The old three-element array is now unreachable, and Java's garbage collector will reclaim it without being asked. That is the automatic memory management we met in Lecture 1 doing its job: in C++ this is where you would have had to <code>delete[]</code> the old array yourself.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 3.2</div> <div class="bd"> <p>A classmate writes this and is surprised that it does not compile:</p> <pre><code class="language-java">int[] data = new int[3];
+data = {
+    1, 2, 3}
+;</code></pre> <p>Give two different one-line fixes, and say which you would prefer.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The bare <code>{1, 2, 3}</code> is only legal in a declaration. Either move it into the declaration, or add the <code>new int[]</code> that makes it a legal expression.</p> <p><strong>Fix 1 &mdash; put the list where it is allowed:</strong></p> <pre><code class="language-java">int[] data = {
+    1, 2, 3}
+;</code></pre> <p><strong>Fix 2 &mdash; keep two lines and name the type:</strong></p> <pre><code class="language-java">int[] data = new int[3];
+data = new int[]{
+    1, 2, 3}
+;</code></pre> <p><strong>Things to notice.</strong> Fix 1 is better here, because Fix 2 allocates two arrays and immediately throws the first one away. Fix 2 earns its keep only when the values genuinely are not known at the point of declaration. Notice also that neither fix "changes" an array: Fix 2 replaces the array that <code>data</code> refers to. Arrays never change size.</p> </div></details> </div> </div> <h2 id="s2"><span class="num">2.</span><code>length</code>, indexing, and running off the end</h2> <p>Every Java array knows how big it is, and it will tell you. This is a real improvement on C++, where an array is just an address and you have to carry the size around in a separate variable.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the <code>length</code> property</span></div> <div class="bd"> <p><code>length</code> is a built-in <strong>property</strong> of every Java array: an <code>int</code> giving the number of elements the array can hold. You write it with no parentheses and no arguments:</p> <p><code>a.length</code> &mdash; the number of slots in the array <code>a</code>.</p> <p>It is fixed at creation and can never be assigned to. <code>a.length = 10;</code> is a compile error.</p> </div> </div> <p>Because indices start at 0, an array of length <code>n</code> has valid indices <code>0</code> through <code>n - 1</code>. Two idioms follow from that and you will write them thousands of times:</p> <ul> <li><code>for (int i = 0; i &lt; a.length; i++)</code> &mdash; visit every element. Note <code>&lt;</code>, not <code>&lt;=</code>.</li> <li><code>a[a.length - 1]</code> &mdash; the last element.</li> </ul> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; <code>length</code> versus <code>length()</code></span></div> <div class="bd"> <p>This one appears on exams every single term, so learn it now and stop losing the point.</p> <table> <tr><th>Thing</th><th>How you ask for its size</th><th>Why</th></tr> <tr><td>An array, <code>int[] a</code></td><td><code>a.length</code></td><td><code>length</code> is a <em>property</em> &mdash; a piece of data built into the array. No parentheses.</td></tr> <tr><td>A <code>String</code>, <code>String s</code></td><td><code>s.length()</code></td><td><code>length()</code> is a <em>method</em> &mdash; a request you send to a <code>String</code> object. Parentheses required.</td></tr> </table> <p>Get either one backwards and the compiler stops you. Here are both mistakes in one file:</p> <pre><code class="language-java">int[] a = {
+    3, 1, 4}
+;
+String s = "CSCI";
+System.out.println(a.length());
+System.out.println(s.length);</code></pre> <pre class="err"><code>LengthTrap.java:5: error: cannot find symbol System.out.println(a.length());
+^
+  symbol:   method length()
+  location: variable a of type int[]
+LengthTrap.java:6: error: cannot find symbol System.out.println(s.length);
+^
+  symbol:   variable length
+  location: variable s of type String
+2 errors</code></pre> <p>Read the two messages carefully, because they are not the same message. The first says <em>method</em> <code>length()</code> not found; the second says <em>variable</em> <code>length</code> not found. <code>javac</code> is telling you exactly which kind of thing it looked for and failed to find, and that is the fastest way to work out which of the two you have mixed up.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the correct forms, side by side</span></div> <div class="bd"> <p>An array of 5 and a string of 4, so the two numbers cannot be confused with each other.</p> <p class="filename">LengthDemo.java</p>
+<pre><code class="language-java">public class LengthDemo {
+    public static void main(String args[]) {
+        int[] a = {3, 1, 4, 1, 5};
+        String s = "CSCI";
+
+        System.out.println("a.length   = " + a.length);
+        System.out.println("s.length() = " + s.length());
+
+        System.out.println("first  = " + a[0]);
+        System.out.println("last   = " + a[a.length - 1]);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>a.length   = 5 s.length() = 4 first  = 3 last   = 5 </code></pre> <p><code>a[a.length - 1]</code> is worth memorising as a unit. It says "the last one" without you having to know the number 5, so it keeps working when the array changes. Writing <code>a[4]</code> here would give the same answer today and break tomorrow.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 3.3</div> <div class="bd"> <p>Given <code>int[] nums = {10, 20, 30, 40};</code> and <code>String word = "Queens";</code>, write the expression that produces each value.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> The number of elements in <code>nums</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>nums.length</code> &mdash; the value is 4. No parentheses: it is a property, not a method.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> The number of characters in <code>word</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>word.length()</code> &mdash; the value is 6. Parentheses required: it is a method call.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> The last element of <code>nums</code>, without writing the number 3 or the number 4.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>nums[nums.length - 1]</code> &mdash; the value is 40.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> The sum of those two sizes.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>nums.length + word.length()</code> &mdash; the value is 10. Both sizes are <code>int</code>, so this is ordinary integer addition.</p> <p><strong>Things to notice across all four parts.</strong> The rule to carry into the exam is short: <em>arrays have <code>length</code>, everything else has <code>length()</code>.</em> If you cannot remember which is which under pressure, ask yourself whether the thing is an object. A <code>String</code> is an object and you ask it questions by calling methods. An array is not really an object with useful methods &mdash; its size is just a field you read.</p> </div></details> </div> </div> </div> <p>What happens if you ask for an element that does not exist? Nothing good in C++ &mdash; the program reads whatever memory happens to be there and carries on. Java refuses, loudly.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; one character wrong, at run time</span></div> <div class="bd"> <p>This loop has <code>&lt;=</code> where it should have <code>&lt;</code>. It compiles perfectly &mdash; the compiler has no way to know how big the array is at that point. Before you reveal: how many lines does it print before something goes wrong?</p> <p class="filename">Bounds.java</p>
+<pre><code class="language-java">public class Bounds {
+    public static void main(String args[]) {
+        int[] a = {3, 1, 4, 1, 5};
+        for (int i = 0; i &lt;= a.length; i++) {
+            System.out.println("a[" + i + "] = " + a[i]);
+        }
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>a[0] = 3 a[1] = 1 a[2] = 4 a[3] = 1 a[4] = 5
+Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for length 5</code></pre> <p>Five correct lines, then the crash. That is the shape of every off-by-one: the program looks entirely healthy right up to the last iteration.</p> <p>The message is unusually helpful, so read all of it. <strong>Index 5</strong> is what you asked for. <strong>length 5</strong> is what the array actually has. Since valid indices stop at <code>length - 1</code>, index 5 is one past the end &mdash; which points straight at the <code>&lt;=</code> in the loop header. Java also prints a stack trace naming the file and line; that line number is the first place to look.</p> <p>This is the security feature from Lecture 1 in action. The JVM checks every single array access at run time and refuses to read memory that is not yours. It costs a little speed and it buys you an entire category of bugs you will never have to hunt.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 3.4</div> <div class="bd"> <p><code>int[] a = new int[8];</code> For each expression say whether it is valid, and if not, what index it asks for and what the exception message would say.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>a[8]</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Invalid at run time. Valid indices are 0 through 7. The message would read <code>Index 8 out of bounds for length 8</code>. This is the single most common array bug there is, and it comes from thinking of <code>a[8]</code> as "the eighth one" &mdash; it would be the ninth.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>a[a.length - 1]</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Valid. <code>a.length</code> is 8, so this is <code>a[7]</code>, the last element.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>a[-1]</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Invalid: <code>Index -1 out of bounds for length 8</code>. Negative indices do not wrap around to the end the way they do in Python. You get this one by writing <code>a[i - 1]</code> inside a loop that starts at <code>i = 0</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>a.length = 10;</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Invalid, and this one the <em>compiler</em> catches: <code>cannot assign a value to final variable length</code>. An array's size is fixed when it is created, so there is nothing to assign to. If you need ten slots, create a new array of ten.</p> <p><strong>Things to notice across all four parts.</strong> Three of these fail at run time and one fails at compile time, and the difference is about what the compiler can know. It knows <code>length</code> is unassignable, because that is a fact about the type. It cannot know whether the value of <code>i</code> will be 8 when the program actually runs, so that check has to wait until run time. Get in the habit of asking, for any bug, "could the compiler possibly have known?"</p> </div></details> </div> </div> </div> <h2 id="s3"><span class="num">3.</span>Walking an array: <code>for</code> and for-each</h2> <p>The indexed loop is the one you already know, and it is the general tool:</p> <pre><code class="language-java">for (int i = 0; i &lt; a.length; i++) System.out.println(a[i]); </code></pre> <p>Java also has a second loop form, built specifically for "do something to every element". It is shorter, it cannot go out of bounds, and it appears in your instructor's own solutions, so you need to be able to read it.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the enhanced for loop (for-each)</span></div> <div class="bd"> <p><code>for (int v : a) { ... }</code> reads as <em>"for each <code>int</code> <code>v</code> in <code>a</code>"</em>. On each pass, <code>v</code> is a fresh variable holding a <strong>copy</strong> of the next element, in order from index 0 to the end.</p> <p>The type before the variable must match the element type of the array: <code>int</code> for an <code>int[]</code>, <code>String</code> for a <code>String[]</code>, <code>double</code> for a <code>double[]</code>.</p> <p>There is no index variable. If you need to know <em>where</em> you are, or you want to change the array, this loop cannot help you.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the two loops, and what for-each cannot do</span></div> <div class="bd"> <p>The first half sums the array both ways. The second half is the interesting part: it tries to zero the array with a for-each loop, prints the result, then does the same job with an indexed loop. Predict both printed rows before you reveal.</p> <p class="filename">ForEachDemo.java</p>
+<pre><code class="language-java">public class ForEachDemo {
+    public static void main(String args[]) {
+        int[] scores = {90, 85, 78, 92, 66};
+
+        int total = 0;
+        for (int i = 0; i &lt; scores.length; i++) total += scores[i];
+        System.out.println("Total (indexed loop):  " + total);
+
+        int total2 = 0;
+        for (int s : scores) total2 += s;
+        System.out.println("Total (for-each):      " + total2);
+
+        System.out.println("Average:               " + total / (double) scores.length);
+
+        for (int s : scores) s = 0;
+        System.out.println("After 'for (int s : scores) s = 0;'");
+        for (int s : scores) System.out.print(s + " ");
+        System.out.println();
+
+        for (int i = 0; i &lt; scores.length; i++) scores[i] = 0;
+        System.out.println("After 'scores[i] = 0;'");
+        for (int s : scores) System.out.print(s + " ");
+        System.out.println();
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Total (indexed loop):  411
+Total (for-each):      411
+Average:               82.2
+After 'for (int s : scores) s = 0;'
+90 85 78 92 66 
+After 'scores[i] = 0;'
+0 0 0 0 0 </code></pre> <p>Both loops compute the same total, as they should. The line to stare at is the fourth: after <code>for (int s : scores) s = 0;</code> the array is <em>completely unchanged</em>.</p> <p>Here is why. <code>s</code> is a brand-new <code>int</code> variable, created fresh on every pass, holding a copy of the element. Assigning to <code>s</code> overwrites the copy and then the copy is discarded. Nothing ever touched <code>scores</code>. The indexed version says <code>scores[i] = 0</code>, which names a slot inside the array, so that one really does write.</p> <p>Note also <code>total / (double) scores.length</code>. Both <code>total</code> and <code>scores.length</code> are <code>int</code>, so without the cast this would be integer division and print <code>82</code> &mdash; exactly the trap from Lecture 1, wearing an array as a disguise.</p> 
+</div></details> </div> </div> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; which loop to use</span></div> <div class="bd"> <p>Use the <strong>for-each</strong> loop when you only need to <em>read</em> every element, in order, and you do not care where you are. Use the <strong>indexed</strong> loop when you need to write into the array, when you need the index itself, when you want to go backwards, or when you want to stop early.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 3.5</div> <div class="bd"> <p>Write a complete program <code>Reverse.java</code> that stores <code>3, 1, 4, 1, 5</code> in an array and prints the elements in reverse order on one line, separated by spaces. Then say why a for-each loop cannot do this job.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Going backwards means starting at the last valid index, <code>a.length - 1</code>, testing <code>i &gt;= 0</code>, and decrementing. Use <code>print</code> rather than <code>println</code> so the values stay on one line, then close the line with a bare <code>println()</code>.</p> <p class="filename">Reverse.java</p>
+<pre><code class="language-java">public class Reverse {
+    public static void main(String args[]) {
+        int[] a = {3, 1, 4, 1, 5};
+        for (int i = a.length - 1; i &gt;= 0; i--)
+            System.out.print(a[i] + " ");
+        System.out.println();
+    }
+}</code></pre> <pre class="out"><code>5 1 4 1 3 </code></pre> <p><strong>Things to notice.</strong> The three parts of the loop header all flip together: start at the end, keep going while <code>i</code> has not passed the front, and step down. Getting one of the three right and the others wrong is how you end up with an infinite loop or an immediate exit.</p> <p>A for-each loop always runs from index 0 forwards and gives you no index, so it simply cannot express "backwards". This is the clearest case of the key idea above: the shorter loop is not the more powerful one.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 3.5</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="8" aria-label="Live coding - Quick Check 3.5">public class Reverse {
+    public static void main(String args[]) {
+        int[] a = {
+            3, 1, 4, 1, 5}
+        ;
+        // Print the elements in reverse order, on one line, separated by spaces. } }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 3.6</div> <div class="bd"> <p>What does this print?</p> <pre><code class="language-java">public class Walk {
+    public static void main(String args[]) {
+        int[] a = {
+            2, 4, 6, 8}
+        ;
+        int t = 0;
+        for (int v : a) t += v;
+        System.out.println(t);
+        for (int i = 0; i &lt; a.length; i++) a[i] = a[i] * a[i];
+        for (int v : a) System.out.print(v + " ");
+        System.out.println();
+        int c = 0;
+        for (int v : a) if (v &gt; 10) c++;
+        System.out.println(c);
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Take the three pieces in order and keep a written record of the array's contents after each one, because the second piece changes it.</p> <pre class="out"><code>20 4 16 36 64 3 </code></pre> <p><strong>Things to notice.</strong> The first for-each sums 2 + 4 + 6 + 8 = 20. The indexed loop then squares each element in place &mdash; and it can, because <code>a[i] = ...</code> names a slot. From that point the array holds 4, 16, 36, 64, so the count of elements greater than 10 is 3, not the 2 you would get from the original values. Whenever a question mixes reading and writing, redraw the array between the loops rather than trying to hold it in your head.</p> </div></details> </div> </div> <h2 id="s4"><span class="num">4.</span>Arrays and methods</h2> <p>An array can be a parameter and it can be a return type. The type is written exactly as in a declaration &mdash; <code>int[]</code> for an array of <code>int</code>, <code>String[]</code> for an array of <code>String</code> &mdash; and the method title line follows the pattern from Lecture 2:</p> <pre><code class="language-java">public static int sum(int[] data)              // takes an array, returns an int public static int[] copyOf(int[] data)         // takes an array, returns an array public static void shorten(String[] words)     // takes an array, returns nothing </code></pre> <p>Notice the third one. A method that returns <code>void</code> normally cannot affect the caller at all. With an array parameter it can, and that difference matters enough to demonstrate.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; what a method can and cannot change</span></div> <div class="bd"> <p>Two overloaded methods with the same name, one taking an <code>int</code> and one taking an <code>int[]</code>. Both set their parameter's contents to zero. Only one of them has any effect on <code>main</code>. Which?</p> <p class="filename">PassArray.java</p>
+<pre><code class="language-java">public class PassArray {
+    public static void main(String args[]) {
+        int[] a = {3, 1, 4};
+        int n = 3;
+
+        zeroOut(a);
+        zeroOut(n);
+
+        System.out.println("n is now " + n);
+        System.out.print("a is now");
+        for (int v : a) System.out.print(" " + v);
+        System.out.println();
+    }
+
+    public static void zeroOut(int[] data) {
+        for (int i = 0; i &lt; data.length; i++) data[i] = 0;
+    }
+
+    public static void zeroOut(int x) {
+        x = 0;
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>n is now 3 a is now 0 0 0 </code></pre> <p><code>n</code> survives; <code>a</code> does not. The rule underneath is the same one that explained the for-each loop: <strong>a parameter is always a copy of the argument.</strong> What differs is what is being copied.</p> <table class="trace"> <tr><th>Call</th><th>What gets copied into the parameter</th><th>Effect on the caller</th></tr> <tr><td><code>zeroOut(n)</code></td><td>A copy of the number 3. <code>x = 0</code> overwrites the copy.</td><td>None. <code>n</code> is still 3.</td></tr> <tr><td><code>zeroOut(a)</code></td><td>A copy of the <em>reference</em> &mdash; of the arrow pointing at the array, not of the array's contents.</td><td><code>data[i] = 0</code> follows the arrow to the one and only array and writes into it. <code>main</code> sees the change.</td></tr> </table> <p>So a <code>void</code> method with an array parameter is a perfectly normal way to get work done in Java, and several of the exam problems at the bottom of this page depend on it. We will come back to references properly in Lecture 8, where the same idea explains a lot of object behavior.</p> <p>One more thing worth noticing: this file has two methods called <code>zeroOut</code>. That is <em>overloading</em>, from Lecture 2 &mdash; Java picks the right one by looking at the type of the argument, and <code>int</code> and <code>int[]</code> are different enough that there is no ambiguity.</p> 
+</div></details> </div> </div> <p>Here is your instructor's own array example from the course code. It exercises the declaration forms from &sect;1, overloading from Lecture 2, and the two-dimensional arrays we take up next.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; ArrayExamples, from the course code</span></div> <div class="bd"> <p>Read the <code>print</code> methods first. There are two of them, distinguished only by whether the parameter is <code>int[]</code> or <code>int[][]</code>. The one-dimensional version stops the loop at <code>data.length - 1</code> and prints the last element separately, so that commas appear only <em>between</em> elements. Work out what the five calls produce.</p> <p class="filename">ArrayExamples.java</p>
+<pre><code class="language-java">public class ArrayExamples {
+    public static void main(String args[]) {
+        int arr[] = {
+            3, 1, 4, 1, 5}
+        ;
+        int[] arr2;
+        arr2 = new int[]{
+            1, 2, 3}
+        ;
+        int[] arr3 = new int[9];
+        print(arr);
+        print(arr2);
+        print(arr3);
+        int[][] matrix = new int[3][4];
+        int[][] irregularArray = {
+            {
+                1, 2}
+            , {
+                3, 4, 5}
+            , {
+                6}
+        }
+        ;
+        print(matrix);
+        print(irregularArray);
+    }
+    public static void print(int[] data) {
+        for (int i = 0; i &lt; data.length - 1; i++) System.out.print(data[i] + ", ");
+        System.out.println(data[data.length - 1]);
+    }
+    public static void print(int[][] data) {
+        for (int i = 0; i &lt; data.length; i++) print(data[i]);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>3, 1, 4, 1, 5
+1, 2, 3
+0, 0, 0, 0, 0, 0, 0, 0, 0
+0, 0, 0, 0
+0, 0, 0, 0
+0, 0, 0, 0
+1, 2
+3, 4, 5
+6</code></pre> <p><code>arr3</code> was created with <code>new int[9]</code> and never filled, so it prints nine zeros &mdash; the defaults from &sect;1. <code>matrix</code> is a 3-by-4 grid of zeros, printed as three rows of four. <code>irregularArray</code> has rows of different lengths, and the output shows it: 2 values, then 3, then 1.</p> <p>The neat part is the two-dimensional <code>print</code>. It does not contain any printing code at all. It loops over the rows, and each row <code>data[i]</code> <em>is</em> a one-dimensional <code>int[]</code>, so it hands the row to the other <code>print</code> and lets overloading pick it. That is the whole reason a two-dimensional array in Java is best thought of as an array of arrays.</p> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Warning<span class="tag">&mdash; this <code>print</code> has a hidden crash in it</span></div> <div class="bd"> <p>The <code>print(int[] data)</code> method above works on every array in that program, but it fails on one input: an array of length 0. With <code>data.length</code> equal to 0, the loop body never runs, and then the last line evaluates <code>data[data.length - 1]</code>, which is <code>data[-1]</code>:</p> <pre class="out"><code>empty.length = 0
+Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: Index -1 out of bounds for length 0</code></pre> <p>Empty arrays are not exotic &mdash; <code>new int[0]</code> is legal, and any method that filters elements can return one. The fix is one guard clause at the top:</p> <pre><code class="language-java">public static void print(int[] data) {
+    if (data.length == 0) {
+        System.out.println("(empty)");
+        return;
+    }
+    for (int i = 0; i &lt; data.length - 1; i++) System.out.print(data[i] + ", ");
+    System.out.println(data[data.length - 1]);
+}</code></pre> <pre class="out"><code>3, 1, 4, 1, 5 (empty) 7 </code></pre> <p>Whenever you see <code>array[something.length - 1]</code> outside a loop, ask yourself what happens when the length is 0. It is one of the most reliable places to find a bug in someone else's code, including your own from last week.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 3.7</div> <div class="bd"> <p>Write a static method <code>countAbove</code> with the title line <code>public static int countAbove(int[] data, int limit)</code> that returns how many elements of <code>data</code> are strictly greater than <code>limit</code>. Then write a <code>main</code> that calls it on <code>{90, 85, 78, 92, 66}</code> with a limit of 80 and prints the answer.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> This is a counting loop: a counter starting at 0, one pass per element, an <code>if</code> that decides whether to increment. We only read the elements, so a for-each loop is the natural choice. The method returns an <code>int</code>, so it needs a <code>return</code> on every path &mdash; here that is a single <code>return count;</code> after the loop.</p> <p class="filename">CountAbove.java</p>
+<pre><code class="language-java">public class CountAbove {
+    public static void main(String args[]) {
+        int[] scores = {
+            90, 85, 78, 92, 66}
+        ;
+        System.out.println("Above 80: " + countAbove(scores, 80));
+    }
+    public static int countAbove(int[] data, int limit) {
+        int count = 0;
+        for (int v : data) if (v &gt; limit) count++;
+        return count;
+    }
+}</code></pre> <pre class="out"><code>Above 80: 3 </code></pre> <p><strong>Things to notice.</strong> 90, 85 and 92 are above 80; 78 and 66 are not. The word "strictly" in the question is doing real work &mdash; if the limit had been 85, <code>v &gt; limit</code> counts 2 while <code>v &gt;= limit</code> counts 3. Read comparison words in exam questions carefully.</p> <p>The method never writes to <code>data</code>, so it does not matter that the array is shared with the caller. A method that only reads its array parameter is the easy case; the one that writes is where you have to think.</p> </div></details> </div> </div> <h2 id="s5"><span class="num">5.</span>Two-dimensional arrays</h2> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; two-dimensional array</span></div> <div class="bd"> <p>A <strong>two-dimensional array</strong> is written <code>int[][]</code> and is best understood as an <em>array whose elements are themselves arrays</em>. You create a rectangular one with <code>new int[3][4]</code> &mdash; three rows, each of length four &mdash; and you reach a single element with two indices, <code>m[row][col]</code>.</p> <p><code>m.length</code> is the number of <strong>rows</strong>. <code>m[i].length</code> is the number of columns <em>in row <code>i</code></em>. Because each row is a separate array, different rows may have different lengths; such an array is called <strong>irregular</strong> or <em>jagged</em>.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; rows, columns, and irregular rows</span></div> <div class="bd"> <p>Before you reveal, decide what <code>matrix[0].length</code> is, and what the three <code>irregular[i].length</code> values are.</p> <p class="filename">Matrix2D.java</p>
+<pre><code class="language-java">public class Matrix2D {
+    public static void main(String args[]) {
+        int[][] matrix = new int[3][4];
+        int[][] irregular = {
+            {
+                1, 2}
+            , {
+                3, 4, 5}
+            , {
+                6}
+        }
+        ;
+        System.out.println("matrix.length    = " + matrix.length);
+        System.out.println("matrix[0].length = " + matrix[0].length);
+        System.out.println("irregular.length = " + irregular.length);
+        for (int i = 0; i &lt; irregular.length; i++) System.out.println("irregular[" + i + "].length = " + irregular[i].length);
+        matrix[1][2] = 7;
+        for (int row = 0; row &lt; matrix.length; row++) {
+            for (int col = 0; col &lt; matrix[row].length; col++) System.out.print(matrix[row][col] + " ");
+            System.out.println();
+        }
+        int total = 0;
+        for (int row = 0; row &lt; irregular.length; row++) for (int col = 0; col &lt; irregular[row].length; col++) total += irregular[row][col];
+        System.out.println("Sum of the irregular array: " + total);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>matrix.length    = 3
+matrix[0].length = 4
+irregular.length = 3
+irregular[0].length = 2
+irregular[1].length = 3
+irregular[2].length = 1
+0 0 0 0 
+0 0 7 0 
+0 0 0 0 
+Sum of the irregular array: 21</code></pre> <p><code>new int[3][4]</code> gives 3 rows of 4, so <code>matrix.length</code> is 3 and <code>matrix[0].length</code> is 4. Rows first, then columns &mdash; the same order as the subscripts in <code>matrix[row][col]</code>.</p> <p>The nested initializer <code>{{1, 2}, {3, 4, 5}, {6}}</code> builds three rows of lengths 2, 3 and 1. That is entirely legal and is why the inner loop must be bounded by <code>irregular[row].length</code> and not by any single fixed number.</p> <p>The 7 lands in row 1, column 2 &mdash; second row, third value &mdash; which is what the printed grid shows.</p> <table class="trace"> <tr><th>Expression</th><th>Meaning</th><th>Value here</th></tr> <tr><td><code>m.length</code></td><td>number of rows</td><td>3</td></tr> <tr><td><code>m[0].length</code></td><td>length of row 0</td><td>4</td></tr> <tr><td><code>m[row][col]</code></td><td>one element</td><td><code>matrix[1][2]</code> is 7</td></tr> <tr><td><code>m[row]</code></td><td>a whole row, itself an <code>int[]</code></td><td>can be passed to any method taking <code>int[]</code></td></tr> </table> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; the wrong bound in the inner loop</span></div> <div class="bd"> <p>This code is supposed to total a two-dimensional array. It compiles, it runs, it prints a number, and the number is wrong:</p> <pre><code class="language-java">int[][] numbers = {
+    {
+        1, 2, 3, 4}
+    , {
+        0, 1, 2, 3}
+}
+;
+int total = 0;
+for (int row = 0; row &lt; numbers.length; row++) {
+    for (int col = 0; col &lt; numbers.length; col++) total += numbers[row][col];
+}
+System.out.println("total = " + total);</code></pre> <pre class="out"><code>total = 4 </code></pre> <p>The correct total is 16. The inner loop says <code>col &lt; numbers.length</code>, which is the number of <em>rows</em> &mdash; 2 &mdash; so it only ever visits columns 0 and 1 and sums 1 + 2 + 0 + 1 = 4. The fix is one word:</p> <pre><code class="language-java">for (int col = 0; col &lt; numbers[row].length; col++) total += numbers[row][col]; </code></pre> <p>Two details make this bug hard to spot. First, the code looks symmetric and symmetric code looks right. Second, if the array happens to be square the two bounds are equal and the program is correct by accident &mdash; until someone hands it a non-square array. Always write <code>numbers[row].length</code> for the inner bound, even when you know the array is rectangular. This exact code is a find-the-error question on the CSCI 212 practice exam.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 3.8</div> <div class="bd"> <p>Let <code>int[][] g = {{1, 2}, {3, 4, 5}, {6}};</code>. Give the value of each expression, or say that it fails.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>g.length</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>3</code> &mdash; the number of rows. The row lengths are irrelevant to this.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>g[1].length</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>3</code> &mdash; row 1 is <code>{3, 4, 5}</code>, which has three elements. Note this is a coincidence: <code>g.length</code> is also 3, and they mean completely different things.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>g[2][1]</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Fails at run time: <code>Index 1 out of bounds for length 1</code>. Row 2 is <code>{6}</code>, so its only valid index is 0. On a rectangular array this would have been fine, which is precisely why irregular arrays need per-row bounds.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> The total number of <code>int</code> values stored in <code>g</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>6</code>, from 2 + 3 + 1. There is no single expression for it; you have to add up the row lengths:</p> <pre><code class="language-java">int count = 0;
+for (int i = 0; i &lt; g.length; i++) count += g[i].length;</code></pre> <p><strong>Things to notice across all four parts.</strong> <code>g.length * g[0].length</code> would give 6 here too &mdash; 3 times 2 &mdash; and it would be wrong for the reason that matters: it happens to agree by luck. Run the same expression on <code>{{1}, {2}, {3, 4, 5, 6}}</code> and it reports 3 when the answer is 6. For anything irregular, loop over the rows.</p> </div></details> </div> </div> </div> <h2 id="s6"><span class="num">6.</span>Your first object: the <code>Scanner</code> class</h2> <p>Everything we have written so far has had its data baked into the source code. To read what a person types, Java gives you a class called <code>Scanner</code> &mdash; and using it means creating your first real object, so this is where the "object-oriented" part of the course title starts to show up.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; class and object</span></div> <div class="bd"> <p><strong>Classes serve as blueprints for objects</strong>, packaging together some data and the methods that operate on it. An <strong>object</strong> is an <em>instance</em> of a class: one actual thing built to that blueprint, with its own copy of the data.</p> <p><code>Scanner</code> is the blueprint. <code>new Scanner(System.in)</code> builds one. If you build two of them, they are two separate objects with two separate sets of data, and what you do to one does not affect the other.</p> </div> </div> <p>Lecture 7 is where we start writing our own classes. For now, <code>Scanner</code> is a good one to meet first, because you can describe it completely with the two lists every class has &mdash; its data and its methods.</p> <table> <tr><th>Data (fields)</th><th>What it holds</th></tr> <tr><td><code>InputStream source</code></td><td>The input source to be scanned. For keyboard input this is <code>System.in</code>.</td></tr> <tr><td>delimiter pattern</td><td>The pattern used to separate tokens. The default is whitespace &mdash; spaces, tabs and newlines.</td></tr> </table> <table> <tr><th>Method</th><th>What it does</th></tr> <tr><td><code>next()</code></td><td>Reads the next token and returns it as a <code>String</code>.</td></tr> <tr><td><code>nextInt()</code></td><td>Reads the next token and returns it as an <code>int</code>.</td></tr> <tr><td><code>nextLine()</code></td><td>Reads the rest of the current line and returns it as a <code>String</code>.</td></tr> <tr><td><code>hasNext()</code></td><td>Returns <code>true</code> if there is more input.</td></tr> <tr><td><code>hasNextInt()</code></td><td>Returns <code>true</code> if the next token can be read as an <code>int</code>.</td></tr> <tr><td><code>useDelimiter(String pattern)</code></td><td>Changes the delimiter pattern.</td></tr> <tr><td><code>close()</code></td><td>Closes the scanner.</td></tr> </table> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; using a Scanner</span></div> <div class="bd"> <ol> <li><strong>Import it.</strong> <code>import java.util.Scanner;</code> goes at the very top of the file, above the <code>class</code> line. <code>Scanner</code> is not one of the classes Java gives you for free the way it does <code>String</code> and <code>System</code>.</li> <li><strong>Create the object.</strong> <code>Scanner input = new Scanner(System.in);</code> The word <code>new</code> allocates the object; <code>System.in</code> tells it where to read from.</li> <li><strong>Prompt, then read.</strong> Print a message saying what you want, then call <code>nextInt()</code>, <code>next()</code> or <code>nextLine()</code> to get it. Java will not prompt for you.</li> <li><strong>Close it</strong> when you are finished: <code>input.close();</code></li> </ol> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; two Scanner objects, one blueprint</span></div> <div class="bd"> <p>To see that each <code>Scanner</code> really is a separate object with its own state, here are two of them reading two different sources, with different delimiters, in alternation. (A <code>Scanner</code> can be built over a plain <code>String</code> as well as over <code>System.in</code>; that lets us demonstrate this without any typing.) Predict all six lines.</p> <p class="filename">TwoScanners.java</p>
+<pre><code class="language-java">import java.util.Scanner;
+
+public class TwoScanners {
+    public static void main(String args[]) {
+        Scanner a = new Scanner("one two three");
+        Scanner b = new Scanner("alpha,beta,gamma");
+        b.useDelimiter(",");
+
+        System.out.println("a: " + a.next());
+        System.out.println("b: " + b.next());
+        System.out.println("a: " + a.next());
+        System.out.println("b: " + b.next());
+        System.out.println("a has more? " + a.hasNext());
+        System.out.println("b has more? " + b.hasNext());
+
+        a.close();
+        b.close();
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>a: one
+b: alpha
+a: two
+b: beta
+a has more? true
+b has more? true</code></pre> <p>Each object remembers its own position in its own source. <code>a</code> has read two of its three tokens and <code>b</code> has read two of its three, and neither one interfered with the other. That is what "an object has its own copy of the data" means in practice.</p> <p><code>b.useDelimiter(",")</code> changed one field of one object. <code>a</code> still splits on whitespace, because <code>useDelimiter</code> is not a setting that belongs to the <code>Scanner</code> <em>class</em> &mdash; it belongs to the individual <code>Scanner</code>.</p> <p><code>hasNext()</code> is the method that lets a loop stop at the right place without knowing in advance how much input there is. We use it that way in Lecture 5, when the input comes from a file.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 3.9</div> <div class="bd"> <p>Answer briefly.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> What is wrong with a program that begins <code>public class Q { public static void main(String args[]) { Scanner in = new Scanner(System.in);</code> and nothing else above it?</p> <details class="soln"><summary></summary><div class="ans"> <p>The <code>import java.util.Scanner;</code> line is missing, so the compiler does not know what <code>Scanner</code> means: <code>error: cannot find symbol ... class Scanner</code>. The import goes on its own line at the top of the file, before <code>public class</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> In <code>new Scanner(System.in)</code>, what is <code>System.in</code>, and what would you put there instead if you wanted to scan a <code>String</code>?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>System.in</code> is the standard input stream &mdash; the keyboard &mdash; and it becomes the <code>Scanner</code>'s source field. To scan a <code>String</code> you pass the string itself: <code>new Scanner("one two three")</code>. In Lecture 5 we pass a <code>File</code> instead, and everything else about using the <code>Scanner</code> stays exactly the same.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>Scanner</code> is a class, and <code>input</code> in <code>Scanner input = new Scanner(System.in);</code> is an object. Which of the two has a delimiter pattern?</p> <details class="soln"><summary></summary><div class="ans"> <p>The object. The class is the blueprint &mdash; it says that every <code>Scanner</code> <em>has</em> a delimiter pattern. The object is the one that actually holds a value for it, which is why two <code>Scanner</code> objects can have different delimiters at the same time.</p> <p><strong>Things to notice across all three parts.</strong> Keep the distinction sharp, because the whole rest of the course is built on it: a class is a description, an object is a thing. <code>new</code> is the word that turns one into the other. You will write this same pattern for <code>File</code>, <code>PrintWriter</code>, <code>ArrayList</code> and eventually for classes you design yourself.</p> </div></details> </div> </div> </div> <h2 id="s7"><span class="num">7.</span>Reading input, token by token and line by line</h2> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; token</span></div> <div class="bd"> <p>A <strong>token</strong> is a run of characters with no delimiter inside it. With the default delimiter &mdash; whitespace &mdash; a token is simply a "word": <code>Ada</code>, <code>212</code>, <code>3.5</code>.</p> <p><code>next()</code> and <code>nextInt()</code> are <em>token</em> methods. They skip over any leading whitespace, read one token, and stop. <code>nextLine()</code> is not a token method: it reads everything up to the end of the current line, spaces included, and consumes the newline.</p> </div> </div> <p>In the sessions below, the input was typed at a real terminal, so each line you see repeated back after a prompt is what the user typed &mdash; the terminal echoes it. Everything else is what the program printed.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; read a count, then read that many numbers</span></div> <div class="bd"> <p>This is the standard shape of an input-driven array program, and you will write it many times: read the size first, allocate the array, then fill it in a loop. Note that <code>nextInt()</code> is perfectly happy to read several numbers from one typed line &mdash; whitespace is whitespace, and a newline is no different from a space.</p> <p class="filename">ReadNumbers.java</p>
+<pre><code class="language-java">import java.util.Scanner;
+
+public class ReadNumbers {
+    public static void main(String args[]) {
+        Scanner input = new Scanner(System.in);
+
+        System.out.print("How many numbers? ");
+        int n = input.nextInt();
+
+        int[] data = new int[n];
+        System.out.print("Enter " + n + " numbers: ");
+        for (int i = 0; i &lt; n; i++) data[i] = input.nextInt();
+
+        int total = 0;
+        int largest = data[0];
+        for (int i = 0; i &lt; data.length; i++) {
+            total += data[i];
+            if (data[i] &gt; largest) largest = data[i];
+        }
+
+        System.out.println("Sum:     " + total);
+        System.out.println("Largest: " + largest);
+        System.out.println("Average: " + total / (double) data.length);
+        input.close();
+    }
+}</code></pre> <p>The user typed <code>4</code> and then <code>10 25 3 18</code>. Work out the three result lines before revealing.</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>How many numbers? 4 Enter 4 numbers: 10 25 3 18 Sum:     56 Largest: 25 Average: 14.0 </code></pre> <p>Four points about the structure, all of which show up in exam solutions.</p> <ul> <li><strong><code>new int[n]</code> with a variable size.</strong> The size does not have to be a literal. This is the whole reason we read the count first.</li> <li><strong><code>System.out.print</code> for prompts, not <code>println</code>.</strong> That leaves the cursor on the same line so the typed answer appears next to the question.</li> <li><strong><code>largest</code> starts at <code>data[0]</code>, not at 0.</strong> Starting at 0 would be wrong for an array of all-negative numbers. Starting at the first element is always safe &mdash; provided the array is not empty, which is the <code>data.length == 0</code> question again.</li> <li><strong><code>total / (double) data.length</code>.</strong> Without the cast, <code>56 / 4</code> is integer division. It gives 14 here rather than 14.0, and it would give 14 instead of 14.5 for a different set of numbers.</li> </ul> 
+</div></details> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; <code>next()</code> versus <code>nextLine()</code></span></div> <div class="bd"> <p>The same input read two different ways. The user typed <code>Ada Byron Lovelace</code> and then <code>CSCI 212 rocks</code>. Square brackets are printed around each result so you can see exactly where it starts and ends &mdash; look closely at the second one.</p> <p class="filename">TokenVsLine.java</p>
+<pre><code class="language-java">import java.util.Scanner;
+
+public class TokenVsLine {
+    public static void main(String args[]) {
+        Scanner input = new Scanner(System.in);
+
+        System.out.print("Type a full name: ");
+        String first = input.next();
+        System.out.println("next() gave: [" + first + "]");
+
+        String rest = input.nextLine();
+        System.out.println("nextLine() gave: [" + rest + "]");
+
+        System.out.print("Type another line: ");
+        String whole = input.nextLine();
+        System.out.println("nextLine() gave: [" + whole + "]");
+
+        input.close();
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Type a full name: Ada Byron Lovelace next() gave: [Ada] nextLine() gave: [ Byron Lovelace] Type another line: CSCI 212 rocks nextLine() gave: [CSCI 212 rocks] </code></pre> <p><code>next()</code> returned <code>Ada</code> and stopped &mdash; one token, no space. It left the cursor sitting immediately after the <code>a</code>, in the middle of the line.</p> <p>The <code>nextLine()</code> that followed picked up from exactly there and returned the rest of that line, <strong>including the leading space</strong>: <code>[ Byron Lovelace]</code>. That leading space is the delimiter that <code>next()</code> stopped at and did not consume.</p> <p>The last <code>nextLine()</code> was called with the cursor at the start of a fresh line, so it returned the whole line with no surprises.</p> <table class="trace"> <tr><th>Call</th><th>Reads</th><th>Leaves the cursor</th></tr> <tr><td><code>next()</code></td><td>one token</td><td>immediately after that token, still on the same line</td></tr> <tr><td><code>nextInt()</code></td><td>one token, converted to <code>int</code></td><td>immediately after that token, still on the same line</td></tr> <tr><td><code>nextLine()</code></td><td>everything up to the end of the line</td><td>at the start of the next line</td></tr> </table> 
+</div></details> </div> </div> <p>That last table is the whole explanation of the trap in the next box. Read it once more before you go on.</p> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; <code>nextInt()</code> followed by <code>nextLine()</code></span></div> <div class="bd"> <p>This program is from the course code. It reads a name and an age, then asks the user to say something. It compiles, it runs, and it never lets the user say anything.</p> <p class="filename">UserInput.java</p>
+<pre><code class="language-java">import java.util.Scanner;
+
+public class UserInput {
+    public static void main(String args[]) {
+        Scanner input = new Scanner(System.in);
+        System.out.println("Enter your name and age:");
+        String name = input.next();
+        int age = input.nextInt();
+        System.out.println("Hello " + name + ", you are "
+                + age + " years old.");
+        System.out.println("Say something:");
+        String msg = input.nextLine();
+        System.out.println("You said:");
+        System.out.println(msg);
+        input.close();
+    }
+}</code></pre> <p>Here is a real session. The user typed <code>Xinying 20</code>, and then typed <code>Java is fine</code> &mdash; or tried to:</p> <pre class="out"><code>Enter your name and age: Xinying 20 Hello Xinying, you are 20 years old. Say something: You said: </code></pre> <p>The program printed <code>You said:</code> and then a blank line, and it never waited for the second answer at all.</p> <p><strong>Why.</strong> <code>nextInt()</code> read the token <code>20</code> and stopped right after the <code>0</code>. The newline the user pressed at the end of that line is still sitting in the input, unread. So when <code>nextLine()</code> runs, it does its job perfectly: it reads everything from the cursor to the end of the current line, and everything from there to the end of the line is <em>nothing</em>. It returns the empty string instantly, and the program races past the prompt.</p> <p><strong>The fix</strong> is one extra <code>nextLine()</code> whose result you throw away, to consume the leftover newline:</p> <p class="filename">UserInputFixed.java</p>
+<pre><code class="language-java">import java.util.Scanner;
+
+public class UserInputFixed {
+    public static void main(String args[]) {
+        Scanner input = new Scanner(System.in);
+        System.out.println("Enter your name and age:");
+        String name = input.next();
+        int age = input.nextInt();
+        input.nextLine();
+        System.out.println("Hello " + name + ", you are "
+                + age + " years old.");
+        System.out.println("Say something:");
+        String msg = input.nextLine();
+        System.out.println("You said:");
+        System.out.println(msg);
+        input.close();
+    }
+}</code></pre> <p>Same session, one line different:</p> <pre class="out"><code>Enter your name and age: Xinying 20 Hello Xinying, you are 20 years old. Say something: Java is fine You said: Java is fine </code></pre> <p>Learn the rule as a reflex: <strong>after any <code>nextInt()</code>, <code>nextDouble()</code> or <code>next()</code>, if the next thing you want is a <code>nextLine()</code>, put a bare <code>input.nextLine();</code> in between.</strong> The symptom is unmistakable once you have seen it &mdash; a prompt that does not wait, followed by a blank answer.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 3.10</div> <div class="bd"> <p>A program contains these lines, in this order, and the user types <code>7</code> then presses Enter, then types <code>hello world</code> and presses Enter.</p> <pre><code class="language-java">int n = input.nextInt();
+String a = input.nextLine();
+String b = input.nextLine();</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> What does <code>a</code> hold?</p> <details class="soln"><summary></summary><div class="ans"> <p>The empty string, <code>""</code>. <code>nextInt()</code> consumed the <code>7</code> and stopped before the newline, so the first <code>nextLine()</code> reads from there to the end of that line &mdash; which is nothing.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What does <code>b</code> hold?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>"hello world"</code>. By now the cursor is at the start of the second line, so <code>nextLine()</code> behaves normally and returns the whole line, space included.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Rewrite the three lines so that <code>a</code> holds <code>"hello world"</code> and nothing is wasted.</p> <details class="soln"><summary></summary><div class="ans"> <p>Consume the leftover newline deliberately, then read the line you actually want:</p> <pre><code class="language-java">int n = input.nextInt();
+input.nextLine();
+// discard the rest of the number's line String a = input.nextLine();</code></pre> <p><strong>Things to notice across all three parts.</strong> The accidental version in (a) and (b) and the deliberate version in (c) execute exactly the same three calls. The difference is entirely in whether the programmer meant it. Writing the throwaway <code>input.nextLine();</code> on a line of its own, with a comment, is how you signal to the next reader that the blank read is on purpose and not a bug.</p> </div></details> </div> </div> </div> <p>One last piece of the <code>Scanner</code>. If the user types something that is not a number where your program called <code>nextInt()</code>, the program does not politely ask again &mdash; it crashes:</p> <pre class="out"><code>Enter an integer: seven
+Exception in thread "main" java.util.InputMismatchException</code></pre> <p>That is what <code>hasNextInt()</code> is for. It looks at the next token and answers <code>true</code> or <code>false</code> without consuming anything, so you can check before you commit.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; refusing to crash on bad input</span></div> <div class="bd"> <p>The loop keeps asking until <code>hasNextInt()</code> says yes. The <code>input.next()</code> inside the loop is essential &mdash; it throws away the offending token. Without it, the bad token would still be there on the next pass and the loop would spin forever. The user typed <code>seven</code>, then <code>12.5</code>, then <code>42</code>.</p> <p class="filename">SafeRead.java</p>
+<pre><code class="language-java">import java.util.Scanner;
+
+public class SafeRead {
+    public static void main(String args[]) {
+        Scanner input = new Scanner(System.in);
+
+        System.out.print("Enter an integer: ");
+        while (!input.hasNextInt()) {
+            System.out.print("That is not an integer. Try again: ");
+            input.next();
+        }
+        int n = input.nextInt();
+        System.out.println("You entered " + n);
+        input.close();
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Enter an integer: seven That is not an integer. Try again: 12.5 That is not an integer. Try again: 42 You entered 42 </code></pre> <p><code>12.5</code> was rejected too, which is correct: <code>hasNextInt()</code> asks whether the token can be read as an <code>int</code>, and <code>12.5</code> cannot. There is a matching <code>hasNextDouble()</code> if that is what you want.</p> <p>The general pattern &mdash; <em>ask <code>hasNextX()</code> before you call <code>nextX()</code></em> &mdash; is worth carrying with you. Its other big use is stopping a reading loop when the input runs out, which is exactly how Lecture 5 reads a file: <code>while (input.hasNext())</code>.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 3.11</div> <div class="bd"> <p>What is wrong with this loop, and what happens when the user types <code>abc</code>?</p> <pre><code class="language-java">Scanner input = new Scanner(System.in);
+int n = 0;
+while (!input.hasNextInt()) {
+    System.out.println("Please type a number.");
+}
+n = input.nextInt();</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Ask what changes between one pass of the loop and the next. If nothing changes, the condition can never change either.</p> <p>The loop body never reads anything, so the offending token <code>abc</code> stays at the front of the input forever. <code>hasNextInt()</code> keeps answering <code>false</code>, and the program prints <code>Please type a number.</code> as fast as it can, without pause, until you kill it. It is an infinite loop.</p> <p>The fix is the <code>input.next();</code> from the worked example &mdash; consume the bad token so the next pass looks at something new:</p> <pre><code class="language-java">while (!input.hasNextInt()) {
+    System.out.println("Please type a number.");
+    input.next();
+}</code></pre> <p><strong>Things to notice.</strong> Every <code>while</code> loop needs something in its body that can eventually make the condition false. Here that "something" is not a counter or an accumulator &mdash; it is consuming input. When a loop that reads input hangs, the first question is always: does the body actually read?</p> </div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 3.12</div> <div class="bd"> <p>Write a complete program <code>Sentinel.java</code> that reads integers typed by the user into an array until the user enters <code>-1</code>, then prints how many numbers were read and their sum. The <code>-1</code> itself is not part of the data. Assume there will be no more than 100 numbers.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> We do not know in advance how many numbers there will be, so allocate the largest array we might need &mdash; 100 &mdash; and keep a separate <code>count</code> of how many slots are actually in use. <code>count</code> is doing double duty: it is both the number of values stored and the index of the next free slot.</p> <p>For the loop, read one number <em>before</em> the loop and again at the <em>bottom</em> of the body. That way the sentinel is tested before it is ever stored. Then sum only the first <code>count</code> elements &mdash; not <code>data.length</code>, which is 100 and would add in a lot of zeros. (They are zeros, so the sum would survive, but the <em>count</em> would not, and a <code>largest</code>-style computation would be badly wrong.)</p> <p class="filename">Sentinel.java</p>
+<pre><code class="language-java">import java.util.Scanner;
+
+public class Sentinel {
+    public static void main(String args[]) {
+        Scanner input = new Scanner(System.in);
+        int[] data = new int[100];
+        int count = 0;
+
+        System.out.print("Enter integers, -1 to stop: ");
+        int n = input.nextInt();
+        while (n != -1) {
+            data[count] = n;
+            count++;
+            n = input.nextInt();
+        }
+
+        int total = 0;
+        for (int i = 0; i &lt; count; i++) total += data[i];
+        System.out.println("Read " + count + " numbers.");
+        System.out.println("Sum is " + total);
+        input.close();
+    }
+}</code></pre> <p>The user typed <code>4 8 15 16 23 42 -1</code> on one line:</p> <pre class="out"><code>Enter integers, -1 to stop: 4 8 15 16 23 42 -1 Read 6 numbers. Sum is 108 </code></pre> <p><strong>Things to notice.</strong> The "read one before the loop, one at the end of the body" shape is called a <em>priming read</em>, and it is the standard way to handle a sentinel when the loop condition has to test the value you just read. The alternative is <code>while (true)</code> with an <code>if (n == -1) break;</code> at the top, which your instructor's own solution to the psychology-study problem below uses. Either is fine; be able to read both.</p> <p>Notice how the array's fixed size forced a decision here. We had to guess 100 and hope. A <code>count</code> variable travelling alongside a partly-used array is a very common pattern, and it is exactly the bookkeeping that <code>ArrayList</code> will do for us in Lecture 6.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 3.12</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="9" aria-label="Live coding - Quick Check 3.12">import java.util.Scanner;
+public class Sentinel {
+    public static void main(String args[]) {
+        Scanner input = new Scanner(System.in);
+        int[] data = new int[100];
+        int count = 0;
+        // Read integers into data until the user types -1. // Then print how many were read, and their sum. } }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="prac"><span class="num">&#9733;</span>Practice Problems</h2> <div class="box prac"> <div class="hd">Practice Problems<span class="tag">&mdash; arrays and Scanner</span></div> <div class="bd"> <p>The first five come from the CSCI 212 practice package and a recent midterm; the last two were written for these notes to drill the two things that cost the most marks &mdash; <code>length</code> versus <code>length()</code>, and the leftover newline. Work them on paper first. The exam is closed book and there is no compiler in the room.</p> </div> </div> <h3>Problem 1 &mdash; The <code>shorten</code> function <span class="muted">(from Exam 1 Practice Problems)</span></h3> <p>Write a function called <code>shorten</code> that is defined in the class <code>P8</code> and shortens each element of an array of strings. Every string with more than two characters is cut down to its first two characters.</p> <p>For example, a program that uses the function <code>shorten</code> follows.</p> <p class="filename">P8.java</p>
+<pre><code class="language-java">public class P8 {
+    public static void main(String args[]) {
+        String x[] = {
+            "CSCI", "1", "11", "Queens", "College", "CUNY"}
+        ;
+        shorten(x);
+        for (int i = 0; i &lt; 6; i++) System.out.print(x[i] + " ");
+        // Output:   CS 1 11 Qu Co CU System.out.println(); } }</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Start from the title line. <code>main</code> calls <code>shorten(x)</code> and then prints <code>x</code> itself, so <code>shorten</code> must <em>modify the caller's array</em> &mdash; it returns nothing. That makes the title line <code>public static void shorten(String[] arr)</code>, and it works for the reason we saw in &sect;4: the method receives a reference to the same array <code>main</code> is holding.</p> <p>Inside, visit every element with an indexed loop (we are writing, so for-each is out). For each one, ask whether it has more than two characters &mdash; <code>arr[i].length() &gt; 2</code>, a method call because these are strings &mdash; and if so replace it with <code>arr[i].substring(0, 2)</code>, the first two characters. Strings of length 0, 1 or 2 are left alone.</p> <p class="filename">P8.java</p>
+<pre><code class="language-java">public class P8 {
+    public static void main(String args[]) {
+        String x[] = {"CSCI", "1", "11", "Queens", "College", "CUNY"};
+        shorten(x);
+        for (int i = 0; i &lt; 6; i++) System.out.print(x[i] + " ");
+        System.out.println();
+    }
+
+    public static void shorten(String[] arr) {
+        for (int i = 0; i &lt; arr.length; i++) {
+            if (arr[i].length() &gt; 2) {
+                arr[i] = arr[i].substring(0, 2);
+            }
+        }
+    }
+}</code></pre> <pre class="out"><code>CS 1 11 Qu Co CU </code></pre> <p><strong>Things to notice.</strong> Both kinds of size appear in one method: <code>arr.length</code> for the array, with no parentheses, and <code>arr[i].length()</code> for each string, with them. If you can write this method without hesitating over that line, you have the &sect;2 material.</p> <p><code>substring(0, 2)</code> takes the characters at indices 0 and 1 &mdash; the second argument is the index to stop <em>before</em>. We meet <code>substring</code> properly in Lecture 4.</p> <p>The loop bound is <code>arr.length</code>, not <code>6</code>. <code>main</code> happens to use <code>6</code> because it knows its own array, but a method written with a hard-coded 6 would crash on any other array. Write methods that work on the array they are given.</p> <p>Finally, note that <code>arr[i] = ...</code> writes into a slot of the array, so the change is visible in <code>main</code>. Had the method instead done <code>String s = arr[i]; s = s.substring(0, 2);</code> it would have changed a local variable and <code>main</code> would print the original strings &mdash; the same mistake as assigning to the for-each variable.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 1</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="12" aria-label="Live coding - Practice Problem 1">public class P8 {
+    public static void main(String args[]) {
+        String x[] = {
+            "CSCI", "1", "11", "Queens", "College", "CUNY"}
+        ;
+        shorten(x);
+        for (int i = 0; i &lt; 6; i++) System.out.print(x[i] + " ");
+        System.out.println();
+    }
+    // Write shorten here. Every string longer than 2 characters // is cut down to its first 2 characters. }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 2 &mdash; Write the missing methods <span class="muted">(from Exam 1 Practice Problems)</span></h3> <p>Write blocks of code to perform the functions used in the following main program. Your blocks must match the given title lines. Each block should be a short function of only a few lines.</p> <p class="filename">P3.java</p>
+<pre><code class="language-java">public class P3 {
+    public static void main(String args[]) {
+        int a[][] = {
+            {
+                1, 2, 3, 4}
+            , {
+                0, 1, 2, 3}
+        }
+        ;
+        int b[] = {
+            3, 1, 4, 1}
+        ;
+        int x = 1, y = 2;
+        // (a) Return true if at least one of x and y is positive. Here Yes is printed if (positive(x, y)) System.out.println( "Yes" ); // (b) Return the sum of the first row. Here 10 is printed. System.out.println(rowSum(a)); // (c) Return the smallest element. Here 1 is printed. System.out.println(smallest(b)); } }</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>private static boolean positive(int x, int y)</code></p> <details class="soln"><summary></summary><div class="ans"> <p>"At least one" is an <code>or</code>. The whole method is a single <code>return</code>:</p> <pre><code class="language-java">private static boolean positive(int x, int y) {
+    return x &gt; 0 || y &gt; 0;
+}</code></pre> <p>Resist the urge to write <code>if (x &gt; 0 || y &gt; 0) return true; else return false;</code>. It is correct but it says the same thing twice &mdash; a comparison already <em>is</em> a <code>boolean</code> in Java.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>private static int rowSum(int[][] a)</code></p> <details class="soln"><summary></summary><div class="ans"> <p>The comment says the <em>first</em> row, so there is only one loop, and it runs across row 0. Its bound is <code>a[0].length</code> &mdash; the length of that row &mdash; not <code>a.length</code>, which is the number of rows:</p> <pre><code class="language-java">private static int rowSum(int[][] a) {
+    int sum = 0;
+    for (int i = 0; i &lt; a[0].length; i++) sum += a[0][i];
+    return sum;
+}</code></pre> <p>Because we only read, a for-each over the row is equally good and is the form used in the posted solution: <code>for (int num : a[0]) sum += num;</code>. That works because <code>a[0]</code> is itself an <code>int[]</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>private static int smallest(int[] b)</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Start the running minimum at the first element, then compare against the rest:</p> <pre><code class="language-java">private static int smallest(int[] b) {
+    int min = b[0];
+    for (int i = 1; i &lt; b.length; i++) if (b[i] &lt; min) min = b[i];
+    return min;
+}</code></pre> <p>All three together, with the given <code>main</code>, produce:</p> <pre class="out"><code>Yes 10 1 </code></pre> <p><strong>Things to notice across all three parts.</strong> The dangerous line is <code>int min = b[0];</code>. Starting instead at <code>0</code>, or at some "big number" like <code>9999</code>, gives the wrong answer for an array that is all positive or that contains something bigger than your guess. Seeding from the array itself is always right &mdash; as long as the array is not empty, which is the &sect;4 warning once more.</p> <p>Notice too that the loop starts at <code>i = 1</code>. Element 0 is already the current minimum, so comparing it with itself is harmless but pointless. Starting at 0 is not an error here.</p> </div></details> </div> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 2</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="18" aria-label="Live coding - Practice Problem 2">public class P3 {
+    public static void main(String args[]) {
+        int a[][] = {
+            {
+                1, 2, 3, 4}
+            , {
+                0, 1, 2, 3}
+        }
+        ;
+        int b[] = {
+            3, 1, 4, 1}
+        ;
+        int x = 1, y = 2;
+        if (positive(x, y)) System.out.println("Yes");
+        System.out.println(rowSum(a));
+        // should print 10 System.out.println(smallest(b));    // should print 1 } private static boolean positive(int x, int y) { } private static int rowSum(int[][] a) { } private static int smallest(int[] b) { } }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 3 &mdash; Write the title lines <span class="muted">(from Exam 1 Practice Problems)</span></h3> <p>Write the best title lines for the functions that are called by the following main program. Do not supply the blocks for the functions.</p> <p class="filename">P1.java</p>
+<pre><code class="language-java">public class P1 {
+    public static void main(String args[]) {
+        int x = 2, y = 3, z[] = new int[4];
+        boolean a = true, b = false, c[] = new boolean[4];
+        String s = "Hello", t = "goodbye", u[][] = new String[4][5];
+        for (int i = 0; i &lt; 4; i++) c[i] = data(x, y, 2.5);
+        // (a) setToFive(z, c); System.out.println(z[1]);                              // (b) prints 5 System.out.println(speedLimit(x, z[1]));               // (c) prints 55 System.out.println(numberStrings(4, u, 5));            // (d) prints 20 } }</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> Title line for <code>data</code> as called at the line marked (a).</p> <details class="soln"><summary></summary><div class="ans"> <p><code>public static boolean data(int x, int y, double z)</code></p> <p>Work it out from the call site in two directions. The arguments are <code>x</code> and <code>y</code>, both <code>int</code>, and the literal <code>2.5</code>, which is a <code>double</code>. The result is assigned to <code>c[i]</code>, and <code>c</code> is a <code>boolean[]</code>, so an element of it is a <code>boolean</code> &mdash; that is the return type.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Title line for <code>setToFive</code> as called at the line marked (b).</p> <details class="soln"><summary></summary><div class="ans"> <p><code>public static void setToFive(int[] arr, boolean[] flags)</code></p> <p>The arguments are <code>z</code>, an <code>int[]</code>, and <code>c</code>, a <code>boolean[]</code>. The call is a statement on its own &mdash; nothing receives a result &mdash; so the return type is <code>void</code>. And yet the very next line prints <code>5</code> from <code>z[1]</code>, which tells you the method modified the caller's array. That is only possible because array parameters share the array, exactly as in &sect;4.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Title line for <code>speedLimit</code> as called at the line marked (c).</p> <details class="soln"><summary></summary><div class="ans"> <p><code>public static int speedLimit(int x, int y)</code></p> <p>Both arguments are <code>int</code> (<code>x</code>, and <code>z[1]</code> which is an element of an <code>int[]</code>). The result is handed to <code>println</code> and the comment says it prints <code>55</code>, an integer, so <code>int</code> is the best choice.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> Title line for <code>numberStrings</code> as called at the line marked (d).</p> <details class="soln"><summary></summary><div class="ans"> <p><code>public static int numberStrings(int a, String[][] arr, int b)</code></p> <p>The middle argument is <code>u</code>, declared as <code>String s = "Hello", t = "goodbye", u[][] = new String[4][5];</code> &mdash; so <code>u</code> is a two-dimensional array of <code>String</code>, written <code>String[][]</code>. The printed result is <code>20</code>, an integer.</p> <p><strong>Things to notice across all four parts.</strong> Every answer came from reading the call, never from guessing what the method might do. Two rules cover all of it: the parameter types are the types of the arguments, and the return type is the type of whatever the call's result is used as &mdash; <code>void</code> if it is used as nothing.</p> <p>The trap in this problem is the declaration line. <code>int x = 2, y = 3, z[] = new int[4];</code> declares two plain <code>int</code> variables and one <code>int[]</code>, because the brackets attach to the variable name and not to the type. The same trick hides <code>u</code> in a line that starts with <code>String s =</code>. This is exactly why <code>int[] z</code> is the safer style to write yourself &mdash; but you still have to read the other one.</p> </div></details> </div> <h3>Problem 4 &mdash; Words longer than average <span class="muted">(from CSCI 212 Midterm &mdash; Summer 2026)</span></h3> <p>Write a complete Java program in <code>Midterm1.java</code> that asks the user to enter the number of words, then reads that many words. The program should print all words whose length is greater than the average word length, in the same order in which they were entered.</p> <p>A sample run of this program, where the user typed <code>6</code> and then the six words:</p> <pre class="out"><code>Enter the number of words: 6 Enter 6 words: java exam inheritance class object code Average length: 5.666666666666667 Words longer than average: inheritance object </code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> This is the <code>ReadNumbers</code> shape from &sect;7 with <code>String</code> in place of <code>int</code>. Read the count with <code>nextInt()</code>, allocate a <code>String[]</code> of that size, and fill it with <code>next()</code> &mdash; one call per word, which is why the six words can all sit on one typed line.</p> <p>Then two passes over the array. The first adds up <code>words[i].length()</code> to get the total number of characters; divide by <code>words.length</code> <em>as a <code>double</code></em> to get the average. The second pass prints every word longer than that average. Two passes are necessary, not lazy: you cannot know whether the first word beats the average until you have seen the last one.</p> <p class="filename">Midterm1.java</p>
+<pre><code class="language-java">import java.util.Scanner;
+
+public class Midterm1 {
+    public static void main(String args[]) {
+        Scanner input = new Scanner(System.in);
+
+        System.out.print("Enter the number of words: ");
+        int n = input.nextInt();
+
+        String[] words = new String[n];
+        System.out.print("Enter " + n + " words: ");
+        for (int i = 0; i &lt; n; i++) words[i] = input.next();
+
+        int totalLength = 0;
+        for (int i = 0; i &lt; words.length; i++) totalLength += words[i].length();
+        double average = totalLength / (double) words.length;
+        System.out.println("Average length: " + average);
+
+        System.out.print("Words longer than average:");
+        for (int i = 0; i &lt; words.length; i++)
+            if (words[i].length() &gt; average) System.out.print(" " + words[i]);
+        System.out.println();
+
+        input.close();
+    }
+}</code></pre> <pre class="out"><code>Enter the number of words: 6 Enter 6 words: java exam inheritance class object code Average length: 5.666666666666667 Words longer than average: inheritance object </code></pre> <p><strong>Things to notice.</strong> The lengths are 4, 4, 11, 5, 6 and 4, giving 34 characters over 6 words &mdash; an average of 5.666666666666667. Only <code>inheritance</code> (11) and <code>object</code> (6) beat it, and they print in the order they were entered because we walk the array forwards.</p> <p><code>totalLength / (double) words.length</code> is the load-bearing cast. Without it, <code>34 / 6</code> is the <code>int</code> 5, <code>average</code> becomes <code>5.0</code>, and <code>class</code> &mdash; length 5 &mdash; is still excluded but the printed average is wrong. On a different word list the truncation would change which words are printed too.</p> <p>Using <code>next()</code> rather than <code>nextLine()</code> for the words is what lets the user type them all on one line, separated by spaces: each <code>next()</code> takes one token. And because the program never calls <code>nextLine()</code> at all, the leftover newline after <code>nextInt()</code> causes no trouble here &mdash; it is just more whitespace for the next <code>next()</code> to skip.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 4</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="7" aria-label="Live coding - Practice Problem 4">import java.util.Scanner;
+public class Midterm1 {
+    public static void main(String args[]) {
+        Scanner input = new Scanner(System.in);
+        // 1. Ask for the number of words and read it. // 2. Read that many words into a String array. // 3. Print the average word length. // 4. Print every word longer than the average, in order. } }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 5 &mdash; The random-number study <span class="muted">(from Exam 1 Practice Problems)</span></h3> <p>Write a complete Java program to be used for a psychology study into random number choices by a human volunteer. Ask the user to repeatedly type 2-digit numbers. Read the user input and discard any number that is less than 10 or greater than 100, but keep track of numbers within this range. When the user enters the number 100 the experiment ends and the program prints a summary with one line of output for each of the numbers from 10 to 99 that was used, of the form:</p> <pre class="out"><code>User chose 10 for 2.1% of choices. User chose 12 for 0.7% of choices. </code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The trick here is to stop thinking of the array as a list of the numbers typed and start thinking of it as a set of <em>counters indexed by the number itself</em>. Make <code>int[] counts = new int[100]</code>, and when the user types 37, do <code>counts[37]++</code>. Slots 0 through 9 are never used and that is fine &mdash; wasting ten <code>int</code> values buys you an array whose index <em>is</em> the number, so no searching is ever needed.</p> <p>Keep a separate <code>total</code> of how many valid numbers were entered, because the percentage is <code>counts[i]</code> out of <code>total</code>, not out of the array length. Loop forever, break on 100, ignore anything outside 10 to 99. Then walk <code>i</code> from 10 to 99 and print only the slots with a nonzero count.</p> <p class="filename">PsychologyStudy.java</p>
+<pre><code class="language-java">import java.util.Scanner;
+
+public class PsychologyStudy {
+    public static void main(String args[]) {
+        Scanner input = new Scanner(System.in);
+        int[] counts = new int[100];
+        int total = 0;
+
+        System.out.println("Type 2 digit numbers. Enter 100 to end:");
+        while (true) {
+            int n = input.nextInt();
+            if (n == 100) break;
+            if (n &gt;= 10 &amp;&amp; n &lt;= 99) {
+                counts[n]++;
+                total++;
+            }
+        }
+        input.close();
+
+        for (int i = 10; i &lt; counts.length; i++) {
+            if (counts[i] &gt; 0) {
+                double percent = counts[i] * 100.0 / total;
+                System.out.printf("User chose %d for %.1f%% of choices.%n", i, percent);
+            }
+        }
+    }
+}</code></pre> <p>A session where the user typed <code>37 42 7 37 99 250 42 37 100</code>:</p> <pre class="out"><code>Type 2 digit numbers. Enter 100 to end: 37 42 7 37 99 250 42 37 100 User chose 37 for 50.0% of choices. User chose 42 for 33.3% of choices. User chose 99 for 16.7% of choices. </code></pre> <p><strong>Things to notice.</strong> <code>7</code> and <code>250</code> were both discarded, so <code>total</code> is 6, not 8. 37 appears three times out of six, which is 50.0%; 42 twice, 33.3%; 99 once, 16.7%. Had we divided by 8 every percentage would have been wrong, which is why the counter has to be incremented in the same <code>if</code> that records the value.</p> <p><code>counts[n]++</code> with <code>n</code> coming straight from the user is only safe because the surrounding <code>if</code> has already checked that <code>n</code> is between 10 and 99. Delete that check and a user typing <code>-5</code> gets you an <code>ArrayIndexOutOfBoundsException</code>. Whenever an index comes from outside your program, something must validate it.</p> <p><code>System.out.printf</code> works like C's <code>printf</code>: <code>%d</code> is an integer, <code>%.1f</code> a <code>double</code> to one decimal place, <code>%%</code> a literal percent sign, and <code>%n</code> a line break. <code>println</code> with string concatenation would also pass, but it would print <code>50.0</code> and <code>33.33333333333333</code> inconsistently.</p> <p>Finally, the loop shape here is <code>while (true)</code> with a <code>break</code>, while Quick Check 3.12 used a priming read. Both are standard; use whichever makes the sentinel test read more naturally.</p> </div></details> <h3>Problem 6 &mdash; What is the output? <span class="muted">(added for these notes)</span></h3> <p>Consider the following Java program.</p> <p class="filename">Output3.java</p>
+<pre><code class="language-java">public class Output3 {
+    public static void main(String args[]) {
+        int x[] = {
+            3, 1, 4, 1, 5}
+        ;
+        int[][] g = {
+            {
+                1, 2}
+            , {
+                3, 4, 5}
+            , {
+                6}
+        }
+        ;
+        String s = "CSCI";
+        System.out.println(x[2 + 2] + x[2]);
+        // line (a) System.out.println(x.length + s.length());        // line (b) System.out.println("" + x[0] + x[1]);             // line (c) System.out.println(x[x.length - 1] - x[0]);       // line (d) int t = 0; for (int v : x) t += v; System.out.println(t);                            // line (e) for (int v : x) v = 0; System.out.println(x[0]);                         // line (f) System.out.println(g.length + " " + g[1].length); // line (g) int c = 0; for (int i = 0; i &lt; g.length; i++) c += g[i].length; System.out.println(c);                            // line (h) int[] y = x; y[0] = 99; System.out.println(x[0]);                         // line (i) } }</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> What is the output at line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>9</code>. The index expression is evaluated first: <code>2 + 2</code> is 4, so this is <code>x[4] + x[2]</code>, which is 5 + 4. Both are <code>int</code> and no <code>String</code> is involved, so <code>+</code> adds.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What is the output at line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>9</code>. <code>x.length</code> is 5 &mdash; a property, no parentheses. <code>s.length()</code> is 4 &mdash; a method, parentheses. 5 + 4 = 9. Swap the parentheses and neither one compiles.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> What is the output at line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>31</code>. The empty <code>String</code> makes the first <code>+</code> a concatenation, so from there everything is text: <code>""</code> then <code>"3"</code> then <code>"31"</code>. Without the <code>""</code> this would have printed <code>4</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> What is the output at line (d)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>2</code>. <code>x.length - 1</code> is 4, so this is <code>x[4] - x[0]</code>, which is 5 &minus; 3.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> What is the output at line (e)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>14</code>. The for-each loop adds every element: 3 + 1 + 4 + 1 + 5.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(f)</span> What is the output at line (f)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>3</code> &mdash; unchanged. <code>v</code> is a copy of the element, so <code>v = 0</code> throws away a copy and the array is untouched. This is the single most common wrong answer on this kind of question.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(g)</span> What is the output at line (g)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>3 3</code>. The first is <code>g.length</code>, the number of rows. The second is <code>g[1].length</code>, the length of row 1, which is <code>{3, 4, 5}</code>. They are equal here by coincidence and mean different things.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(h)</span> What is the output at line (h)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>6</code>. The loop adds the three row lengths: 2 + 3 + 1. Note that <code>g.length * g[0].length</code> would have given 3 &times; 2 = 6 as well &mdash; also by coincidence, and wrong in general for an irregular array.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(i)</span> What is the output at line (i)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>99</code>. <code>int[] y = x;</code> does not copy the array. It makes <code>y</code> a second name for the same array, so writing through <code>y</code> is visible through <code>x</code>.</p> <p><strong>Things to notice across the whole problem.</strong> Lines (f) and (i) are the same idea seen from both sides. Assigning to a <em>copy of an element</em> changes nothing; assigning through a <em>second name for the array</em> changes everything. The rule that covers both: an array variable holds a reference to the array, and <code>=</code> copies the reference, never the contents. Lecture 8 makes this the main event.</p> <p>To make a genuine copy you have to allocate a new array and copy element by element, as in the <code>FixedSize</code> example in &sect;1.</p> </div></details> </div> <h3>Problem 7 &mdash; Find the three errors <span class="muted">(added for these notes)</span></h3> <p>Consider the following Java code, saved in a file called <code>Scores.java</code>. Exactly 3 of the numbered lines have errors. Identify the 3 different errors by giving the numbers of the incorrect lines. For each error also give a corrected version of the line. Any line without a number is correct as written and is not to be changed. Make sure that your corrections lead to the indicated output.</p> <p class="filename">Scores.java</p>
+<pre><code class="language-java">import java.util.Scanner;
+
+public class Scores {
+    public static void main(String args[]) {
+        Scanner input = new Scanner(System.in);
+        System.out.print("How many scores? ");
+        int n = input.nextInt();
+
+        int scores[] = new int[];                        // line 1
+        for (int i = 0; i &lt; scores.length(); i++)        // line 2
+            scores[i] = input.nextInt();
+
+        int total = 0;
+        for (int s : scores) total += s;
+        double avg = total / scores.length;              // line 3
+        System.out.println("Average: " + avg);
+
+        int above = 0;
+        for (int i = 0; i &lt; scores.length; i++)
+            if (scores[i] &gt; avg) above++;
+        System.out.println("Above average: " + above);
+        input.close();
+    }
+}</code></pre> <p>With the user typing <code>5</code> and then <code>90 85 78 92 66</code>, the required output is:</p> <pre class="out"><code>How many scores? 5 90 85 78 92 66 Average: 82.2 Above average: 3 </code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Look for three different kinds of trouble, in the order the compiler will find them: a <code>new</code> with no size, a size asked for the wrong way, and something that compiles cleanly but produces the wrong number. The required output is what settles the third one.</p> <p><strong>Error 1 &mdash; line 1.</strong> <code>new int[]</code> with no size and no initializer list.</p> <pre class="err"><code>Scores.java:9: error: array dimension missing
+        int scores[] = new int[];                        // line 1
+                                ^
+1 error</code></pre> <p>Corrected: <code>int scores[] = new int[n];</code> &mdash; the count the user just gave us.</p> <p><strong>Error 2 &mdash; line 2.</strong> <code>scores</code> is an array, so its size is the property <code>length</code>, not a method <code>length()</code>.</p> <pre class="err"><code>Scores2.java:10: error: cannot find symbol for (int i = 0; i &lt; scores.length(); i++)
+        // line 2
+^
+  symbol:   method length()
+  location: variable scores of type int[]
+1 error</code></pre> <p>Corrected: <code>for (int i = 0; i &lt; scores.length; i++)</code></p> <p><strong>Error 3 &mdash; line 3.</strong> This one compiles. <code>total</code> is an <code>int</code> and <code>scores.length</code> is an <code>int</code>, so <code>total / scores.length</code> is integer division: 411 / 5 gives the <code>int</code> 82, which is then widened to <code>82.0</code>. The required output says <code>82.2</code>.</p> <p>Corrected: <code>double avg = total / (double) scores.length;</code></p> <p>With all three fixed:</p> <p class="filename">ScoresFixed.java</p>
+<pre><code class="language-java">import java.util.Scanner;
+
+public class ScoresFixed {
+    public static void main(String args[]) {
+        Scanner input = new Scanner(System.in);
+        System.out.print("How many scores? ");
+        int n = input.nextInt();
+
+        int scores[] = new int[n];                       // line 1
+        for (int i = 0; i &lt; scores.length; i++)          // line 2
+            scores[i] = input.nextInt();
+
+        int total = 0;
+        for (int s : scores) total += s;
+        double avg = total / (double) scores.length;     // line 3
+        System.out.println("Average: " + avg);
+
+        int above = 0;
+        for (int i = 0; i &lt; scores.length; i++)
+            if (scores[i] &gt; avg) above++;
+        System.out.println("Above average: " + above);
+        input.close();
+    }
+}</code></pre> <pre class="out"><code>How many scores? 5 90 85 78 92 66 Average: 82.2 Above average: 3 </code></pre> <p><strong>Things to notice.</strong> <code>javac</code> reported only the line 1 error on the first compile &mdash; a syntax error stops the parser before it reaches line 2. Fixing one error and immediately being handed a new one is normal and does not mean your fix was wrong.</p> <p>Error 3 is the interesting one, because with this particular data it does not change the <code>Above average</code> count: 90, 85 and 92 beat both 82.0 and 82.2. The only visible symptom is a wrong average. That is exactly how integer division gets into production code &mdash; it is often nearly right, and "nearly right" does not fail any test you thought to write.</p> <p>The unnumbered lines are all correct, and two of them are worth a second look: the for-each loop <code>for (int s : scores) total += s;</code> is fine because it only reads, and the final indexed loop needs its index only for <code>scores[i]</code>, so it could equally have been a for-each.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 7</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="26" aria-label="Live coding - Practice Problem 7">import java.util.Scanner;
+
+public class Scores {
+    public static void main(String args[]) {
+        Scanner input = new Scanner(System.in);
+        System.out.print("How many scores? ");
+        int n = input.nextInt();
+
+        int scores[] = new int[];                        // line 1
+        for (int i = 0; i &lt; scores.length(); i++)        // line 2
+            scores[i] = input.nextInt();
+
+        int total = 0;
+        for (int s : scores) total += s;
+        double avg = total / scores.length;              // line 3
+        System.out.println("Average: " + avg);
+
+        int above = 0;
+        for (int i = 0; i &lt; scores.length; i++)
+            if (scores[i] &gt; avg) above++;
+        System.out.println("Above average: " + above);
+        input.close();
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <div class="box sum" id="summary"> <div class="hd">Lecture Summary</div> <div class="bd"> <ul> <li>An array holds many values of one type under one name, indexed from <code>0</code> to <code>length - 1</code>. Declaring it and creating it are separate steps, and the brackets may sit after the type (<code>int[] a</code>) or after the name (<code>int a[]</code>).</li> <li>The size is required when you allocate with <code>new</code>, except with an initializer list, which counts itself. Once created, <strong>the size is fixed</strong> &mdash; "growing" an array means building a new one and copying.</li> <li>New arrays are filled with defaults: <code>0</code>, <code>0.0</code>, <code>false</code>, <code>null</code>.</li> <li><code>a.length</code> is a <strong>property</strong> and takes no parentheses. <code>s.length()</code> is a <strong>method</strong> and requires them. Mixing them up is a compile error, and it is on the exam.</li> <li>Reading past the end throws <code>ArrayIndexOutOfBoundsException</code>, and the message names both the index you asked for and the length you actually had.</li> <li>The for-each loop <code>for (int v : a)</code> is the clean way to <em>read</em> every element. Assigning to <code>v</code> changes nothing; to write into the array you need an index.</li> <li>A method that takes an array parameter shares the caller's array, so a <code>void</code> method can change it &mdash; which is how <code>shorten</code> and <code>setToFive</code> work.</li> <li>A two-dimensional array is an array of arrays: <code>m.length</code> counts rows, <code>m[i].length</code> counts the columns of row <code>i</code>, and rows may legally have different lengths.</li> <li><code>Scanner</code> is a class &mdash; a blueprint. <code>new Scanner(System.in)</code> builds an object from it with its own source and its own delimiter. Its methods are <code>next</code>, <code>nextInt</code>, <code>nextLine</code>, <code>hasNext</code>, <code>hasNextInt</code>, <code>useDelimiter</code> and <code>close</code>, and it needs <code>import java.util.Scanner;</code>.</li> <li><code>next</code> and <code>nextInt</code> read one token and stop before the newline; <code>nextLine</code> reads to the end of the line. That mismatch is the leftover-newline trap, and the cure is one extra <code>input.nextLine();</code>.</li> </ul> <p><strong>Coming up in Lecture 4.</strong> We leaned on <code>String</code> all day today &mdash; <code>length()</code>, <code>substring</code>, an array of them &mdash; without ever saying what a <code>String</code> really is. Next time we take the <code>String</code> class properly: why it is immutable, why <code>==</code> is not how you compare two
+    strings, and the dozen methods you will use for the rest of the semester.</p>
+  </div>
+</div>
+
+<nav class="pagenav">
+<span class="disabled"><div class="dir">&larr; Previous</div><div class="ttl">Lecture 2 &mdash; Methods, Overloading and Recursion</div><div class="pending">posts Thu Sep 3</div></span>
+<span class="disabled next"><div class="dir">Next &rarr;</div><div class="ttl">Lecture 4 &mdash; The String Class</div><div class="pending">posts Thu Sep 10</div></span>
+</nav>
+<footer class="pf">CSCI 212 &middot; Object-Oriented Programming in Java &middot; Queens College, CUNY</footer>
+</div>
+<script>
+(()=>{var ut=Object.create;var xe=Object.defineProperty;var ft=Object.getOwnPropertyDescriptor;var gt=Object.getOwnPropertyNames;var ht=Object.getPrototypeOf,dt=Object.prototype.hasOwnProperty;var pt=(e,t)=>()=>{try{return t||e((t={exports:{}}).exports,t),t.exports}catch(n){throw t=0,n}};var Et=(e,t,n,l)=>{if(t&&typeof t=="object"||typeof t=="function")for(let d of gt(t))!dt.call(e,d)&&d!==n&&xe(e,d,{get:()=>t[d],enumerable:!(l=ft(t,d))||l.enumerable});return e};var bt=(e,t,n)=>(n=e!=null?ut(ht(e)):{},Et(t||!e||!e.__esModule?xe(n,"default",{value:e,enumerable:!0}):n,e));var Ke=pt((ln,Ge)=>{function Ie(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(t=>{let n=e[t],l=typeof n;(l==="object"||l==="function")&&!Object.isFrozen(n)&&Ie(n)}),e}var Z=class{constructor(t){t.data===void 0&&(t.data={}),this.data=t.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function Ce(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function k(e,...t){let n=Object.create(null);for(let l in e)n[l]=e[l];return t.forEach(function(l){for(let d in l)n[d]=l[d]}),n}var _t="</span>",Ne=e=>!!e.scope,Mt=(e,{prefix:t})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let n=e.split(".");return[`${t}${n.shift()}`,...n.map((l,d)=>`${l}${"_".repeat(d+1)}`)].join(" ")}return`${t}${e}`},oe=class{constructor(t,n){this.buffer="",this.classPrefix=n.classPrefix,t.walk(this)}addText(t){this.buffer+=Ce(t)}openNode(t){if(!Ne(t))return;let n=Mt(t.scope,{prefix:this.classPrefix});this.span(n)}closeNode(t){Ne(t)&&(this.buffer+=_t)}value(){return this.buffer}span(t){this.buffer+=`<span class="${t}">`}},Re=(e={})=>{let t={children:[]};return Object.assign(t,e),t},ae=class e{constructor(){this.rootNode=Re(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(t){this.top.children.push(t)}openNode(t){let n=Re({scope:t});this.add(n),this.stack.push(n)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(t){return this.constructor._walk(t,this.rootNode)}static _walk(t,n){return typeof n=="string"?t.addText(n):n.children&&(t.openNode(n),n.children.forEach(l=>this._walk(t,l)),t.closeNode(n)),t}static _collapse(t){typeof t!="string"&&t.children&&(t.children.every(n=>typeof n=="string")?t.children=[t.children.join("")]:t.children.forEach(n=>{e._collapse(n)}))}},le=class extends ae{constructor(t){super(),this.options=t}addText(t){t!==""&&this.add(t)}startScope(t){this.openNode(t)}endScope(){this.closeNode()}__addSublanguage(t,n){let l=t.root;n&&(l.scope=`language:${n}`),this.add(l)}toHTML(){return new oe(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function G(e){return e?typeof e=="string"?e:e.source:null}function De(e){return B("(?=",e,")")}function Ot(e){return B("(?:",e,")*")}function wt(e){return B("(?:",e,")?")}function B(...e){return e.map(n=>G(n)).join("")}function xt(e){let t=e[e.length-1];return typeof t=="object"&&t.constructor===Object?(e.splice(e.length-1,1),t):{}}function V(...e){return"("+(xt(e).capture?"":"?:")+e.map(l=>G(l)).join("|")+")"}function ke(e){return new RegExp(e.toString()+"|").exec("").length-1}function Nt(e,t){let n=e&&e.exec(t);return n&&n.index===0}var Rt=new RegExp(V(/\[(?:[^\\\]]|\\.)*\]/,/\(\?<(?![=!])[^>]+>/,/\(\?'[^']+'/,/\(\??/,/\\([1-9][0-9]*)/,/\\./));function fe(e,{joinWith:t}){let n=0;return e.map(l=>{n+=1;let d=n,_=G(l),c="";for(;_.length>0;){let r=Rt.exec(_);if(!r){c+=_;break}c+=_.substring(0,r.index),_=_.substring(r.index+r[0].length),r[0][0]==="\\"&&r[1]?c+="\\"+String(Number(r[1])+d):(c+=r[0],(r[0]==="("||/^\(\?[<']/.test(r[0]))&&n++)}return c}).map(l=>`(${l})`).join(t)}var yt=/\b\B/,ve="[a-zA-Z]\\w*",ge="[a-zA-Z_]\\w*",Le="\\b\\d+(\\.\\d+)?",Be="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Pe="\\b(0b[01]+)",St="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",At=(e={})=>{let t=/^#![ ]*\//;return e.binary&&(e.begin=B(t,/.*\b/,e.binary,/\b.*/)),k({scope:"meta",begin:t,end:/$/,relevance:0,"on:begin":(n,l)=>{n.index!==0&&l.ignoreMatch()}},e)},K={begin:"\\\\[\\s\\S]",relevance:0},Tt={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[K]},It={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[K]},Ct={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},Q=function(e,t,n={}){let l=k({scope:"comment",begin:e,end:t,contains:[]},n);l.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let d=V("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return l.contains.push({begin:B(/[ ]+/,"(",d,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),l},Dt=Q("//","$"),kt=Q("/\\*","\\*/"),vt=Q("#","$"),Lt={scope:"number",begin:Le,relevance:0},Bt={scope:"number",begin:Be,relevance:0},Pt={scope:"number",begin:Pe,relevance:0},$t={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[K,{begin:/\[/,end:/\]/,relevance:0,contains:[K]}]},Ht={scope:"title",begin:ve,relevance:0},Ut={scope:"title",begin:ge,relevance:0},jt={begin:"\\.\\s*"+ge,relevance:0},Gt=function(e){return Object.assign(e,{"on:begin":(t,n)=>{n.data._beginMatch=t[1]},"on:end":(t,n)=>{n.data._beginMatch!==t[1]&&n.ignoreMatch()}})},X=Object.freeze({__proto__:null,APOS_STRING_MODE:Tt,BACKSLASH_ESCAPE:K,BINARY_NUMBER_MODE:Pt,BINARY_NUMBER_RE:Pe,COMMENT:Q,C_BLOCK_COMMENT_MODE:kt,C_LINE_COMMENT_MODE:Dt,C_NUMBER_MODE:Bt,C_NUMBER_RE:Be,END_SAME_AS_BEGIN:Gt,HASH_COMMENT_MODE:vt,IDENT_RE:ve,MATCH_NOTHING_RE:yt,METHOD_GUARD:jt,NUMBER_MODE:Lt,NUMBER_RE:Le,PHRASAL_WORDS_MODE:Ct,QUOTE_STRING_MODE:It,REGEXP_MODE:$t,RE_STARTERS_RE:St,SHEBANG:At,TITLE_MODE:Ht,UNDERSCORE_IDENT_RE:ge,UNDERSCORE_TITLE_MODE:Ut});function Kt(e,t){e.input[e.index-1]==="."&&t.ignoreMatch()}function mt(e,t){e.className!==void 0&&(e.scope=e.className,delete e.className)}function Wt(e,t){t&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=Kt,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function Ft(e,t){Array.isArray(e.illegal)&&(e.illegal=V(...e.illegal))}function zt(e,t){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function Yt(e,t){e.relevance===void 0&&(e.relevance=1)}var Xt=(e,t)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let n=Object.assign({},e);Object.keys(e).forEach(l=>{delete e[l]}),e.keywords=n.keywords,e.begin=B(n.beforeMatch,De(n.begin)),e.starts={relevance:0,contains:[Object.assign(n,{endsParent:!0})]},e.relevance=0,delete n.beforeMatch},Zt=["of","and","for","in","not","or","if","then","parent","list","value"],Jt="keyword";function $e(e,t,n=Jt){let l=Object.create(null);return typeof e=="string"?d(n,e.split(" ")):Array.isArray(e)?d(n,e):Object.keys(e).forEach(function(_){Object.assign(l,$e(e[_],t,_))}),l;function d(_,c){t&&(c=c.map(r=>r.toLowerCase())),c.forEach(function(r){let u=r.split("|");l[u[0]]=[_,Vt(u[0],u[1])]})}}function Vt(e,t){return t?Number(t):Qt(e)?0:1}function Qt(e){return Zt.includes(e.toLowerCase())}var ye={},L=e=>{console.error(e)},Se=(e,...t)=>{console.log(`WARN: ${e}`,...t)},H=(e,t)=>{ye[`${e}/${t}`]||(console.log(`Deprecated as of ${e}. ${t}`),ye[`${e}/${t}`]=!0)},J=new Error;function He(e,t,{key:n}){let l=0,d=e[n],_={},c={};for(let r=1;r<=t.length;r++)c[r+l]=d[r],_[r+l]=!0,l+=ke(t[r-1]);e[n]=c,e[n]._emit=_,e[n]._multi=!0}function qt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw L("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),J;if(typeof e.beginScope!="object"||e.beginScope===null)throw L("beginScope must be object"),J;He(e,e.begin,{key:"beginScope"}),e.begin=fe(e.begin,{joinWith:""})}}function en(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw L("skip, excludeEnd, returnEnd not compatible with endScope: {}"),J;if(typeof e.endScope!="object"||e.endScope===null)throw L("endScope must be object"),J;He(e,e.end,{key:"endScope"}),e.end=fe(e.end,{joinWith:""})}}function tn(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function nn(e){tn(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),qt(e),en(e)}function sn(e){function t(c,r){return new RegExp(G(c),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(r?"g":""))}class n{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(r,u){u.position=this.position++,this.matchIndexes[this.matchAt]=u,this.regexes.push([u,r]),this.matchAt+=ke(r)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let r=this.regexes.map(u=>u[1]);this.matcherRe=t(fe(r,{joinWith:"|"}),!0),this.lastIndex=0}exec(r){this.matcherRe.lastIndex=this.lastIndex;let u=this.matcherRe.exec(r);if(!u)return null;let O=u.findIndex((P,I)=>I>0&&P!==void 0),M=this.matchIndexes[O];return u.splice(0,O),Object.assign(u,M)}}class l{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(r){if(this.multiRegexes[r])return this.multiRegexes[r];let u=new n;return this.rules.slice(r).forEach(([O,M])=>u.addRule(O,M)),u.compile(),this.multiRegexes[r]=u,u}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(r,u){this.rules.push([r,u]),u.type==="begin"&&this.count++}exec(r){let u=this.getMatcher(this.regexIndex);u.lastIndex=this.lastIndex;let O=u.exec(r);if(this.resumingScanAtSamePosition()&&!(O&&O.index===this.lastIndex)){let M=this.getMatcher(0);M.lastIndex=this.lastIndex+1,O=M.exec(r)}return O&&(this.regexIndex+=O.position+1,this.regexIndex===this.count&&this.considerAll()),O}}function d(c){let r=new l;return c.contains.forEach(u=>r.addRule(u.begin,{rule:u,type:"begin"})),c.terminatorEnd&&r.addRule(c.terminatorEnd,{type:"end"}),c.illegal&&r.addRule(c.illegal,{type:"illegal"}),r}function _(c,r){let u=c;if(c.isCompiled)return u;[mt,zt,nn,Xt].forEach(M=>M(c,r)),e.compilerExtensions.forEach(M=>M(c,r)),c.__beforeBegin=null,[Wt,Ft,Yt].forEach(M=>M(c,r)),c.isCompiled=!0;let O=null;return typeof c.keywords=="object"&&c.keywords.$pattern&&(c.keywords=Object.assign({},c.keywords),O=c.keywords.$pattern,delete c.keywords.$pattern),O=O||/\w+/,c.keywords&&(c.keywords=$e(c.keywords,e.case_insensitive)),u.keywordPatternRe=t(O,!0),r&&(c.begin||(c.begin=/\B|\b/),u.beginRe=t(u.begin),!c.end&&!c.endsWithParent&&(c.end=/\B|\b/),c.end&&(u.endRe=t(u.end)),u.terminatorEnd=G(u.end)||"",c.endsWithParent&&r.terminatorEnd&&(u.terminatorEnd+=(c.end?"|":"")+r.terminatorEnd)),c.illegal&&(u.illegalRe=t(c.illegal)),c.contains||(c.contains=[]),c.contains=[].concat(...c.contains.map(function(M){return rn(M==="self"?c:M)})),c.contains.forEach(function(M){_(M,u)}),c.starts&&_(c.starts,r),u.matcher=d(u),u}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=k(e.classNameAliases||{}),_(e)}function Ue(e){return e?e.endsWithParent||Ue(e.starts):!1}function rn(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(t){return k(e,{variants:null},t)})),e.cachedVariants?e.cachedVariants:Ue(e)?k(e,{starts:e.starts?k(e.starts):null}):Object.isFrozen(e)?k(e):e}var cn="11.12.0",ue=class extends Error{constructor(t,n){super(t),this.name="HTMLInjectionError",this.html=n}},ce=Ce,Ae=k,Te=Symbol("nomatch"),on=7,je=function(e){let t=Object.create(null),n=Object.create(null),l=[],d=!0,_="Could not find the language '{}', did you forget to load/include a language module?",c={disableAutodetect:!0,name:"Plain text",contains:[]},r={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:le};function u(i){return r.noHighlightRe.test(i)}function O(i){let a=i.className+" ";a+=i.parentNode?i.parentNode.className:"";let h=r.languageDetectRe.exec(a);if(h){let E=C(h[1]);return E||(Se(_.replace("{}",h[1])),Se("Falling back to no-highlight mode for this block.",i)),E?h[1]:"no-highlight"}return a.split(/\s+/).find(E=>u(E)||C(E))}function M(i,a,h){let E="",w="";typeof a=="object"?(E=i,h=a.ignoreIllegals,w=a.language):(H("10.7.0","highlight(lang, code, ...args) has been deprecated."),H("10.7.0",`Please use highlight(code, options) instead.
+(see the highlight.js issue tracker)`),w=i,E=a),h===void 0&&(h=!0);let y={code:E,language:w};W("before:highlight",y);let D=y.result?y.result:P(y.language,y.code,h);return D.code=y.code,W("after:highlight",D),D}function P(i,a,h,E){let w=Object.create(null);function y(s,o){return s.keywords[o]}function D(){if(!f.keywords){x.addText(b);return}let s=0;f.keywordPatternRe.lastIndex=0;let o=f.keywordPatternRe.exec(b),g="";for(;o;){g+=b.substring(s,o.index);let p=A.case_insensitive?o[0].toLowerCase():o[0],N=y(f,p);if(N){let[T,at]=N;if(x.addText(g),g="",w[p]=(w[p]||0)+1,w[p]<=on&&(Y+=at),T.startsWith("_"))g+=o[0];else{let lt=A.classNameAliases[T]||T;S(o[0],lt)}}else g+=o[0];s=f.keywordPatternRe.lastIndex,o=f.keywordPatternRe.exec(b)}g+=b.substring(s),x.addText(g)}function F(){if(b==="")return;let s=null;if(typeof f.subLanguage=="string"){if(!t[f.subLanguage]){x.addText(b);return}s=P(f.subLanguage,b,!0,we[f.subLanguage]),we[f.subLanguage]=s._top}else s=$(b,f.subLanguage.length?f.subLanguage:null);f.relevance>0&&(Y+=s.relevance),x.__addSublanguage(s._emitter,s.language)}function R(){f.subLanguage!=null?F():D(),b=""}function S(s,o){s!==""&&(x.startScope(o),x.addText(s),x.endScope())}function be(s,o){let g=1,p=o.length-1;for(;g<=p;){if(!s._emit[g]){g++;continue}let N=A.classNameAliases[s[g]]||s[g],T=o[g];N?S(T,N):(b=T,D(),b=""),g++}}function _e(s,o){return s.scope&&typeof s.scope=="string"&&x.openNode(A.classNameAliases[s.scope]||s.scope),s.beginScope&&(s.beginScope._wrap?(S(b,A.classNameAliases[s.beginScope._wrap]||s.beginScope._wrap),b=""):s.beginScope._multi&&(be(s.beginScope,o),b="")),f=Object.create(s,{parent:{value:f}}),f}function Me(s,o,g){let p=Nt(s.endRe,g);if(p){if(s["on:end"]){let N=new Z(s);s["on:end"](o,N),N.isMatchIgnored&&(p=!1)}if(p){for(;s.endsParent&&s.parent;)s=s.parent;return s}}if(s.endsWithParent)return Me(s.parent,o,g)}function it(s){return f.matcher.regexIndex===0?(b+=s[0],1):(re=!0,0)}function st(s){let o=s[0],g=s.rule,p=new Z(g),N=[g.__beforeBegin,g["on:begin"]];for(let T of N)if(T&&(T(s,p),p.isMatchIgnored))return it(o);return g.skip?b+=o:(g.excludeBegin&&(b+=o),R(),!g.returnBegin&&!g.excludeBegin&&(b=o)),_e(g,s),g.returnBegin?0:o.length}function rt(s){let o=s[0],g=a.substring(s.index),p=Me(f,s,g);if(!p)return Te;let N=f;f.endScope&&f.endScope._wrap?(R(),S(o,f.endScope._wrap)):f.endScope&&f.endScope._multi?(R(),be(f.endScope,s)):N.skip?b+=o:(N.returnEnd||N.excludeEnd||(b+=o),R(),N.excludeEnd&&(b=o));do f.scope&&x.closeNode(),!f.skip&&!f.subLanguage&&(Y+=f.relevance),f=f.parent;while(f!==p.parent);return p.starts&&_e(p.starts,s),N.returnEnd?0:o.length}function ct(){let s=[];for(let o=f;o!==A;o=o.parent)o.scope&&s.unshift(o.scope);s.forEach(o=>x.openNode(o))}let z={};function Oe(s,o){let g=o&&o[0];if(b+=s,g==null)return R(),0;if(z.type==="begin"&&o.type==="end"&&z.index===o.index&&g===""){if(b+=a.slice(o.index,o.index+1),!d){let p=new Error(`0 width match regex (${i})`);throw p.languageName=i,p.badRule=z.rule,p}return 1}if(z=o,o.type==="begin")return st(o);if(o.type==="illegal"&&!h){let p=new Error('Illegal lexeme "'+g+'" for mode "'+(f.scope||"<unnamed>")+'"');throw p.mode=f,p}else if(o.type==="end"){let p=rt(o);if(p!==Te)return p}if(o.type==="illegal"&&g==="")return o.index===a.length||(b+=`
+`),1;if(se>1e5&&se>o.index*3)throw new Error("potential infinite loop, way more iterations than matches");return b+=g,g.length}let A=C(i);if(!A)throw L(_.replace("{}",i)),new Error('Unknown language: "'+i+'"');let ot=sn(A),ie="",f=E||ot,we={},x=new r.__emitter(r);ct();let b="",Y=0,v=0,se=0,re=!1;try{if(A.__emitTokens)A.__emitTokens(a,x);else{for(f.matcher.considerAll();;){se++,re?re=!1:f.matcher.considerAll(),f.matcher.lastIndex=v;let s=f.matcher.exec(a);if(!s)break;let o=a.substring(v,s.index),g=Oe(o,s);v=s.index+g}Oe(a.substring(v))}return x.finalize(),ie=x.toHTML(),{language:i,value:ie,relevance:Y,illegal:!1,_emitter:x,_top:f}}catch(s){if(s.message&&s.message.includes("Illegal"))return{language:i,value:ce(a),illegal:!0,relevance:0,_illegalBy:{message:s.message,index:v,context:a.slice(v-100,v+100),mode:s.mode,resultSoFar:ie},_emitter:x};if(d)return{language:i,value:ce(a),illegal:!1,relevance:0,errorRaised:s,_emitter:x,_top:f};throw s}}function I(i){let a={value:ce(i),illegal:!1,relevance:0,_top:c,_emitter:new r.__emitter(r)};return a._emitter.addText(i),a}function $(i,a){a=a||r.languages||Object.keys(t);let h=I(i),E=a.filter(C).filter(Ee).map(R=>P(R,i,!1));E.unshift(h);let w=E.sort((R,S)=>{if(R.relevance!==S.relevance)return S.relevance-R.relevance;if(R.language&&S.language){if(C(R.language).supersetOf===S.language)return 1;if(C(S.language).supersetOf===R.language)return-1}return 0}),[y,D]=w,F=y;return F.secondBest=D,F}function te(i,a,h){let E=a&&n[a]||h;i.classList.add("hljs"),i.classList.add(`language-${E}`)}function ne(i){let a=null,h=O(i);if(u(h))return;if(W("before:highlightElement",{el:i,language:h}),i.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",i);return}if(i.children.length>0&&(r.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("(see the highlight.js security wiki)"),console.warn("The element with unescaped HTML:"),console.warn(i)),r.throwUnescapedHTML))throw new ue("One of your code blocks includes unescaped HTML.",i.innerHTML);a=i;let E=a.textContent,w=h?M(E,{language:h,ignoreIllegals:!0}):$(E);i.innerHTML=w.value,i.dataset.highlighted="yes",te(i,h,w.language),i.result={language:w.language,re:w.relevance,relevance:w.relevance},w.secondBest&&(i.secondBest={language:w.secondBest.language,relevance:w.secondBest.relevance}),W("after:highlightElement",{el:i,result:w,text:E})}function Ye(i){r=Ae(r,i)}let Xe=()=>{m(),H("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function Ze(){m(),H("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let de=!1;function m(){function i(){m()}if(document.readyState==="loading"){de||window.addEventListener("DOMContentLoaded",i,!1),de=!0;return}document.querySelectorAll(r.cssSelector).forEach(ne)}function Je(i,a){let h=null;try{h=a(e)}catch(E){if(L("Language definition for '{}' could not be registered.".replace("{}",i)),d)L(E);else throw E;h=c}h.name||(h.name=i),t[i]=h,h.rawDefinition=a.bind(null,e),h.aliases&&pe(h.aliases,{languageName:i})}function Ve(i){delete t[i];for(let a of Object.keys(n))n[a]===i&&delete n[a]}function Qe(){return Object.keys(t)}function C(i){return i=(i||"").toLowerCase(),t[i]||t[n[i]]}function pe(i,{languageName:a}){typeof i=="string"&&(i=[i]),i.forEach(h=>{n[h.toLowerCase()]=a})}function Ee(i){let a=C(i);return a&&!a.disableAutodetect}function qe(i){i["before:highlightBlock"]&&!i["before:highlightElement"]&&(i["before:highlightElement"]=a=>{i["before:highlightBlock"](Object.assign({block:a.el},a))}),i["after:highlightBlock"]&&!i["after:highlightElement"]&&(i["after:highlightElement"]=a=>{i["after:highlightBlock"](Object.assign({block:a.el},a))})}function et(i){qe(i),l.push(i)}function tt(i){let a=l.indexOf(i);a!==-1&&l.splice(a,1)}function W(i,a){let h=i;l.forEach(function(E){E[h]&&E[h](a)})}function nt(i){return H("10.7.0","highlightBlock will be removed entirely in v12.0"),H("10.7.0","Please use highlightElement now."),ne(i)}Object.assign(e,{highlight:M,highlightAuto:$,highlightAll:m,highlightElement:ne,highlightBlock:nt,configure:Ye,initHighlighting:Xe,initHighlightingOnLoad:Ze,registerLanguage:Je,unregisterLanguage:Ve,listLanguages:Qe,getLanguage:C,registerAliases:pe,autoDetection:Ee,inherit:Ae,addPlugin:et,removePlugin:tt}),e.debugMode=function(){d=!1},e.safeMode=function(){d=!0},e.versionString=cn,e.regex={concat:B,lookahead:De,either:V,optional:wt,anyNumberOfTimes:Ot};for(let i in X)typeof X[i]=="object"&&Ie(X[i]);return Object.assign(e,X),e},U=je({});U.newInstance=()=>je({});Ge.exports=U;U.HighlightJS=U;U.default=U});var me=bt(Ke(),1);var he=me.default;var j="[0-9](_*[0-9])*",q=`\\.(${j})`,ee="[0-9a-fA-F](_*[0-9a-fA-F])*",We={className:"number",variants:[{begin:`(\\b(${j})((${q})|\\.)?|(${q}))[eE][+-]?(${j})[fFdD]?\\b`},{begin:`\\b(${j})((${q})[fFdD]?\\b|\\.([fFdD]\\b)?)`},{begin:`(${q})[fFdD]?\\b`},{begin:`\\b(${j})[fFdD]\\b`},{begin:`\\b0[xX]((${ee})\\.?|(${ee})?\\.(${ee}))[pP][+-]?(${j})[fFdD]?\\b`},{begin:"\\b(0|[1-9](_*[0-9])*)[lL]?\\b"},{begin:`\\b0[xX](${ee})[lL]?\\b`},{begin:"\\b0(_*[0-7])*[lL]?\\b"},{begin:"\\b0[bB][01](_*[01])*[lL]?\\b"}],relevance:0};function Fe(e,t,n){return n===-1?"":e.replace(t,l=>Fe(e,t,n-1))}function ze(e){let t=e.regex,n="[\xC0-\u02B8a-zA-Z_$][\xC0-\u02B8a-zA-Z_$0-9]*",l="(?:(?:\\s*\\[\\s*])+)?",d=n+"<@@@>"+l,c="(?:"+("\\?(?:\\s+(?:extends|super)\\s+"+d+")?")+"|"+d+")",r=Fe("(?:\\s*<\\s*"+c+"(?:\\s*,\\s*"+c+")*\\s*>)?",/<@@@>/g,2),I={keyword:["synchronized","abstract","private","var","static","if","const ","for","while","strictfp","finally","protected","import","native","final","void","enum","else","break","transient","catch","instanceof","volatile","case","assert","package","default","public","try","switch","continue","throws","protected","public","private","module","requires","exports","do","sealed","yield","permits","goto","when"],literal:["false","true","null"],type:["char","boolean","long","float","int","byte","short","double"],built_in:["super","this"]},$={className:"meta",begin:"@"+n,contains:[{begin:/\(/,end:/\)/,contains:["self"]}]},te={className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[e.C_BLOCK_COMMENT_MODE],endsParent:!0};return{name:"Java",aliases:["jsp"],keywords:I,illegal:/<\/|#/,contains:[e.COMMENT("/\\*\\*","\\*/",{relevance:0,contains:[{begin:/\w+@/,relevance:0},{className:"doctag",begin:"@[A-Za-z]+"}]}),{begin:/import java\.[a-z]+\./,keywords:"import",relevance:2},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE,{begin:/"""/,end:/"""/,className:"string",contains:[e.BACKSLASH_ESCAPE]},e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,{match:[/\b(?:class|interface|enum|extends|implements|new)/,/\s+/,n],className:{1:"keyword",3:"title.class"}},{match:/non-sealed/,scope:"keyword"},{beginKeywords:"new throw return else yield assert",relevance:0},{begin:[n,t.concat(r,l,/\s+/),n,l,/\s*/,/=(?!=)/],className:{1:"type",3:"variable",6:"operator"}},{begin:[/record/,/\s+/,n],className:{1:"keyword",3:"title.class"},contains:[te,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},{begin:[n,t.concat(r,l,/\s+/),n,/\s*(?=\()/],className:{1:"type",3:"title.function"},keywords:I,contains:[{className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[$,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,We,e.C_BLOCK_COMMENT_MODE]},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},We,$]}}he.registerLanguage("java",ze);window.hljs=he;})();
+</script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---- 1. syntax highlighting -------------------------------------- */
+  function highlight() {
+    if (!window.hljs) return;
+    var blocks = document.querySelectorAll('pre code.language-java');
+    for (var i = 0; i < blocks.length; i++) {
+      try { window.hljs.highlightElement(blocks[i]); } catch (e) {}
+    }
+  }
+
+  /* ---- 2. every solution / reveal starts closed --------------------- */
+  function closeAll() {
+    var d = document.querySelectorAll('details.soln');
+    for (var i = 0; i < d.length; i++) { d[i].open = false; }
+  }
+
+  /* ---- 3. show all / hide all -------------------------------------- */
+  function wireToolbar() {
+    var show = document.getElementById('showAll');
+    var hide = document.getElementById('hideAll');
+    function setAll(v) {
+      var d = document.querySelectorAll('details.soln');
+      for (var i = 0; i < d.length; i++) { d[i].open = v; }
+    }
+    if (show) show.addEventListener('click', function () { setAll(true); });
+    if (hide) hide.addEventListener('click', function () { setAll(false); });
+  }
+
+  /* ---- 4. live-coding editors -------------------------------------- */
+  var INDENT = '    ';
+
+  function wireEditors() {
+    var eds = document.querySelectorAll('.editor');
+    for (var i = 0; i < eds.length; i++) { wireOne(eds[i]); }
+  }
+
+  function wireOne(box) {
+    var ta = box.querySelector('textarea');
+    if (!ta) return;
+    var starter = ta.value;
+
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Tab' || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+      ev.preventDefault();
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+
+      if (s === e && !ev.shiftKey) {
+        ta.value = v.slice(0, s) + INDENT + v.slice(e);
+        ta.selectionStart = ta.selectionEnd = s + INDENT.length;
+        return;
+      }
+      /* block indent / outdent over the selected lines */
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var le = v.indexOf('\n', e);
+      if (le === -1) le = v.length;
+      var seg = v.slice(ls, le);
+      var lines = seg.split('\n');
+      var delta0 = 0, total = 0;
+
+      for (var i = 0; i < lines.length; i++) {
+        if (ev.shiftKey) {
+          var m = lines[i].match(/^(\t| {1,4})/);
+          if (m) {
+            lines[i] = lines[i].slice(m[0].length);
+            if (i === 0) delta0 = -m[0].length;
+            total -= m[0].length;
+          }
+        } else {
+          lines[i] = INDENT + lines[i];
+          if (i === 0) delta0 = INDENT.length;
+          total += INDENT.length;
+        }
+      }
+      ta.value = v.slice(0, ls) + lines.join('\n') + v.slice(le);
+      ta.selectionStart = Math.max(ls, s + delta0);
+      ta.selectionEnd = Math.max(ta.selectionStart, e + total);
+    });
+
+    /* keep the indent of the current line when Enter is pressed */
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Enter' || ev.shiftKey || ev.ctrlKey || ev.metaKey) return;
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+      if (s !== e) return;
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var lead = (v.slice(ls, s).match(/^[ \t]*/) || [''])[0];
+      var extra = /[{(\[]\s*$/.test(v.slice(ls, s)) ? INDENT : '';
+      if (!lead && !extra) return;
+      ev.preventDefault();
+      var ins = '\n' + lead + extra;
+      ta.value = v.slice(0, s) + ins + v.slice(e);
+      ta.selectionStart = ta.selectionEnd = s + ins.length;
+    });
+
+    var rst = box.querySelector('[data-act="reset"]');
+    if (rst) rst.addEventListener('click', function () {
+      ta.value = starter;
+      ta.focus();
+      flash(box, 'Reset to starter code');
+    });
+
+    var cpy = box.querySelector('[data-act="copy"]');
+    if (cpy) cpy.addEventListener('click', function () {
+      var done = function () { flash(box, 'Copied — paste it into your IDE'); };
+      var fail = function () { flash(box, 'Copy failed — select the text and press Ctrl/Cmd+C'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value).then(done, function () { legacy(ta, done, fail); });
+      } else {
+        legacy(ta, done, fail);
+      }
+    });
+  }
+
+  function legacy(ta, done, fail) {
+    try {
+      var st = ta.selectionStart, en = ta.selectionEnd;
+      ta.select();
+      var ok = document.execCommand('copy');
+      ta.selectionStart = st; ta.selectionEnd = en;
+      ok ? done() : fail();
+    } catch (e) { fail(); }
+  }
+
+  function flash(box, msg) {
+    var f = box.querySelector('.foot');
+    if (!f) return;
+    if (f.getAttribute('data-base') === null || f.getAttribute('data-base') === undefined) {
+      f.setAttribute('data-base', f.textContent);
+    }
+    f.textContent = msg;
+    window.setTimeout(function () { f.textContent = f.getAttribute('data-base'); }, 2200);
+  }
+
+  /* ---- go ----------------------------------------------------------- */
+  function init() {
+    highlight();
+    closeAll();
+    wireToolbar();
+    wireEditors();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  /* belt and braces: some browsers restore <details> state on soft reload */
+  window.addEventListener('pageshow', closeAll);
+})();
+</script>
+</body>
+</html>

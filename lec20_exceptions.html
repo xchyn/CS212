@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class 24 — Exception Handling | CSCI 212</title>
+<style>
+:root{
+  --ink:#0f172a; --ink2:#334155; --muted:#64748b; --line:#e2e8f0;
+  --bg:#ffffff; --bg2:#f8fafc;
+  --obj:#4f46e5; --def:#2563eb; --ex:#059669; --alg:#7c3aed;
+  --key:#b45309; --warn:#dc2626; --qc:#0891b2; --prac:#be185d; --sum:#475569;
+  --edit:#ea580c; --edit-bg:#fff7ed;
+  --code-bg:#0d1117; --code-bd:#000000;   /* read-only listings: black */
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px 80px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:#0f172a;color:#e2e8f0;font-size:13.5px;
+  border-bottom:3px solid var(--obj);
+}
+.topbar .inner{max-width:900px;margin:0 auto;padding:10px 22px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.topbar a{color:#e2e8f0;text-decoration:none;border-bottom:1px solid transparent}
+.topbar a:hover{border-bottom-color:#94a3b8}
+.topbar .course{font-weight:700;letter-spacing:.02em}
+.topbar .sep{color:#475569}
+.topbar .spacer{flex:1}
+
+/* ---------- title block ---------- */
+.titleblock{padding:34px 0 10px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.eyebrow{
+  font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--obj);margin-bottom:8px;
+}
+.titleblock h1{font-size:33px;line-height:1.2;margin:0 0 10px;letter-spacing:-.015em}
+.titleblock .sub{margin:0;color:var(--muted);font-size:17px;line-height:1.5}
+
+h2{
+  font-size:24px;margin:46px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line);letter-spacing:-.01em;scroll-margin-top:14px;
+}
+h2 .num{color:var(--obj);font-weight:800;margin-right:11px}
+h3{font-size:18.5px;margin:30px 0 10px;color:var(--ink)}
+h4{font-size:16px;margin:20px 0 8px;color:var(--ink2)}
+p{margin:12px 0}
+ul,ol{margin:12px 0;padding-left:26px}
+li{margin:6px 0}
+a{color:var(--def)}
+hr{border:0;border-top:1px solid var(--line);margin:30px 0}
+strong{color:var(--ink)}
+.muted{color:var(--muted)}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--bg2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 20px 16px;margin:22px 0;
+}
+.toc .th{
+  font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;
+}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:30px}
+.toc li{margin:3px 0;font-size:14.5px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- show all / hide all ---------- */
+.tools{
+  display:flex;gap:9px;align-items:center;flex-wrap:wrap;
+  padding:11px 15px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:9px;margin:22px 0;font-size:13.5px;
+}
+.tools .lab{font-weight:700;color:var(--ink2)}
+.tools button{
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  background:#fff;color:var(--ink2);border:1px solid #cbd5e1;
+  border-radius:6px;padding:4px 12px;
+}
+.tools button:hover{background:var(--obj);border-color:var(--obj);color:#fff}
+.tools .muted{font-size:12.5px}
+
+/* ---------- boxes ---------- */
+.box{border:1px solid var(--line);border-left:5px solid var(--muted);border-radius:8px;margin:22px 0;overflow:hidden;background:#fff}
+.box>.hd{
+  padding:9px 16px;font-size:12.5px;font-weight:700;
+  letter-spacing:.075em;text-transform:uppercase;color:#fff;background:var(--muted);
+}
+.box>.hd .tag{margin-left:5px;font-weight:500;text-transform:none;letter-spacing:0;opacity:.92;font-size:13px}
+.box>.bd{padding:4px 18px 14px}
+.box>.bd>:first-child{margin-top:12px}
+.box>.bd>:last-child{margin-bottom:2px}
+
+.box.obj{border-left-color:var(--obj)}  .box.obj>.hd{background:var(--obj)}
+.box.def{border-left-color:var(--def)}  .box.def>.hd{background:var(--def)}
+.box.ex{border-left-color:var(--ex)}    .box.ex>.hd{background:var(--ex)}
+.box.alg{border-left-color:var(--alg)}  .box.alg>.hd{background:var(--alg)}
+.box.key{border-left-color:var(--key)}  .box.key>.hd{background:var(--key)}
+.box.warn{border-left-color:var(--warn)}.box.warn>.hd{background:var(--warn)}
+.box.qc{border-left-color:var(--qc)}    .box.qc>.hd{background:var(--qc)}
+.box.prac{border-left-color:var(--prac)}.box.prac>.hd{background:var(--prac)}
+.box.sum{border-left-color:var(--sum)}  .box.sum>.hd{background:var(--sum)}
+
+.box.obj{background:#f5f5ff}
+.box.qc{background:#f0fbfe}
+.box.warn{background:#fff7f7}
+.box.key{background:#fffbf2}
+.box.sum{background:#f8fafc}
+
+/* ---------- code ---------- */
+/* Read-only listings sit on black, matching CSCI 211, so a code block is never
+   mistaken for the editable live-coding box. */
+pre{
+  margin:14px 0;padding:13px 15px;overflow-x:auto;
+  background:var(--code-bg);border:1px solid var(--code-bd);border-radius:8px;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;color:#c9d1d9;
+}
+pre code{font-family:inherit;font-size:inherit;background:none;padding:0;border:0;color:inherit;display:block}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef2f7;
+  border:1px solid #e2e8f0;border-radius:4px;padding:1px 5px;color:#0b3a5b;
+}
+.filename{
+  font-family:var(--mono);font-size:12px;color:#475569;
+  margin:16px 0 -9px;font-weight:600;
+}
+
+/* comparison block: another language, never syntax-highlighted. Dark like the
+   Java listings, but desaturated and dashed so it reads as "not this course". */
+pre.cmp{background:#161b22;border-style:dashed;border-color:#3f4650;color:#9aa4b2}
+pre.cmp code{color:#9aa4b2}
+
+/* shell commands you type */
+pre.sh{background:#1e293b;border-color:#1e293b;color:#e2e8f0;position:relative;padding-top:26px}
+pre.sh code{color:#e2e8f0}
+pre.sh::before{
+  content:"Terminal";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#86efac;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* output / terminal blocks */
+pre.out{background:#111d33;border-color:#111d33;color:#e2e8f0;position:relative;padding-top:26px}
+pre.out code{color:#e2e8f0}
+pre.out::before{
+  content:"Output";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#7dd3fc;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+pre.err{background:#1f1416;border-color:#7f1d1d;color:#fecdd3;padding-top:26px;position:relative}
+pre.err code{color:#fecdd3}
+pre.err::before{
+  content:"Compiler message";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#fda4af;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* ---- highlight.js, GitHub-dark palette (hand-written, no external file) ---- */
+.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-template-tag,
+.hljs-template-variable,.hljs-type,.hljs-variable.language_{color:#ff7b72}
+.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#d2a8ff}
+.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,
+.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable{color:#79c0ff}
+.hljs-meta .hljs-string,.hljs-regexp,.hljs-string{color:#a5d6ff}
+.hljs-built_in,.hljs-symbol{color:#ffa657}
+.hljs-code,.hljs-comment,.hljs-formula{color:#8b949e;font-style:italic}
+.hljs-name,.hljs-quote,.hljs-selector-pseudo,.hljs-selector-tag{color:#7ee787}
+.hljs-subst{color:#c9d1d9}
+.hljs-section{color:#1f6feb;font-weight:700}
+.hljs-bullet{color:#f2cc60}
+.hljs-emphasis{color:#c9d1d9;font-style:italic}
+.hljs-strong{color:#c9d1d9;font-weight:700}
+
+/* ---------- trace tables ---------- */
+table{border-collapse:collapse;margin:16px 0;font-size:14px;width:100%}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg2);font-weight:700;font-size:13px}
+table.trace td:first-child,table.trace th:first-child{white-space:nowrap}
+table code{font-size:.88em}
+
+/* ---------- multi-part questions ---------- */
+.part{margin:16px 0;padding-left:14px;border-left:2px solid #cbd5e1}
+.part .q{margin:0 0 8px}
+.part .pl{font-weight:700;color:var(--qc);margin-right:6px}
+
+/* ---------- collapsible solutions ---------- */
+details.soln{margin:10px 0 4px}
+details.soln>summary{
+  list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  font-size:12.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:#fff;background:var(--sum);border-radius:6px;padding:5px 13px;
+  user-select:none;
+}
+details.soln>summary::-webkit-details-marker{display:none}
+details.soln>summary::before{content:"\25B6";font-size:9px;transition:transform .15s}
+details.soln[open]>summary::before{transform:rotate(90deg)}
+details.soln>summary::after{content:"Show Answer"}
+details.soln[open]>summary::after{content:"Hide Answer"}
+details.soln>summary:hover{filter:brightness(1.18)}
+
+details.soln.reveal>summary{background:var(--ex)}
+details.soln.reveal>summary::after{content:"Show Output & Explanation"}
+details.soln.reveal[open]>summary::after{content:"Hide Output & Explanation"}
+details.soln.reveal.noout>summary::after{content:"Show Explanation"}
+details.soln.reveal.noout[open]>summary::after{content:"Hide Explanation"}
+
+.ans{
+  margin-top:11px;padding:2px 16px 10px;background:#fff;
+  border:1px solid var(--line);border-left:3px solid var(--sum);border-radius:7px;
+}
+details.soln.reveal .ans{border-left-color:var(--ex)}
+.ans>:first-child{margin-top:12px}
+.ans>:last-child{margin-bottom:6px}
+
+/* ---------- live coding editor ---------- */
+.editor{
+  margin:18px 0;border:2px dashed var(--edit);border-radius:9px;
+  background:var(--edit-bg);overflow:hidden;
+}
+.editor .ehd{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:7px 13px;background:var(--edit);color:#fff;
+  font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+}
+.editor .ehd .etitle{flex:1}
+.editor .ehd button{
+  font:inherit;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  cursor:pointer;background:rgba(255,255,255,.16);color:#fff;
+  border:1px solid rgba(255,255,255,.5);border-radius:5px;padding:3px 10px;
+}
+.editor .ehd button:hover{background:#fff;color:var(--edit)}
+.editor textarea{
+  display:block;width:100%;border:0;outline:0;resize:vertical;
+  padding:12px 15px;background:var(--edit-bg);color:#431407;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;
+  tab-size:4;-moz-tab-size:4;min-height:150px;
+}
+.editor textarea:focus{background:#fff}
+.editor .foot{
+  padding:5px 13px 7px;font-size:11.5px;color:#9a3412;background:#ffedd5;
+  border-top:1px solid #fed7aa;
+}
+
+/* ---------- prev/next nav ---------- */
+.pagenav{display:flex;gap:14px;margin:52px 0 0;flex-wrap:wrap}
+.pagenav a,.pagenav span.disabled{
+  flex:1 1 260px;display:block;text-decoration:none;
+  border:1px solid var(--line);border-radius:9px;padding:12px 16px;background:#fff;
+}
+.pagenav a:hover{border-color:var(--obj);background:var(--bg2)}
+.pagenav .dir{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.pagenav .ttl{font-size:15px;font-weight:600;color:var(--ink);margin-top:3px}
+.pagenav .next{text-align:right}
+.pagenav span.disabled{opacity:.4}
+.pagenav span.disabled .ttl{color:var(--muted)}
+
+footer.pf{
+  margin-top:40px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--muted);text-align:center;
+}
+
+/* ---------- index page ---------- */
+table.sched{font-size:14.5px}
+table.sched th{background:#0f172a;color:#fff;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+table.sched td:first-child{white-space:nowrap;font-weight:700;color:var(--muted);width:60px}
+table.sched tr.examrow td{background:#fff1f2}
+table.sched tr.revrow td{background:#fffbeb}
+table.sched a{font-weight:600;text-decoration:none}
+table.sched a:hover{text-decoration:underline}
+
+
+/* ---------- release gating ---------- */
+.pending{
+  margin-top:4px;font-size:11.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:#b45309;
+}
+.pagenav span.disabled .pending{color:#b45309}
+table.sched tr.pendingrow td{background:#fcfcfd}
+table.sched .unrel{color:var(--muted)}
+table.sched .pending{display:block;margin-top:2px}
+table.sched td.cn{white-space:nowrap;width:52px;font-weight:700;color:var(--muted)}
+table.sched td.dt{white-space:nowrap;width:104px;color:var(--muted);font-size:13.5px}
+table.sched tr.offrow td{background:#f1f5f9;color:var(--muted);font-style:italic}
+.refcard{
+  display:block;text-decoration:none;border:1px solid var(--line);
+  border-left:5px solid var(--alg);border-radius:9px;padding:13px 17px;
+  margin:22px 0;background:#faf9ff;
+}
+.refcard:hover{background:#f5f3ff;border-color:var(--alg)}
+.refcard .rl{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--alg)}
+.refcard .rt{font-size:16px;font-weight:600;color:var(--ink);margin-top:3px}
+.refcard .rd{font-size:14px;color:var(--muted);margin-top:4px}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,.tools,.pagenav,.pending{display:none !important}
+  html,body{width:100%;font-size:10pt}
+  .wrap{max-width:100%;width:100%;padding:0}
+  /* a wide <pre> must wrap rather than widen the page and clip every other
+     element at the paper edge */
+  /* Screen shows code on black; paper does not. Restore a dark-on-light palette
+     for print only, or the dark theme's light tokens vanish on white. */
+  pre{white-space:pre-wrap;overflow:visible;overflow-wrap:anywhere;font-size:8.6pt;
+      background:#f8fafc !important;color:#24292e !important;border-color:#cbd5e1 !important;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  pre code{color:#24292e !important}
+  pre.cmp{background:#fff !important;color:#475569 !important;border-color:#94a3b8 !important}
+  pre.cmp code{color:#475569 !important}
+  pre .hljs-doctag,pre .hljs-keyword,pre .hljs-meta .hljs-keyword,pre .hljs-template-tag,
+  pre .hljs-template-variable,pre .hljs-type,pre .hljs-variable.language_{color:#d73a49 !important}
+  pre .hljs-title,pre .hljs-title.class_,pre .hljs-title.class_.inherited__,
+  pre .hljs-title.function_{color:#6f42c1 !important}
+  pre .hljs-attr,pre .hljs-attribute,pre .hljs-literal,pre .hljs-meta,pre .hljs-number,
+  pre .hljs-operator,pre .hljs-selector-attr,pre .hljs-selector-class,pre .hljs-selector-id,
+  pre .hljs-variable{color:#005cc5 !important}
+  pre .hljs-meta .hljs-string,pre .hljs-regexp,pre .hljs-string{color:#032f62 !important}
+  pre .hljs-built_in,pre .hljs-symbol{color:#e36209 !important}
+  pre .hljs-code,pre .hljs-comment,pre .hljs-formula{color:#6a737d !important}
+  pre .hljs-name,pre .hljs-quote,pre .hljs-selector-pseudo,
+  pre .hljs-selector-tag{color:#22863a !important}
+  pre .hljs-subst,pre .hljs-emphasis,pre .hljs-strong{color:#24292e !important}
+  .filename{color:#475569 !important}
+  table{table-layout:fixed;width:100%;word-wrap:break-word;overflow-wrap:anywhere}
+  .box,.toc{max-width:100%}
+  a{color:var(--ink);text-decoration:none}
+  .box,.part,pre,table,.editor{break-inside:avoid;page-break-inside:avoid}
+  h2{break-after:avoid;page-break-after:avoid}
+  details.soln>summary{display:none !important}
+  details.soln:not([open])>.ans{display:none !important}
+  details.soln::before{
+    content:"Answer withheld — see the online notes.";
+    display:block;font-size:9pt;font-style:italic;color:#64748b;margin:6px 0;
+  }
+  details.soln[open]::before{content:""}
+  .editor textarea{display:none !important}
+  .editor{border:1.5px solid #fdba74 !important;background:#fff;border-style:solid}
+  .editor .ehd{background:#fff !important;color:#9a3412 !important;border-bottom:1px solid #fdba74}
+  .editor .ehd button{display:none}
+  .editor .foot{display:none}
+  .editor::after{content:"";display:block;height:2.1in;background:#fff}
+  pre.out,pre.sh{background:#f1f5f9 !important;color:#0f172a !important;border-color:#94a3b8 !important}
+  pre.err{background:#fef2f2 !important;color:#7f1d1d !important;border-color:#fca5a5 !important}
+  pre.out code,pre.sh code{color:#0f172a !important}
+  pre.err code{color:#7f1d1d !important}
+  pre.out::before,pre.sh::before{color:#475569}
+  pre.err::before{color:#b91c1c}
+  .box>.hd{color:#000;background:#fff !important;border-bottom:1px solid #cbd5e1}
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="inner">
+<span class="course">CSCI 212</span>
+<span class="sep">|</span>
+<a href="index.html">Course index</a>
+<span class="sep">|</span>
+<span>Class 24 of 28</span>
+<span class="sep">|</span>
+<span>Tuesday, November 24</span>
+<span class="spacer"></span>
+<span>Queens College, CUNY</span>
+</div></div>
+<div class="wrap">
+<div class="titleblock">
+  <div class="eyebrow">Session 24 &middot; Lecture 20</div>
+  <h1>Exception Handling</h1>
+  <p class="sub">What Java does when something goes wrong, and how you take control of it instead of watching the program die.</p>
+</div>
+
+<div class="box obj">
+  <div class="hd">Learning Objectives</div>
+  <div class="bd">
+    <p>By the end of today's session you should be able to:</p>
+    <ol>
+      <li>Say what an exception <em>is</em> &mdash; an object, thrown at the point of failure &mdash; and explain why Java uses one instead of returning an error code.</li>
+      <li>Read a stack trace and name the method that failed, the method that called it, and where the program stopped.</li>
+      <li>Wrap risky code in a <code>try</code> block and handle the failure in a <code>catch</code> block, so the program keeps running.</li> <li>Place <code>Throwable</code>, <code>Error</code>, <code>Exception</code> and <code>RuntimeException</code> correctly in the hierarchy, and decide from that whether an exception is checked or unchecked.</li> <li>Use <code>throw</code> to raise an exception yourself and <code>throws</code> to declare that a method may pass one on &mdash; and say which is which without hesitating.</li> <li>Write several <code>catch</code> blocks for one <code>try</code>, and order them so the file compiles.</li> <li>Write your own exception class by extending <code>Exception</code>, with a constructor that takes a message, and read that message back with <code>getMessage()</code>.</li> <li>Say exactly when a <code>finally</code> block runs, including when the <code>try</code> block executes a <code>return</code>.</li> <li>Go back to the file reading of Lecture 5, the arrays of Lecture 3 and the text fields of Lecture 17, and make each one survive bad input.</li> </ol> </div> </div> <div class="toc"> <div class="th">On this page</div> <ol> <li><a href="#s1">What an exception is</a></li> <li><a href="#s2"><code>try</code> and <code>catch</code></a></li> <li><a href="#s3">The hierarchy: checked and unchecked</a></li> <li><a href="#s4"><code>throw</code> and <code>throws</code></a></li> <li><a href="#s5">Several catch blocks, and the ordering rule</a></li> <li><a href="#s6">Writing your own exception class</a></li> <li><a href="#s7"><code>finally</code></a></li> <li><a href="#s8">Going back and fixing three earlier lectures</a></li> <li><a href="#prac">Practice Problems</a></li> <li><a href="#summary">Lecture Summary</a></li> </ol> </div> <div class="tools"> <span class="lab">Answers</span> <button id="showAll" type="button">Show all</button> <button id="hideAll" type="button">Hide all</button> <span class="muted">&mdash; every worked-example output and every solution is hidden when the page loads. Work it out first, then reveal.</span> </div> <hr> <h2 id="s1"><span class="num">1.</span>What an exception is</h2> <p>Exam 2 is behind you. It closed out the parking-ticket case study, inheritance, polymorphism, abstract classes and interfaces, and the five GUI lectures. Everything from today onward is new material and it is all on the final: exceptions today, then linked lists, stacks and queues, then generics, then iterators and threads.</p> <p>Today's topic is the one that has been hanging over the whole course. You have already seen programs die. In Lecture 3 an array index past the end killed one. In Lecture 6 an <code>ArrayList</code> did the same. In Lecture 17 a user typed <code>twenty</code> into a text field and <code>Integer.parseInt</code> gave up. Every one of those lectures said the same thing: <em>we will explain this properly in Lecture 20</em>. This is Lecture 20.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; exception</span></div> <div class="bd"> <p>An <strong>exception</strong> is an event that occurs during execution and disrupts the normal flow of instructions. Concretely, it is an <strong>object</strong> &mdash; an instance of a class such as <code>NumberFormatException</code> &mdash; that carries a description of what went wrong.</p> <p>When a method cannot do its job, it creates one of these objects and <strong>throws</strong> it. Throwing stops that method immediately. The object then travels back up the chain of callers looking for someone who has said "I will deal with that kind of problem." If nobody has, the program stops and prints the object's description.</p> </div> </div> <p>Compare that with what you would have done in C++, or in Java before this lecture: return a special value. A method that reads an age returns &minus;1 for "the user typed nonsense." That approach has three problems, and exceptions fix all three.</p> <table> <tr><th>Returning an error code</th><th>Throwing an exception</th></tr> <tr><td>The caller has to remember to check. Nothing forces it.</td><td>An unhandled exception is impossible to ignore &mdash; the program stops.</td></tr> <tr><td>You have to invent a value that cannot be a real answer. For a method returning a <code>double</code>, there may not be one.</td><td>The exception is a separate channel. Every legal <code>double</code> stays available as a real answer.</td></tr> <tr><td>Error handling is tangled into the normal path: every call site grows an <code>if</code>.</td><td>The normal path reads straight down inside <code>try</code>; all the error handling collects in one <code>catch</code>.</td></tr> <tr><td>The error code says only "it failed." </td><td>The exception object carries a message, a type, and the exact call stack it came from.</td></tr> </table> <div class="box key"> <div class="hd">Key Idea</div> <div class="bd"> <p>An exception separates <em>detecting</em> a problem from <em>deciding what to do about it</em>. The method that discovers the trouble usually has no idea what the right response is &mdash; <code>Integer.parseInt</code> cannot know whether your program should reprompt, use a default, or quit. So it throws, and the code that <em>does</em> know catches.</p> </div> </div> <p>Here is the starting point for the whole lecture: the instructor's Example 1, a five-round loop that asks for an age. It has no error handling at all.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; a program with no defences</span></div> <div class="bd"> <p>The loop is supposed to run five times. In the session below the user types <code>21</code>, then <code>twenty</code>, then <code>30</code>. Before you reveal: how many of those three answers does the program manage to process?</p> <p class="filename">Example1.java</p>
+<pre><code class="language-java">import java.util.Scanner;
+
+public class Example1 {
+   public static void main(String args[]) {
+      Scanner screen = new Scanner(System.in);
+      for (int i = 0; i &lt; 5; i++) {
+         System.out.print("How old are you? ");
+         String ageString = screen.next();
+         int age = Integer.parseInt(ageString);
+         System.out.println("You are " + age + " years old.");
+      }
+   }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>How old are you? 21 You are 21 years old. How old are you? twenty
+Exception in thread "main" java.lang.NumberFormatException: For input string: "twenty" at java.base/java.lang.NumberFormatException.forInputString(NumberFormatException.java:67) at java.base/java.lang.Integer.parseInt(Integer.java:662) at java.base/java.lang.Integer.parseInt(Integer.java:778)
+	at Example1.main(Example1.java:9)</code></pre> <p>One. The user never even got asked the third question, and the remaining three rounds of the loop never happened. <code>Integer.parseInt("twenty")</code> had no <code>int</code> it could honestly return, so it threw a <code>NumberFormatException</code>. Nothing in <code>main</code> was prepared to catch it, so <code>main</code> stopped too, and when <code>main</code> stops the program is over.</p> <p>That block of <code>at ...</code> lines is a <strong>stack trace</strong>, and it is a gift, not a scolding. Read it from the <em>bottom</em> up:</p> <table class="trace"> <tr><th>Line</th><th>What it says</th></tr> <tr><td><code>at Example1.main(Example1.java:9)</code></td><td>Your code. Line 9 of <code>Example1.java</code> &mdash; the <code>Integer.parseInt</code> call. <strong>This is the line to go and look at.</strong></td></tr> <tr><td><code>at java.base/...Integer.parseInt(Integer.java:778)</code></td><td>Inside the library: the one-argument <code>parseInt</code> you called.</td></tr> <tr><td><code>at java.base/...Integer.parseInt(Integer.java:662)</code></td><td>It called a two-argument version.</td></tr> <tr><td><code>at java.base/...forInputString(...)</code></td><td>Which built the exception object. This is where the throw happened.</td></tr> <tr><td><code>Exception in thread "main" java.lang.NumberFormatException: For input string: "twenty"</code></td><td>The top line: the <em>type</em> of the exception, then a colon, then its <em>message</em>. The message even quotes the text that caused it.</td></tr> </table> <p>The line numbers inside <code>Integer.java</code> come from the particular Java release installed on the machine, so yours may differ by a few. The bottom line &mdash; the one naming <em>your</em> file &mdash; is the one that matters, and it is reliable.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 20.1</div> <div class="bd"> <p>A method <code>level2</code> divides by zero. It was called by <code>level1</code>, which was called by <code>main</code>. Nobody handles anything.</p> <pre><code class="language-java">public class PropagateNoCatch {
+    public static void main(String args[]) {
+        System.out.println("main: starting");
+        level1();
+        System.out.println("main: this line never runs");
+    }
+
+    static void level1() {
+        System.out.println("  level1: about to call level2");
+        level2();
+    }
+
+    static void level2() {
+        System.out.println("    level2: about to divide");
+        int bad = 10 / 0;
+        System.out.println("    level2: never runs " + bad);
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> Which of the five <code>println</code> calls actually produce output?</p> <details class="soln"><summary></summary><div class="ans"> <p>The first three, in the order written. The moment <code>10 / 0</code> is evaluated, <code>level2</code> stops &mdash; so its last <code>println</code> never runs. <code>level1</code> had nothing left to do anyway, but had it contained more statements they would have been skipped as well, because the exception passes straight through any method that does not catch it. Then <code>main</code> stops, so its last line never runs either.</p> <pre class="out"><code>main: starting
+  level1: about to call level2
+    level2: about to divide</code></pre> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Sketch the stack trace you expect, then compare with the real one.</p> <details class="soln"><summary></summary><div class="ans"> <p>Three <code>at</code> lines, innermost first &mdash; <code>level2</code>, then <code>level1</code>, then <code>main</code> &mdash; because that is the order in which the calls are stacked up:</p> <pre class="out"><code>Exception in thread "main" java.lang.ArithmeticException: / by zero
+	at PropagateNoCatch.level2(PropagateNoCatch.java:15)
+	at PropagateNoCatch.level1(PropagateNoCatch.java:10)
+	at PropagateNoCatch.main(PropagateNoCatch.java:4)</code></pre> <p><strong>Things to notice across both parts.</strong> A stack trace is a photograph of the call stack at the instant of the throw. Every <code>at</code> line is one frame: who was in the middle of calling whom. Because all three frames here are your own classes, all three line numbers are worth reading; in the Example 1 trace, three of the four frames were library code and only the last one told you anything actionable.</p> <p>The exception type is <code>ArithmeticException</code> and the message is the terse <code>/ by zero</code>. Hold on to that &mdash; &sect;3 shows that the same division written with <code>double</code> values does not throw at all.</p> </div></details> </div> </div> </div> <h2 id="s2"><span class="num">2.</span><code>try</code> and <code>catch</code></h2> <p>An exception you never handle is just a crash with better diagnostics. The point of the mechanism is that you <em>can</em> handle it.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; try and catch</span></div> <div class="bd"> <p>A <strong><code>try</code> block</strong> encloses code that might throw. A <strong><code>catch</code> block</strong> follows it and names one type of exception plus a variable to hold the thrown object:</p> <pre><code class="language-java">try {
+    // code that might throw } catch (SomeException e) { // what to do about it }</code></pre> <p>If nothing is thrown, the <code>try</code> block runs to the end and the <code>catch</code> block is skipped entirely. If something <em>is</em> thrown, the rest of the <code>try</code> block is abandoned, the thrown object is bound to <code>e</code>, the <code>catch</code> block runs, and execution then continues with whatever follows the whole <code>try</code>/<code>catch</code>. The program does not stop.</p> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; the rest of the try block is abandoned</span></div> <div class="bd"> <p>A <code>catch</code> does not resume where the throw happened. There is no "try that line again" in Java. If your <code>try</code> block is</p> <pre><code class="language-java">try {
+    int age = Integer.parseInt(text);
+    // throws here System.out.println("You are " + age);  // skipped total = total + age;                   // skipped } catch (NumberFormatException e) { System.out.println("not a number"); }</code></pre> <p>then <em>both</em> later statements are skipped, and <code>age</code> does not exist outside the block at all. Keep <code>try</code> blocks small and put only the risky work and the work that depends on it inside.</p> </div> </div> <p>Here is the instructor's Example 2. Two things changed from Example 1: the parsing moved into a helper method <code>readAgeFrom</code>, and the call to it is wrapped in a <code>try</code>.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the same program, now unkillable</span></div> <div class="bd"> <p>The user types <code>21</code>, <code>twenty</code>, <code>30</code>, <code>five</code>, <code>44</code> &mdash; five answers, two of them nonsense. Before you reveal: how many times does the loop run, and how many times is the user asked a question?</p> <p class="filename">Example2.java</p>
+<pre><code class="language-java">import java.util.Scanner;
+
+public class Example2 {
+   public static void main(String args[]) {
+      Scanner screen = new Scanner(System.in);
+      for (int i = 0; i &lt; 5; i++) {
+         System.out.print("How old are you? ");
+         try {
+            int age = readAgeFrom(screen);
+            System.out.println("You are " + age + " years old.");
+         } catch (Exception e) {
+            System.out.println("Your age must be an integer!");
+         }
+      }
+   }
+
+   private static int readAgeFrom(Scanner screen) {
+      String s = screen.next();
+      return Integer.parseInt(s);
+   }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>How old are you? 21 You are 21 years old. How old are you? twenty Your age must be an integer! How old are you? 30 You are 30 years old. How old are you? five Your age must be an integer! How old are you? 44 You are 44 years old. </code></pre> <p>All five rounds, all five questions. The exception is still thrown &mdash; deep inside <code>Integer.parseInt</code>, exactly as before &mdash; but now it does not get past <code>main</code>. It stops <code>parseInt</code>, stops <code>readAgeFrom</code>, and reaches the <code>try</code> in <code>main</code>, which was waiting for it.</p> <p>Three details worth pinning down:</p> <ul> <li><strong>The prompt is outside the <code>try</code>.</strong> It has to be: it cannot fail, and it must happen on every round whatever happened last round.</li> <li><strong><code>readAgeFrom</code> has no error handling of its own</strong>, and it does not need any. It just lets the exception pass through. That is the whole benefit of the mechanism &mdash; the method that detects a problem and the method that handles it can be far apart, with plain, uncluttered code in between.</li> <li><strong><code>catch (Exception e)</code> catches almost everything.</strong> That is convenient here and dangerous in general; &sect;3 and &sect;5 explain why, and Example 3 in &sect;4 shows the bug it hides.</li> </ul> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 20.2</div> <div class="bd"> <p>Take Example 2 and make it count. Rewrite <code>main</code> so that it still asks five times, but at the end it prints how many valid ages it got and how many it rejected. The loop must still run exactly five times.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Two counters declared before the loop. The <code>good++</code> goes at the end of the <code>try</code> block &mdash; it must be somewhere that only runs when nothing was thrown &mdash; and <code>bad++</code> goes inside the <code>catch</code>. Do not try to be clever and put <code>good++</code> after the whole <code>try</code>/<code>catch</code>; that runs on both paths.</p> <p class="filename">CountAges.java</p>
+<pre><code class="language-java">import java.util.Scanner;
+
+public class CountAges {
+    public static void main(String args[]) {
+        Scanner screen = new Scanner(System.in);
+        int good = 0, bad = 0;
+
+        for (int i = 0; i &lt; 5; i++) {
+            System.out.print("How old are you? ");
+            try {
+                int age = readAgeFrom(screen);
+                System.out.println("You are " + age + " years old.");
+                good++;
+            } catch (Exception e) {
+                System.out.println("Your age must be an integer!");
+                bad++;
+            }
+        }
+
+        System.out.println("Accepted " + good + ", rejected " + bad + ".");
+    }
+
+    private static int readAgeFrom(Scanner screen) {
+        String s = screen.next();
+        return Integer.parseInt(s);
+    }
+}</code></pre> <p>Run with the same five answers &mdash; <code>21</code>, <code>twenty</code>, <code>30</code>, <code>five</code>, <code>44</code>:</p> <pre class="out"><code>How old are you? 21 You are 21 years old. How old are you? twenty Your age must be an integer! How old are you? 30 You are 30 years old. How old are you? five Your age must be an integer! How old are you? 44 You are 44 years old. Accepted 3, rejected 2. </code></pre> <p><strong>Things to notice.</strong> Where you put <code>good++</code> inside the <code>try</code> matters. If you had written it <em>before</em> <code>readAgeFrom</code>, it would count attempts, not successes, because the increment would already have happened when the throw arrived. Statements after the throwing call are skipped; statements before it are not undone. An exception is not a rollback.</p> <p>Both counters have to be declared outside the loop, and <code>age</code> cannot be: a variable declared inside a <code>try</code> block dies at the closing brace, which is one more reason to keep those blocks small.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 20.2</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="7" aria-label="Live coding - Quick Check 20.2">import java.util.Scanner;
+public class CountAges {
+    public static void main(String args[]) {
+        Scanner screen = new Scanner(System.in);
+        // 1. Declare two counters here. for (int i = 0; i &lt; 5; i++) { System.out.print("How old are you? "); try { int age = readAgeFrom(screen); System.out.println("You are " + age + " years old."); // 2. Count a success. } catch (Exception e) { System.out.println("Your age must be an integer!"); // 3. Count a failure. } } // 4. Print both totals. } private static int readAgeFrom(Scanner screen) { String s = screen.next(); return Integer.parseInt(s); } }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s3"><span class="num">3.</span>The hierarchy: checked and unchecked</h2> <p><code>catch (Exception e)</code> caught a <code>NumberFormatException</code> in Example 2. That is not a coincidence, and it is not special-case magic in the compiler. It is inheritance &mdash; Lecture 12 &mdash; doing exactly what you would expect. Every exception class in Java sits in one big family tree, and a <code>catch</code> clause catches its named type <em>and every subclass of it</em>.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; Throwable, Error, Exception, RuntimeException</span></div> <div class="bd"> <p><strong><code>Throwable</code></strong> is the root. Only an object of a class descended from <code>Throwable</code> can appear after <code>throw</code> or in a <code>catch</code> clause. It has two direct subclasses:</p> <ul> <li><strong><code>Error</code></strong> &mdash; serious trouble in the JVM itself, such as <code>OutOfMemoryError</code> or <code>StackOverflowError</code>. Your program is not expected to recover from these, and you should not try to catch them.</li> <li><strong><code>Exception</code></strong> &mdash; conditions an application might reasonably want to catch. This is the branch you live in.</li> </ul> <p>Inside <code>Exception</code> there is one subclass with a special status: <strong><code>RuntimeException</code></strong>. It and everything below it is treated differently by the compiler, which is the subject of the rest of this section.</p> </div> </div> <p>Here is the part of the tree you will actually meet this semester. Every name in it has already appeared in this course except <code>IOException</code>.</p> <p class="filename">The exception hierarchy &mdash; the part that matters for CSCI 212</p>
+<pre class="cmp"><code>Object | +-- Throwable | +-- Error  .......................................... unchecked, do not catch |     +-- OutOfMemoryError |     +-- StackOverflowError | +-- Exception ....................................... CHECKED | +-- IOException |     +-- FileNotFoundException                 &lt;- Lecture 5 | +-- ClassNotFoundException | +-- (any class you write that extends Exception) &lt;- AgeException, section 6 | +-- RuntimeException .......................... UNCHECKED from here down | +-- ArithmeticException                   &lt;- 7 / 0 +-- NullPointerException                  &lt;- Lecture 8 +-- ClassCastException                    &lt;- Lecture 13 | +-- IllegalArgumentException |     +-- NumberFormatException           &lt;- Lecture 17 | +-- IndexOutOfBoundsException             &lt;- Lecture 6 +-- ArrayIndexOutOfBoundsException  &lt;- Lecture 3 +-- StringIndexOutOfBoundsException &lt;- Lecture 4 </code></pre> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; the one line that decides everything</span></div> <div class="bd"> <p>Draw a line under <code>RuntimeException</code>. Everything on or below that line is <strong>unchecked</strong>. Everything else under <code>Exception</code> is <strong>checked</strong>.</p> <ul> <li><strong>Checked</strong>: the compiler forces you to deal with it. Either catch it, or write <code>throws</code> on your method and make it someone else's problem. Nothing else compiles.</li> <li><strong>Unchecked</strong>: the compiler says nothing. You may catch it if you want to; you are never made to.</li> </ul> </div> </div> <p>Why the split? Because the two kinds have different causes. A checked exception describes something that can go wrong <em>even though your code is perfect</em>: the file really might not be there, the network really might be down. An unchecked exception almost always means your code has a bug &mdash; you indexed past the end, you dereferenced a null, you divided by zero. Java's position is that the first kind deserves a mandatory plan and the second kind deserves a fix, not a <code>catch</code>.</p> <table> <tr><th></th><th>Checked</th><th>Unchecked</th></tr> <tr><td>Where in the tree</td><td>Under <code>Exception</code>, but <em>not</em> under <code>RuntimeException</code></td><td>Under <code>RuntimeException</code> (and under <code>Error</code>)</td></tr> <tr><td>Compiler requires action?</td><td>Yes &mdash; catch it or declare <code>throws</code></td><td>No</td></tr> <tr><td>Usually means</td><td>The outside world did not cooperate</td><td>A bug in your program</td></tr> <tr><td>Examples in this course</td><td><code>IOException</code>, <code>FileNotFoundException</code>, <code>ClassNotFoundException</code>, and any class you write that extends <code>Exception</code></td><td><code>NullPointerException</code>, <code>ArrayIndexOutOfBoundsException</code>, <code>IndexOutOfBoundsException</code>, <code>NumberFormatException</code>, <code>ArithmeticException</code>, <code>ClassCastException</code></td></tr> </table> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the five unchecked exceptions you will meet</span></div> <div class="bd"> <p>Five separate mistakes, one per branch of <code>trouble</code>, all caught by a single <code>catch (RuntimeException e)</code> because all five types descend from it. <code>getClass().getSimpleName()</code> prints the exception's class name, so you can see which one arrived. Before you reveal: name the five exception types from the code alone.</p> <p class="filename">UncheckedTour.java</p>
+<pre><code class="language-java">public class UncheckedTour {
+    static String name = null;              // never assigned
+
+    public static void main(String args[]) {
+        for (int i = 0; i &lt; 5; i++) {
+            try {
+                trouble(i);
+            } catch (RuntimeException e) {
+                System.out.println(e.getClass().getSimpleName());
+                System.out.println("    message: " + e.getMessage());
+            }
+        }
+    }
+
+    static void trouble(int which) {
+        if (which == 0) {
+            System.out.println(name.length());
+        } else if (which == 1) {
+            int[] a = new int[3];
+            System.out.println(a[5]);
+        } else if (which == 2) {
+            System.out.println(Integer.parseInt("twenty"));
+        } else if (which == 3) {
+            System.out.println(10 / (which - 3));
+        } else {
+            Object o = "a String";
+            Integer n = (Integer) o;
+            System.out.println(n);
+        }
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>NullPointerException
+    message: Cannot invoke "String.length()" because "UncheckedTour.name" is null
+ArrayIndexOutOfBoundsException
+    message: Index 5 out of bounds for length 3
+NumberFormatException
+    message: For input string: "twenty"
+ArithmeticException
+    message: / by zero
+ClassCastException
+    message: class java.lang.String cannot be cast to class java.lang.Integer (java.lang.String and java.lang.Integer are in module java.base of loader 'bootstrap')</code></pre> <table class="trace"> <tr><th>Exception</th><th>Cause</th><th>Where you have already met it</th></tr> <tr><td><code>NullPointerException</code></td><td>Calling a method on a reference that is <code>null</code></td><td>Lecture 8, the uninitialized object reference</td></tr> <tr><td><code>ArrayIndexOutOfBoundsException</code></td><td>An array index outside <code>0 .. length-1</code></td><td>Lecture 3</td></tr> <tr><td><code>NumberFormatException</code></td><td>Text that is not a number handed to <code>parseInt</code></td><td>Lecture 17, the GUI text field</td></tr> <tr><td><code>ArithmeticException</code></td><td>Integer division or <code>%</code> by zero</td><td>Lecture 1, and again below</td></tr> <tr><td><code>ClassCastException</code></td><td>Casting a reference to a type the object is not</td><td>Lecture 13, downcasting a <code>Shape</code></td></tr> </table> <p>Not one of these five needed a <code>throws</code> clause anywhere, and <code>trouble</code> declares none. That is what "unchecked" buys you &mdash; and also what it costs you, because nothing warned you they were possible.</p> <p>Notice how good the messages are. <code>Index 5 out of bounds for length 3</code> tells you both numbers. The <code>NullPointerException</code> message even names the variable that was null. Read them; they are usually enough to fix the bug without a debugger.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 20.3</div> <div class="bd"> <p>For each situation, name the exception type and say whether it is checked or unchecked.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>new Scanner(new File("grades.txt"))</code> where <code>grades.txt</code> does not exist.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>FileNotFoundException</code>, and it is <strong>checked</strong> &mdash; it descends from <code>IOException</code>, which is under <code>Exception</code> but not under <code>RuntimeException</code>. This is precisely why every file program in Lecture 5 had <code>throws FileNotFoundException</code> written on <code>main</code>. You now know what that clause was doing.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>String s = list.get(7);</code> on an <code>ArrayList</code> of size 3.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>IndexOutOfBoundsException</code>, <strong>unchecked</strong>. It is under <code>RuntimeException</code>. The compiler will not mention it, and no <code>throws</code> clause is needed &mdash; which is why the Lecture 6 program that did this compiled perfectly and then died at run time.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> A <code>Student</code> reference that was never assigned, and you call <code>s.getName()</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>NullPointerException</code>, <strong>unchecked</strong>. Under <code>RuntimeException</code>. It is the canonical "your code has a bug" exception: the right response is almost never a <code>catch</code>, it is to work out why the reference was null.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> A class you wrote yourself, <code>class AgeException extends Exception</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Checked</strong>, because you extended <code>Exception</code> directly and stopped short of <code>RuntimeException</code>. Anyone who throws an <code>AgeException</code> must declare it; anyone who calls that method must catch it or declare it too. Had you written <code>extends RuntimeException</code> instead, it would be unchecked and the compiler would stay silent.</p> <p><strong>Things to notice across all four parts.</strong> You never have to memorise a list. Find the class in the tree and ask one question: <em>is <code>RuntimeException</code> one of its ancestors?</em> Yes means unchecked, no means checked. Everything else follows.</p> </div></details> </div> </div> </div> <p>One asymmetry in that list is genuinely surprising, and it is worth two minutes because it contradicts what most people assume about division by zero.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; dividing by zero, twice, with different results</span></div> <div class="bd"> <p>Six divisions by zero. Five of them are floating-point and one is integer. Decide which lines print, and what the program does at the end, before you look.</p> <p class="filename">DivideDemo.java</p>
+<pre><code class="language-java">public class DivideDemo {
+    public static void main(String args[]) {
+        int    i = 7,   zeroInt = 0;
+        double d = 7.0, zeroDouble = 0.0;
+
+        System.out.println("double / double : " + (d / zeroDouble));
+        System.out.println("-double / double: " + (-d / zeroDouble));
+        System.out.println("0.0 / 0.0       : " + (zeroDouble / zeroDouble));
+        System.out.println("int / double    : " + (i / zeroDouble));
+        System.out.println("double % double : " + (d % zeroDouble));
+
+        System.out.println("about to divide two ints...");
+        System.out.println("int / int       : " + (i / zeroInt));
+        System.out.println("this line never runs");
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>double / double : Infinity
+-double / double: -Infinity
+0.0 / 0.0       : NaN
+int / double    : Infinity
+double % double : NaN
+about to divide two ints...
+Exception in thread "main" java.lang.ArithmeticException: / by zero
+	at DivideDemo.main(DivideDemo.java:13)</code></pre> <p><strong>Integer division by zero throws. Floating-point division by zero does not.</strong> Instead it produces one of three special <code>double</code> values that the IEEE floating-point standard defines for exactly this case:</p> <table class="trace"> <tr><th>Expression</th><th>Result</th><th>Reason</th></tr> <tr><td><code>7.0 / 0.0</code></td><td><code>Infinity</code></td><td>A positive number divided by zero.</td></tr> <tr><td><code>-7.0 / 0.0</code></td><td><code>-Infinity</code></td><td>The sign is carried through.</td></tr> <tr><td><code>0.0 / 0.0</code></td><td><code>NaN</code></td><td>"Not a Number" &mdash; there is no defensible answer at all.</td></tr> <tr><td><code>7 / 0.0</code></td><td><code>Infinity</code></td><td>One <code>double</code> operand is enough; the <code>int</code> is promoted, so this is floating-point division.</td></tr> <tr><td><code>7.0 % 0.0</code></td><td><code>NaN</code></td><td><code>%</code> behaves the same way <code>/</code> does.</td></tr> <tr><td><code>7 / 0</code></td><td>throws <code>ArithmeticException</code></td><td>Both operands are <code>int</code>. There is no <code>int</code> that means infinity, so the JVM has nothing to return.</td></tr> </table> <p>That is the whole explanation: <code>double</code> has bit patterns reserved for infinity and NaN, and <code>int</code> does not. Java is not being inconsistent; it is returning the best available answer in each type, and in one of the two types there is no answer.</p> <p>The practical consequence is the dangerous one. An integer division bug announces itself loudly and immediately. A floating-point one does not &mdash; it quietly produces <code>Infinity</code> or <code>NaN</code>, and those values then propagate through every later calculation, because anything plus <code>NaN</code> is <code>NaN</code>. You find out ten screens later when an average prints as <code>NaN</code>. This is the trap Quick Check 1.10 warned about back in Lecture 1.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 20.4</div> <div class="bd"> <p>A method computes the average of an <code>int</code> array. Give the exact result of <code>average(a)</code> for each case below.</p> <pre><code class="language-java">static double average(int[] a) {
+    int sum = 0;
+    for (int i = 0; i &lt; a.length; i++) sum += a[i];
+    return sum / a.length;
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>a</code> is <code>{90, 85, 78}</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>84.0</code>, not <code>84.33333333333333</code>. Both <code>sum</code> and <code>a.length</code> are <code>int</code>, so <code>sum / a.length</code> is integer division &mdash; 253 / 3 = 84 &mdash; and only then is the 84 widened to a <code>double</code> on the way out. This is the Lecture 1 division trap, still alive. The fix is <code>return sum / (double) a.length;</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>a</code> is an empty array, <code>new int[0]</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p>It throws <code>ArithmeticException: / by zero</code>. The loop body never runs, so <code>sum</code> is 0 and <code>a.length</code> is 0, and <code>0 / 0</code> with two <code>int</code> operands is an integer division by zero. The method never returns; the exception goes to the caller.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Same empty array, but after you apply the fix from part (a) &mdash; <code>return sum / (double) a.length;</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p>Now it returns <code>NaN</code>, silently. The cast made this floating-point division, so <code>0 / 0.0</code> is <code>NaN</code> rather than a throw. The caller gets a <code>double</code> back, prints it, and nothing looks broken until someone notices <code>NaN</code> in a report.</p> <p><strong>Things to notice across all three parts.</strong> Fixing the division-trap bug made the empty-array bug <em>harder</em> to find, not easier. That is the trade the floating-point standard makes for you, and it is why you should never rely on a divide by zero to tell you an array was empty. Check <code>a.length == 0</code> yourself and throw a real exception &mdash; which is exactly what Practice Problem 3 asks you to do.</p> </div></details> </div> </div> </div> <h2 id="s4"><span class="num">4.</span><code>throw</code> and <code>throws</code></h2> <p>So far the exceptions have all been thrown by the library. But <code>Integer.parseInt</code> has no opinion about whether 150 is a plausible age &mdash; only your program does. When <em>your</em> code detects a problem, you throw the exception yourself.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the throw statement</span></div> <div class="bd"> <p><code>throw</code> is a <strong>statement</strong>. It takes one expression, which must evaluate to a <code>Throwable</code> object, and it raises that object immediately:</p> <pre><code class="language-java">throw new Exception("Age too big!"); </code></pre> <p>You almost always see <code>throw new</code> together, because you construct the object right there. Execution of the current method stops at that instant &mdash; a <code>throw</code> is as final as a <code>return</code>, and code after it in the same block is unreachable.</p> </div> </div> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the throws clause</span></div> <div class="bd"> <p><code>throws</code> is part of a <strong>method signature</strong>. It goes after the parameter list and before the opening brace, and it lists the checked exception types this method may let escape:</p> <pre><code class="language-java">private static int readAgeFrom(Scanner screen) throws Exception { </code></pre> <p>It is a declaration to the compiler and to anyone reading your code: <em>callers of this method must be ready for this.</em> It throws nothing by itself. Several types are separated by commas: <code>throws IOException, AgeException</code>.</p> </div> </div> <div class="box warn"> <div class="hd">Warning<span class="tag">&mdash; <code>throw</code> and <code>throws</code> are not the same word</span></div> <div class="bd"> <p>They differ by one letter and students mix them up in every exam. Learn them as a pair:</p> <table> <tr><th></th><th><code>throw</code></th><th><code>throws</code></th></tr> <tr><td>What it is</td><td>A statement, inside a method body</td><td>A clause, in the method header</td></tr> <tr><td>How many per method</td><td>As many as you like</td><td>One clause, listing one or more types</td></tr> <tr><td>Followed by</td><td>An <em>object</em>: <code>throw new AgeException("too big");</code></td><td>One or more <em>type names</em>: <code>throws AgeException</code></td></tr> <tr><td>Effect</td><td>Raises the exception right now</td><td>Raises nothing. It only says one might get out</td></tr> <tr><td>Ends with a semicolon?</td><td>Yes</td><td>No &mdash; the method's opening brace follows</td></tr> </table> <p>Two consequences of that last row are worth saying out loud. <code>throw new AgeException;</code> is not legal &mdash; you must call the constructor, so it is <code>throw new AgeException("too big");</code>. And <code>throws new AgeException()</code> is not legal either &mdash; <code>throws</code> takes a type, never an object.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; both keywords in nine lines</span></div> <div class="bd"> <p>One method uses both. Read the two comments; they mark the two keywords.</p> <p class="filename">ThrowVsThrows.java</p>
+<pre><code class="language-java">public class ThrowVsThrows {
+    public static void main(String args[]) {
+        try {
+            System.out.println(withdraw(100, 30));
+            System.out.println(withdraw(100, 250));
+        } catch (Exception e) {
+            System.out.println("caught: " + e.getMessage());
+        }
+    }
+
+    //          keyword #2, on the signature: "I might hand one of these back"
+    static int withdraw(int balance, int amount) throws Exception {
+        if (amount &gt; balance)
+            //   keyword #1, a statement: "here is one, right now"
+            throw new Exception("Insufficient funds: asked for " + amount
+                                + ", balance is " + balance);
+        return balance - amount;
+    }
+}</code></pre> <p>Before you reveal: how many lines does <code>main</code> print?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>70
+caught: Insufficient funds: asked for 250, balance is 100</code></pre> <p>Two. The first <code>withdraw</code> succeeds and its result is printed. The second throws, so the <code>System.out.println</code> around it never gets a value to print &mdash; the second call is abandoned <em>before</em> <code>println</code> is reached &mdash; and control jumps straight to the <code>catch</code>.</p> <p>Note that <code>main</code> itself does not need <code>throws Exception</code>, because it catches the exception rather than letting it escape. That is the choice the compiler forces on you for every checked exception: <strong>handle it or declare it</strong>. There is no third option.</p> 
+</div></details> </div> </div> <p>What happens if you do neither? The compiler stops you. This is her Example 3 without its <code>throws</code> clause:</p> <pre class="err"><code>Unreported.java:7: error: unreported exception ClassNotFoundException; must be caught or declared to be thrown throw new ClassNotFoundException();
+^
+1 error</code></pre> <p>And once the clause <em>is</em> there, the requirement moves one level up, to whoever calls the method:</p> <pre class="err"><code>CallerSide.java:3: error: unreported exception ClassNotFoundException; must be caught or declared to be thrown methodX();
+^
+1 error</code></pre> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; handle it or declare it</span></div> <div class="bd"> <p>A checked exception cannot be ignored anywhere along the call chain. Each method either catches it or adds <code>throws</code> and passes the obligation to its caller. That is why <code>throws FileNotFoundException</code> appeared on <code>main</code> in every Lecture 5 program: <code>main</code> was passing the obligation all the way out to the JVM, which "handles" it by printing the stack trace and stopping.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 20.5</div> <div class="bd"> <p>This is Part 3 of the Exam 3 practice question on finding errors.</p> <pre><code class="language-java">void methodX() {
+    throw new ClassNotFoundException();
+    // line (d) }</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> What is wrong with line (d)?</p> <details class="soln"><summary></summary><div class="ans"> <p>Nothing is wrong with the <code>throw</code> statement itself. The problem is the method <em>header</em>. <code>ClassNotFoundException</code> is a checked exception &mdash; it descends from <code>Exception</code> but not from <code>RuntimeException</code> &mdash; so <code>methodX</code> must either catch it or declare it. It does neither, so the file does not compile:</p> <pre class="err"><code>Unreported.java:7: error: unreported exception ClassNotFoundException; must be caught or declared to be thrown throw new ClassNotFoundException();
+^
+1 error</code></pre> <p>The fix is one clause on the signature:</p> <pre><code class="language-java">void methodX() throws ClassNotFoundException {
+    throw new ClassNotFoundException();
+}</code></pre> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Would the same code compile if the exception were <code>IllegalArgumentException</code> instead?</p> <details class="soln"><summary></summary><div class="ans"> <p>Yes, unchanged. <code>IllegalArgumentException</code> is under <code>RuntimeException</code>, so it is unchecked and no <code>throws</code> clause is required. The method compiles and throws at run time with no warning of any kind.</p> <p><strong>Things to notice across both parts.</strong> Whether a <code>throw</code> needs a <code>throws</code> depends only on <em>which class you threw</em> &mdash; nothing about the statement changes. When you see this question on an exam, do not read the <code>throw</code> line first. Look up the exception class in the hierarchy, decide checked or unchecked, and only then look at the signature.</p> </div></details> </div> </div> </div> <p>Now the instructor's Example 3, which puts a real rule into <code>readAgeFrom</code>: an age over 100 is not believable, so throw.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; throwing your own, and a bug it exposes</span></div> <div class="bd"> <p>The user types <code>21</code>, <code>150</code>, <code>twenty</code>, <code>30</code>, <code>44</code>. The <code>catch</code> block now prints <code>e.getMessage()</code> as well as its fixed line. Before you reveal, predict the two lines the program prints for the answer <code>150</code> &mdash; and ask yourself whether they make sense together.</p> <p class="filename">Example3.java</p>
+<pre><code class="language-java">import java.util.Scanner;
+
+public class Example3 {
+   public static void main(String args[]) {
+      Scanner screen = new Scanner(System.in);
+      for (int i = 0; i &lt; 5; i++) {
+         System.out.print("How old are you? ");
+         try {
+            int age = readAgeFrom(screen);
+            System.out.println("You are " + age + " years old.");
+         } catch (Exception e) {
+            System.out.println("Your age must be an integer!");
+            System.out.println(e.getMessage());
+         }
+      }
+   }
+
+   private static int readAgeFrom(Scanner screen) throws Exception {
+      String s = screen.next();
+      int ans = Integer.parseInt(s);
+      if (ans &gt; 100) throw new Exception("Age too big!");
+      return ans;
+   }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>How old are you? 21 You are 21 years old. How old are you? 150 Your age must be an integer! Age too big! How old are you? twenty Your age must be an integer! For input string: "twenty" How old are you? 30 You are 30 years old. How old are you? 44 You are 44 years old. </code></pre> <p>The program told the user who typed <code>150</code> that <em>"Your age must be an integer!"</em> &mdash; and 150 is an integer. The message is wrong, and the next line contradicts it.</p> <p>The cause is the single <code>catch (Exception e)</code>. Two entirely different failures now arrive at the same block:</p> <table class="trace"> <tr><th>Input</th><th>What was thrown</th><th>Thrown by</th><th><code>getMessage()</code></th></tr> <tr><td><code>twenty</code></td><td><code>NumberFormatException</code></td><td><code>Integer.parseInt</code>, inside the library</td><td><code>For input string: "twenty"</code></td></tr> <tr><td><code>150</code></td><td><code>Exception</code></td><td>your own <code>throw</code>, in <code>readAgeFrom</code></td><td><code>Age too big!</code></td></tr> </table> <p><code>NumberFormatException</code> is a descendant of <code>Exception</code>, so one <code>catch (Exception e)</code> swallows both, and the block cannot tell them apart. This is the concrete cost of catching too broadly, and there are exactly two ways out. The quick one is to stop printing a message you cannot justify and print only <code>e.getMessage()</code>, which is the instructor's Example 3b. The real one is to write a separate <code>catch</code> for each kind &mdash; &sect;5 and &sect;6.</p> 
+</div></details> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; Example 3b: let the message speak</span></div> <div class="bd"> <p>Two changes from Example 3: the hard-coded line in the <code>catch</code> is gone, and a second rule rejects negative ages. The user types <code>21</code>, <code>150</code>, <code>-3</code>, <code>twenty</code>, <code>44</code>.</p> <p class="filename">Example3b.java</p>
+<pre><code class="language-java">import java.util.Scanner;
+
+public class Example3b {
+   public static void main(String args[]) {
+      Scanner screen = new Scanner(System.in);
+      for (int i = 0; i &lt; 5; i++) {
+         System.out.print("How old are you? ");
+         try {
+            int age = readAgeFrom(screen);
+            System.out.println("You are " + age + " years old.");
+         } catch (Exception e) {
+            System.out.println(e.getMessage());
+         }
+      }
+   }
+
+   private static int readAgeFrom(Scanner screen) throws Exception {
+      String s = screen.next();
+      int ans = Integer.parseInt(s);
+      if (ans &gt; 100) throw new Exception("Age too big!");
+      if (ans &lt; 0) throw new Exception("Age cannot be negative!");
+      return ans;
+   }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>How old are you? 21 You are 21 years old. How old are you? 150 Age too big! How old are you? -3 Age cannot be negative! How old are you? twenty For input string: "twenty" How old are you? 44 You are 44 years old. </code></pre> <p>Every message is now truthful, and adding a third rule to <code>readAgeFrom</code> needs no change to <code>main</code> at all. But look at the fourth line. <code>For input string: "twenty"</code> is a message written by the authors of <code>Integer</code>, for programmers. It is not something you would ever want to show a user, and the program has no way to replace it, because it still cannot tell which kind of failure it caught.</p> <p>Notice also that the two <code>if</code> statements come <em>after</em> the <code>parseInt</code>. They have to: until the text has been converted there is no number to compare against 100. Order the checks in the order the information becomes available.</p> 
+</div></details> </div> </div> <h2 id="s5"><span class="num">5.</span>Several catch blocks, and the ordering rule</h2> <p>One <code>try</code> may be followed by as many <code>catch</code> blocks as you like. When something is thrown, Java tries them <strong>in the order written</strong> and runs the <em>first</em> one whose type matches. At most one <code>catch</code> block ever runs.</p> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; how Java picks a catch block</span></div> <div class="bd"> <ol> <li>An exception object is thrown inside the <code>try</code> block.</li> <li>Look at the first <code>catch</code> clause. Ask: is the thrown object an instance of that type, or of any subclass of it?</li> <li>If yes, run that block and skip all the others. Execution continues after the last <code>catch</code>.</li> <li>If no, move to the next <code>catch</code> clause and repeat.</li> <li>If none match, the exception leaves this method entirely and the search continues in the caller.</li> </ol> </div> </div> <p>Because the test is "is it this type <em>or a subclass</em>", a <code>catch (Exception e)</code> matches everything. Put it first and nothing after it can ever run &mdash; and Java, rather than letting you write dead code, refuses to compile the file at all.</p> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; general before specific</span></div> <div class="bd"> <p>This does not compile:</p> <p class="filename">CatchOrder.java</p>
+<pre><code class="language-java">public class CatchOrder {
+    public static void main(String args[]) {
+        try {
+            int n = Integer.parseInt("twenty");
+            System.out.println(n);
+        } catch (Exception e) {
+            System.out.println("something went wrong");
+        } catch (NumberFormatException e) {
+            System.out.println("that is not a number");
+        }
+    }
+}</code></pre> <pre class="err"><code>CatchOrder.java:8: error: exception NumberFormatException has already been caught
+        } catch (NumberFormatException e) {
+          ^
+1 error</code></pre> <p>Read the message literally: by the time control could reach the second clause, the first one has <em>already</em> caught every <code>NumberFormatException</code> there is. The second block is unreachable, and unreachable <code>catch</code> blocks are a compile error, not a warning.</p> <p><strong>The rule: a subclass <code>catch</code> must come before its superclass <code>catch</code>.</strong> Order your clauses most specific first, most general last, and put <code>catch (Exception e)</code> last if you use it at all. Two clauses whose types are <em>unrelated</em> &mdash; say <code>NumberFormatException</code> and <code>FileNotFoundException</code> &mdash; may go in either order, because neither can shadow the other.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the same file, clauses swapped</span></div> <div class="bd"> <p>Swap the two blocks and the file compiles. The loop feeds it one bad string and one good one. Which block runs each time?</p> <p class="filename">CatchOrderFixed.java</p>
+<pre><code class="language-java">public class CatchOrderFixed {
+    public static void main(String args[]) {
+        String[] inputs = {"twenty", "42"};
+        for (int i = 0; i &lt; inputs.length; i++) {
+            try {
+                int n = Integer.parseInt(inputs[i]);
+                System.out.println("parsed " + n);
+            } catch (NumberFormatException e) {
+                System.out.println("that is not a number: " + e.getMessage());
+            } catch (Exception e) {
+                System.out.println("something else went wrong");
+            }
+        }
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>that is not a number: For input string: "twenty" parsed 42 </code></pre> <p>Round one throws, and the <em>first</em> matching clause wins, so the specific block runs and the general one is skipped &mdash; even though <code>catch (Exception e)</code> would also have matched. Round two throws nothing, so both <code>catch</code> blocks are skipped and the <code>try</code> block runs to the end.</p> <p>The trailing <code>catch (Exception e)</code> never runs in this program at all. That is normal and correct: it is there as a safety net for something you did not anticipate, and a safety net that is never needed is a good outcome.</p> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; catching something that cannot happen</span></div> <div class="bd"> <p>The compiler also refuses the opposite error. If nothing inside the <code>try</code> block can throw a particular <em>checked</em> exception, you may not write a <code>catch</code> for it:</p> <pre class="err"><code>NeverThrown.java:7: error: exception FileNotFoundException is never thrown in body of corresponding try statement } catch (FileNotFoundException e) {
+^
+1 error</code></pre> <p>This rule applies to checked exceptions only. <code>catch (ArithmeticException e)</code> around a block that plainly cannot divide by zero compiles without complaint, because an unchecked exception could in principle come from anywhere.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 20.6</div> <div class="bd"> <p>Consider this fragment, where <code>list</code> is an <code>ArrayList</code> of size 3.</p> <pre><code class="language-java">try {
+    System.out.println(list.get(k));
+    System.out.println(100 / k);
+}
+catch (ArithmeticException e) {
+    System.out.println("A");
+}
+catch (IndexOutOfBoundsException e) {
+    System.out.println("B");
+}
+catch (RuntimeException e) {
+    System.out.println("C");
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> What is printed when <code>k</code> is 1?</p> <details class="soln"><summary></summary><div class="ans"> <p>Nothing from the <code>catch</code> blocks. <code>list.get(1)</code> is legal and <code>100 / 1</code> is 100, so the <code>try</code> block runs to the end and prints the element and <code>100</code>. No exception, no <code>catch</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What is printed when <code>k</code> is 0?</p> <details class="soln"><summary></summary><div class="ans"> <p>The element at index 0, then <code>A</code>. <code>list.get(0)</code> succeeds, so the first <code>println</code> runs. Then <code>100 / 0</code> throws <code>ArithmeticException</code>, which matches the very first clause. The remaining clauses are skipped.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> What is printed when <code>k</code> is 7?</p> <details class="soln"><summary></summary><div class="ans"> <p>Just <code>B</code>. <code>list.get(7)</code> throws <code>IndexOutOfBoundsException</code> immediately, so the second <code>println</code> is never reached at all &mdash; there is no division. The first clause does not match; the second does.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> Could <code>C</code> ever be printed? And what happens if you move the <code>RuntimeException</code> clause to the top?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>C</code> can be printed &mdash; by any unchecked exception that is neither of the first two, for example a <code>NullPointerException</code> if <code>list</code> itself were null. It is the general clause of the three.</p> <p>Moving it to the top makes the file stop compiling, twice over, because both <code>ArithmeticException</code> and <code>IndexOutOfBoundsException</code> descend from <code>RuntimeException</code>:</p> <pre class="err"><code>QC206Bad.java:12: error: exception ArithmeticException has already been caught } catch (ArithmeticException e) {
+^
+QC206Bad.java:14: error: exception IndexOutOfBoundsException has already been caught } catch (IndexOutOfBoundsException e) {
+^
+2 errors</code></pre> <p><strong>Things to notice across all four parts.</strong> Two habits will get you through every exam question of this shape. First, walk the <code>try</code> block statement by statement and stop at the first one that throws &mdash; everything after it in the block is dead. Second, check the clause order against the hierarchy before you do anything else: if a superclass appears above one of its subclasses, the answer is "it does not compile" and there is nothing else to work out.</p> </div></details> </div> </div> </div> <h2 id="s6"><span class="num">6.</span>Writing your own exception class</h2> <p>Example 3b left us stuck. <code>catch (Exception e)</code> cannot distinguish "the text was not a number" from "the number was out of range", because both arrive as an <code>Exception</code>. Section 5 gives the tool &mdash; separate <code>catch</code> blocks &mdash; but that only helps if the two failures have different <em>types</em>. So make one.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; a custom exception class</span></div> <div class="bd"> <p>An exception class is an ordinary class that extends <code>Exception</code> (or one of its subclasses). It usually adds no fields and no methods at all &mdash; the type name <em>is</em> the information. All it needs is a constructor that takes a message and hands it to the superclass with <code>super(s)</code>, so that <code>getMessage()</code> can give it back later.</p> <p class="filename">AgeException.java</p>
+<pre><code class="language-java">public class AgeException extends Exception {
+    public AgeException(String s) {
+        super(s);
+    }
+}</code></pre> <p>Five lines, and now <code>AgeException</code> is a type you can <code>throw</code>, a type you can name in a <code>catch</code>, and a type distinct from everything else in the hierarchy.</p> </div> </div> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; extends Exception or extends RuntimeException?</span></div> <div class="bd"> <p><code>extends Exception</code> makes your class <strong>checked</strong>: everyone who might throw it must declare it, and everyone who calls them must catch or declare it. <code>extends RuntimeException</code> makes it <strong>unchecked</strong>: the compiler says nothing at all.</p> <p>For this course, extend <code>Exception</code>. It is what the instructor's <code>AgeException</code> does, it is what the exam questions ask for &mdash; "objects that are exceptions but are <em>not</em> run time exceptions" is exactly this phrase &mdash; and it is the choice that makes the compiler help you.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; Example 4, with two catch blocks that mean different things</span></div> <div class="bd"> <p><code>readAgeFrom</code> now throws <code>AgeException</code> for a bad <em>value</em>, while <code>Integer.parseInt</code> still throws <code>NumberFormatException</code> for bad <em>text</em>. Two failures, two types, two <code>catch</code> blocks. The user types <code>21</code>, <code>twenty</code>, <code>150</code>, <code>0</code>, <code>44</code>.</p> <p>Before you reveal: <code>readAgeFrom</code> declares <code>throws AgeException</code> and nothing else. It can plainly also produce a <code>NumberFormatException</code>. Why does that compile?</p> <p class="filename">AgeException.java</p>
+<pre><code class="language-java">public class AgeException extends Exception {
+    public AgeException(String s) {
+        super(s);
+    }
+}</code></pre> <p class="filename">Example4.java</p>
+<pre><code class="language-java">import java.util.Scanner;
+
+public class Example4 {
+    public static void main(String args[]) {
+        Scanner screen = new Scanner(System.in);
+        for (int i = 0; i &lt; 5; i++) {
+            System.out.print("How old are you? ");
+            try {
+                int age = readAgeFrom(screen);
+                System.out.println("You are " + age + " years old.");
+            } catch (NumberFormatException e) {
+                System.out.println("Your age must be an integer!");
+            } catch (AgeException e) {
+                System.out.println("A legal age must be between 1 and 100.");
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    private static int readAgeFrom(Scanner screen) throws AgeException {
+        String s = screen.next();
+        int ans = Integer.parseInt(s);
+        if (ans &gt; 100) throw new AgeException("Age too big!");
+        if (ans &lt; 1) throw new AgeException("Age too small!");
+        return ans;
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>How old are you? 21 You are 21 years old. How old are you? twenty Your age must be an integer! How old are you? 150 A legal age must be between 1 and 100. Age too big! How old are you? 0 A legal age must be between 1 and 100. Age too small! How old are you? 44 You are 44 years old. </code></pre> <p><strong>Why it compiles.</strong> <code>NumberFormatException</code> is unchecked &mdash; it lives under <code>RuntimeException</code> &mdash; so it never has to be declared. <code>AgeException</code> extends <code>Exception</code> directly, so it is checked and must be. The <code>throws</code> clause lists exactly the checked exception and says nothing about the unchecked one. That is not sloppiness; it is the rule from &sect;3 applied literally.</p> <p><strong>Why the messages are finally right.</strong> The two <code>catch</code> blocks are reached by genuinely different types, so each can say something true. The user who typed <code>twenty</code> is told to type an integer; the user who typed <code>150</code> is told the legal range. Nobody is told a falsehood, and no library message reaches the screen.</p> <p>The clause order here is safe either way &mdash; <code>NumberFormatException</code> and <code>AgeException</code> are unrelated, sitting in different branches of the tree, so neither can shadow the other. Adding <code>catch (Exception e)</code> as a third block would be legal, but only at the bottom.</p> <p>One more thing to notice: <code>getMessage()</code> returns exactly the <code>String</code> handed to <code>new AgeException(...)</code>, because the constructor passed it up with <code>super(s)</code>. Leave out that <code>super(s)</code> call and <code>getMessage()</code> returns <code>null</code>.</p> 
+</div></details> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; getMessage, toString and printStackTrace</span></div> <div class="bd"> <p>Three methods every exception object has, inherited from <code>Throwable</code>. They are easy to confuse, so here they are side by side on one object.</p> <p class="filename">ThreeMethods.java</p>
+<pre><code class="language-java">public class ThreeMethods {
+    public static void main(String args[]) {
+        try {
+            deeper();
+        } catch (Exception e) {
+            System.out.println("getMessage() : " + e.getMessage());
+            System.out.println("toString()   : " + e.toString());
+            System.out.println("printStackTrace() writes this:");
+            e.printStackTrace();
+        }
+        System.out.println("main: still running");
+    }
+
+    static void deeper() throws Exception {
+        throw new Exception("the roof is on fire");
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>getMessage() : the roof is on fire toString()   : java.lang.Exception: the roof is on fire printStackTrace() writes this: java.lang.Exception: the roof is on fire at ThreeMethods.deeper(ThreeMethods.java:15) at ThreeMethods.main(ThreeMethods.java:4) main: still running </code></pre> <table class="trace"> <tr><th>Method</th><th>Returns / does</th><th>Use it when</th></tr> <tr><td><code>getMessage()</code></td><td>Returns just the <code>String</code> given to the constructor, or <code>null</code> if there was none.</td><td>You want to show the user something, or build your own message.</td></tr> <tr><td><code>toString()</code></td><td>Returns the full class name, a colon, and the message. This is what <code>"" + e</code> produces, and what <code>System.out.println(e)</code> prints.</td><td>You want the type <em>and</em> the message in one line, usually in a log.</td></tr> <tr><td><code>printStackTrace()</code></td><td>Returns nothing. <em>Writes</em> the <code>toString()</code> line plus every stack frame &mdash; to <code>System.err</code>, not <code>System.out</code>.</td><td>Debugging. Almost never in code a user will run.</td></tr> </table> <p>The line numbers in the trace are exactly the ones in this file, and they will change if you add a line at the top; the frames themselves are what to read. Because <code>printStackTrace</code> writes to <code>System.err</code>, its output can appear out of order relative to <code>System.out</code> in some consoles, which is one more reason not to mix the two in a finished program.</p> <p>And the last line matters most: <code>main: still running</code>. Printing a stack trace is not the same as crashing. The exception was caught, so the program carried on.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 20.7</div> <div class="bd"> <p>Write a class <code>InsufficientFundsException</code> whose objects are exceptions but are <em>not</em> run time exceptions, with a constructor that takes a <code>String</code> and no other methods. Then write a <code>BankAccount</code> class with a <code>double balance</code>, a constructor that sets it, a <code>withdraw(double amount)</code> method that throws your exception when <code>amount</code> exceeds the balance, and a <code>main</code> that withdraws 30 and then 250 from an account holding 100, catching and reporting the failure.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> "Exceptions but not run time exceptions" is the exam's phrasing for <code>extends Exception</code> &mdash; if it said run time exceptions you would extend <code>RuntimeException</code>. The constructor does one thing: <code>super(message)</code>. In <code>BankAccount</code>, <code>withdraw</code> needs <code>throws InsufficientFundsException</code> on its signature because the exception is checked, and <code>main</code> needs a <code>try</code>/<code>catch</code> for the same reason. Put both withdrawals in one <code>try</code> and watch what happens to the second.</p> <p class="filename">InsufficientFundsException.java</p>
+<pre><code class="language-java">public class InsufficientFundsException extends Exception {
+    public InsufficientFundsException(String message) {
+        super(message);
+    }
+}</code></pre> <p class="filename">BankAccount.java</p>
+<pre><code class="language-java">public class BankAccount {
+    private double balance;
+
+    public BankAccount(double startingBalance) {
+        balance = startingBalance;
+    }
+
+    public double getBalance() { return balance; }
+
+    public void withdraw(double amount) throws InsufficientFundsException {
+        if (amount &gt; balance)
+            throw new InsufficientFundsException("Short by " + (amount - balance));
+        balance = balance - amount;
+    }
+
+    public static void main(String args[]) {
+        BankAccount a = new BankAccount(100.0);
+
+        double[] requests = {30.0, 250.0, 20.0};
+        for (int i = 0; i &lt; requests.length; i++) {
+            try {
+                a.withdraw(requests[i]);
+                System.out.println("Withdrew " + requests[i]
+                                   + ", balance now " + a.getBalance());
+            } catch (InsufficientFundsException e) {
+                System.out.println("Refused " + requests[i] + ": " + e.getMessage());
+            }
+        }
+    }
+}</code></pre> <pre class="out"><code>Withdrew 30.0, balance now 70.0
+Refused 250.0: Short by 180.0
+Withdrew 20.0, balance now 50.0</code></pre> <p><strong>Things to notice.</strong> The <code>try</code> is <em>inside</em> the loop, so a refused withdrawal does not end the run &mdash; the third request still goes through. Had the loop been inside the <code>try</code> instead, the second request would have ended it and 20 would never have been withdrawn. Where you draw the boundary of a <code>try</code> block is a design decision, not a formality.</p> <p>Notice also that <code>balance</code> is not changed before the <code>throw</code>. Validate first, mutate second; an exception does not undo a change you already made, so an object left in a broken state stays broken. This is the same point as Quick Check 20.2's counter.</p> <p>The message <code>Short by 180.0</code> is computed at throw time and travels with the object. That is the advantage of an exception over a <code>boolean</code> return: the failure carries data.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 20.7</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="6" aria-label="Live coding - Quick Check 20.7">public class InsufficientFundsException extends Exception {
+    // 1. One constructor, taking a String. Pass it up with super. } class BankAccount { private double balance; public BankAccount(double startingBalance) { balance = startingBalance; } public double getBalance() { return balance; } // 2. withdraw(double amount): throw when amount is more than balance. //    Remember the throws clause on this signature. public static void main(String args[]) { BankAccount a = new BankAccount(100.0); // 3. Withdraw 30, then 250, then 20 -- each in a try/catch //    so that one refusal does not stop the others. } }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s7"><span class="num">7.</span><code>finally</code></h2> <p>There is a third block you can attach to a <code>try</code>, and it exists for one problem: cleanup. If you opened a file, you must close it &mdash; whether the read succeeded, whether it threw, whether you returned early. Writing <code>input.close()</code> at the end of the <code>try</code> block does not cover the throwing case; writing it in the <code>catch</code> too duplicates it; writing it after both misses the case where you returned.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the finally block</span></div> <div class="bd"> <p>A <strong><code>finally</code></strong> block comes after the <code>catch</code> blocks and <strong>always runs</strong>:</p> <pre><code class="language-java">try {
+    // code that might throw } catch (Exception e) { // handle it } finally { // always runs }</code></pre> <p>"Always" means all of these: the <code>try</code> block finished normally; the <code>try</code> block threw and a <code>catch</code> handled it; the <code>try</code> block threw and <em>no</em> <code>catch</code> matched, so the exception is on its way out of the method; the <code>try</code> block or a <code>catch</code> block executed a <code>return</code>. In every one of those cases <code>finally</code> runs before control actually leaves.</p> <p>You may write <code>try</code>/<code>finally</code> with no <code>catch</code> at all, when you want the cleanup but intend the exception to travel onward.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; finally versus return</span></div> <div class="bd"> <p><code>describe</code> returns from inside the <code>try</code> and again from inside the <code>catch</code>, and it has a <code>finally</code>. Work out the exact order of the printed lines for each of the three calls before you look &mdash; in particular, does <code>finally: cleaning up</code> come before or after <code>case 1: ok</code>?</p> <p class="filename">FinallyDemo.java</p>
+<pre><code class="language-java">public class FinallyDemo {
+    public static void main(String args[]) {
+        System.out.println("case 1: " + describe("42"));
+        System.out.println("case 2: " + describe("twenty"));
+        System.out.println("case 3: " + describe(null));
+    }
+
+    static String describe(String text) {
+        try {
+            int n = Integer.parseInt(text);
+            System.out.println("  try: parsed " + n);
+            return "ok";
+        } catch (NumberFormatException e) {
+            System.out.println("  catch: " + e.getMessage());
+            return "not a number";
+        } finally {
+            System.out.println("  finally: cleaning up");
+        }
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>  try: parsed 42
+  finally: cleaning up
+case 1: ok
+  catch: For input string: "twenty"
+  finally: cleaning up
+case 2: not a number
+  catch: Cannot parse null string
+  finally: cleaning up
+case 3: not a number</code></pre> <p><strong><code>finally</code> runs before the method actually returns.</strong> In case 1 the <code>try</code> block reached <code>return "ok";</code>, but the value does not leave the method until the <code>finally</code> block has run &mdash; which is why <code>finally: cleaning up</code> is printed before <code>case 1: ok</code>. Java evaluates the return expression, holds the value, runs <code>finally</code>, and only then hands the value back to the caller.</p> <p>Case 2 is the same story down the <code>catch</code> path: <code>catch</code> prints, <code>catch</code> returns, <code>finally</code> still runs first.</p> <p>Case 3 is the surprise. <code>Integer.parseInt(null)</code> does not throw a <code>NullPointerException</code> as most people predict &mdash; it throws a <code>NumberFormatException</code> with the message <code>Cannot parse null string</code>. That is a deliberate decision by the library authors: from <code>parseInt</code>'s point of view, <code>null</code> is just one more piece of text it cannot turn into a number. It matters here because the <code>catch</code> clause names <code>NumberFormatException</code>, so case 3 is handled rather than escaping.</p> 
+</div></details> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; finally with nothing to catch</span></div> <div class="bd"> <p>No <code>catch</code> block at all here, and the <code>try</code> block throws. Does <code>finally</code> still run? And does the exception still reach the console?</p> <p class="filename">FinallyEscape.java</p>
+<pre><code class="language-java">public class FinallyEscape {
+    public static void main(String args[]) {
+        try {
+            System.out.println("try: opening the resource");
+            int bad = 10 / 0;
+            System.out.println("try: never runs " + bad);
+        } finally {
+            System.out.println("finally: closing the resource");
+        }
+        System.out.println("main: never runs");
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>try: opening the resource
+finally: closing the resource
+Exception in thread "main" java.lang.ArithmeticException: / by zero
+	at FinallyEscape.main(FinallyEscape.java:5)</code></pre> <p>Yes to both, and in that order. The <code>finally</code> block runs on the way out, then the exception continues its journey up the stack exactly as if the <code>finally</code> had not been there. The statement after the whole <code>try</code>/<code>finally</code> does not run, because the exception is still travelling &mdash; <code>finally</code> handles nothing, it only guarantees cleanup.</p> <p>This shape &mdash; <code>try</code> with <code>finally</code> and no <code>catch</code> &mdash; is exactly right when a method wants to release a resource but has no idea how to recover from the failure. Close the file, let the caller decide.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 20.8</div> <div class="bd"> <p>Give the exact output of this program.</p> <pre><code class="language-java">public class Mystery {
+    public static void main(String args[]) {
+        System.out.println("A " + f(4, 2));
+        System.out.println("B " + f(4, 0));
+        System.out.println("C " + f(0, 4));
+    }
+
+    static int f(int a, int b) {
+        try {
+            System.out.print("try ");
+            return a / b;
+        } catch (ArithmeticException e) {
+            System.out.print("catch ");
+            return -1;
+        } finally {
+            System.out.print("finally ");
+        }
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Two things to keep straight. First, everything inside <code>f</code> is printed with <code>print</code>, not <code>println</code>, so it lands on the same line as the <code>A </code>, <code>B </code> or <code>C </code> that follows. Second, the argument to <code>println</code> in <code>main</code> must be fully evaluated before <code>main</code> can print anything &mdash; so all of <code>f</code>'s output comes out first, and the <code>A </code> line appears only when <code>f</code> has returned.</p> <p>Call by call:</p> <table class="trace"> <tr><th>Call</th><th>Inside <code>f</code></th><th>Then <code>main</code> prints</th></tr> <tr><td><code>f(4, 2)</code></td><td><code>try </code> &mdash; no exception &mdash; <code>return 2</code> held &mdash; <code>finally </code></td><td><code>A 2</code></td></tr> <tr><td><code>f(4, 0)</code></td><td><code>try </code> &mdash; throws &mdash; <code>catch </code> &mdash; <code>return -1</code> held &mdash; <code>finally </code></td><td><code>B -1</code></td></tr> <tr><td><code>f(0, 4)</code></td><td><code>try </code> &mdash; <code>0 / 4</code> is <code>0</code>, no exception &mdash; <code>finally </code></td><td><code>C 0</code></td></tr> </table> <pre class="out"><code>try finally A 2 try catch finally B -1 try finally C 0 </code></pre> <p><strong>Things to notice.</strong> The third call is the one that catches people out. <code>f(0, 4)</code> looks like it ought to be trouble because there is a zero in it, but the zero is the <em>numerator</em>: <code>0 / 4</code> is a perfectly ordinary <code>0</code>. Only a zero divisor throws.</p> <p>The word <code>finally</code> appears on every line and the word <code>catch</code> on exactly one. If you find yourself writing an answer where <code>finally</code> is missing from a line, check whether you assumed that <code>return</code> skips it. It does not.</p> </div></details> </div> </div> <div class="box warn"> <div class="hd">Warning<span class="tag">&mdash; never <code>return</code> from inside a <code>finally</code> block</span></div> <div class="bd"> <p><code>finally</code> runs on the way out, which raises an awkward question: what if the <code>finally</code> block itself tries to leave the method? Java's answer is that the <code>finally</code> wins, and the result is a method that can silently discard an exception.</p> <p>Do not write this. It compiles, and <code>javac -Xlint</code> warns about it, but nothing stops you:</p> <pre><code class="language-java">static int h() {
+    try {
+        throw new RuntimeException("boom");
+    }
+    finally {
+        return 3;
+    }
+}</code></pre> <pre class="err"><code>FinallyReturn.java:31: warning: [finally] finally clause cannot complete normally }
+^</code></pre> <p><code>h()</code> returns 3. The <code>RuntimeException</code> is thrown, the <code>finally</code> block starts running on the exception's way out, and its <code>return</code> abandons the exception completely &mdash; no stack trace, no <code>catch</code>, no trace of the failure anywhere. That is the single worst thing a <code>finally</code> block can do. Keep <code>finally</code> for cleanup only: close things, release things, print things. Never <code>return</code> and never <code>throw</code> from inside one.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 20.9</div> <div class="bd"> <p>Give the exact output of this program. Two of the three methods are the pattern the warning box just told you to avoid; one is not.</p> <pre><code class="language-java">public class FinallyReturn {
+    public static void main(String args[]) {
+        System.out.println("f() = " + f());
+        System.out.println("g() = " + g());
+        System.out.println("h() = " + h());
+        System.out.println("main: still running");
+    }
+
+    static int f() {
+        int x = 1;
+        try {
+            return x;
+        } finally {
+            x = 99;
+        }
+    }
+
+    static int g() {
+        try {
+            return 1;
+        } finally {
+            return 2;
+        }
+    }
+
+    static int h() {
+        try {
+            throw new RuntimeException("boom");
+        } finally {
+            return 3;
+        }
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Take the three methods separately, and in each one ask the same question: what value has already been decided when the <code>finally</code> block starts?</p> <pre class="out"><code>f() = 1 g() = 2 h() = 3 main: still running </code></pre> <table class="trace"> <tr><th>Method</th><th>What happens</th><th>Result</th></tr> <tr><td><code>f()</code></td><td><code>return x</code> evaluates <code>x</code> to <code>1</code> and holds that <em>value</em>. The <code>finally</code> block then sets the variable to 99, but the return value was copied out already.</td><td><code>1</code></td></tr> <tr><td><code>g()</code></td><td>The <code>try</code> block's <code>return 1</code> is held, then the <code>finally</code> block executes its own <code>return 2</code>, which replaces it.</td><td><code>2</code></td></tr> <tr><td><code>h()</code></td><td>An exception is on its way out when the <code>finally</code> block runs <code>return 3</code>. The return wins and the exception is thrown away entirely.</td><td><code>3</code></td></tr> </table> <p><strong>Things to notice.</strong> <code>f()</code> is the one that is fine, and it is worth being clear about why. <code>return x;</code> does not return the <em>variable</em> <code>x</code>; it evaluates <code>x</code> to a value and returns that. Changing <code>x</code> afterwards changes nothing. Had <code>x</code> been a reference to an object and the <code>finally</code> block modified the object's fields, the caller <em>would</em> see the change &mdash; because then the held value is the reference, and the object behind it is shared. This is the Lecture 8 distinction between a variable and what it points at, and it applies here unchanged.</p> <p><code>g()</code> and <code>h()</code> should never appear in code you write. <code>h()</code> in particular is how real failures vanish without a trace: someone adds a <code>return</code> to a <code>finally</code> block "to simplify it" and every exception that method could raise is silently discarded from that day on.</p> </div></details> </div> </div> <h2 id="s8"><span class="num">8.</span>Going back and fixing three earlier lectures</h2> <p>You now have every piece of machinery those earlier lectures were missing. Three programs from earlier in the semester are worth revisiting, because in each case the fix is a handful of lines and the improvement is large.</p> <h3>Lecture 5 &mdash; the file that might not be there</h3> <p>Every file program in Lecture 5 carried <code>throws FileNotFoundException</code> on <code>main</code>, which we called "a required piece of punctuation". You now know exactly what it meant: <em>this method declines to handle a checked exception, so the JVM will handle it &mdash; by killing the program.</em> For a real program that is a poor answer. The user typed a file name that does not exist; telling them so is better than a stack trace.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; opening a file that may not exist</span></div> <div class="bd"> <p><code>report</code> is called twice: once with a file that exists and holds <code>95 98 91</code>, once with a name that does not exist at all. The <code>finally</code> block closes the <code>Scanner</code> on both paths. Before you reveal: does the second call print anything from the <code>try</code> block?</p> <p class="filename">ReadScoresSafely.java</p>
+<pre><code class="language-java">import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+public class ReadScoresSafely {
+    public static void main(String args[]) {
+        report("scores.txt");
+        report("nosuchfile.txt");
+    }
+
+    static void report(String fileName) {
+        Scanner input = null;
+        try {
+            input = new Scanner(new File(fileName));
+            int sum = 0, count = 0;
+            while (input.hasNextInt()) {
+                sum += input.nextInt();
+                count++;
+            }
+            System.out.println(fileName + ": " + count + " scores, total " + sum);
+        } catch (FileNotFoundException e) {
+            System.out.println(fileName + ": could not be opened.");
+            System.out.println("   " + e.getMessage());
+        } finally {
+            if (input != null) input.close();
+            System.out.println("   (scanner closed: " + (input != null) + ")");
+        }
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>scores.txt: 3 scores, total 284
+   (scanner closed: true)
+nosuchfile.txt: could not be opened.
+   nosuchfile.txt (No such file or directory)
+   (scanner closed: false)</code></pre> <p>Nothing from the <code>try</code> block on the second call. <code>new Scanner(new File(...))</code> is the very first statement, and it threw, so the loop and the summary line were never reached. That is also why <code>input</code> is still <code>null</code> in the <code>finally</code> block, and why the <code>if (input != null)</code> guard is essential &mdash; without it, the cleanup would itself throw a <code>NullPointerException</code> while trying to close a <code>Scanner</code> that was never created.</p> <p><code>main</code> no longer needs <code>throws FileNotFoundException</code>, because <code>report</code> handles it. The obligation stopped travelling as soon as somebody accepted it.</p> <p>The wording of the message &mdash; <code>nosuchfile.txt (No such file or directory)</code> &mdash; comes from the operating system, so a Windows machine phrases it differently. Never parse an exception message in code; show it to a human and no more.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 20.10</div> <div class="bd"> <p>In <code>ReadScoresSafely</code>, why is <code>Scanner input</code> declared <em>before</em> the <code>try</code> block rather than on the line where it is created, as in Lecture 5?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Ask about scope, then about what <code>finally</code> needs.</p> <p>A variable declared inside a block exists only inside that block. If you had written</p> <pre><code class="language-java">try {
+    Scanner input = new Scanner(new File(fileName));
+    // declared here ... } finally { input.close();                                      // input is not in scope }</code></pre> <p>the <code>finally</code> block would not compile: <code>input</code> died at the <code>try</code> block's closing brace. For <code>finally</code> to clean up a resource, the variable naming that resource must be declared outside the <code>try</code>. Initializing it to <code>null</code> is then forced, because the compiler must be sure it is assigned before it is read.</p> <p><strong>Things to notice.</strong> This declare-outside, assign-inside, null-check-in- finally pattern is so common that Java added a shorthand for it, <em>try-with-resources</em>: <code>try (Scanner input = new Scanner(new File(fileName))) { ... }</code> closes the <code>Scanner</code> automatically with no <code>finally</code> block at all. It is worth knowing that it exists; the explicit version above is what this course expects you to write, and it is what makes the role of <code>finally</code> visible.</p> </div></details> </div> </div> <h3>Lecture 3 and Lecture 6 &mdash; the index that was out of bounds</h3> <p>Arrays throw <code>ArrayIndexOutOfBoundsException</code>; <code>ArrayList</code> throws <code>IndexOutOfBoundsException</code>, its superclass. Both are unchecked, so nothing ever forced you to think about them. When the index comes from a user or a file rather than from a loop you wrote, that is a real risk.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the same four indexes against an array and a list</span></div> <div class="bd"> <p>An <code>int[]</code> of length 3 and an <code>ArrayList</code> of size 2, probed with the indexes 0, 2, 3 and &minus;1. Eight accesses, and some of them are legal. Work out which four throw before you reveal.</p> <p class="filename">SafeIndex.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class SafeIndex {
+    public static void main(String args[]) {
+        int[] scores = {90, 85, 78};
+        ArrayList&lt;String&gt; names = new ArrayList&lt;String&gt;();
+        names.add("Ada");
+        names.add("Grace");
+
+        int[] wanted = {0, 2, 3, -1};
+        for (int i = 0; i &lt; wanted.length; i++) {
+            int k = wanted[i];
+            try {
+                System.out.println("scores[" + k + "] = " + scores[k]);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                System.out.println("scores[" + k + "] : " + e.getMessage());
+            }
+            try {
+                System.out.println("names.get(" + k + ") = " + names.get(k));
+            } catch (IndexOutOfBoundsException e) {
+                System.out.println("names.get(" + k + ") : " + e.getMessage());
+            }
+        }
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>scores[0] = 90
+names.get(0) = Ada
+scores[2] = 78
+names.get(2) : Index 2 out of bounds for length 2
+scores[3] : Index 3 out of bounds for length 3
+names.get(3) : Index 3 out of bounds for length 2
+scores[-1] : Index -1 out of bounds for length 3
+names.get(-1) : Index -1 out of bounds for length 2</code></pre> <p>Index 2 is the interesting one: legal for the array of length 3, illegal for the list of size 2. There is nothing special about the number; what matters is the length of the thing you are indexing, which is why the message always tells you both.</p> <p>Two separate <code>try</code> blocks, not one. If both accesses shared a <code>try</code>, a failure in the array line would skip the list line entirely and half the table would be missing. When two operations are independent, give them independent <code>try</code> blocks.</p> <p>The <code>catch</code> types differ because the classes do: <code>ArrayIndexOutOfBoundsException</code> extends <code>IndexOutOfBoundsException</code>. Writing <code>catch (IndexOutOfBoundsException e)</code> for both would have worked, since a subclass is caught by its superclass; writing <code>catch (ArrayIndexOutOfBoundsException e)</code> around <code>names.get(k)</code> would <em>not</em>, because an <code>ArrayList</code> never throws that subclass.</p> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Warning<span class="tag">&mdash; do not use catch as a substitute for an if</span></div> <div class="bd"> <p>You could write this:</p> <pre><code class="language-java">try {
+    total += scores[i];
+}
+catch (ArrayIndexOutOfBoundsException e) {
+    // i was too big; ignore }</code></pre> <p>Do not. When you can test the condition cheaply yourself &mdash; <code>if (i &gt;= 0 &amp;&amp; i &lt; scores.length)</code> &mdash; the <code>if</code> is clearer, faster, and does not hide genuine bugs. Reserve <code>catch</code> for conditions you cannot test in advance: whether a file exists at the instant you open it, whether a <code>String</code> a user typed happens to parse. The <code>SafeIndex</code> example above is a demonstration of what the exceptions <em>are</em>, not a recommendation for how to loop over an array.</p> </div> </div> <h3>Lecture 17 &mdash; the text field the user typed nonsense into</h3> <p>The Lecture 17 GUI read a <code>JTextField</code> with <code>getText()</code> and converted it with <code>Integer.parseInt</code>. It had no way to survive a user typing <code>twenty</code>, and a GUI that dies on bad input is worse than a console program that does &mdash; the window vanishes with no explanation. The fix is one <code>try</code>/<code>catch</code> inside <code>actionPerformed</code>.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; a text field that cannot be broken</span></div> <div class="bd"> <p>A window with a text field, a button and a label. This program opens a window and prints nothing to the console, so there is no output block below it &mdash; what to look at is <code>actionPerformed</code>.</p> <p class="filename">Doubler.java</p>
+<pre><code class="language-java">import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+public class Doubler extends JFrame implements ActionListener {
+    private JTextField input;
+    private JLabel result;
+
+    public Doubler() {
+        setTitle("Doubler");
+        setSize(320, 120);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        input = new JTextField(8);
+        result = new JLabel("type a whole number");
+        JButton go = new JButton("Double it");
+        go.addActionListener(this);
+
+        panel.add(input);
+        panel.add(go);
+        panel.add(result);
+        add(panel);
+        setVisible(true);
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        try {
+            int n = Integer.parseInt(input.getText().trim());
+            result.setText("Twice that is " + (2 * n));
+        } catch (NumberFormatException ex) {
+            result.setText("Please type a whole number.");
+            input.setText("");
+        }
+    }
+
+    public static void main(String args[]) {
+        new Doubler();
+    }
+}</code></pre> <details class="soln reveal noout"><summary></summary><div class="ans">
+ <p>What happens on screen: a 320-by-120 window titled <em>Doubler</em> holding a text field, a <em>Double it</em> button and a label reading <em>type a whole number</em>. Type <code>21</code> and press the button and the label becomes <em>Twice that is 42</em>. Type <code>twenty</code> and press it and the label becomes <em>Please type a whole number.</em>, the field is cleared, and &mdash; this is the point &mdash; the window is still there and still working. Type <code>21</code> again and it doubles it as if nothing had happened.</p> <p>Three details in <code>actionPerformed</code> are worth copying into your own GUI code:</p> <ul> <li><strong><code>.trim()</code> before parsing.</strong> <code>Integer.parseInt(" 21 ")</code> throws; users put spaces in text fields constantly. Trimming first removes the commonest false failure, as Lecture 17 noted.</li> <li><strong>The exception variable is named <code>ex</code>, not <code>e</code>.</strong> It has to be: <code>actionPerformed</code> already has a parameter called <code>e</code>, the <code>ActionEvent</code>, and reusing the name inside the <code>catch</code> would not compile.</li> <li><strong>The <code>catch</code> reports through the same label as the success path.</strong> The user never sees a console, so a <code>System.out.println</code> in the <code>catch</code> would be invisible; the whole point is to put the message where they are already looking.</li> </ul> <p>Without the <code>try</code>/<code>catch</code> the exception escapes <code>actionPerformed</code> into Swing's event dispatch thread, which prints a stack trace to the console the user cannot see and leaves the window sitting there having silently done nothing. That is the worst of both worlds, and one <code>catch</code> block avoids it.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 20.11</div> <div class="bd"> <p>Add validation to <code>Doubler</code>. Beyond rejecting text that is not a number, the program should also refuse a number outside 1 to 1000 &mdash; and the two failures must produce different messages. Write a helper method <code>readValue()</code> that returns the <code>int</code> or throws, plus the new <code>actionPerformed</code>. Use a custom exception class for the range failure.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> This is Example 4's design applied to a GUI. The two failures need two types: <code>NumberFormatException</code> already covers bad text, so write a <code>RangeException</code> for the bad value. <code>readValue</code> parses, then checks the range and throws; it declares <code>throws RangeException</code> because that class extends <code>Exception</code> and is therefore checked, and it says nothing about <code>NumberFormatException</code> because that one is unchecked. <code>actionPerformed</code> gets two <code>catch</code> blocks. They are unrelated types, so their order is free.</p> <p class="filename">RangeException.java</p>
+<pre><code class="language-java">public class RangeException extends Exception {
+    public RangeException(String s) {
+        super(s);
+    }
+}</code></pre> <pre><code class="language-java">private int readValue() throws RangeException {
+    int n = Integer.parseInt(input.getText().trim());
+    if (n &lt; 1 || n &gt; 1000) throw new RangeException("Value " + n + " is outside 1 to 1000.");
+    return n;
+}
+public void actionPerformed(ActionEvent e) {
+    try {
+        int n = readValue();
+        result.setText("Twice that is " + (2 * n));
+    }
+    catch (NumberFormatException ex) {
+        result.setText("Please type a whole number.");
+        input.setText("");
+    }
+    catch (RangeException ex) {
+        result.setText(ex.getMessage());
+    }
+}</code></pre> <p>Typing <code>twenty</code> gives <em>Please type a whole number.</em>; typing <code>5000</code> gives <em>Value 5000 is outside 1 to 1000.</em>; typing <code>21</code> gives <em>Twice that is 42</em>.</p> <p><strong>Things to notice.</strong> The range message is built inside <code>readValue</code>, where the offending number is in hand, and carried to the <code>catch</code> inside the exception object. That is the payoff of <code>getMessage()</code>: the place that detects the problem writes the explanation, and the place that handles it decides where to display it. Neither has to know about the other.</p> <p>Compare the two <code>catch</code> blocks. The <code>NumberFormatException</code> one cannot use <code>ex.getMessage()</code> &mdash; that message is <code>For input string: "twenty"</code>, written for programmers. The <code>RangeException</code> one can, because you wrote the message yourself. Whenever you find yourself unable to show <code>getMessage()</code> to a user, that is a sign the exception came from the library and needs a message of your own.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 20.11</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="6" aria-label="Live coding - Quick Check 20.11">public class RangeException extends Exception { // 1. Constructor taking a String. } // Add these two methods to the Doubler class from above. // 2. private int readValue() -- parse, then range-check and throw. //    Which exception types does this signature have to declare? // 3. public void actionPerformed(ActionEvent e) -- two catch blocks, //    two different messages in the label. </textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 20.12</div> <div class="bd"> <p>Design questions. For each, say whether the situation calls for a <code>try</code>/<code>catch</code>, an ordinary <code>if</code>, or neither.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> A <code>for</code> loop over an array using <code>for (int i = 0; i &lt; a.length; i++)</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p>Neither. The loop condition already guarantees the index is in range. Wrapping it in a <code>try</code> adds noise and hides a real bug if one ever appears.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Dividing <code>total</code> by <code>count</code>, where both are <code>int</code> and <code>count</code> was computed from user input.</p> <details class="soln"><summary></summary><div class="ans"> <p>An <code>if</code>. <code>if (count == 0)</code> is one cheap test you fully control, and it lets you say something meaningful instead of dividing and reacting. Catching <code>ArithmeticException</code> here would work, but it is using an exception where a condition will do.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Opening a file whose name the user typed.</p> <details class="soln"><summary></summary><div class="ans"> <p>A <code>try</code>/<code>catch</code>, and the compiler will insist on it or on a <code>throws</code> clause because <code>FileNotFoundException</code> is checked. There is no <code>if</code> that helps: even a check that the file exists could be true and then false a millisecond later. This is the textbook case for an exception.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> Converting a <code>String</code> from a text field into an <code>int</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p>A <code>try</code>/<code>catch</code>. In principle you could inspect every character yourself, but you would be reimplementing <code>parseInt</code> &mdash; and getting the edge cases wrong, since a leading minus is fine, a leading plus is fine, an empty string is not, and a value beyond <code>Integer.MAX_VALUE</code> is not either. Let the library decide and catch its verdict.</p> <p><strong>Things to notice across all four parts.</strong> The dividing line is whether <em>you</em> can cheaply and reliably test the condition first. If you can, test it. If the answer depends on the outside world or on a library's definition of valid, catch. Nearly every "should this be an exception?" argument comes down to that one question.</p> </div></details> </div> </div> </div> <h2 id="prac"><span class="num">&#9733;</span>Practice Problems</h2> <div class="box prac"> <div class="hd">Practice Problems<span class="tag">&mdash; exam-style, exceptions</span></div> <div class="bd"> <p>The first three are the exception questions from the practice set for the final, in the instructor's own wording. Problems 4 and 5 target the two ideas that cost the most marks: the ordering of <code>catch</code> clauses, and the exact moment a <code>finally</code> block runs. Work them on paper &mdash; the exam is closed book and there is no compiler in the room.</p> </div> </div> <h3>Problem 1 &mdash; A try-catch block in nine lines <span class="muted">(from Exam 3 Practice Problems)</span></h3> <p>Write a <code>main</code> method with a try-catch block. Inside the block it creates an array of Strings &mdash; the array is called <code>list</code> and has size 10. Print the value stored in <code>list[10]</code>. The catch block should catch <code>ArithmeticException</code> and <code>RuntimeException</code>. Your code shouldn't be longer than 9 lines excluding curly braces.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The body is three lines: declare the array, print the bad element, and one <code>catch</code>. The interesting part of this question is the last sentence of the specification, because as literally written it does not compile &mdash; and knowing why is the point.</p> <p><strong>The trap.</strong> The obvious reading is a multi-catch clause, <code>catch (ArithmeticException | RuntimeException e)</code>. Java rejects it:</p> <pre class="err"><code>MultiCatchBad.java:6: error: Alternatives in a multi-catch statement cannot be related by subclassing } catch (ArithmeticException | RuntimeException e) {
+^
+Alternative ArithmeticException is a subclass of alternative RuntimeException
+1 error</code></pre> <p><code>ArithmeticException</code> extends <code>RuntimeException</code>, and a multi-catch clause may not list two types where one is an ancestor of the other &mdash; the first alternative would be completely covered by the second, so naming it adds nothing.</p> <p>Writing them as <em>two separate</em> <code>catch</code> clauses is legal, but only in one order. Specific first compiles:</p> <pre><code class="language-java">}
+catch (ArithmeticException e) {
+    System.out.println("arith");
+}
+catch (RuntimeException e) {
+    System.out.println("Exception caught: " + e.getMessage());
+}</code></pre> <p>General first does not, for the reason from &sect;5:</p> <pre class="err"><code>TwoClausesBad.java:8: error: exception ArithmeticException has already been caught } catch (ArithmeticException e) {
+^
+1 error</code></pre> <p><strong>What to write.</strong> Within the nine-line budget, <code>catch (RuntimeException e)</code> alone satisfies the requirement: it already catches <code>ArithmeticException</code>, and every other unchecked exception, including the <code>ArrayIndexOutOfBoundsException</code> this code actually produces.</p> <p class="filename">ArrayCatch.java</p>
+<pre><code class="language-java">public class ArrayCatch {
+    public static void main(String[] args) {
+        try {
+            String[] list = new String[10];
+            System.out.println(list[10]);
+        } catch (RuntimeException e) {
+            System.out.println("Exception caught: " + e.getMessage());
+        }
+    }
+}</code></pre> <pre class="out"><code>Exception caught: Index 10 out of bounds for length 10 </code></pre> <p><strong>Things to notice.</strong> <code>new String[10]</code> gives you indexes 0 through 9. <code>list[10]</code> is the eleventh element of a ten-element array &mdash; the classic off-by-one, and the reason the question chose that number.</p> <p>The array is created <em>inside</em> the <code>try</code>, which is what the question asks for and is also fine: <code>new String[10]</code> cannot fail. If you wanted to use <code>list</code> after the block you would have to declare it outside, exactly as with the <code>Scanner</code> in Quick Check 20.10.</p> <p>Nothing here is checked, so no <code>throws</code> clause appears anywhere, and in fact the <code>try</code>/<code>catch</code> is optional as far as the compiler is concerned. It is the difference between a program that prints one tidy line and one that prints a stack trace and dies.</p> </div></details> <h3>Problem 2 &mdash; RoomCounter and NegativeCounterException <span class="muted">(from Exam 3 Practice Problems)</span></h3> <p>Create a class called <code>RoomCounter</code> which counts the number of people in a room. We know that the number of people in a room can never be negative. The class should have <code>addPerson</code> (adds one person), <code>removePerson</code> (removes one person) and <code>getCount</code> (returns the number of people). If <code>removePerson()</code> would make the number of people less than zero, throw a <code>NegativeCounterException</code>.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Create the class <code>RoomCounter</code> with a default constructor and one instance variable <code>count</code> of type <code>int</code>. Write the three methods and throw an exception where appropriate. The only getter method is <code>getCount()</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> <code>count</code> is <code>private</code> &mdash; encapsulation, Lecture 7. The default constructor sets it to 0, which Java would do anyway, but the question asks for the constructor. Only <code>removePerson</code> can fail, so only it gets a <code>throws</code> clause. Check <em>before</em> decrementing.</p> <pre><code class="language-java">public class RoomCounter {
+    private int count;
+    public RoomCounter() {
+        count = 0;
+    }
+    public void addPerson() {
+        count++;
+    }
+    public void removePerson() throws NegativeCounterException {
+        if (count &lt;= 0) throw new NegativeCounterException();
+        count--;
+    }
+    public int getCount() {
+        return count;
+    }
+}</code></pre> <p>The test is <code>count &lt;= 0</code>, not <code>count &lt; 0</code>. The rule is that the count may never <em>become</em> negative, so the removal has to be refused while the room is already empty. Writing <code>count &lt; 0</code> would allow one removal too many and leave the count at &minus;1, which is the exact state the exception exists to prevent.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Define the class <code>NegativeCounterException</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p>Four lines. Note that <code>removePerson</code> throws it with <code>new NegativeCounterException()</code> and no argument, so the constructor takes no parameter &mdash; it supplies the message itself:</p> <p class="filename">NegativeCounterException.java</p>
+<pre><code class="language-java">public class NegativeCounterException extends Exception {
+    public NegativeCounterException() {
+        super("Cannot remove a person from an empty room");
+    }
+}</code></pre> <p><code>extends Exception</code> makes it checked, which is what forces the <code>throws</code> clause in part (a) and the <code>try</code>/<code>catch</code> in part (c). A no-argument constructor that calls <code>super(...)</code> with a fixed message is a good pattern when the failure only ever means one thing; <code>AgeException</code> took a parameter instead because its message varies with the reason.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> In <code>RoomCounter</code>, write a static <code>main()</code>. Create a <code>RoomCounter</code> object, add three people, then in a try-catch block remove one person at a time and catch any exception. After each removal, print the count.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Add three, then loop <em>four</em> times &mdash; three successful removals and one that must fail, otherwise the <code>catch</code> block is never exercised and you have not demonstrated anything. Put the <code>try</code> inside the loop so one failure does not end it.</p> <p class="filename">RoomCounter.java</p>
+<pre><code class="language-java">public class RoomCounter {
+    private int count;
+
+    public RoomCounter() { count = 0; }
+
+    public void addPerson() { count++; }
+
+    public void removePerson() throws NegativeCounterException {
+        if (count &lt;= 0) throw new NegativeCounterException();
+        count--;
+    }
+
+    public int getCount() { return count; }
+
+    public static void main(String args[]) {
+        RoomCounter room = new RoomCounter();
+
+        room.addPerson();
+        room.addPerson();
+        room.addPerson();
+        System.out.println("Current count: " + room.getCount());
+
+        for (int i = 0; i &lt; 4; i++) {
+            try {
+                room.removePerson();
+                System.out.println("Person removed. Count: " + room.getCount());
+            } catch (NegativeCounterException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+}</code></pre> <pre class="out"><code>Current count: 3
+Person removed. Count: 2
+Person removed. Count: 1
+Person removed. Count: 0
+Cannot remove a person from an empty room</code></pre> <p><strong>Things to notice across all three parts.</strong> The print statement sits <em>inside</em> the <code>try</code>, after the call. That is deliberate: on the fourth pass <code>removePerson</code> throws, so the print is skipped and the count is not reported a second time as 0. Had the print been after the whole <code>try</code>/<code>catch</code>, the last line of output would have been a confusing <code>Person removed. Count: 0</code> following the error message.</p> <p><code>getMessage()</code> returns the text the no-argument constructor passed to <code>super</code>. Printing <code>e.getMessage()</code> rather than a hard-coded string in <code>main</code> keeps the wording in one place &mdash; the exception class &mdash; which is the whole reason to give an exception a message at all.</p> <p>This design puts the rule inside the object. No caller of <code>RoomCounter</code> can drive the count negative, no matter what they do, because the only way to change it is through methods that enforce the invariant. Compare that with returning a <code>boolean</code> from <code>removePerson</code>, which a caller can simply ignore.</p> </div></details> </div> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 2</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="6" aria-label="Live coding - Practice Problem 2">public class NegativeCounterException extends Exception {
+    // (b) A no-argument constructor that supplies a fixed message. } class RoomCounter { private int count; // (a) Default constructor, addPerson, removePerson, getCount. //     Only one of the three methods can fail -- which one, and //     what does its signature need? public static void main(String args[]) { // (c) Add three people, then remove one at a time four times, //     printing the count after each successful removal. } }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 3 &mdash; EmptyArrayException and the average method <span class="muted">(from Exam 3 Practice Problems)</span></h3> <p>Consider the following class <code>P3</code>, which has three methods: <code>main</code>, <code>readMyArrayList</code> and <code>average</code>.</p> <p class="filename">P3.java</p>
+<pre><code class="language-java">public class P3 {
+    public static void main(String args[]) {
+        Scanner input = new Scanner(System.in);
+        for (int i = 0; i &lt; 5; i++) {
+            ArrayList&lt;Integer&gt; list = readMyArrayList(input);
+            System.out.println(average(list));
+        }
+    }
+    static ArrayList&lt;Integer&gt; readMyArrayList(Scanner input) {
+        ArrayList&lt;Integer&gt; answer = new ArrayList&lt;&gt;();
+        System.out.println("How many elements?");
+        int size = input.nextInt();
+        for (int i = 0; i &lt; size; i++) answer.add(input.nextInt());
+        return answer;
+    }
+    static double average(ArrayList&lt;Integer&gt; list) {
+        int sum = 0;
+        for (int i = 0; i &lt; list.size(); i++) sum += list.get(i);
+        return ((double) sum) / list.size();
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> Write a class <code>EmptyArrayException</code> whose objects are exceptions but are not run time exceptions. You should provide a constructor with a <code>String</code> parameter. No other methods should be given.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> "Exceptions but not run time exceptions" is the instruction to extend <code>Exception</code> rather than <code>RuntimeException</code> &mdash; that is, to make it checked. "A constructor with a <code>String</code> parameter" and "no other methods" means the class is exactly five lines.</p> <p class="filename">EmptyArrayException.java</p>
+<pre><code class="language-java">public class EmptyArrayException extends Exception {
+    public EmptyArrayException(String message) {
+        super(message);
+    }
+}</code></pre> <p>Do not add a <code>getMessage()</code>. You inherit one from <code>Throwable</code>, and the <code>super(message)</code> call is what makes it return something useful. Adding your own would be extra code that does the same job worse.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Modify the method <code>average</code> to throw an <code>EmptyArrayException</code> whenever its <code>list</code> parameter has size 0. Give the complete code for the modified method.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Two edits. The guard goes first, before the loop, because there is nothing to compute if the list is empty. The signature needs <code>throws EmptyArrayException</code>, since the class is checked.</p> <pre><code class="language-java">static double average(ArrayList&lt;Integer&gt; list) throws EmptyArrayException {
+    if (list.size() == 0) throw new EmptyArrayException("Empty list!!!");
+    int sum = 0;
+    for (int i = 0; i &lt; list.size(); i++) sum += list.get(i);
+    return ((double) sum) / list.size();
+}</code></pre> <p>Without the guard, what would the original method have returned for an empty list? Not an exception &mdash; <code>((double) 0) / 0</code> is floating-point division, so it returns <code>NaN</code>, silently, exactly as Quick Check 20.4(c) showed. That is precisely why this question exists: an exception turns an invisible wrong answer into a loud, catchable event.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Modify <code>main</code> to catch any exception thrown by <code>average</code>. After catching one, report an illegal empty list to the user and make an adjustment so that the <code>for</code> loop has an extra iteration &mdash; so the loop really does find 5 averages, if necessary by making the user enter extra data. Write complete code for the modified <code>main</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Wrap both statements in a <code>try</code>. Both have to be inside it: if the read were outside, a thrown exception would still leave the average unprinted, and if the print were outside, there would be no value to print. The "extra iteration" is the neat part &mdash; <code>i--</code> inside the <code>catch</code> cancels the <code>i++</code> the <code>for</code> header is about to perform, so that round does not count.</p> <p class="filename">P3.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+import java.util.Scanner;
+
+public class P3 {
+    public static void main(String args[]) {
+        Scanner input = new Scanner(System.in);
+        for (int i = 0; i &lt; 5; i++) {
+            try {
+                ArrayList&lt;Integer&gt; list = readMyArrayList(input);
+                System.out.println(average(list));
+            } catch (EmptyArrayException e) {
+                System.out.println("Illegal empty list: " + e.getMessage());
+                i--;                       // buy back this iteration
+            }
+        }
+    }
+
+    static ArrayList&lt;Integer&gt; readMyArrayList(Scanner input) {
+        ArrayList&lt;Integer&gt; answer = new ArrayList&lt;&gt;();
+        System.out.println("How many elements?");
+        int size = input.nextInt();
+        for (int i = 0; i &lt; size; i++) answer.add(input.nextInt());
+        return answer;
+    }
+
+    static double average(ArrayList&lt;Integer&gt; list) throws EmptyArrayException {
+        if (list.size() == 0) throw new EmptyArrayException("Empty list!!!");
+        int sum = 0;
+        for (int i = 0; i &lt; list.size(); i++) sum += list.get(i);
+        return ((double) sum) / list.size();
+    }
+}</code></pre> <p>A session in which the user's second list is empty. Six lists are entered and five averages are printed, which is the requirement:</p> <pre class="out"><code>How many elements? 3 90 85 78 84.33333333333333 How many elements? 0 Illegal empty list: Empty list!!! How many elements? 2 10 20 15.0 How many elements? 1 7 7.0 How many elements? 2 4 5 4.5 How many elements? 1 100 100.0 </code></pre> <p><strong>Things to notice across all three parts.</strong> <code>i--</code> in the <code>catch</code> is the whole trick, and it is worth being sure why it works: the <code>for</code> header runs <code>i++</code> after every iteration, including the ones that threw, so decrementing inside the <code>catch</code> leaves <code>i</code> unchanged for that round. Five successful averages therefore require exactly five successful rounds, however many failures happen in between.</p> <p>It is a technique to use knowingly, not reflexively &mdash; a loop whose counter can move backwards can, in principle, never terminate. Here that is the intended behavior: the loop must keep asking until it has five real averages. If the failures were caused by something the user could not fix, this would be an infinite loop.</p> <p>Note also what the <code>catch</code> clause names. <code>catch (EmptyArrayException e)</code> is specific to the one thing <code>average</code> throws. <code>catch (Exception e)</code> would also compile, and would additionally swallow anything <code>readMyArrayList</code> throws &mdash; for instance the <code>InputMismatchException</code> you get when the user types a word where <code>nextInt()</code> wants a number. That is a different failure with a different fix, and lumping the two together is exactly the mistake Example 3 in &sect;4 demonstrated.</p> </div></details> </div> <h3>Problem 4 &mdash; Find the errors <span class="muted">(added for these notes)</span></h3> <p>The following file does not compile. There are two errors, both on numbered lines. Identify them, say what the compiler reports, and give the corrected file.</p> <p class="filename">Broken.java</p>
+<pre><code class="language-java">import java.io.File;
+import java.util.Scanner;
+
+public class Broken {
+    public static void main(String args[]) {
+        try {
+            Scanner in = new Scanner(new File("data.txt"));   // line 1
+            int n = check(in.nextInt());                      // line 2
+            System.out.println("value " + n);
+        } catch (Exception e) {                               // line 3
+            System.out.println("general problem");
+        } catch (ArithmeticException e) {                     // line 4
+            System.out.println("arithmetic problem");
+        }
+    }
+
+    static int check(int n) {                                 // line 5
+        if (n &lt; 0) throw new Exception("negative");           // line 6
+        return n;
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Look for the two failure modes from this lecture. One: a <code>catch</code> clause that can never be reached, because a superclass was caught above it. Two: a checked exception that is neither caught nor declared. Then check the remaining lines are innocent &mdash; line 1 is fine because <code>FileNotFoundException</code> <em>is</em> caught, by the <code>catch (Exception e)</code> on line 3.</p> <p>Here is what <code>javac</code> actually says:</p> <pre class="err"><code>Broken.java:12: error: exception ArithmeticException has already been caught
+        } catch (ArithmeticException e) {                     // line 4
+          ^
+Broken.java:18: error: unreported exception Exception; must be caught or declared to be thrown
+        if (n &lt; 0) throw new Exception("negative");           // line 6
+                   ^
+2 errors</code></pre> <p><strong>Error 1 &mdash; lines 3 and 4.</strong> <code>ArithmeticException</code> descends from <code>Exception</code>, so by the time control could reach line 4 the clause on line 3 has already caught every one of them. Swap the two clauses: specific first, general last.</p> <p><strong>Error 2 &mdash; lines 5 and 6.</strong> Line 6 throws a plain <code>Exception</code>, which is checked, but line 5 declares nothing. Add <code>throws Exception</code> to <code>check</code>. Note that the error is reported against line 6, the <code>throw</code>, even though the correction is made on line 5 &mdash; the compiler points at the statement, and you fix the signature.</p> <p>Corrected:</p> <p class="filename">Fixed.java</p>
+<pre><code class="language-java">import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+public class Fixed {
+    public static void main(String args[]) {
+        try {
+            Scanner in = new Scanner(new File("data.txt"));   // line 1
+            int n = check(in.nextInt());                      // line 2
+            System.out.println("value " + n);
+        } catch (ArithmeticException e) {                     // line 4
+            System.out.println("arithmetic problem");
+        } catch (Exception e) {                               // line 3
+            System.out.println("general problem: " + e.getMessage());
+        }
+    }
+
+    static int check(int n) throws Exception {                // line 5
+        if (n &lt; 0) throw new Exception("negative");           // line 6
+        return n;
+    }
+}</code></pre> <p>With a <code>data.txt</code> containing <code>-5</code>:</p> <pre class="out"><code>general problem: negative </code></pre> <p>And with <code>data.txt</code> deleted:</p> <pre class="out"><code>general problem: data.txt (No such file or directory) </code></pre> <p><strong>Things to notice.</strong> Both of those runs land in the same <code>catch</code> block, and the program cannot tell them apart &mdash; a missing file and a negative number produce the same handler. If that matters, the fix is a third <code>catch (FileNotFoundException e)</code> <em>above</em> the general one, or better, a custom exception class for the negative case, exactly as <code>AgeException</code> did in &sect;6.</p> <p>Two errors, and <code>javac</code> reported both at once. It managed that because these are semantic errors, not syntax errors &mdash; the parser got all the way through the file. A missing semicolon early on would have stopped it after one message, as it did in the Lecture 1 practice problems.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 4</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="23" aria-label="Live coding - Practice Problem 4">import java.io.File;
+import java.util.Scanner;
+
+public class Broken {
+    public static void main(String args[]) {
+        try {
+            Scanner in = new Scanner(new File("data.txt"));   // line 1
+            int n = check(in.nextInt());                      // line 2
+            System.out.println("value " + n);
+        } catch (Exception e) {                               // line 3
+            System.out.println("general problem");
+        } catch (ArithmeticException e) {                     // line 4
+            System.out.println("arithmetic problem");
+        }
+    }
+
+    static int check(int n) {                                 // line 5
+        if (n &lt; 0) throw new Exception("negative");           // line 6
+        return n;
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 5 &mdash; What is the output? <span class="muted">(added for these notes)</span></h3> <p>Consider the following Java program. Give the output at each of the marked lines.</p> <p class="filename">Output20.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class Output20 {
+    public static void main(String args[]) {
+        ArrayList&lt;Integer&gt; a = new ArrayList&lt;Integer&gt;();
+        a.add(4); a.add(0); a.add(9);
+
+        System.out.println(step(a, 0));            // line (a)
+        System.out.println(step(a, 1));            // line (b)
+        System.out.println(step(a, 5));            // line (c)
+
+        try {
+            System.out.println(12.0 / 0);          // line (d)
+            System.out.println(12 / 0);            // line (e)
+            System.out.println("unreachable");
+        } catch (ArithmeticException e) {
+            System.out.println("caught " + e.getMessage());
+        } finally {
+            System.out.println("done");            // line (f)
+        }
+    }
+
+    static String step(ArrayList&lt;Integer&gt; a, int i) {
+        try {
+            return "value " + (100 / a.get(i));
+        } catch (ArithmeticException e) {
+            return "arithmetic";
+        } catch (IndexOutOfBoundsException e) {
+            return "index";
+        } finally {
+            System.out.print("[cleanup] ");
+        }
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> What is the output at line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>[cleanup] value 25</code>. <code>a.get(0)</code> is 4, and <code>100 / 4</code> is 25, so the <code>try</code> block returns. The <code>finally</code> block runs before the value leaves <code>step</code>, and it uses <code>print</code>, so <code>[cleanup] </code> appears first and on the same line.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What is the output at line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>[cleanup] arithmetic</code>. <code>a.get(1)</code> is 0, so <code>100 / 0</code> throws <code>ArithmeticException</code> &mdash; both operands are <code>int</code>. The first <code>catch</code> matches and returns <code>"arithmetic"</code>; <code>finally</code> still runs on the way out.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> What is the output at line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>[cleanup] index</code>. <code>a.get(5)</code> throws <code>IndexOutOfBoundsException</code> before any division is attempted, so the first <code>catch</code> does not match and the second does.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> What is the output at line (d)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Infinity</code>. <code>12.0</code> is a <code>double</code>, so this is floating-point division and nothing is thrown. The line prints and execution carries on to line (e).</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> What is the output at line (e)?</p> <details class="soln"><summary></summary><div class="ans"> <p>Line (e) itself prints nothing. <code>12 / 0</code> with two <code>int</code> operands throws <code>ArithmeticException</code>, so <code>println</code> never receives a value. The <code>catch</code> block runs instead and prints <code>caught / by zero</code> &mdash; the message on an <code>ArithmeticException</code> from integer division is the terse <code>/ by zero</code>. The <code>"unreachable"</code> line is skipped.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(f)</span> What is the output at line (f), and what is the whole program's output?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>done</code>, printed after the <code>catch</code> block has finished. Putting it all together:</p> <pre class="out"><code>[cleanup] value 25
+[cleanup] arithmetic
+[cleanup] index
+Infinity
+caught / by zero
+done</code></pre> <p><strong>Things to notice across all six parts.</strong> Every line of this problem is one of the three ideas that get tested: does <code>finally</code> run (always), which <code>catch</code> matches (the first compatible one, in written order), and does division by zero throw (only for integers).</p> <p>The <code>[cleanup] </code> prefix on the first three lines is the giveaway for the <code>finally</code>-before- <code>return</code> rule. If you predicted <code>value 25 [cleanup]</code> you assumed the <code>return</code> leaves immediately; it does not. It evaluates the expression, holds the result, runs <code>finally</code>, and only then departs.</p> <p>Lines (d) and (e) are the same division written twice, differing only in a <code>.0</code>. One prints a value and one throws. Whenever an exam shows you two adjacent divisions by zero, check the types before anything else.</p> </div></details> </div> <div class="box sum" id="summary"> <div class="hd">Lecture Summary</div> <div class="bd"> <ul> <li>An <strong>exception</strong> is an object describing a failure. It is <strong>thrown</strong> at the point of failure, and it travels up the call stack until some <code>catch</code> matches it &mdash; or until it reaches the JVM, which prints a <strong>stack trace</strong> and stops the program. Read a stack trace from the bottom up; the first line naming your own file is the one to go and look at.</li> <li><code>try</code> holds the risky code; <code>catch</code> names one exception type and says what to do about it. The rest of the <code>try</code> block after the throw is <strong>abandoned</strong>, not resumed, and nothing already done is undone.</li> <li>The hierarchy is <code>Throwable</code> &rarr; <code>Error</code> and <code>Exception</code>, with <code>RuntimeException</code> under <code>Exception</code>. Everything at or below <code>RuntimeException</code> is <strong>unchecked</strong>; everything else under <code>Exception</code> is <strong>checked</strong>, and a checked exception must be <strong>caught or declared</strong> at every level of the call chain.</li> <li><code>throw</code> is a statement that raises an object right now. <code>throws</code> is a clause on a method signature that names types and raises nothing. One letter, two completely different jobs.</li> <li>Several <code>catch</code> blocks may follow one <code>try</code>, and Java runs the <strong>first</strong> one whose type matches. A subclass clause must therefore come <strong>before</strong> its superclass, or the file does not compile &mdash; <code>exception X has already been caught</code>.</li> <li>Write your own exception with <code>class MyException extends Exception</code> and a constructor that calls <code>super(message)</code>. That makes it checked, gives it a distinct type worth a <code>catch</code> clause of its own, and makes <code>getMessage()</code> return your text. <code>getMessage</code>, <code>toString</code> and <code>printStackTrace</code> are the three methods to know.</li> <li><code>finally</code> always runs &mdash; after a normal finish, after a handled throw, on the way out of an unhandled one, and <strong>before</strong> a <code>return</code> in the <code>try</code> or <code>catch</code> actually delivers its value.</li> <li>Integer division by zero throws <code>ArithmeticException</code>; floating-point division by zero quietly gives <code>Infinity</code>, <code>-Infinity</code> or <code>NaN</code>. The loud one is easier to debug.</li> <li>Use <code>catch</code> for conditions you cannot cheaply test yourself &mdash; a file that may not exist, text a user may have mistyped. Use an <code>if</code> when you can.</li> </ul> <p><strong>Coming up in Lecture 21: Linked Lists, Stacks and Queues.</strong> We leave error handling and start building data structures from scratch &mdash; a chain of <code>Node</code> objects, each holding a value and a reference to the next, and then the two classic disciplines built on top of it: a queue that serves first-in-first-out and a stack that serves last-in-first-out. Exceptions come straight back with us: popping an empty stack is precisely the <code>RoomCounter</code> problem from Practice Problem 2, and your own exception class is how you will
+    report it.</p>
+  </div>
+</div>
+
+<nav class="pagenav">
+<span class="disabled"><div class="dir">&larr; Previous</div><div class="ttl">Review 2 &mdash; Exam 2 Review</div><div class="pending">posts Tue Nov 17</div></span>
+<span class="disabled next"><div class="dir">Next &rarr;</div><div class="ttl">Lecture 21 &mdash; Linked Lists, Stacks and Queues</div><div class="pending">posts Tue Dec 1</div></span>
+</nav>
+<footer class="pf">CSCI 212 &middot; Object-Oriented Programming in Java &middot; Queens College, CUNY</footer>
+</div>
+<script>
+(()=>{var ut=Object.create;var xe=Object.defineProperty;var ft=Object.getOwnPropertyDescriptor;var gt=Object.getOwnPropertyNames;var ht=Object.getPrototypeOf,dt=Object.prototype.hasOwnProperty;var pt=(e,t)=>()=>{try{return t||e((t={exports:{}}).exports,t),t.exports}catch(n){throw t=0,n}};var Et=(e,t,n,l)=>{if(t&&typeof t=="object"||typeof t=="function")for(let d of gt(t))!dt.call(e,d)&&d!==n&&xe(e,d,{get:()=>t[d],enumerable:!(l=ft(t,d))||l.enumerable});return e};var bt=(e,t,n)=>(n=e!=null?ut(ht(e)):{},Et(t||!e||!e.__esModule?xe(n,"default",{value:e,enumerable:!0}):n,e));var Ke=pt((ln,Ge)=>{function Ie(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(t=>{let n=e[t],l=typeof n;(l==="object"||l==="function")&&!Object.isFrozen(n)&&Ie(n)}),e}var Z=class{constructor(t){t.data===void 0&&(t.data={}),this.data=t.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function Ce(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function k(e,...t){let n=Object.create(null);for(let l in e)n[l]=e[l];return t.forEach(function(l){for(let d in l)n[d]=l[d]}),n}var _t="</span>",Ne=e=>!!e.scope,Mt=(e,{prefix:t})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let n=e.split(".");return[`${t}${n.shift()}`,...n.map((l,d)=>`${l}${"_".repeat(d+1)}`)].join(" ")}return`${t}${e}`},oe=class{constructor(t,n){this.buffer="",this.classPrefix=n.classPrefix,t.walk(this)}addText(t){this.buffer+=Ce(t)}openNode(t){if(!Ne(t))return;let n=Mt(t.scope,{prefix:this.classPrefix});this.span(n)}closeNode(t){Ne(t)&&(this.buffer+=_t)}value(){return this.buffer}span(t){this.buffer+=`<span class="${t}">`}},Re=(e={})=>{let t={children:[]};return Object.assign(t,e),t},ae=class e{constructor(){this.rootNode=Re(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(t){this.top.children.push(t)}openNode(t){let n=Re({scope:t});this.add(n),this.stack.push(n)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(t){return this.constructor._walk(t,this.rootNode)}static _walk(t,n){return typeof n=="string"?t.addText(n):n.children&&(t.openNode(n),n.children.forEach(l=>this._walk(t,l)),t.closeNode(n)),t}static _collapse(t){typeof t!="string"&&t.children&&(t.children.every(n=>typeof n=="string")?t.children=[t.children.join("")]:t.children.forEach(n=>{e._collapse(n)}))}},le=class extends ae{constructor(t){super(),this.options=t}addText(t){t!==""&&this.add(t)}startScope(t){this.openNode(t)}endScope(){this.closeNode()}__addSublanguage(t,n){let l=t.root;n&&(l.scope=`language:${n}`),this.add(l)}toHTML(){return new oe(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function G(e){return e?typeof e=="string"?e:e.source:null}function De(e){return B("(?=",e,")")}function Ot(e){return B("(?:",e,")*")}function wt(e){return B("(?:",e,")?")}function B(...e){return e.map(n=>G(n)).join("")}function xt(e){let t=e[e.length-1];return typeof t=="object"&&t.constructor===Object?(e.splice(e.length-1,1),t):{}}function V(...e){return"("+(xt(e).capture?"":"?:")+e.map(l=>G(l)).join("|")+")"}function ke(e){return new RegExp(e.toString()+"|").exec("").length-1}function Nt(e,t){let n=e&&e.exec(t);return n&&n.index===0}var Rt=new RegExp(V(/\[(?:[^\\\]]|\\.)*\]/,/\(\?<(?![=!])[^>]+>/,/\(\?'[^']+'/,/\(\??/,/\\([1-9][0-9]*)/,/\\./));function fe(e,{joinWith:t}){let n=0;return e.map(l=>{n+=1;let d=n,_=G(l),c="";for(;_.length>0;){let r=Rt.exec(_);if(!r){c+=_;break}c+=_.substring(0,r.index),_=_.substring(r.index+r[0].length),r[0][0]==="\\"&&r[1]?c+="\\"+String(Number(r[1])+d):(c+=r[0],(r[0]==="("||/^\(\?[<']/.test(r[0]))&&n++)}return c}).map(l=>`(${l})`).join(t)}var yt=/\b\B/,ve="[a-zA-Z]\\w*",ge="[a-zA-Z_]\\w*",Le="\\b\\d+(\\.\\d+)?",Be="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Pe="\\b(0b[01]+)",St="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",At=(e={})=>{let t=/^#![ ]*\//;return e.binary&&(e.begin=B(t,/.*\b/,e.binary,/\b.*/)),k({scope:"meta",begin:t,end:/$/,relevance:0,"on:begin":(n,l)=>{n.index!==0&&l.ignoreMatch()}},e)},K={begin:"\\\\[\\s\\S]",relevance:0},Tt={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[K]},It={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[K]},Ct={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},Q=function(e,t,n={}){let l=k({scope:"comment",begin:e,end:t,contains:[]},n);l.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let d=V("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return l.contains.push({begin:B(/[ ]+/,"(",d,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),l},Dt=Q("//","$"),kt=Q("/\\*","\\*/"),vt=Q("#","$"),Lt={scope:"number",begin:Le,relevance:0},Bt={scope:"number",begin:Be,relevance:0},Pt={scope:"number",begin:Pe,relevance:0},$t={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[K,{begin:/\[/,end:/\]/,relevance:0,contains:[K]}]},Ht={scope:"title",begin:ve,relevance:0},Ut={scope:"title",begin:ge,relevance:0},jt={begin:"\\.\\s*"+ge,relevance:0},Gt=function(e){return Object.assign(e,{"on:begin":(t,n)=>{n.data._beginMatch=t[1]},"on:end":(t,n)=>{n.data._beginMatch!==t[1]&&n.ignoreMatch()}})},X=Object.freeze({__proto__:null,APOS_STRING_MODE:Tt,BACKSLASH_ESCAPE:K,BINARY_NUMBER_MODE:Pt,BINARY_NUMBER_RE:Pe,COMMENT:Q,C_BLOCK_COMMENT_MODE:kt,C_LINE_COMMENT_MODE:Dt,C_NUMBER_MODE:Bt,C_NUMBER_RE:Be,END_SAME_AS_BEGIN:Gt,HASH_COMMENT_MODE:vt,IDENT_RE:ve,MATCH_NOTHING_RE:yt,METHOD_GUARD:jt,NUMBER_MODE:Lt,NUMBER_RE:Le,PHRASAL_WORDS_MODE:Ct,QUOTE_STRING_MODE:It,REGEXP_MODE:$t,RE_STARTERS_RE:St,SHEBANG:At,TITLE_MODE:Ht,UNDERSCORE_IDENT_RE:ge,UNDERSCORE_TITLE_MODE:Ut});function Kt(e,t){e.input[e.index-1]==="."&&t.ignoreMatch()}function mt(e,t){e.className!==void 0&&(e.scope=e.className,delete e.className)}function Wt(e,t){t&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=Kt,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function Ft(e,t){Array.isArray(e.illegal)&&(e.illegal=V(...e.illegal))}function zt(e,t){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function Yt(e,t){e.relevance===void 0&&(e.relevance=1)}var Xt=(e,t)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let n=Object.assign({},e);Object.keys(e).forEach(l=>{delete e[l]}),e.keywords=n.keywords,e.begin=B(n.beforeMatch,De(n.begin)),e.starts={relevance:0,contains:[Object.assign(n,{endsParent:!0})]},e.relevance=0,delete n.beforeMatch},Zt=["of","and","for","in","not","or","if","then","parent","list","value"],Jt="keyword";function $e(e,t,n=Jt){let l=Object.create(null);return typeof e=="string"?d(n,e.split(" ")):Array.isArray(e)?d(n,e):Object.keys(e).forEach(function(_){Object.assign(l,$e(e[_],t,_))}),l;function d(_,c){t&&(c=c.map(r=>r.toLowerCase())),c.forEach(function(r){let u=r.split("|");l[u[0]]=[_,Vt(u[0],u[1])]})}}function Vt(e,t){return t?Number(t):Qt(e)?0:1}function Qt(e){return Zt.includes(e.toLowerCase())}var ye={},L=e=>{console.error(e)},Se=(e,...t)=>{console.log(`WARN: ${e}`,...t)},H=(e,t)=>{ye[`${e}/${t}`]||(console.log(`Deprecated as of ${e}. ${t}`),ye[`${e}/${t}`]=!0)},J=new Error;function He(e,t,{key:n}){let l=0,d=e[n],_={},c={};for(let r=1;r<=t.length;r++)c[r+l]=d[r],_[r+l]=!0,l+=ke(t[r-1]);e[n]=c,e[n]._emit=_,e[n]._multi=!0}function qt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw L("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),J;if(typeof e.beginScope!="object"||e.beginScope===null)throw L("beginScope must be object"),J;He(e,e.begin,{key:"beginScope"}),e.begin=fe(e.begin,{joinWith:""})}}function en(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw L("skip, excludeEnd, returnEnd not compatible with endScope: {}"),J;if(typeof e.endScope!="object"||e.endScope===null)throw L("endScope must be object"),J;He(e,e.end,{key:"endScope"}),e.end=fe(e.end,{joinWith:""})}}function tn(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function nn(e){tn(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),qt(e),en(e)}function sn(e){function t(c,r){return new RegExp(G(c),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(r?"g":""))}class n{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(r,u){u.position=this.position++,this.matchIndexes[this.matchAt]=u,this.regexes.push([u,r]),this.matchAt+=ke(r)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let r=this.regexes.map(u=>u[1]);this.matcherRe=t(fe(r,{joinWith:"|"}),!0),this.lastIndex=0}exec(r){this.matcherRe.lastIndex=this.lastIndex;let u=this.matcherRe.exec(r);if(!u)return null;let O=u.findIndex((P,I)=>I>0&&P!==void 0),M=this.matchIndexes[O];return u.splice(0,O),Object.assign(u,M)}}class l{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(r){if(this.multiRegexes[r])return this.multiRegexes[r];let u=new n;return this.rules.slice(r).forEach(([O,M])=>u.addRule(O,M)),u.compile(),this.multiRegexes[r]=u,u}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(r,u){this.rules.push([r,u]),u.type==="begin"&&this.count++}exec(r){let u=this.getMatcher(this.regexIndex);u.lastIndex=this.lastIndex;let O=u.exec(r);if(this.resumingScanAtSamePosition()&&!(O&&O.index===this.lastIndex)){let M=this.getMatcher(0);M.lastIndex=this.lastIndex+1,O=M.exec(r)}return O&&(this.regexIndex+=O.position+1,this.regexIndex===this.count&&this.considerAll()),O}}function d(c){let r=new l;return c.contains.forEach(u=>r.addRule(u.begin,{rule:u,type:"begin"})),c.terminatorEnd&&r.addRule(c.terminatorEnd,{type:"end"}),c.illegal&&r.addRule(c.illegal,{type:"illegal"}),r}function _(c,r){let u=c;if(c.isCompiled)return u;[mt,zt,nn,Xt].forEach(M=>M(c,r)),e.compilerExtensions.forEach(M=>M(c,r)),c.__beforeBegin=null,[Wt,Ft,Yt].forEach(M=>M(c,r)),c.isCompiled=!0;let O=null;return typeof c.keywords=="object"&&c.keywords.$pattern&&(c.keywords=Object.assign({},c.keywords),O=c.keywords.$pattern,delete c.keywords.$pattern),O=O||/\w+/,c.keywords&&(c.keywords=$e(c.keywords,e.case_insensitive)),u.keywordPatternRe=t(O,!0),r&&(c.begin||(c.begin=/\B|\b/),u.beginRe=t(u.begin),!c.end&&!c.endsWithParent&&(c.end=/\B|\b/),c.end&&(u.endRe=t(u.end)),u.terminatorEnd=G(u.end)||"",c.endsWithParent&&r.terminatorEnd&&(u.terminatorEnd+=(c.end?"|":"")+r.terminatorEnd)),c.illegal&&(u.illegalRe=t(c.illegal)),c.contains||(c.contains=[]),c.contains=[].concat(...c.contains.map(function(M){return rn(M==="self"?c:M)})),c.contains.forEach(function(M){_(M,u)}),c.starts&&_(c.starts,r),u.matcher=d(u),u}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=k(e.classNameAliases||{}),_(e)}function Ue(e){return e?e.endsWithParent||Ue(e.starts):!1}function rn(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(t){return k(e,{variants:null},t)})),e.cachedVariants?e.cachedVariants:Ue(e)?k(e,{starts:e.starts?k(e.starts):null}):Object.isFrozen(e)?k(e):e}var cn="11.12.0",ue=class extends Error{constructor(t,n){super(t),this.name="HTMLInjectionError",this.html=n}},ce=Ce,Ae=k,Te=Symbol("nomatch"),on=7,je=function(e){let t=Object.create(null),n=Object.create(null),l=[],d=!0,_="Could not find the language '{}', did you forget to load/include a language module?",c={disableAutodetect:!0,name:"Plain text",contains:[]},r={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:le};function u(i){return r.noHighlightRe.test(i)}function O(i){let a=i.className+" ";a+=i.parentNode?i.parentNode.className:"";let h=r.languageDetectRe.exec(a);if(h){let E=C(h[1]);return E||(Se(_.replace("{}",h[1])),Se("Falling back to no-highlight mode for this block.",i)),E?h[1]:"no-highlight"}return a.split(/\s+/).find(E=>u(E)||C(E))}function M(i,a,h){let E="",w="";typeof a=="object"?(E=i,h=a.ignoreIllegals,w=a.language):(H("10.7.0","highlight(lang, code, ...args) has been deprecated."),H("10.7.0",`Please use highlight(code, options) instead.
+(see the highlight.js issue tracker)`),w=i,E=a),h===void 0&&(h=!0);let y={code:E,language:w};W("before:highlight",y);let D=y.result?y.result:P(y.language,y.code,h);return D.code=y.code,W("after:highlight",D),D}function P(i,a,h,E){let w=Object.create(null);function y(s,o){return s.keywords[o]}function D(){if(!f.keywords){x.addText(b);return}let s=0;f.keywordPatternRe.lastIndex=0;let o=f.keywordPatternRe.exec(b),g="";for(;o;){g+=b.substring(s,o.index);let p=A.case_insensitive?o[0].toLowerCase():o[0],N=y(f,p);if(N){let[T,at]=N;if(x.addText(g),g="",w[p]=(w[p]||0)+1,w[p]<=on&&(Y+=at),T.startsWith("_"))g+=o[0];else{let lt=A.classNameAliases[T]||T;S(o[0],lt)}}else g+=o[0];s=f.keywordPatternRe.lastIndex,o=f.keywordPatternRe.exec(b)}g+=b.substring(s),x.addText(g)}function F(){if(b==="")return;let s=null;if(typeof f.subLanguage=="string"){if(!t[f.subLanguage]){x.addText(b);return}s=P(f.subLanguage,b,!0,we[f.subLanguage]),we[f.subLanguage]=s._top}else s=$(b,f.subLanguage.length?f.subLanguage:null);f.relevance>0&&(Y+=s.relevance),x.__addSublanguage(s._emitter,s.language)}function R(){f.subLanguage!=null?F():D(),b=""}function S(s,o){s!==""&&(x.startScope(o),x.addText(s),x.endScope())}function be(s,o){let g=1,p=o.length-1;for(;g<=p;){if(!s._emit[g]){g++;continue}let N=A.classNameAliases[s[g]]||s[g],T=o[g];N?S(T,N):(b=T,D(),b=""),g++}}function _e(s,o){return s.scope&&typeof s.scope=="string"&&x.openNode(A.classNameAliases[s.scope]||s.scope),s.beginScope&&(s.beginScope._wrap?(S(b,A.classNameAliases[s.beginScope._wrap]||s.beginScope._wrap),b=""):s.beginScope._multi&&(be(s.beginScope,o),b="")),f=Object.create(s,{parent:{value:f}}),f}function Me(s,o,g){let p=Nt(s.endRe,g);if(p){if(s["on:end"]){let N=new Z(s);s["on:end"](o,N),N.isMatchIgnored&&(p=!1)}if(p){for(;s.endsParent&&s.parent;)s=s.parent;return s}}if(s.endsWithParent)return Me(s.parent,o,g)}function it(s){return f.matcher.regexIndex===0?(b+=s[0],1):(re=!0,0)}function st(s){let o=s[0],g=s.rule,p=new Z(g),N=[g.__beforeBegin,g["on:begin"]];for(let T of N)if(T&&(T(s,p),p.isMatchIgnored))return it(o);return g.skip?b+=o:(g.excludeBegin&&(b+=o),R(),!g.returnBegin&&!g.excludeBegin&&(b=o)),_e(g,s),g.returnBegin?0:o.length}function rt(s){let o=s[0],g=a.substring(s.index),p=Me(f,s,g);if(!p)return Te;let N=f;f.endScope&&f.endScope._wrap?(R(),S(o,f.endScope._wrap)):f.endScope&&f.endScope._multi?(R(),be(f.endScope,s)):N.skip?b+=o:(N.returnEnd||N.excludeEnd||(b+=o),R(),N.excludeEnd&&(b=o));do f.scope&&x.closeNode(),!f.skip&&!f.subLanguage&&(Y+=f.relevance),f=f.parent;while(f!==p.parent);return p.starts&&_e(p.starts,s),N.returnEnd?0:o.length}function ct(){let s=[];for(let o=f;o!==A;o=o.parent)o.scope&&s.unshift(o.scope);s.forEach(o=>x.openNode(o))}let z={};function Oe(s,o){let g=o&&o[0];if(b+=s,g==null)return R(),0;if(z.type==="begin"&&o.type==="end"&&z.index===o.index&&g===""){if(b+=a.slice(o.index,o.index+1),!d){let p=new Error(`0 width match regex (${i})`);throw p.languageName=i,p.badRule=z.rule,p}return 1}if(z=o,o.type==="begin")return st(o);if(o.type==="illegal"&&!h){let p=new Error('Illegal lexeme "'+g+'" for mode "'+(f.scope||"<unnamed>")+'"');throw p.mode=f,p}else if(o.type==="end"){let p=rt(o);if(p!==Te)return p}if(o.type==="illegal"&&g==="")return o.index===a.length||(b+=`
+`),1;if(se>1e5&&se>o.index*3)throw new Error("potential infinite loop, way more iterations than matches");return b+=g,g.length}let A=C(i);if(!A)throw L(_.replace("{}",i)),new Error('Unknown language: "'+i+'"');let ot=sn(A),ie="",f=E||ot,we={},x=new r.__emitter(r);ct();let b="",Y=0,v=0,se=0,re=!1;try{if(A.__emitTokens)A.__emitTokens(a,x);else{for(f.matcher.considerAll();;){se++,re?re=!1:f.matcher.considerAll(),f.matcher.lastIndex=v;let s=f.matcher.exec(a);if(!s)break;let o=a.substring(v,s.index),g=Oe(o,s);v=s.index+g}Oe(a.substring(v))}return x.finalize(),ie=x.toHTML(),{language:i,value:ie,relevance:Y,illegal:!1,_emitter:x,_top:f}}catch(s){if(s.message&&s.message.includes("Illegal"))return{language:i,value:ce(a),illegal:!0,relevance:0,_illegalBy:{message:s.message,index:v,context:a.slice(v-100,v+100),mode:s.mode,resultSoFar:ie},_emitter:x};if(d)return{language:i,value:ce(a),illegal:!1,relevance:0,errorRaised:s,_emitter:x,_top:f};throw s}}function I(i){let a={value:ce(i),illegal:!1,relevance:0,_top:c,_emitter:new r.__emitter(r)};return a._emitter.addText(i),a}function $(i,a){a=a||r.languages||Object.keys(t);let h=I(i),E=a.filter(C).filter(Ee).map(R=>P(R,i,!1));E.unshift(h);let w=E.sort((R,S)=>{if(R.relevance!==S.relevance)return S.relevance-R.relevance;if(R.language&&S.language){if(C(R.language).supersetOf===S.language)return 1;if(C(S.language).supersetOf===R.language)return-1}return 0}),[y,D]=w,F=y;return F.secondBest=D,F}function te(i,a,h){let E=a&&n[a]||h;i.classList.add("hljs"),i.classList.add(`language-${E}`)}function ne(i){let a=null,h=O(i);if(u(h))return;if(W("before:highlightElement",{el:i,language:h}),i.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",i);return}if(i.children.length>0&&(r.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("(see the highlight.js security wiki)"),console.warn("The element with unescaped HTML:"),console.warn(i)),r.throwUnescapedHTML))throw new ue("One of your code blocks includes unescaped HTML.",i.innerHTML);a=i;let E=a.textContent,w=h?M(E,{language:h,ignoreIllegals:!0}):$(E);i.innerHTML=w.value,i.dataset.highlighted="yes",te(i,h,w.language),i.result={language:w.language,re:w.relevance,relevance:w.relevance},w.secondBest&&(i.secondBest={language:w.secondBest.language,relevance:w.secondBest.relevance}),W("after:highlightElement",{el:i,result:w,text:E})}function Ye(i){r=Ae(r,i)}let Xe=()=>{m(),H("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function Ze(){m(),H("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let de=!1;function m(){function i(){m()}if(document.readyState==="loading"){de||window.addEventListener("DOMContentLoaded",i,!1),de=!0;return}document.querySelectorAll(r.cssSelector).forEach(ne)}function Je(i,a){let h=null;try{h=a(e)}catch(E){if(L("Language definition for '{}' could not be registered.".replace("{}",i)),d)L(E);else throw E;h=c}h.name||(h.name=i),t[i]=h,h.rawDefinition=a.bind(null,e),h.aliases&&pe(h.aliases,{languageName:i})}function Ve(i){delete t[i];for(let a of Object.keys(n))n[a]===i&&delete n[a]}function Qe(){return Object.keys(t)}function C(i){return i=(i||"").toLowerCase(),t[i]||t[n[i]]}function pe(i,{languageName:a}){typeof i=="string"&&(i=[i]),i.forEach(h=>{n[h.toLowerCase()]=a})}function Ee(i){let a=C(i);return a&&!a.disableAutodetect}function qe(i){i["before:highlightBlock"]&&!i["before:highlightElement"]&&(i["before:highlightElement"]=a=>{i["before:highlightBlock"](Object.assign({block:a.el},a))}),i["after:highlightBlock"]&&!i["after:highlightElement"]&&(i["after:highlightElement"]=a=>{i["after:highlightBlock"](Object.assign({block:a.el},a))})}function et(i){qe(i),l.push(i)}function tt(i){let a=l.indexOf(i);a!==-1&&l.splice(a,1)}function W(i,a){let h=i;l.forEach(function(E){E[h]&&E[h](a)})}function nt(i){return H("10.7.0","highlightBlock will be removed entirely in v12.0"),H("10.7.0","Please use highlightElement now."),ne(i)}Object.assign(e,{highlight:M,highlightAuto:$,highlightAll:m,highlightElement:ne,highlightBlock:nt,configure:Ye,initHighlighting:Xe,initHighlightingOnLoad:Ze,registerLanguage:Je,unregisterLanguage:Ve,listLanguages:Qe,getLanguage:C,registerAliases:pe,autoDetection:Ee,inherit:Ae,addPlugin:et,removePlugin:tt}),e.debugMode=function(){d=!1},e.safeMode=function(){d=!0},e.versionString=cn,e.regex={concat:B,lookahead:De,either:V,optional:wt,anyNumberOfTimes:Ot};for(let i in X)typeof X[i]=="object"&&Ie(X[i]);return Object.assign(e,X),e},U=je({});U.newInstance=()=>je({});Ge.exports=U;U.HighlightJS=U;U.default=U});var me=bt(Ke(),1);var he=me.default;var j="[0-9](_*[0-9])*",q=`\\.(${j})`,ee="[0-9a-fA-F](_*[0-9a-fA-F])*",We={className:"number",variants:[{begin:`(\\b(${j})((${q})|\\.)?|(${q}))[eE][+-]?(${j})[fFdD]?\\b`},{begin:`\\b(${j})((${q})[fFdD]?\\b|\\.([fFdD]\\b)?)`},{begin:`(${q})[fFdD]?\\b`},{begin:`\\b(${j})[fFdD]\\b`},{begin:`\\b0[xX]((${ee})\\.?|(${ee})?\\.(${ee}))[pP][+-]?(${j})[fFdD]?\\b`},{begin:"\\b(0|[1-9](_*[0-9])*)[lL]?\\b"},{begin:`\\b0[xX](${ee})[lL]?\\b`},{begin:"\\b0(_*[0-7])*[lL]?\\b"},{begin:"\\b0[bB][01](_*[01])*[lL]?\\b"}],relevance:0};function Fe(e,t,n){return n===-1?"":e.replace(t,l=>Fe(e,t,n-1))}function ze(e){let t=e.regex,n="[\xC0-\u02B8a-zA-Z_$][\xC0-\u02B8a-zA-Z_$0-9]*",l="(?:(?:\\s*\\[\\s*])+)?",d=n+"<@@@>"+l,c="(?:"+("\\?(?:\\s+(?:extends|super)\\s+"+d+")?")+"|"+d+")",r=Fe("(?:\\s*<\\s*"+c+"(?:\\s*,\\s*"+c+")*\\s*>)?",/<@@@>/g,2),I={keyword:["synchronized","abstract","private","var","static","if","const ","for","while","strictfp","finally","protected","import","native","final","void","enum","else","break","transient","catch","instanceof","volatile","case","assert","package","default","public","try","switch","continue","throws","protected","public","private","module","requires","exports","do","sealed","yield","permits","goto","when"],literal:["false","true","null"],type:["char","boolean","long","float","int","byte","short","double"],built_in:["super","this"]},$={className:"meta",begin:"@"+n,contains:[{begin:/\(/,end:/\)/,contains:["self"]}]},te={className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[e.C_BLOCK_COMMENT_MODE],endsParent:!0};return{name:"Java",aliases:["jsp"],keywords:I,illegal:/<\/|#/,contains:[e.COMMENT("/\\*\\*","\\*/",{relevance:0,contains:[{begin:/\w+@/,relevance:0},{className:"doctag",begin:"@[A-Za-z]+"}]}),{begin:/import java\.[a-z]+\./,keywords:"import",relevance:2},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE,{begin:/"""/,end:/"""/,className:"string",contains:[e.BACKSLASH_ESCAPE]},e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,{match:[/\b(?:class|interface|enum|extends|implements|new)/,/\s+/,n],className:{1:"keyword",3:"title.class"}},{match:/non-sealed/,scope:"keyword"},{beginKeywords:"new throw return else yield assert",relevance:0},{begin:[n,t.concat(r,l,/\s+/),n,l,/\s*/,/=(?!=)/],className:{1:"type",3:"variable",6:"operator"}},{begin:[/record/,/\s+/,n],className:{1:"keyword",3:"title.class"},contains:[te,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},{begin:[n,t.concat(r,l,/\s+/),n,/\s*(?=\()/],className:{1:"type",3:"title.function"},keywords:I,contains:[{className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[$,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,We,e.C_BLOCK_COMMENT_MODE]},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},We,$]}}he.registerLanguage("java",ze);window.hljs=he;})();
+</script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---- 1. syntax highlighting -------------------------------------- */
+  function highlight() {
+    if (!window.hljs) return;
+    var blocks = document.querySelectorAll('pre code.language-java');
+    for (var i = 0; i < blocks.length; i++) {
+      try { window.hljs.highlightElement(blocks[i]); } catch (e) {}
+    }
+  }
+
+  /* ---- 2. every solution / reveal starts closed --------------------- */
+  function closeAll() {
+    var d = document.querySelectorAll('details.soln');
+    for (var i = 0; i < d.length; i++) { d[i].open = false; }
+  }
+
+  /* ---- 3. show all / hide all -------------------------------------- */
+  function wireToolbar() {
+    var show = document.getElementById('showAll');
+    var hide = document.getElementById('hideAll');
+    function setAll(v) {
+      var d = document.querySelectorAll('details.soln');
+      for (var i = 0; i < d.length; i++) { d[i].open = v; }
+    }
+    if (show) show.addEventListener('click', function () { setAll(true); });
+    if (hide) hide.addEventListener('click', function () { setAll(false); });
+  }
+
+  /* ---- 4. live-coding editors -------------------------------------- */
+  var INDENT = '    ';
+
+  function wireEditors() {
+    var eds = document.querySelectorAll('.editor');
+    for (var i = 0; i < eds.length; i++) { wireOne(eds[i]); }
+  }
+
+  function wireOne(box) {
+    var ta = box.querySelector('textarea');
+    if (!ta) return;
+    var starter = ta.value;
+
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Tab' || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+      ev.preventDefault();
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+
+      if (s === e && !ev.shiftKey) {
+        ta.value = v.slice(0, s) + INDENT + v.slice(e);
+        ta.selectionStart = ta.selectionEnd = s + INDENT.length;
+        return;
+      }
+      /* block indent / outdent over the selected lines */
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var le = v.indexOf('\n', e);
+      if (le === -1) le = v.length;
+      var seg = v.slice(ls, le);
+      var lines = seg.split('\n');
+      var delta0 = 0, total = 0;
+
+      for (var i = 0; i < lines.length; i++) {
+        if (ev.shiftKey) {
+          var m = lines[i].match(/^(\t| {1,4})/);
+          if (m) {
+            lines[i] = lines[i].slice(m[0].length);
+            if (i === 0) delta0 = -m[0].length;
+            total -= m[0].length;
+          }
+        } else {
+          lines[i] = INDENT + lines[i];
+          if (i === 0) delta0 = INDENT.length;
+          total += INDENT.length;
+        }
+      }
+      ta.value = v.slice(0, ls) + lines.join('\n') + v.slice(le);
+      ta.selectionStart = Math.max(ls, s + delta0);
+      ta.selectionEnd = Math.max(ta.selectionStart, e + total);
+    });
+
+    /* keep the indent of the current line when Enter is pressed */
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Enter' || ev.shiftKey || ev.ctrlKey || ev.metaKey) return;
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+      if (s !== e) return;
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var lead = (v.slice(ls, s).match(/^[ \t]*/) || [''])[0];
+      var extra = /[{(\[]\s*$/.test(v.slice(ls, s)) ? INDENT : '';
+      if (!lead && !extra) return;
+      ev.preventDefault();
+      var ins = '\n' + lead + extra;
+      ta.value = v.slice(0, s) + ins + v.slice(e);
+      ta.selectionStart = ta.selectionEnd = s + ins.length;
+    });
+
+    var rst = box.querySelector('[data-act="reset"]');
+    if (rst) rst.addEventListener('click', function () {
+      ta.value = starter;
+      ta.focus();
+      flash(box, 'Reset to starter code');
+    });
+
+    var cpy = box.querySelector('[data-act="copy"]');
+    if (cpy) cpy.addEventListener('click', function () {
+      var done = function () { flash(box, 'Copied — paste it into your IDE'); };
+      var fail = function () { flash(box, 'Copy failed — select the text and press Ctrl/Cmd+C'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value).then(done, function () { legacy(ta, done, fail); });
+      } else {
+        legacy(ta, done, fail);
+      }
+    });
+  }
+
+  function legacy(ta, done, fail) {
+    try {
+      var st = ta.selectionStart, en = ta.selectionEnd;
+      ta.select();
+      var ok = document.execCommand('copy');
+      ta.selectionStart = st; ta.selectionEnd = en;
+      ok ? done() : fail();
+    } catch (e) { fail(); }
+  }
+
+  function flash(box, msg) {
+    var f = box.querySelector('.foot');
+    if (!f) return;
+    if (f.getAttribute('data-base') === null || f.getAttribute('data-base') === undefined) {
+      f.setAttribute('data-base', f.textContent);
+    }
+    f.textContent = msg;
+    window.setTimeout(function () { f.textContent = f.getAttribute('data-base'); }, 2200);
+  }
+
+  /* ---- go ----------------------------------------------------------- */
+  function init() {
+    highlight();
+    closeAll();
+    wireToolbar();
+    wireEditors();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  /* belt and braces: some browsers restore <details> state on soft reload */
+  window.addEventListener('pageshow', closeAll);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class 8 — Object References and Aliasing | CSCI 212</title>
+<style>
+:root{
+  --ink:#0f172a; --ink2:#334155; --muted:#64748b; --line:#e2e8f0;
+  --bg:#ffffff; --bg2:#f8fafc;
+  --obj:#4f46e5; --def:#2563eb; --ex:#059669; --alg:#7c3aed;
+  --key:#b45309; --warn:#dc2626; --qc:#0891b2; --prac:#be185d; --sum:#475569;
+  --edit:#ea580c; --edit-bg:#fff7ed;
+  --code-bg:#0d1117; --code-bd:#000000;   /* read-only listings: black */
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px 80px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:#0f172a;color:#e2e8f0;font-size:13.5px;
+  border-bottom:3px solid var(--obj);
+}
+.topbar .inner{max-width:900px;margin:0 auto;padding:10px 22px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.topbar a{color:#e2e8f0;text-decoration:none;border-bottom:1px solid transparent}
+.topbar a:hover{border-bottom-color:#94a3b8}
+.topbar .course{font-weight:700;letter-spacing:.02em}
+.topbar .sep{color:#475569}
+.topbar .spacer{flex:1}
+
+/* ---------- title block ---------- */
+.titleblock{padding:34px 0 10px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.eyebrow{
+  font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--obj);margin-bottom:8px;
+}
+.titleblock h1{font-size:33px;line-height:1.2;margin:0 0 10px;letter-spacing:-.015em}
+.titleblock .sub{margin:0;color:var(--muted);font-size:17px;line-height:1.5}
+
+h2{
+  font-size:24px;margin:46px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line);letter-spacing:-.01em;scroll-margin-top:14px;
+}
+h2 .num{color:var(--obj);font-weight:800;margin-right:11px}
+h3{font-size:18.5px;margin:30px 0 10px;color:var(--ink)}
+h4{font-size:16px;margin:20px 0 8px;color:var(--ink2)}
+p{margin:12px 0}
+ul,ol{margin:12px 0;padding-left:26px}
+li{margin:6px 0}
+a{color:var(--def)}
+hr{border:0;border-top:1px solid var(--line);margin:30px 0}
+strong{color:var(--ink)}
+.muted{color:var(--muted)}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--bg2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 20px 16px;margin:22px 0;
+}
+.toc .th{
+  font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;
+}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:30px}
+.toc li{margin:3px 0;font-size:14.5px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- show all / hide all ---------- */
+.tools{
+  display:flex;gap:9px;align-items:center;flex-wrap:wrap;
+  padding:11px 15px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:9px;margin:22px 0;font-size:13.5px;
+}
+.tools .lab{font-weight:700;color:var(--ink2)}
+.tools button{
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  background:#fff;color:var(--ink2);border:1px solid #cbd5e1;
+  border-radius:6px;padding:4px 12px;
+}
+.tools button:hover{background:var(--obj);border-color:var(--obj);color:#fff}
+.tools .muted{font-size:12.5px}
+
+/* ---------- boxes ---------- */
+.box{border:1px solid var(--line);border-left:5px solid var(--muted);border-radius:8px;margin:22px 0;overflow:hidden;background:#fff}
+.box>.hd{
+  padding:9px 16px;font-size:12.5px;font-weight:700;
+  letter-spacing:.075em;text-transform:uppercase;color:#fff;background:var(--muted);
+}
+.box>.hd .tag{margin-left:5px;font-weight:500;text-transform:none;letter-spacing:0;opacity:.92;font-size:13px}
+.box>.bd{padding:4px 18px 14px}
+.box>.bd>:first-child{margin-top:12px}
+.box>.bd>:last-child{margin-bottom:2px}
+
+.box.obj{border-left-color:var(--obj)}  .box.obj>.hd{background:var(--obj)}
+.box.def{border-left-color:var(--def)}  .box.def>.hd{background:var(--def)}
+.box.ex{border-left-color:var(--ex)}    .box.ex>.hd{background:var(--ex)}
+.box.alg{border-left-color:var(--alg)}  .box.alg>.hd{background:var(--alg)}
+.box.key{border-left-color:var(--key)}  .box.key>.hd{background:var(--key)}
+.box.warn{border-left-color:var(--warn)}.box.warn>.hd{background:var(--warn)}
+.box.qc{border-left-color:var(--qc)}    .box.qc>.hd{background:var(--qc)}
+.box.prac{border-left-color:var(--prac)}.box.prac>.hd{background:var(--prac)}
+.box.sum{border-left-color:var(--sum)}  .box.sum>.hd{background:var(--sum)}
+
+.box.obj{background:#f5f5ff}
+.box.qc{background:#f0fbfe}
+.box.warn{background:#fff7f7}
+.box.key{background:#fffbf2}
+.box.sum{background:#f8fafc}
+
+/* ---------- code ---------- */
+/* Read-only listings sit on black, matching CSCI 211, so a code block is never
+   mistaken for the editable live-coding box. */
+pre{
+  margin:14px 0;padding:13px 15px;overflow-x:auto;
+  background:var(--code-bg);border:1px solid var(--code-bd);border-radius:8px;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;color:#c9d1d9;
+}
+pre code{font-family:inherit;font-size:inherit;background:none;padding:0;border:0;color:inherit;display:block}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef2f7;
+  border:1px solid #e2e8f0;border-radius:4px;padding:1px 5px;color:#0b3a5b;
+}
+.filename{
+  font-family:var(--mono);font-size:12px;color:#475569;
+  margin:16px 0 -9px;font-weight:600;
+}
+
+/* comparison block: another language, never syntax-highlighted. Dark like the
+   Java listings, but desaturated and dashed so it reads as "not this course". */
+pre.cmp{background:#161b22;border-style:dashed;border-color:#3f4650;color:#9aa4b2}
+pre.cmp code{color:#9aa4b2}
+
+/* shell commands you type */
+pre.sh{background:#1e293b;border-color:#1e293b;color:#e2e8f0;position:relative;padding-top:26px}
+pre.sh code{color:#e2e8f0}
+pre.sh::before{
+  content:"Terminal";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#86efac;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* output / terminal blocks */
+pre.out{background:#111d33;border-color:#111d33;color:#e2e8f0;position:relative;padding-top:26px}
+pre.out code{color:#e2e8f0}
+pre.out::before{
+  content:"Output";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#7dd3fc;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+pre.err{background:#1f1416;border-color:#7f1d1d;color:#fecdd3;padding-top:26px;position:relative}
+pre.err code{color:#fecdd3}
+pre.err::before{
+  content:"Compiler message";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#fda4af;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* ---- highlight.js, GitHub-dark palette (hand-written, no external file) ---- */
+.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-template-tag,
+.hljs-template-variable,.hljs-type,.hljs-variable.language_{color:#ff7b72}
+.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#d2a8ff}
+.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,
+.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable{color:#79c0ff}
+.hljs-meta .hljs-string,.hljs-regexp,.hljs-string{color:#a5d6ff}
+.hljs-built_in,.hljs-symbol{color:#ffa657}
+.hljs-code,.hljs-comment,.hljs-formula{color:#8b949e;font-style:italic}
+.hljs-name,.hljs-quote,.hljs-selector-pseudo,.hljs-selector-tag{color:#7ee787}
+.hljs-subst{color:#c9d1d9}
+.hljs-section{color:#1f6feb;font-weight:700}
+.hljs-bullet{color:#f2cc60}
+.hljs-emphasis{color:#c9d1d9;font-style:italic}
+.hljs-strong{color:#c9d1d9;font-weight:700}
+
+/* ---------- trace tables ---------- */
+table{border-collapse:collapse;margin:16px 0;font-size:14px;width:100%}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg2);font-weight:700;font-size:13px}
+table.trace td:first-child,table.trace th:first-child{white-space:nowrap}
+table code{font-size:.88em}
+
+/* ---------- multi-part questions ---------- */
+.part{margin:16px 0;padding-left:14px;border-left:2px solid #cbd5e1}
+.part .q{margin:0 0 8px}
+.part .pl{font-weight:700;color:var(--qc);margin-right:6px}
+
+/* ---------- collapsible solutions ---------- */
+details.soln{margin:10px 0 4px}
+details.soln>summary{
+  list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  font-size:12.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:#fff;background:var(--sum);border-radius:6px;padding:5px 13px;
+  user-select:none;
+}
+details.soln>summary::-webkit-details-marker{display:none}
+details.soln>summary::before{content:"\25B6";font-size:9px;transition:transform .15s}
+details.soln[open]>summary::before{transform:rotate(90deg)}
+details.soln>summary::after{content:"Show Answer"}
+details.soln[open]>summary::after{content:"Hide Answer"}
+details.soln>summary:hover{filter:brightness(1.18)}
+
+details.soln.reveal>summary{background:var(--ex)}
+details.soln.reveal>summary::after{content:"Show Output & Explanation"}
+details.soln.reveal[open]>summary::after{content:"Hide Output & Explanation"}
+details.soln.reveal.noout>summary::after{content:"Show Explanation"}
+details.soln.reveal.noout[open]>summary::after{content:"Hide Explanation"}
+
+.ans{
+  margin-top:11px;padding:2px 16px 10px;background:#fff;
+  border:1px solid var(--line);border-left:3px solid var(--sum);border-radius:7px;
+}
+details.soln.reveal .ans{border-left-color:var(--ex)}
+.ans>:first-child{margin-top:12px}
+.ans>:last-child{margin-bottom:6px}
+
+/* ---------- live coding editor ---------- */
+.editor{
+  margin:18px 0;border:2px dashed var(--edit);border-radius:9px;
+  background:var(--edit-bg);overflow:hidden;
+}
+.editor .ehd{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:7px 13px;background:var(--edit);color:#fff;
+  font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+}
+.editor .ehd .etitle{flex:1}
+.editor .ehd button{
+  font:inherit;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  cursor:pointer;background:rgba(255,255,255,.16);color:#fff;
+  border:1px solid rgba(255,255,255,.5);border-radius:5px;padding:3px 10px;
+}
+.editor .ehd button:hover{background:#fff;color:var(--edit)}
+.editor textarea{
+  display:block;width:100%;border:0;outline:0;resize:vertical;
+  padding:12px 15px;background:var(--edit-bg);color:#431407;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;
+  tab-size:4;-moz-tab-size:4;min-height:150px;
+}
+.editor textarea:focus{background:#fff}
+.editor .foot{
+  padding:5px 13px 7px;font-size:11.5px;color:#9a3412;background:#ffedd5;
+  border-top:1px solid #fed7aa;
+}
+
+/* ---------- prev/next nav ---------- */
+.pagenav{display:flex;gap:14px;margin:52px 0 0;flex-wrap:wrap}
+.pagenav a,.pagenav span.disabled{
+  flex:1 1 260px;display:block;text-decoration:none;
+  border:1px solid var(--line);border-radius:9px;padding:12px 16px;background:#fff;
+}
+.pagenav a:hover{border-color:var(--obj);background:var(--bg2)}
+.pagenav .dir{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.pagenav .ttl{font-size:15px;font-weight:600;color:var(--ink);margin-top:3px}
+.pagenav .next{text-align:right}
+.pagenav span.disabled{opacity:.4}
+.pagenav span.disabled .ttl{color:var(--muted)}
+
+footer.pf{
+  margin-top:40px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--muted);text-align:center;
+}
+
+/* ---------- index page ---------- */
+table.sched{font-size:14.5px}
+table.sched th{background:#0f172a;color:#fff;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+table.sched td:first-child{white-space:nowrap;font-weight:700;color:var(--muted);width:60px}
+table.sched tr.examrow td{background:#fff1f2}
+table.sched tr.revrow td{background:#fffbeb}
+table.sched a{font-weight:600;text-decoration:none}
+table.sched a:hover{text-decoration:underline}
+
+
+/* ---------- release gating ---------- */
+.pending{
+  margin-top:4px;font-size:11.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:#b45309;
+}
+.pagenav span.disabled .pending{color:#b45309}
+table.sched tr.pendingrow td{background:#fcfcfd}
+table.sched .unrel{color:var(--muted)}
+table.sched .pending{display:block;margin-top:2px}
+table.sched td.cn{white-space:nowrap;width:52px;font-weight:700;color:var(--muted)}
+table.sched td.dt{white-space:nowrap;width:104px;color:var(--muted);font-size:13.5px}
+table.sched tr.offrow td{background:#f1f5f9;color:var(--muted);font-style:italic}
+.refcard{
+  display:block;text-decoration:none;border:1px solid var(--line);
+  border-left:5px solid var(--alg);border-radius:9px;padding:13px 17px;
+  margin:22px 0;background:#faf9ff;
+}
+.refcard:hover{background:#f5f3ff;border-color:var(--alg)}
+.refcard .rl{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--alg)}
+.refcard .rt{font-size:16px;font-weight:600;color:var(--ink);margin-top:3px}
+.refcard .rd{font-size:14px;color:var(--muted);margin-top:4px}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,.tools,.pagenav,.pending{display:none !important}
+  html,body{width:100%;font-size:10pt}
+  .wrap{max-width:100%;width:100%;padding:0}
+  /* a wide <pre> must wrap rather than widen the page and clip every other
+     element at the paper edge */
+  /* Screen shows code on black; paper does not. Restore a dark-on-light palette
+     for print only, or the dark theme's light tokens vanish on white. */
+  pre{white-space:pre-wrap;overflow:visible;overflow-wrap:anywhere;font-size:8.6pt;
+      background:#f8fafc !important;color:#24292e !important;border-color:#cbd5e1 !important;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  pre code{color:#24292e !important}
+  pre.cmp{background:#fff !important;color:#475569 !important;border-color:#94a3b8 !important}
+  pre.cmp code{color:#475569 !important}
+  pre .hljs-doctag,pre .hljs-keyword,pre .hljs-meta .hljs-keyword,pre .hljs-template-tag,
+  pre .hljs-template-variable,pre .hljs-type,pre .hljs-variable.language_{color:#d73a49 !important}
+  pre .hljs-title,pre .hljs-title.class_,pre .hljs-title.class_.inherited__,
+  pre .hljs-title.function_{color:#6f42c1 !important}
+  pre .hljs-attr,pre .hljs-attribute,pre .hljs-literal,pre .hljs-meta,pre .hljs-number,
+  pre .hljs-operator,pre .hljs-selector-attr,pre .hljs-selector-class,pre .hljs-selector-id,
+  pre .hljs-variable{color:#005cc5 !important}
+  pre .hljs-meta .hljs-string,pre .hljs-regexp,pre .hljs-string{color:#032f62 !important}
+  pre .hljs-built_in,pre .hljs-symbol{color:#e36209 !important}
+  pre .hljs-code,pre .hljs-comment,pre .hljs-formula{color:#6a737d !important}
+  pre .hljs-name,pre .hljs-quote,pre .hljs-selector-pseudo,
+  pre .hljs-selector-tag{color:#22863a !important}
+  pre .hljs-subst,pre .hljs-emphasis,pre .hljs-strong{color:#24292e !important}
+  .filename{color:#475569 !important}
+  table{table-layout:fixed;width:100%;word-wrap:break-word;overflow-wrap:anywhere}
+  .box,.toc{max-width:100%}
+  a{color:var(--ink);text-decoration:none}
+  .box,.part,pre,table,.editor{break-inside:avoid;page-break-inside:avoid}
+  h2{break-after:avoid;page-break-after:avoid}
+  details.soln>summary{display:none !important}
+  details.soln:not([open])>.ans{display:none !important}
+  details.soln::before{
+    content:"Answer withheld — see the online notes.";
+    display:block;font-size:9pt;font-style:italic;color:#64748b;margin:6px 0;
+  }
+  details.soln[open]::before{content:""}
+  .editor textarea{display:none !important}
+  .editor{border:1.5px solid #fdba74 !important;background:#fff;border-style:solid}
+  .editor .ehd{background:#fff !important;color:#9a3412 !important;border-bottom:1px solid #fdba74}
+  .editor .ehd button{display:none}
+  .editor .foot{display:none}
+  .editor::after{content:"";display:block;height:2.1in;background:#fff}
+  pre.out,pre.sh{background:#f1f5f9 !important;color:#0f172a !important;border-color:#94a3b8 !important}
+  pre.err{background:#fef2f2 !important;color:#7f1d1d !important;border-color:#fca5a5 !important}
+  pre.out code,pre.sh code{color:#0f172a !important}
+  pre.err code{color:#7f1d1d !important}
+  pre.out::before,pre.sh::before{color:#475569}
+  pre.err::before{color:#b91c1c}
+  .box>.hd{color:#000;background:#fff !important;border-bottom:1px solid #cbd5e1}
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="inner">
+<span class="course">CSCI 212</span>
+<span class="sep">|</span>
+<a href="index.html">Course index</a>
+<span class="sep">|</span>
+<span>Class 8 of 28</span>
+<span class="sep">|</span>
+<span>Thursday, September 24</span>
+<span class="spacer"></span>
+<span>Queens College, CUNY</span>
+</div></div>
+<div class="wrap">
+<div class="titleblock">
+  <div class="eyebrow">Session 8 &middot; Lecture 8</div>
+  <h1>Object References and Aliasing</h1>
+  <p class="sub">A variable of a class type does not hold the object. It holds a note saying where the object is &mdash; and every confusing program you write this semester will trace back to that one sentence.</p>
+</div>
+
+<div class="box obj">
+  <div class="hd">Learning Objectives</div>
+  <div class="bd">
+    <p>By the end of today's session you should be able to:</p>
+    <ol>
+      <li>Say what a variable of a class type actually stores, and how that differs from a variable of a primitive type.</li>
+      <li>Predict what <code>Point c = a;</code> does &mdash; and explain why it does not make a second point.</li> <li>Draw a box-and-arrow diagram of any short program that creates and assigns objects, and read the answer off your own diagram.</li> <li>Explain what <code>null</code> means, recognize a <code>NullPointerException</code>, and guard against one.</li> <li>Predict the result of <code>==</code> between two object variables, and say why two objects with identical contents can still be unequal.</li> <li>Explain why storing an object inside another object stores a <em>reference</em>, and what that means for a <code>Triangle</code> built from <code>Point</code>s the caller still holds.</li> <li>Tell <em>mutating</em> an object (<code>pts[i].setX(...)</code>) apart from <em>rebinding</em> a variable (<code>pts[i] = new Point(...)</code>), and predict how each one affects everything else pointing at the object.</li> <li>State what Java passes to a method, and explain why a method can change an object's contents but can never change which object the caller's variable points at.</li> <li>Write a constructor that makes its own copies, so an object cannot be changed behind its back.</li> </ol> </div> </div> <div class="toc"> <div class="th">On this page</div> <ol> <li><a href="#s1">What a class-type variable really holds</a></li> <li><a href="#s2">Aliasing: two names, one object</a></li> <li><a href="#s3"><code>null</code>, and the NullPointerException</a></li> <li><a href="#s4"><code>==</code> on objects compares references</a></li> <li><a href="#s5">Objects stored inside objects</a></li> <li><a href="#s6">Mutating versus rebinding</a></li> <li><a href="#s7">Passing objects to methods</a></li> <li><a href="#prac">Practice Problems</a></li> <li><a href="#summary">Lecture Summary</a></li> </ol> </div> <div class="tools"> <span class="lab">Answers</span> <button id="showAll" type="button">Show all</button> <button id="hideAll" type="button">Hide all</button> <span class="muted">&mdash; every worked-example output and every solution is hidden when the page loads. Work it out first, then reveal.</span> </div> <hr> <h2 id="s1"><span class="num">1.</span>What a class-type variable really holds</h2> <p>Last time you learned to build a class and make objects out of it. You wrote <code>Point</code>, you wrote <code>Triangle</code>, you handed three <code>Point</code>s to a <code>Triangle</code> constructor, and everything worked. The lecture ended with one question left deliberately open: when you write</p> <pre><code class="language-java">Point a = new Point(0, 0);
+Point c = a;</code></pre> <p>do you now have two points, or two names for one point? Today's answer decides the meaning of half the code you have already written, so it is worth getting exactly right rather than approximately right.</p> <p>Start with the thing you already trust. A primitive variable holds its value, and nothing else. The name <code>m</code> <em>is</em> the box that contains 5.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; reference</span></div> <div class="bd"> <p>A variable of a class type does <strong>not</strong> hold an object. It holds a <strong>reference</strong>: a value that tells the JVM where in memory the object lives. You can think of it as the object's address, or as an arrow pointing at the object.</p> <p>The object itself lives somewhere else &mdash; in a region of memory called the <em>heap</em> &mdash; and it is created by <code>new</code>. Without a <code>new</code> there is no object, no matter how many variables you declare.</p> <p>Java will not let you see the numeric value of a reference, do arithmetic on it, or turn it into an integer. That is the whole difference between a Java reference and a C++ pointer: same idea, none of the sharp edges.</p> </div> </div> <p>Draw it. Two columns: the variables on the left, the objects on the right, and an arrow from each variable to the object it refers to.</p> <p class="filename">After the two lines above</p>
+<pre class="cmp"><code>      variables                    the heap
+  +------------+
+a | reference  |------------&gt;  +---------------+
+  +------------+          \    |  a Point      |
+                           \   |    x = 0.0    |
+c | reference  |------------&gt;  |    y = 0.0    |
+  +------------+               +---------------+
+
+  ONE object. TWO arrows pointing at it.</code></pre> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; the one sentence for today</span></div> <div class="bd"> <p><code>new</code> creates objects. <code>=</code> copies whatever is in the variable. For a primitive that is the value; for a class type that is the <em>arrow</em>. So the number of objects in your program is exactly the number of times you wrote <code>new</code> &mdash; assignments never add one.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the same two lines, twice</span></div> <div class="bd"> <p>This program does the identical thing twice: declare a variable, copy it into a second variable, then change the second one. The first time with an <code>int</code>, the second time with a <code>Point</code>. Everything about the shape of the code is the same. Predict both lines before you reveal.</p> <p class="filename">CopyDemo.java</p>
+<pre><code class="language-java">public class CopyDemo {
+    public static void main(String args[]) {
+        int m = 5;
+        int n = m;
+        n = 99;
+        System.out.println("m = " + m + ", n = " + n);
+
+        Point p = new Point(5, 5);
+        Point q = p;
+        q.setX(99);
+        System.out.println("p = " + p + ", q = " + q);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>m = 5, n = 99
+p = (99.0, 5.0), q = (99.0, 5.0)</code></pre> <p>The <code>int</code> behaves the way you expect: <code>n = m</code> copied the number 5 into a second box, and changing <code>n</code> left <code>m</code> alone. There were two boxes from the moment <code>int n = m;</code> ran.</p> <p>The <code>Point</code> does not. <code>Point q = p;</code> copied the <em>arrow</em>, so <code>p</code> and <code>q</code> point at the same object. <code>q.setX(99)</code> did not change <code>q</code> at all &mdash; <code>q</code> still holds the same arrow it always did. It reached <em>through</em> <code>q</code> and changed the object, and <code>p</code> is looking at that same object.</p> <p class="filename">CopyDemo after line 9</p>
+<pre class="cmp"><code>int side                     Point side
+
+m | 5  |                   p | ref |--\
+                                       &gt;--&gt; +-------------+
+n | 99 |                   q | ref |--/     | x = 99.0    |
+                                            | y =  5.0    |
+two boxes, two values                       +-------------+
+                                      two arrows, ONE object</code></pre> <p>Notice which statement was harmless and which was not. <code>q = p</code> was harmless &mdash; it only wrote into <code>q</code>. <code>q.setX(99)</code> was the dangerous one, because the dot reaches past the variable and touches the shared object. Whenever you are hunting a bug like this, look for the dots, not the equals signs.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 8.1</div> <div class="bd"> <p>Same idea, slightly rearranged. What are the three lines of output?</p> <p class="filename">IntVsPoint.java</p>
+<pre><code class="language-java">public class IntVsPoint {
+    public static void main(String args[]) {
+        int i = 10;
+        int j = i;
+        j = j + 5;
+        System.out.println("i = " + i + ", j = " + j);
+
+        Point p = new Point(10, 10);
+        Point q = p;
+        q.setY(q.getY() + 5);
+        System.out.println("p = " + p);
+        System.out.println("q = " + q);
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Count the <code>new</code>s: there is exactly one, so exactly one <code>Point</code> exists. <code>Point q = p;</code> therefore gives that one object a second name. Then <code>q.setY(q.getY() + 5)</code> reads 10 out of the object and writes 15 back into it &mdash; the same object <code>p</code> names.</p> <pre class="out"><code>i = 10, j = 15
+p = (10.0, 15.0)
+q = (10.0, 15.0)</code></pre> <p><strong>Things to notice.</strong> The two halves are written to look identical on purpose. <code>j = j + 5</code> changes the variable <code>j</code>; <code>q.setY(q.getY() + 5)</code> changes the <em>object</em>, which is not the same thing at all. The <code>int</code> lines print different numbers; the <code>Point</code> lines cannot possibly print different points, because there is only one point.</p> </div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 8.2</div> <div class="bd"> <p>No output to predict here &mdash; just counting.</p> <pre><code class="language-java">Point p1 = new Point(1, 1);
+Point p2 = p1;
+Point p3 = new Point(1, 1);
+Point p4 = p3;
+Point p5 = p2;</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> How many <code>Point</code> objects does this code create?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Two.</strong> Count the <code>new</code> keywords: there are exactly two, so exactly two objects were built. The other three lines are assignments, and an assignment never builds anything.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> How many variables point at each object?</p> <details class="soln"><summary></summary><div class="ans"> <p>The first object &mdash; the one built on line 1 &mdash; is pointed at by <code>p1</code>, <code>p2</code> and <code>p5</code>: three names. The second object is pointed at by <code>p3</code> and <code>p4</code>: two names. Five variables, two objects.</p> <p class="filename">Five variables two objects</p>
+<pre class="cmp"><code>p1 ---\
+p2 -----&gt; +-------------+       p3 ---\
+p5 ---/   | Point (1,1) |               &gt; +-------------+
+          +-------------+       p4 ---/   | Point (1,1) |
+                                          +-------------+</code></pre> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> After <code>p1.setX(50);</code>, what does <code>p5</code> print, and what does <code>p4</code> print?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>p5</code> prints <code>(50.0, 1.0)</code> and <code>p4</code> prints <code>(1.0, 1.0)</code>. <code>p1</code> and <code>p5</code> are arrows to the same object, so a change made through one is visible through the other. <code>p3</code> and <code>p4</code> point at a completely separate object that nothing in this line touched.</p> <p><strong>Things to notice across all three parts.</strong> The two objects have identical contents and are still two objects. "Same contents" and "same object" are different questions in Java, and &sect;4 is entirely about not confusing them. Get in the habit of counting <code>new</code> before you do anything else &mdash; it is the fastest way to know how many independent things you are dealing with.</p> </div></details> </div> </div> </div> <h2 id="s2"><span class="num">2.</span>Aliasing: two names, one object</h2> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; alias, aliasing</span></div> <div class="bd"> <p>Two reference variables are <strong>aliases</strong> when they hold the same reference, so both point at the same object. The situation is called <strong>aliasing</strong>.</p> <p>The consequence is the whole point: <em>a change made through one alias is visible through every other alias</em>. There is no copy to fall out of step, because there is no copy.</p> </div> </div> <p>Here is the instructor's own demonstration, the first program of Lecture 7's notes. It pauses in the middle and waits for you to press Return, so the class can commit to an answer before seeing it. The transcripts on this page are real sessions, so the word typed at the keyboard appears in the output exactly where it was typed.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; <code>Point c = a;</code> (the instructor's Example1)</span></div> <div class="bd"> <p>The <code>Point</code> class is unchanged from Lecture 7. It is reprinted here because everything today is built on it.</p> <p class="filename">Point.java</p>
+<pre><code class="language-java">public class Point {
+    private double x, y;
+
+    public Point() {
+        x = 0.0;
+        y = 0.0;
+    }
+
+    public Point(double xValue, double yValue) {
+        x = xValue;
+        y = yValue;
+    }
+
+    public double getX() { return x; }
+    public double getY() { return y; }
+    public void setX(double xValue) { x = xValue; }
+    public void setY(double yValue) { y = yValue; }
+
+    public double distanceTo(Point other) {
+        return Math.sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
+    }
+
+    public String toString() {
+        return "(" + x + ", " + y + ")";
+    }
+}</code></pre> <p class="filename">Example1.java</p>
+<pre><code class="language-java">import java.util.Scanner;
+
+public class Example1 {
+    public static void main(String args[]) {
+        Scanner input = new Scanner(System.in);
+        Point a = new Point(0, 0);
+        Point b = new Point(0, 1);
+        Point c = a;
+
+        System.out.println("a is " + a);
+        System.out.println("b is " + b);
+        System.out.println("c is " + c);
+        System.out.println("We can change c with c.setX(2)");
+        c.setX(2);
+        System.out.println("c is " + c);
+        System.out.println("Did a or b change? ");
+        input.nextLine();
+
+        System.out.println("a is now " + a);
+        System.out.println("b is now " + b);
+        input.close();
+    }
+}</code></pre> <p>The program asks you the question out loud: <em>did <code>a</code> or <code>b</code> change?</em> Write down both answers before you open the toggle.</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>a is (0.0, 0.0)
+b is (0.0, 1.0)
+c is (0.0, 0.0)
+We can change c with c.setX(2)
+c is (2.0, 0.0)
+Did a or b change?
+yes
+a is now (2.0, 0.0)
+b is now (0.0, 1.0)</code></pre> <p>(The <code>yes</code> on its own line is what was typed at the keyboard when the program paused.)</p> <p><code>a</code> changed. <code>b</code> did not. Two <code>new</code>s ran, so there are exactly two <code>Point</code> objects, and <code>c</code> is a third name for the first of them.</p> <p class="filename">Example1 after c.setX(2)</p>
+<pre class="cmp"><code>a | ref |----\
+              \---&gt; +--------------+
+c | ref |----/      | x = 2.0      |   &lt;-- c.setX(2) wrote here
+                    | y = 0.0      |
+                    +--------------+
+
+b | ref |---------&gt; +--------------+
+                    | x = 0.0      |   &lt;-- untouched
+                    | y = 1.0      |
+                    +--------------+</code></pre> <table class="trace"> <tr><th>Statement</th><th>Objects on the heap</th><th>Who points where</th></tr> <tr><td><code>Point a = new Point(0, 0);</code></td><td>#1 = (0.0, 0.0)</td><td>a &rarr; #1</td></tr> <tr><td><code>Point b = new Point(0, 1);</code></td><td>#1, #2 = (0.0, 1.0)</td><td>a &rarr; #1, b &rarr; #2</td></tr> <tr><td><code>Point c = a;</code></td><td>still just #1 and #2</td><td>a &rarr; #1, b &rarr; #2, c &rarr; #1</td></tr> <tr><td><code>c.setX(2);</code></td><td>#1 = (2.0, 0.0)</td><td>unchanged &mdash; no arrow moved</td></tr> </table> <p>Read the last row carefully, because it is the row people get wrong. <code>c.setX(2)</code> changed an <em>object</em>. It changed no variable at all. <code>a</code>, <code>b</code> and <code>c</code> hold exactly the references they held before, which is precisely why <code>a</code> reports the new value.</p> 
+</div></details> </div> </div> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; how to trace any reference program</span></div> <div class="bd"> <p>This is a mechanical routine. Done on paper it is nearly impossible to get wrong, and it is exactly what the exam questions are testing.</p> <ol> <li>Draw two columns: <strong>variables</strong> on the left, <strong>objects</strong> on the right. Leave room; you will need it.</li> <li>Every time you meet <code>new</code>, draw a <strong>new box</strong> on the right and fill in its fields. Number the boxes #1, #2, #3 as you go.</li> <li>Every time you meet <code>x = y</code> where both are class types, <strong>erase <code>x</code>'s arrow and redraw it</strong> to wherever <code>y</code>'s arrow points. No box is created, none is destroyed.</li> <li>Every time you meet <code>x.setSomething(...)</code>, <strong>follow <code>x</code>'s arrow</strong> and edit the numbers inside that box. No arrow moves.</li> <li>To print <code>x</code>, follow <code>x</code>'s arrow and read the box it lands on.</li> </ol> <p>Steps 3 and 4 are the whole lecture. Step 3 moves an arrow and touches no object; step 4 touches an object and moves no arrow.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 8.3</div> <div class="bd"> <p>Run the procedure above on this program. Give the three lines of output.</p> <p class="filename">ArrowTrace.java</p>
+<pre><code class="language-java">public class ArrowTrace {
+    public static void main(String args[]) {
+        Point r = new Point(1, 1);
+        Point s = new Point(2, 2);
+        Point t = r;
+        r = s;
+        r.setX(9);
+        System.out.println("r = " + r);   // line (a)
+        System.out.println("s = " + s);   // line (b)
+        System.out.println("t = " + t);   // line (c)
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> What is printed at line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>(9.0, 2.0)</code>. Two <code>new</code>s, so two objects: #1 = (1,1) and #2 = (2,2). <code>t = r</code> points <code>t</code> at #1. Then <code>r = s</code> <em>moves <code>r</code>'s arrow</em> off #1 and onto #2. So <code>r.setX(9)</code> edits #2, and <code>r</code> prints #2.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What is printed at line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>(9.0, 2.0)</code> &mdash; the same thing. After <code>r = s</code>, the variables <code>r</code> and <code>s</code> are aliases for object #2, and <code>r.setX(9)</code> edited that object. This is the line students least expect: nothing was ever done "to <code>s</code>", and <code>s</code> changed anyway.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> What is printed at line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <pre class="out"><code>r = (9.0, 2.0)
+s = (9.0, 2.0)
+t = (1.0, 1.0)</code></pre> <p><code>t</code> prints <code>(1.0, 1.0)</code>. <code>t</code> was aimed at object #1 back when <code>r</code> still pointed there, and moving <code>r</code> afterwards has no effect on <code>t</code> &mdash; <code>t</code> holds its own copy of the arrow, and that copy still points at #1.</p> <p class="filename">ArrowTrace after r.setX(9)</p>
+<pre class="cmp"><code>t | ref |-----------&gt; +-------------+
+                      | #1  (1, 1)  |
+                      +-------------+
+
+r | ref |----\
+              \-----&gt; +-------------+
+s | ref |----/        | #2  (9, 2)  |
+                      +-------------+</code></pre> <p><strong>Things to notice across all three parts.</strong> Object #1 is now reachable only through <code>t</code>. If <code>t</code> had not existed, nothing would refer to #1 any more and the garbage collector would eventually reclaim it &mdash; that is the whole of Java's memory management in one sentence. Notice also that <code>r = s</code> and <code>r.setX(9)</code> sit on adjacent lines and do completely different kinds of damage. Highlight the <code>=</code> lines in one color and the <code>.set</code> lines in another; the answer usually falls out.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 8.4</div> <div class="bd"> <p>You have a <code>Point original</code> and you want a <em>genuinely separate</em> point that starts with the same coordinates, so that changing one cannot possibly affect the other. Write the missing line, then say what the program prints.</p> <p class="filename">MakeCopy.java</p>
+<pre><code class="language-java">public class MakeCopy {
+    public static void main(String args[]) {
+        Point original = new Point(4, 7);
+
+        Point copy = /* your line here */;
+
+        copy.setX(-1);
+        System.out.println("original = " + original);
+        System.out.println("copy     = " + copy);
+        System.out.println("original == copy? " + (original == copy));
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> <code>Point copy = original;</code> is exactly the thing that does <em>not</em> work &mdash; it makes an alias. To get a separate object you must run <code>new</code> again, and feed the constructor the coordinates you read out of the original with its getters.</p> <p class="filename">MakeCopy.java</p>
+<pre><code class="language-java">public class MakeCopy {
+    public static void main(String args[]) {
+        Point original = new Point(4, 7);
+
+        Point copy = new Point(original.getX(), original.getY());
+
+        copy.setX(-1);
+        System.out.println("original = " + original);
+        System.out.println("copy     = " + copy);
+        System.out.println("original == copy? " + (original == copy));
+    }
+}</code></pre> <pre class="out"><code>original = (4.0, 7.0)
+copy     = (-1.0, 7.0)
+original == copy? false</code></pre> <p><strong>Things to notice.</strong> The word <code>new</code> is the only thing on that line that matters. Everything else is bookkeeping to get the right numbers into the new object.</p> <p>Many classes provide this as a <em>copy constructor</em> &mdash; a constructor whose single parameter is another object of the same class:</p> <pre><code class="language-java">public Point(Point other) {
+    x = other.getX();
+    y = other.getY();
+}</code></pre> <p>With that in <code>Point</code>, the line becomes <code>Point copy = new Point(original);</code>, which reads much better and cannot be mistaken for an assignment. <code>Point</code> as the instructor wrote it does not have one; adding it is a good five-minute exercise.</p> <p>The last line printing <code>false</code> is the subject of &sect;4, and it should already look reasonable: the two points hold the same numbers but they are not the same object.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 8.4</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="15" aria-label="Live coding - Quick Check 8.4">public class MakeCopy {
+    public static void main(String args[]) {
+        Point original = new Point(4, 7);
+
+        // Make copy a SEPARATE Point with the same coordinates.
+        Point copy = ;
+
+        copy.setX(-1);
+        System.out.println("original = " + original);
+        System.out.println("copy     = " + copy);
+        System.out.println("original == copy? " + (original == copy));
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s3"><span class="num">3.</span><code>null</code>, and the NullPointerException</h2> <p>If a reference variable is an arrow, there has to be a way to say "this arrow points at nothing". Java spells it <code>null</code>.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; null</span></div> <div class="bd"> <p><code>null</code> is a special reference value meaning <em>no object</em>. Any reference variable may hold it, whatever its class.</p> <p><code>null</code> is the default for every uninitialized instance variable of a class type, and for every slot of a newly created array of objects. <code>new Point[3]</code> gives you three slots holding <code>null</code> &mdash; it does <em>not</em> give you three points.</p> <p>Printing a <code>null</code> reference prints the four letters <code>null</code>. Calling a method on one is a run-time error.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; what <code>null</code> does, and what it does not survive</span></div> <div class="bd"> <p>This program deliberately ends badly. Everything up to the last line is fine. Work out how many lines it manages to print.</p> <p class="filename">NullDemo.java</p>
+<pre><code class="language-java">public class NullDemo {
+    public static void main(String args[]) {
+        Point p = null;
+        System.out.println("p is " + p);
+        System.out.println("Is p null? " + (p == null));
+
+        p = new Point(1, 2);
+        System.out.println("p is " + p);
+        System.out.println("Is p null? " + (p == null));
+
+        p = null;
+        System.out.println("About to call a method on p...");
+        System.out.println(p.getX());
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>p is null
+Is p null? true
+p is (1.0, 2.0)
+Is p null? false
+About to call a method on p...
+Exception in thread "main" java.lang.NullPointerException: Cannot invoke "Point.getX()" because "p" is null
+	at NullDemo.main(NullDemo.java:13)</code></pre> <p>Five lines, then the crash. Three separate facts are on display.</p> <ul> <li><strong><code>"p is " + p</code> does not crash</strong> even when <code>p</code> is <code>null</code>. String concatenation checks for <code>null</code> and substitutes the text <code>null</code>, so printing a <code>null</code> reference is always safe. This is why a crash often happens several lines <em>after</em> the variable actually became <code>null</code>.</li> <li><strong><code>p == null</code> is the test</strong>, and it is legal on any reference at any time.</li> <li><strong><code>p.getX()</code> is what kills it.</strong> The dot means "follow the arrow", and there is no arrow to follow.</li> </ul> <p>The message names the variable &mdash; <code>because "p" is null</code> &mdash; because this program was compiled with debugging information, which every IDE does by default. A bare <code>javac NullDemo.java</code> with no options prints an internal slot name &mdash; <code>local1</code> in angle brackets &mdash; where the variable's real name would be. Either way the first half of the message, <code>Cannot invoke "Point.getX()"</code>, tells you which call failed, and the <code>at NullDemo.main(NullDemo.java:13)</code> line tells you exactly where.</p> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; an array of objects is an array of nulls</span></div> <div class="bd"> <p>This is the single most common way students meet a <code>NullPointerException</code> in this course:</p> <pre><code class="language-java">Point pts[] = new Point[3];
+pts[0].setX(5);                 // NullPointerException</code></pre> <p><code>new Point[3]</code> makes <em>one</em> object: the array. It makes no <code>Point</code>s at all. You need a second <code>new</code> per slot:</p> <pre><code class="language-java">Point pts[] = new Point[3];
+for (int i = 0; i &lt; 3; i++) {
+    pts[i] = new Point(0, 0);
+}</code></pre> <p>This is exactly why the instructor's <code>Example3</code> writes <code>pts[i] = new Point(...)</code> inside a loop before ever building a <code>Triangle</code> from the array. Watch for it again in &sect;6.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 8.5</div> <div class="bd"> <p>Which numbered line throws the exception, and what do the lines before it print?</p> <p class="filename">NullTrace.java</p>
+<pre><code class="language-java">public class NullTrace {
+    public static void main(String args[]) {
+        Point a = new Point(1, 1);
+        Point b = null;
+        Point c = a;
+
+        System.out.println(a);              // line 1
+        System.out.println(b);              // line 2
+        System.out.println(c.getX());       // line 3
+        c = null;
+        System.out.println(a.getY());       // line 4
+        System.out.println(b.getX());       // line 5
+        System.out.println("done");         // line 6
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> What do lines 1 to 4 print?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>(1.0, 1.0)</code>, then <code>null</code>, then <code>1.0</code>, then <code>1.0</code>.</p> <p>Line 2 is safe: printing a <code>null</code> reference prints the word. Line 3 follows <code>c</code>, which is an alias for the object <code>a</code> names, so it prints that object's x. Line 4 is the interesting one &mdash; <code>c = null</code> set <em>the variable <code>c</code></em> to nothing; it did nothing whatsoever to the object, which <code>a</code> still points at perfectly well.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Which line throws, and does line 6 ever run?</p> <details class="soln"><summary></summary><div class="ans"> <p>Line 5 throws, and line 6 never runs.</p> <pre class="out"><code>(1.0, 1.0)
+null
+1.0
+1.0
+Exception in thread "main" java.lang.NullPointerException: Cannot invoke "Point.getX()" because "b" is null
+	at NullTrace.main(NullTrace.java:12)</code></pre> <p><code>b</code> was <code>null</code> from the very first line of the program, but nothing had asked it to <em>do</em> anything until line 5. An uncaught exception ends the program on the spot, so <code>"done"</code> is never printed.</p> <p><strong>Things to notice across both parts.</strong> The trap in this question is line 4. Setting <code>c = null</code> looks like it should break something, and it breaks nothing: erasing one arrow does not erase the object, and the other arrow is still fine. Compare with <code>c.setX(...)</code>, which would have been visible through <code>a</code> immediately. Erasing an arrow is private to one variable; editing an object is public to everyone pointing at it.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 8.6</div> <div class="bd"> <p>This program is supposed to add up the x-coordinates of every point in the array and print the total. Not every slot was filled. Run it in your head, say what happens, then repair it so that empty slots are simply skipped.</p> <p class="filename">TotalXBroken.java</p>
+<pre><code class="language-java">public class TotalXBroken {
+    public static void main(String args[]) {
+        Point pts[] = new Point[4];
+        pts[0] = new Point(1, 1);
+        pts[2] = new Point(3, 3);
+
+        double total = 0;
+        for (int i = 0; i &lt; pts.length; i++) {
+            total += pts[i].getX();
+        }
+        System.out.println("Total x: " + total);
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> <code>new Point[4]</code> gives four <code>null</code> slots and only two of them are filled, so the loop hits <code>pts[1]</code> and dies. As written it prints nothing at all &mdash; not even a partial total &mdash; because the <code>println</code> is after the loop:</p> <pre class="out"><code>Exception in thread "main" java.lang.NullPointerException: Cannot invoke "Point.getX()" because "pts[i]" is null
+	at TotalXBroken.main(TotalXBroken.java:9)</code></pre> <p>The fix is a guard before the dot. Test the slot against <code>null</code> and skip it if it is empty.</p> <p class="filename">TotalXFixed.java</p>
+<pre><code class="language-java">public class TotalXFixed {
+    public static void main(String args[]) {
+        Point pts[] = new Point[4];
+        pts[0] = new Point(1, 1);
+        pts[2] = new Point(3, 3);
+
+        double total = 0;
+        for (int i = 0; i &lt; pts.length; i++) {
+            if (pts[i] != null) {
+                total += pts[i].getX();
+            }
+        }
+        System.out.println("Total x: " + total);
+    }
+}</code></pre> <pre class="out"><code>Total x: 4.0</code></pre> <p><strong>Things to notice.</strong> The message even tells you the expression that was <code>null</code> &mdash; <code>because "pts[i]" is null</code> &mdash; which is far more useful than the bare <code>NullPointerException</code> older versions of Java printed. Read the whole message before you start guessing.</p> <p>The other repair, filling every slot with <code>new Point(0, 0)</code> first, gives <code>4.0</code> as well here, but it is a different program: it says "there are four points, two of them at the origin" rather than "there are two points and two empty slots". Choose the one that matches what the data actually means.</p> <p>A guard like this only makes sense when <code>null</code> is a legitimate state for your data. If a <code>null</code> in that array would be a bug, do not hide it behind an <code>if</code> &mdash; let it crash loudly and go fix whatever failed to fill the slot.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 8.6</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="16" aria-label="Live coding - Quick Check 8.6">public class TotalXBroken {
+    public static void main(String args[]) {
+        Point pts[] = new Point[4];
+        pts[0] = new Point(1, 1);
+        pts[2] = new Point(3, 3);
+
+        double total = 0;
+        for (int i = 0; i &lt; pts.length; i++) {
+            // Fix this line so empty slots are skipped.
+            total += pts[i].getX();
+        }
+        System.out.println("Total x: " + total);
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s4"><span class="num">4.</span><code>==</code> on objects compares references</h2> <p>You have used <code>==</code> since your first week of CSCI 111 and it has always meant what you wanted. On objects it still does exactly what it always did &mdash; compare the two values in the two variables &mdash; but the values in the variables are now arrows.</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; what <code>==</code> asks</span></div> <div class="bd"> <p>For primitives, <code>a == b</code> asks <em>"are these the same value?"</em></p> <p>For objects, <code>a == b</code> asks <em>"are these arrows pointing at the same object?"</em> It does not look inside the objects. Two separate objects whose fields are identical in every way still give <code>false</code>.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; identical contents, different answers</span></div> <div class="bd"> <p>All three points below print the same thing. Predict the three <code>==</code> results anyway.</p> <p class="filename">IdentityDemo.java</p>
+<pre><code class="language-java">public class IdentityDemo {
+    public static void main(String args[]) {
+        Point p1 = new Point(3, 4);
+        Point p2 = new Point(3, 4);
+        Point p3 = p1;
+
+        System.out.println("p1 = " + p1);
+        System.out.println("p2 = " + p2);
+        System.out.println("p3 = " + p3);
+
+        System.out.println("p1 == p2? " + (p1 == p2));
+        System.out.println("p1 == p3? " + (p1 == p3));
+        System.out.println("p1.getX() == p2.getX()? " + (p1.getX() == p2.getX()));
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>p1 = (3.0, 4.0)
+p2 = (3.0, 4.0)
+p3 = (3.0, 4.0)
+p1 == p2? false
+p1 == p3? true
+p1.getX() == p2.getX()? true</code></pre> <p>Three lines print <code>(3.0, 4.0)</code> and yet <code>p1 == p2</code> is <code>false</code>. Two <code>new</code>s ran, so there are two objects, and two different objects are never <code>==</code>, however identical they look. <code>p1 == p3</code> is <code>true</code> because <code>p3</code> was never given its own object &mdash; it was handed <code>p1</code>'s arrow.</p> <p>The last line is the important contrast. <code>p1.getX()</code> and <code>p2.getX()</code> are <code>double</code> values, so <em>that</em> <code>==</code> is a primitive comparison and answers the question you probably meant to ask. The dot changed the meaning of the operator that follows it.</p> <table class="trace"> <tr><th>Expression</th><th>What is being compared</th><th>Result</th></tr> <tr><td><code>p1 == p2</code></td><td>two references, to two different objects</td><td><code>false</code></td></tr> <tr><td><code>p1 == p3</code></td><td>two references, to the same object</td><td><code>true</code></td></tr> <tr><td><code>p1.getX() == p2.getX()</code></td><td>two <code>double</code> values, <code>3.0</code> and <code>3.0</code></td><td><code>true</code></td></tr> </table> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; using <code>==</code> to ask "are these the same point?"</span></div> <div class="bd"> <p>If what you mean is "do these two points have the same coordinates", <code>==</code> is the wrong tool and will quietly answer <code>false</code> most of the time. Right now the only honest way to write it is to compare the fields yourself:</p> <pre><code class="language-java">if (p1.getX() == p2.getX() &amp;&amp; p1.getY() == p2.getY()) {
+    System.out.println("same coordinates");
+}</code></pre> <p>Java's standard answer to this problem is a method called <code>equals</code>, which every class inherits and which you can define for your own class. Out of the box, <code>equals</code> on a class you wrote does exactly what <code>==</code> does, which is why it is not the fix yet. Writing a real <code>equals</code> for <code>Point</code> is the first thing we do in Lecture 9.</p> <p>The same trap applies to <code>String</code>, which is an object like any other. That is also next lecture's business &mdash; for now, note it and be suspicious of <code>==</code> on anything whose type starts with a capital letter.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 8.7</div> <div class="bd"> <p>Give the six lines of output.</p> <p class="filename">EqualsRefs.java</p>
+<pre><code class="language-java">public class EqualsRefs {
+    public static void main(String args[]) {
+        Point p = new Point(0, 0);
+        Point q = new Point(0, 0);
+        Point r = q;
+
+        System.out.println(p == q);                             // line (a)
+        System.out.println(q == r);                             // line (b)
+        System.out.println(p.getX() == q.getX());               // line (c)
+        q.setX(5);
+        System.out.println(q == r);                             // line (d)
+        System.out.println(r.getX());                           // line (e)
+        q = p;
+        System.out.println(q == r);                             // line (f)
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> Line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>false</code>. Two <code>new</code>s, two objects. Their contents are identical and that is irrelevant.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>true</code>. <code>Point r = q;</code> copied <code>q</code>'s arrow, so both point at the second object.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>true</code>. These are <code>double</code> values, both <code>0.0</code>, so this is an ordinary primitive comparison. Compare it with line (a) &mdash; same two objects, opposite answer, because a different question was asked.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> Line (d)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>true</code>, still. <code>q.setX(5)</code> edited the object; it did not move any arrow. <code>q</code> and <code>r</code> point where they always did.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> Line (e)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>5.0</code>. <code>r</code> is an alias for the object <code>q.setX(5)</code> just edited, so the change is visible through <code>r</code> even though <code>r</code> was never mentioned.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(f)</span> Line (f)?</p> <details class="soln"><summary></summary><div class="ans"> <pre class="out"><code>false
+true
+true
+true
+5.0
+false</code></pre> <p><code>false</code>. <code>q = p</code> moved <code>q</code>'s arrow onto the first object, while <code>r</code> stayed on the second one. Two arrows, two different targets.</p> <p><strong>Things to notice across all six parts.</strong> Lines (b), (d) and (f) ask the identical question <code>q == r</code> and get <code>true</code>, <code>true</code>, <code>false</code>. Between (b) and (d) an object was edited &mdash; no effect on <code>==</code>. Between (d) and (f) a variable was reassigned &mdash; and that is the only thing that can change the answer. <code>==</code> on objects reports on arrows and on nothing else.</p> </div></details> </div> </div> </div> <h2 id="s5"><span class="num">5.</span>Objects stored inside objects</h2> <p>In Lecture 7 you built a <code>Triangle</code> out of three <code>Point</code>s and it seemed harmless. It is not, and the reason is now obvious: an instance variable of a class type is a reference, exactly like a local variable of a class type. When the constructor runs <code>a = pA;</code> it copies an arrow.</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; a Triangle does not contain Points</span></div> <div class="bd"> <p>A <code>Triangle</code> object contains three <em>references</em>. The <code>Point</code> objects live outside it, on the heap, and the caller who passed them in is still holding arrows to the very same objects.</p> <p>So the caller can reach in and change the triangle's geometry at any time, without ever mentioning the triangle. The <code>Triangle</code> has no way to notice and no way to stop it.</p> </div> </div> <p>Today's <code>Triangle</code> is the instructor's variant whose <code>toString</code> lists the three vertices rather than the three side lengths. We need to see <em>which points</em> a triangle is holding, not how long its sides are.</p> <p class="filename">Triangle.java</p>
+<pre><code class="language-java">public class Triangle {
+    private Point a, b, c;
+
+    public Triangle(Point pA, Point pB, Point pC) {
+        a = pA;
+        b = pB;
+        c = pC;
+    }
+
+    public String toString() {
+        return "Triangle: " + a + ", " + b + ", " + c;
+    }
+}</code></pre> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the instructor's Example2, the centerpiece of this lecture</span></div> <div class="bd"> <p>Six variables, two triangles, and five deliberate pauses where the program asks you to commit to an answer. Read the setup carefully first &mdash; which <code>Point</code>s do <code>abc</code> and <code>def</code> actually share?</p> <p class="filename">Example2.java</p>
+<pre><code class="language-java">import java.util.Scanner;
+
+public class Example2 {
+    public static void main(String args[]) {
+        Scanner input = new Scanner(System.in);
+        Point a = new Point(0, 0);
+        Point b = new Point(0, 1);
+        Point c = new Point(1, 1);
+        Triangle abc = new Triangle(a, b, c);
+        System.out.println("Triangle abc: " + abc);
+        Point d = a;
+        Point e = new Point(2, 0);
+        Point f = c;
+        Triangle def = new Triangle(d, e, f);
+        System.out.println("Triangle def: " + def + "\n");
+
+        System.out.print("Are triangle abc and def equal? ");
+        input.next();
+        System.out.println("Are triangle abc and def equal: " + (abc == def) + "\n");
+
+        System.out.println("Changing data in Object a changes triangle abc");
+        a.setX(-1);
+        System.out.println("Triangle abc is now: " + abc + "\n");
+
+        System.out.print("Does it change Point d? ");
+        input.next();
+        System.out.println("Point d changes the point d to " + d + "\n");
+
+        System.out.print("Does it change triangle def? ");
+        input.next();
+        System.out.println("Triangle def has changed to: " + def + "\n");
+
+        d = new Point(3, 3);
+        System.out.println("Constructing a new Point d changes the point d to " + d);
+        System.out.print("Does it change triangle def? ");
+        input.next();
+        System.out.println("Triangle def is still: " + def + "\n");
+
+        System.out.print("Does it change Point a? ");
+        input.next();
+        System.out.println("Point a is still: " + a);
+        input.close();
+    }
+}</code></pre> <p>Before you look: the five questions the program asks are (1) are the two triangles equal, (2) does changing <code>a</code> change <code>d</code>, (3) does it change triangle <code>def</code>, (4) does building a brand-new <code>Point d</code> change <code>def</code>, and (5) does it change <code>a</code>. Write yes or no five times.</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Triangle abc: Triangle: (0.0, 0.0), (0.0, 1.0), (1.0, 1.0)
+Triangle def: Triangle: (0.0, 0.0), (2.0, 0.0), (1.0, 1.0)
+
+Are triangle abc and def equal? no
+Are triangle abc and def equal: false
+
+Changing data in Object a changes triangle abc
+Triangle abc is now: Triangle: (-1.0, 0.0), (0.0, 1.0), (1.0, 1.0)
+
+Does it change Point d? yes
+Point d changes the point d to (-1.0, 0.0)
+
+Does it change triangle def? yes
+Triangle def has changed to: Triangle: (-1.0, 0.0), (2.0, 0.0), (1.0, 1.0)
+
+Constructing a new Point d changes the point d to (3.0, 3.0)
+Does it change triangle def? no
+Triangle def is still: Triangle: (-1.0, 0.0), (2.0, 0.0), (1.0, 1.0)
+
+Does it change Point a? no
+Point a is still: (-1.0, 0.0)</code></pre> <p>(The lone <code>no</code>, <code>yes</code>, <code>yes</code>, <code>no</code>, <code>no</code> after each question are the answers typed at the keyboard while the program was paused. They happen to be the right ones.)</p> <p>Everything follows from the picture. Only four <code>Point</code> objects are ever built &mdash; four <code>new Point</code> calls before the halfway mark &mdash; and the six point variables share them:</p> <p class="filename">Example2 immediately after Triangle def is built</p>
+<pre class="cmp"><code>a ---\                                  Triangle abc
+d ----&gt;  #1 (0, 0) &lt;-------------------  a
+                    \                    b ---&gt; #2
+b ------&gt;  #2 (0, 1) -------------------/       c ---&gt; #3
+c ---\
+f ----&gt;  #3 (1, 1) &lt;-------\            Triangle def
+                            \----------  a  (same #1)
+e ------&gt;  #4 (2, 0) &lt;-------------------  b  (#4)
+                                           c  (same #3)
+
+4 objects.  abc and def SHARE #1 and #3.</code></pre> <table class="trace"> <tr><th>Question</th><th>Answer</th><th>Why</th></tr> <tr><td><code>abc == def</code></td><td><code>false</code></td><td>Two <code>new Triangle</code> calls, so two <code>Triangle</code> objects. Sharing vertices does not make them the same object.</td></tr> <tr><td>Does <code>a.setX(-1)</code> change <code>d</code>?</td><td>yes</td><td><code>Point d = a;</code> made <code>d</code> an alias for object #1. The change was made to #1.</td></tr> <tr><td>Does it change <code>def</code>?</td><td>yes</td><td><code>def</code> stores the reference it was handed, which is also #1. It never made a copy.</td></tr> <tr><td>Does <code>d = new Point(3, 3)</code> change <code>def</code>?</td><td>no</td><td>This moved <em>the variable <code>d</code></em> onto a fifth object. <code>def</code>'s own field still holds the arrow to #1.</td></tr> <tr><td>Does it change <code>a</code>?</td><td>no</td><td>Same reason. <code>a</code> still holds its own arrow to #1, which is still <code>(-1.0, 0.0)</code>.</td></tr> </table> <p>Rows 2 and 3 are the same event seen from two places; rows 4 and 5 are the same non-event. The whole program is a controlled experiment separating <em>editing the object at the end of the arrow</em> from <em>moving the arrow</em>. Only the first is visible to anybody else.</p> <p>One more line worth reading twice: <code>Triangle abc</code> was printed as <code>(-1.0, 0.0), (0.0, 1.0), (1.0, 1.0)</code> even though nothing in the program ever mentioned <code>abc</code> between building it and printing it. A triangle whose vertices can move underneath it is a genuine design hazard, and later in this section we close the hole.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 8.8</div> <div class="bd"> <p>Four lines of output. The last two lines are where the marks are.</p> <p class="filename">TriangleAlias.java</p>
+<pre><code class="language-java">public class TriangleAlias {
+    public static void main(String args[]) {
+        Point v = new Point(0, 0);
+        Point w = new Point(1, 0);
+        Point z = new Point(0, 1);
+
+        Triangle t = new Triangle(v, w, z);
+        System.out.println(t);              // line (a)
+
+        v.setX(10);
+        System.out.println(t);              // line (b)
+
+        w = new Point(20, 20);
+        System.out.println(t);              // line (c)
+        System.out.println(w);              // line (d)
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> Line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Triangle: (0.0, 0.0), (1.0, 0.0), (0.0, 1.0)</code> &mdash; the three points as built.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Triangle: (10.0, 0.0), (1.0, 0.0), (0.0, 1.0)</code>. <code>v.setX(10)</code> edited the object the triangle's first field points at. The triangle was not touched and changed anyway.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Triangle: (10.0, 0.0), (1.0, 0.0), (0.0, 1.0)</code> &mdash; unchanged from line (b). <code>w = new Point(20, 20);</code> pointed the local variable <code>w</code> at a brand-new object. The triangle's second field still holds the arrow to the original <code>(1.0, 0.0)</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> Line (d)?</p> <details class="soln"><summary></summary><div class="ans"> <pre class="out"><code>Triangle: (0.0, 0.0), (1.0, 0.0), (0.0, 1.0)
+Triangle: (10.0, 0.0), (1.0, 0.0), (0.0, 1.0)
+Triangle: (10.0, 0.0), (1.0, 0.0), (0.0, 1.0)
+(20.0, 20.0)</code></pre> <p><code>(20.0, 20.0)</code>. <code>w</code> really did change &mdash; it is now the only variable pointing at the new object.</p> <p><strong>Things to notice across all four parts.</strong> Lines (b) and (c) are the exam question in miniature. <code>v.setX(10)</code> and <code>w = new Point(20, 20)</code> look like equally drastic edits, and only one of them is visible to the triangle. If a change was made with a dot, everybody sharing the object sees it; if it was made with an equals sign, it is private to that one variable.</p> </div></details> </div> </div> </div> <p>So how do you build a <code>Triangle</code> that cannot be sabotaged after the fact? Make it stop storing other people's objects and store its own instead. The constructor runs <code>new</code> on each vertex.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; a constructor that copies</span></div> <div class="bd"> <p><code>SafeTriangle</code> differs from <code>Triangle</code> in three lines. Each field is filled with a fresh <code>Point</code> built from the argument's coordinates, rather than with the argument itself.</p> <p class="filename">SafeTriangle.java</p>
+<pre><code class="language-java">public class SafeTriangle {
+    private Point a, b, c;
+
+    public SafeTriangle(Point pA, Point pB, Point pC) {
+        a = new Point(pA.getX(), pA.getY());
+        b = new Point(pB.getX(), pB.getY());
+        c = new Point(pC.getX(), pC.getY());
+    }
+
+    public String toString() {
+        return "Triangle: " + a + ", " + b + ", " + c;
+    }
+}</code></pre> <p class="filename">SafeDemo.java</p>
+<pre><code class="language-java">public class SafeDemo {
+    public static void main(String args[]) {
+        Point v = new Point(0, 0);
+        Point w = new Point(1, 0);
+        Point z = new Point(0, 1);
+
+        Triangle sharing = new Triangle(v, w, z);
+        SafeTriangle copying = new SafeTriangle(v, w, z);
+
+        System.out.println("sharing: " + sharing);
+        System.out.println("copying: " + copying);
+
+        v.setX(99);
+        System.out.println("after v.setX(99):");
+        System.out.println("sharing: " + sharing);
+        System.out.println("copying: " + copying);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>sharing: Triangle: (0.0, 0.0), (1.0, 0.0), (0.0, 1.0)
+copying: Triangle: (0.0, 0.0), (1.0, 0.0), (0.0, 1.0)
+after v.setX(99):
+sharing: Triangle: (99.0, 0.0), (1.0, 0.0), (0.0, 1.0)
+copying: Triangle: (0.0, 0.0), (1.0, 0.0), (0.0, 1.0)</code></pre> <p>Both triangles start out looking the same, and after one <code>setX</code> they disagree. The copying constructor built objects that nobody outside the <code>SafeTriangle</code> has an arrow to, so nobody outside can change them.</p> <p>This technique has a name: a <strong>defensive copy</strong>. It costs three <code>new</code> calls and buys you a class whose state cannot be altered behind its back. It is not always the right choice &mdash; sometimes sharing is exactly what you want, as when several shapes genuinely must move together &mdash; but it should be a decision you make on purpose rather than one the language makes for you by default.</p> <p>There is a second leak, and it is easy to miss: a getter. If <code>Triangle</code> had a method <code>public Point getA() { return a; }</code>, it would hand out an arrow to its own private field, and the caller could then edit it. Practice Problem 4 closes both holes.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 8.9</div> <div class="bd"> <p>This is the <code>Segment</code> class from Lecture 7, unchanged. Its constructor has the same hole <code>Triangle</code> has.</p> <p class="filename">Segment.java</p>
+<pre><code class="language-java">public class Segment {
+    private Point start, end;
+
+    public Segment(Point start, Point end) {
+        this.start = start;
+        this.end = end;
+    }
+
+    public double length() {
+        return start.distanceTo(end);
+    }
+
+    public String toString() {
+        return start + "--" + end;
+    }
+}</code></pre> <p class="filename">SegmentDemo.java</p>
+<pre><code class="language-java">public class SegmentDemo {
+    public static void main(String[] args) {
+        Point p = new Point(1, 1);
+        Point q = new Point(4, 5);
+
+        Segment s = new Segment(p, q);
+        System.out.println(s);
+        System.out.println(s.length());
+
+        p.setY(-3);
+        System.out.println(s);
+        System.out.println(s.length());
+    }
+}</code></pre> <p>Give the four lines this prints, then rewrite the constructor so that a <code>Segment</code> keeps its own copies of the two endpoints and the last two lines match the first two.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> As written, <code>this.start = start;</code> stores the caller's arrow, so <code>p.setY(-3)</code> moves one end of the segment and changes its length. Here is what it does print:</p> <pre class="out"><code>(1.0, 1.0)--(4.0, 5.0)
+5.0
+(1.0, -3.0)--(4.0, 5.0)
+8.54400374531753</code></pre> <p>The repair is a <code>new Point</code> on each side of the constructor, built from the argument's coordinates. Nothing else in the class changes.</p> <p class="filename">SafeSegment.java</p>
+<pre><code class="language-java">public class SafeSegment {
+    private Point start, end;
+
+    public SafeSegment(Point start, Point end) {
+        this.start = new Point(start.getX(), start.getY());
+        this.end = new Point(end.getX(), end.getY());
+    }
+
+    public double length() {
+        return start.distanceTo(end);
+    }
+
+    public String toString() {
+        return start + "--" + end;
+    }
+}</code></pre> <pre class="out"><code>(1.0, 1.0)--(4.0, 5.0)
+5.0
+(1.0, 1.0)--(4.0, 5.0)
+5.0</code></pre> <p><strong>Things to notice.</strong> The parameters are named <code>start</code> and <code>end</code>, the same as the fields, so the <code>this.</code> on the left-hand side is still compulsory &mdash; the Lecture 7 shadowing rule has not gone away. On the right-hand side, bare <code>start</code> means the parameter, which is exactly what you want to read the coordinates out of.</p> <p>The length changing from <code>5.0</code> to <code>8.54400374531753</code> is the part that should worry you. A <code>Segment</code> that silently reports a different length than the one it was built with is not a bug in <code>length()</code>; it is a bug in the constructor, three lines away, written days earlier.</p> <p>Copying two points is cheap. Copying a large structure is not, and a constructor that deep-copies everything it is handed can become a real performance problem. The professional habit is to copy small things freely and, for large things, document loudly whether your class shares or copies.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 8.9</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="19" aria-label="Live coding - Quick Check 8.9">public class Segment {
+    private Point start, end;
+
+    public Segment(Point start, Point end) {
+        // Store copies, not the caller's own Point objects.
+        this.start = start;
+        this.end = end;
+    }
+
+    public double length() {
+        return start.distanceTo(end);
+    }
+
+    public String toString() {
+        return start + "--" + end;
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s6"><span class="num">6.</span>Mutating versus rebinding</h2> <p>Everything so far comes down to one distinction, and it is worth giving it names.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; mutating and rebinding</span></div> <div class="bd"> <p>To <strong>mutate</strong> an object is to change the data inside it: <code>p.setX(5)</code>. The object stays where it is, keeps its identity, and every arrow pointing at it now sees the new value.</p> <p>To <strong>rebind</strong> a variable is to point it at a different object: <code>p = new Point(5, 0)</code>. The old object is untouched, everybody else's arrows still point at it, and only this one variable moved.</p> <p>Both are written with code that looks like "changing <code>p</code>". They are opposites.</p> </div> </div> <p>The instructor wrote two programs, <code>Example3</code> and <code>Example3b</code>, that differ in exactly two lines out of thirty. They exist to make this distinction impossible to miss, so read them side by side. Both build a triangle from an array of points, then read three <em>more</em> points and build a second triangle from the same array.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; Example3: the second loop mutates</span></div> <div class="bd"> <p>The first loop fills the array with <code>new Point</code>. The second loop calls <code>setX</code> and <code>setY</code> on the points already in the array. At the end the program offers to show you triangle 1 again &mdash; that offer is the whole experiment.</p> <p class="filename">Example3.java</p>
+<pre><code class="language-java">import java.util.Scanner;
+
+public class Example3 {
+    public static void main(String args[]) {
+        Scanner input = new Scanner(System.in);
+        Point pts[] = new Point[3];
+        System.out.println("Setting up triangle 1:");
+        for (int i = 0; i &lt; 3; i++) {
+            System.out.print("Give the coordinates for the next vertex: ");
+            pts[i] = new Point(input.nextDouble(), input.nextDouble());
+        }
+        Triangle t1 = new Triangle(pts[0], pts[1], pts[2]);
+        System.out.println(t1);
+        System.out.println("Setting up triangle 2:");
+        for (int i = 0; i &lt; 3; i++) {
+            System.out.print("Give the coordinates for the next vertex: ");
+            pts[i].setX(input.nextDouble());
+            pts[i].setY(input.nextDouble());
+        }
+        Triangle t2 = new Triangle(pts[0], pts[1], pts[2]);
+        System.out.println(t2);
+        System.out.println("Are the triangles equal using == ?  \n" + (t1 == t2));
+
+        System.out.print("Do you want to see triangle 1 again? ");
+        String answer = input.next();
+        if (answer.trim().toUpperCase().charAt(0) == 'Y') {
+            System.out.println(t1);
+        }
+        input.close();
+    }
+}</code></pre> <p>The session below enters the 3&ndash;4&ndash;5 triangle <code>(0,0) (3,0) (0,4)</code> for triangle 1, then <code>(1,1) (2,2) (3,3)</code> for triangle 2, then answers <code>yes</code>. What does the last line print?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Setting up triangle 1:
+Give the coordinates for the next vertex: 0 0
+Give the coordinates for the next vertex: 3 0
+Give the coordinates for the next vertex: 0 4
+Triangle: (0.0, 0.0), (3.0, 0.0), (0.0, 4.0)
+Setting up triangle 2:
+Give the coordinates for the next vertex: 1 1
+Give the coordinates for the next vertex: 2 2
+Give the coordinates for the next vertex: 3 3
+Triangle: (1.0, 1.0), (2.0, 2.0), (3.0, 3.0)
+Are the triangles equal using == ?
+false
+Do you want to see triangle 1 again? yes
+Triangle: (1.0, 1.0), (2.0, 2.0), (3.0, 3.0)</code></pre> <p><strong>Triangle 1 is gone.</strong> It printed <code>(0,0), (3,0), (0,4)</code> earlier in the same run, and now the same variable <code>t1</code> prints triangle 2's coordinates. Nothing overwrote <code>t1</code>. Nothing reassigned it. Three <code>setX</code>/<code>setY</code> pairs edited the three <code>Point</code> objects, and <code>t1</code> was holding arrows to those very objects.</p> <p class="filename">Example3 after the second loop</p>
+<pre class="cmp"><code>pts[0] --\
+t1.a  ----&gt; #1 (1, 1)  &lt;---- t2.a
+pts[1] --\
+t1.b  ----&gt; #2 (2, 2)  &lt;---- t2.b
+pts[2] --\
+t1.c  ----&gt; #3 (3, 3)  &lt;---- t2.c
+
+Only THREE Point objects ever existed. Both triangles hold all three.</code></pre> <p>Notice also <code>t1 == t2</code> is <code>false</code>. Two <code>new Triangle</code> calls made two <code>Triangle</code> objects, and they are different objects even though every single vertex is shared. <code>==</code> compares the two triangle references, not what is inside them &mdash; &sect;4 exactly.</p> <p>So this program contains a bug that no compiler will ever find and no error message will ever mention. It simply gives a wrong answer, quietly, and only if you happen to look at triangle 1 afterwards.</p> 
+</div></details> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; Example3b: the second loop rebinds</span></div> <div class="bd"> <p>The instructor's own comment in the source is <em>"What about an alternative like this?"</em>. Two statements in the second loop become one: instead of calling setters on the point already in the slot, the loop puts a brand-new <code>Point</code> in the slot.</p> <p class="filename">Example3b.java</p>
+<pre><code class="language-java">import java.util.Scanner;
+
+public class Example3b {
+    public static void main(String args[]) {
+        Scanner input = new Scanner(System.in);
+        Point pts[] = new Point[3];
+        System.out.println("Setting up triangle 1:");
+        for (int i = 0; i &lt; 3; i++) {
+            System.out.print("Give the coordinates for the next vertex: ");
+            pts[i] = new Point(input.nextDouble(), input.nextDouble());
+        }
+        Triangle t1 = new Triangle(pts[0], pts[1], pts[2]);
+        System.out.println(t1);
+        System.out.println("Setting up triangle 2:");
+        for (int i = 0; i &lt; 3; i++) {
+            System.out.print("Give the coordinates for the next vertex: ");
+
+            pts[i] = new Point(input.nextDouble(), input.nextDouble());
+        }
+        Triangle t2 = new Triangle(pts[0], pts[1], pts[2]);
+        System.out.println(t2);
+        System.out.println("Are the triangles equal using == ? \n" + (t1 == t2));
+
+        System.out.print("Do you want to see triangle 1 again? ");
+        String answer = input.next();
+        if (answer.trim().toUpperCase().charAt(0) == 'Y') {
+            System.out.println(t1);
+        }
+        input.close();
+    }
+}</code></pre> <p>Same six pairs of numbers, same <code>yes</code>. What is different about the last line?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Setting up triangle 1:
+Give the coordinates for the next vertex: 0 0
+Give the coordinates for the next vertex: 3 0
+Give the coordinates for the next vertex: 0 4
+Triangle: (0.0, 0.0), (3.0, 0.0), (0.0, 4.0)
+Setting up triangle 2:
+Give the coordinates for the next vertex: 1 1
+Give the coordinates for the next vertex: 2 2
+Give the coordinates for the next vertex: 3 3
+Triangle: (1.0, 1.0), (2.0, 2.0), (3.0, 3.0)
+Are the triangles equal using == ?
+false
+Do you want to see triangle 1 again? yes
+Triangle: (0.0, 0.0), (3.0, 0.0), (0.0, 4.0)</code></pre> <p><strong>Triangle 1 survived.</strong> <code>pts[i] = new Point(...)</code> ran <code>new</code> three more times, so there are now six <code>Point</code> objects. Assigning into the array slot moved the array's arrow onto the new object; <code>t1</code>'s three fields still hold arrows to the original three, which nothing ever edited.</p> <p class="filename">Example3b after the second loop</p>
+<pre class="cmp"><code>t1.a -----&gt; #1 (0, 0)         pts[0] --&gt; #4 (1, 1) &lt;-- t2.a
+t1.b -----&gt; #2 (3, 0)         pts[1] --&gt; #5 (2, 2) &lt;-- t2.b
+t1.c -----&gt; #3 (0, 4)         pts[2] --&gt; #6 (3, 3) &lt;-- t2.c
+
+SIX Point objects. The two triangles share nothing.</code></pre> <table class="trace"> <tr><th></th><th><code>Example3</code> (mutate)</th><th><code>Example3b</code> (rebind)</th></tr> <tr><td>Second loop writes</td><td><code>pts[i].setX(...)</code> and <code>pts[i].setY(...)</code></td><td><code>pts[i] = new Point(...)</code></td></tr> <tr><td><code>Point</code> objects created</td><td>3</td><td>6</td></tr> <tr><td>Does <code>t1</code> change?</td><td>yes &mdash; silently</td><td>no</td></tr> <tr><td><code>t1 == t2</code></td><td><code>false</code></td><td><code>false</code></td></tr> <tr><td>Triangles share vertices?</td><td>all three</td><td>none</td></tr> </table> <p>This is why the two files exist. They accept the same input, print the same first four lines, and are wrong and right respectively &mdash; and the difference is one statement substituted for two. When you want a genuinely new value in a slot, <code>new</code> is not the long-winded option; it is the correct one.</p> <p>One thing that does <em>not</em> change: <code>t1 == t2</code> is <code>false</code> in both programs. <code>==</code> never looks inside, so it cannot tell you that in <code>Example3</code> the two triangles are vertex-for-vertex identical. That is a job for <code>equals</code>, next lecture.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 8.10</div> <div class="bd"> <p>One mutation and one rebinding, on adjacent lines. Give all four outputs.</p> <p class="filename">MutateVsRebind.java</p>
+<pre><code class="language-java">public class MutateVsRebind {
+    public static void main(String args[]) {
+        Point pts[] = new Point[2];
+        pts[0] = new Point(1, 1);
+        pts[1] = new Point(2, 2);
+
+        Point keep0 = pts[0];
+        Point keep1 = pts[1];
+
+        pts[0].setX(50);            // mutate
+        pts[1] = new Point(60, 60); // rebind
+
+        System.out.println("pts[0] = " + pts[0]);   // line (a)
+        System.out.println("pts[1] = " + pts[1]);   // line (b)
+        System.out.println("keep0  = " + keep0);    // line (c)
+        System.out.println("keep1  = " + keep1);    // line (d)
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> Line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>(50.0, 1.0)</code>. The object in slot 0 was edited in place; its y is untouched.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>(60.0, 60.0)</code>. Slot 1 now points at a third <code>Point</code> object built by <code>new</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>(50.0, 1.0)</code> &mdash; the same as <code>pts[0]</code>. <code>keep0</code> is an alias for the object that was mutated, so it sees the change.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> Line (d)?</p> <details class="soln"><summary></summary><div class="ans"> <pre class="out"><code>pts[0] = (50.0, 1.0)
+pts[1] = (60.0, 60.0)
+keep0  = (50.0, 1.0)
+keep1  = (2.0, 2.0)</code></pre> <p><code>(2.0, 2.0)</code> &mdash; the original. Rebinding <code>pts[1]</code> moved the array's arrow and left the old object exactly where it was, still reachable through <code>keep1</code>.</p> <p><strong>Things to notice across all four parts.</strong> <code>keep0</code> and <code>keep1</code> were written identically and behave oppositely, because of what happened to the objects they point at, not to them. This is <code>Example3</code> versus <code>Example3b</code> compressed into two lines, and it is precisely the pattern the exam questions test: save a reference, then change the original one way or the other, then ask what the saved reference sees.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 8.11</div> <div class="bd"> <p>Write two static methods that both scale an array of points by a factor <code>k</code>.</p> <ul> <li><code>scaleAll</code> must <em>mutate</em> the existing points, so that anything else holding one of them sees the change.</li> <li><code>replaceAll</code> must <em>rebind</em> each slot to a brand-new point, leaving the originals untouched.</li> </ul> <p>Then predict what the demo prints.</p> <p class="filename">ScaleDemo.java</p>
+<pre><code class="language-java">public class ScaleDemo {
+    public static void scaleAll(Point pts[], double k) {
+        // mutate each point in place
+    }
+
+    public static void replaceAll(Point pts[], double k) {
+        // put a new point in each slot
+    }
+
+    public static void main(String args[]) {
+        Point a = new Point(1, 2);
+        Point b = new Point(3, 4);
+        Point pts[] = {a, b};
+
+        scaleAll(pts, 10);
+        System.out.println("after scaleAll:   pts[0] = " + pts[0] + ", a = " + a);
+
+        replaceAll(pts, 10);
+        System.out.println("after replaceAll: pts[0] = " + pts[0] + ", a = " + a);
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> <code>scaleAll</code> reads each coordinate with a getter, multiplies, and writes it back with a setter &mdash; no <code>new</code> anywhere. <code>replaceAll</code> computes the same two numbers and hands them to <code>new Point</code>, then assigns into the slot. The array literal <code>{a, b}</code> puts the arrows from <code>a</code> and <code>b</code> into the two slots, so at the start <code>pts[0]</code> and <code>a</code> are aliases.</p> <p class="filename">ScaleDemo.java</p>
+<pre><code class="language-java">public class ScaleDemo {
+    public static void scaleAll(Point pts[], double k) {
+        for (int i = 0; i &lt; pts.length; i++) {
+            pts[i].setX(pts[i].getX() * k);
+            pts[i].setY(pts[i].getY() * k);
+        }
+    }
+
+    public static void replaceAll(Point pts[], double k) {
+        for (int i = 0; i &lt; pts.length; i++) {
+            pts[i] = new Point(pts[i].getX() * k, pts[i].getY() * k);
+        }
+    }
+
+    public static void main(String args[]) {
+        Point a = new Point(1, 2);
+        Point b = new Point(3, 4);
+        Point pts[] = {a, b};
+
+        scaleAll(pts, 10);
+        System.out.println("after scaleAll:   pts[0] = " + pts[0] + ", a = " + a);
+
+        replaceAll(pts, 10);
+        System.out.println("after replaceAll: pts[0] = " + pts[0] + ", a = " + a);
+    }
+}</code></pre> <pre class="out"><code>after scaleAll:   pts[0] = (10.0, 20.0), a = (10.0, 20.0)
+after replaceAll: pts[0] = (100.0, 200.0), a = (10.0, 20.0)</code></pre> <p><strong>Things to notice.</strong> After <code>scaleAll</code> the two printed values agree, because <code>pts[0]</code> and <code>a</code> still point at one object. After <code>replaceAll</code> they disagree: <code>pts[0]</code> has moved on to a new object at ten times the size, while <code>a</code> is left holding the one <code>scaleAll</code> produced.</p> <p>Both methods "work" in the sense that the array now contains scaled points. Which one you want depends entirely on whether anything outside the array is supposed to notice. That is a design question, and the answer has to be decided by you, not discovered by a user at 2am.</p> <p>Note that <code>replaceAll</code> does successfully change the caller's array, even though we are about to spend &sect;7 saying that a method cannot change its caller's variables. There is no contradiction: the array itself is an object, the method was handed a reference to it, and writing into a slot mutates that object. What <code>replaceAll</code> cannot do is make the caller's variable <code>pts</code> point at a different array.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 8.11</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="25" aria-label="Live coding - Quick Check 8.11">public class ScaleDemo {
+    public static void scaleAll(Point pts[], double k) {
+        // Mutate each point in place: no "new" allowed here.
+
+    }
+
+    public static void replaceAll(Point pts[], double k) {
+        // Put a brand-new Point in each slot.
+
+    }
+
+    public static void main(String args[]) {
+        Point a = new Point(1, 2);
+        Point b = new Point(3, 4);
+        Point pts[] = {a, b};
+
+        scaleAll(pts, 10);
+        System.out.println("after scaleAll:   pts[0] = " + pts[0] + ", a = " + a);
+
+        replaceAll(pts, 10);
+        System.out.println("after replaceAll: pts[0] = " + pts[0] + ", a = " + a);
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s7"><span class="num">7.</span>Passing objects to methods</h2> <p>Passing a value to a method is an assignment: the argument is copied into the parameter. So everything in this lecture applies unchanged, and the famous confusing question answers itself.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; pass-by-value</span></div> <div class="bd"> <p>Java is <strong>pass-by-value</strong>, always, with no exceptions. When you call a method, the value of each argument is <em>copied</em> into the corresponding parameter, and the parameter is a brand-new variable local to the method.</p> <p>For a primitive argument, the value copied is the number. For an object argument, the value copied is the <strong>reference</strong>. The object itself is never copied.</p> </div> </div> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; what a method can and cannot do</span></div> <div class="bd"> <p>A method that receives an object <strong>can</strong> change that object's contents, and the caller will see it, because both are looking at the same object.</p> <p>A method <strong>cannot</strong> change which object the caller's variable points at. Assigning to the parameter only moves the method's own private arrow, and that arrow ceases to exist when the method returns.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; three methods, one of which does nothing</span></div> <div class="bd"> <p><code>moveIt</code> mutates its parameter. <code>replaceIt</code> rebinds its parameter. <code>bumpIt</code> does the same thing to a <code>double</code>. Decide, for each of the three, whether <code>main</code> sees any effect.</p> <p class="filename">ParamDemo.java</p>
+<pre><code class="language-java">public class ParamDemo {
+    public static void moveIt(Point p) {
+        p.setX(100);
+    }
+
+    public static void replaceIt(Point p) {
+        p = new Point(-7, -7);
+        System.out.println("    inside replaceIt, p is " + p);
+    }
+
+    public static void bumpIt(double d) {
+        d = d + 1;
+        System.out.println("    inside bumpIt, d is " + d);
+    }
+
+    public static void main(String args[]) {
+        Point q = new Point(1, 1);
+        double v = 1;
+
+        System.out.println("before moveIt:    q is " + q);
+        moveIt(q);
+        System.out.println("after moveIt:     q is " + q);
+
+        System.out.println("before replaceIt: q is " + q);
+        replaceIt(q);
+        System.out.println("after replaceIt:  q is " + q);
+
+        System.out.println("before bumpIt:    v is " + v);
+        bumpIt(v);
+        System.out.println("after bumpIt:     v is " + v);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>before moveIt:    q is (1.0, 1.0)
+after moveIt:     q is (100.0, 1.0)
+before replaceIt: q is (100.0, 1.0)
+    inside replaceIt, p is (-7.0, -7.0)
+after replaceIt:  q is (100.0, 1.0)
+before bumpIt:    v is 1.0
+    inside bumpIt, d is 2.0
+after bumpIt:     v is 1.0</code></pre> <p><strong><code>moveIt</code> worked.</strong> <code>p</code> received a copy of <code>q</code>'s arrow, and <code>p.setX(100)</code> followed that arrow to the one and only <code>Point</code> object. <code>q</code> sees the change because there was never anything else to see.</p> <p><strong><code>replaceIt</code> did nothing at all</strong>, from <code>main</code>'s point of view. It really did build a new point and it really did print <code>(-7.0, -7.0)</code> from inside, proving that its own <code>p</code> moved. But <code>p</code> was a local variable; when the method returned, <code>p</code> vanished and the new <code>Point</code> became garbage. <code>q</code> never moved.</p> <p><strong><code>bumpIt</code> did nothing either</strong>, and nobody is surprised by that. It is the exact same mechanism: the parameter is a copy, and assigning to a copy is invisible outside. <code>replaceIt</code> and <code>bumpIt</code> are the same story told with different types.</p> <p class="filename">Inside replaceIt just after the assignment</p>
+<pre class="cmp"><code>main's q  | ref |------&gt; +---------------+
+                         | Point         |
+                         |  x = 100.0    |
+                         |  y =   1.0    |
+                         +---------------+
+
+replaceIt's p | ref |--&gt; +---------------+
+                         | Point (-7,-7) |   &lt;- dies when the method returns
+                         +---------------+</code></pre> <p>The test that never fails: <em>did the method use a dot, or an equals sign?</em> A dot reaches the caller's object. An equals sign on the parameter itself reaches nothing.</p> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; a "reset" method that resets nothing</span></div> <div class="bd"> <p>This is <code>replaceIt</code> in the wild, and it looks completely reasonable:</p> <p class="filename">ResetDemo.java</p>
+<pre><code class="language-java">public class ResetDemo {
+    public static void resetBroken(Point p) {
+        p = new Point(0, 0);
+    }
+
+    public static void resetWorking(Point p) {
+        p.setX(0);
+        p.setY(0);
+    }
+
+    public static void main(String args[]) {
+        Point p = new Point(8, 9);
+        resetBroken(p);
+        System.out.println("after resetBroken:  " + p);
+
+        resetWorking(p);
+        System.out.println("after resetWorking: " + p);
+    }
+}</code></pre> <pre class="out"><code>after resetBroken:  (8.0, 9.0)
+after resetWorking: (0.0, 0.0)</code></pre> <p><code>resetBroken</code> compiles, runs, throws no exception and accomplishes nothing. <code>resetWorking</code> reaches through the reference with two dots and edits the object the caller is holding.</p> <p>If you genuinely need a method to hand back a different object, do not try to write it into the parameter &mdash; <strong>return</strong> it, and let the caller assign: <code>p = reset(p);</code>. That is the only way, and it is why so many library methods return a value you might have expected them to modify in place.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; why you cannot write <code>swap</code> in Java</span></div> <div class="bd"> <p>In C++ you would write a swap that takes references and exchanges them. Try the direct translation in Java and watch it fail, then watch the version that works.</p> <p class="filename">SwapDemo.java</p>
+<pre><code class="language-java">public class SwapDemo {
+    public static void swapRefs(Point p, Point q) {
+        Point temp = p;
+        p = q;
+        q = temp;
+        System.out.println("    inside swapRefs: p is " + p + ", q is " + q);
+    }
+
+    public static void swapContents(Point p, Point q) {
+        double tx = p.getX(), ty = p.getY();
+        p.setX(q.getX());
+        p.setY(q.getY());
+        q.setX(tx);
+        q.setY(ty);
+        System.out.println("    inside swapContents: p is " + p + ", q is " + q);
+    }
+
+    public static void main(String args[]) {
+        Point a = new Point(1, 1);
+        Point b = new Point(2, 2);
+
+        System.out.println("start:              a is " + a + ", b is " + b);
+        swapRefs(a, b);
+        System.out.println("after swapRefs:     a is " + a + ", b is " + b);
+
+        swapContents(a, b);
+        System.out.println("after swapContents: a is " + a + ", b is " + b);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>start:              a is (1.0, 1.0), b is (2.0, 2.0)
+    inside swapRefs: p is (2.0, 2.0), q is (1.0, 1.0)
+after swapRefs:     a is (1.0, 1.0), b is (2.0, 2.0)
+    inside swapContents: p is (2.0, 2.0), q is (1.0, 1.0)
+after swapContents: a is (2.0, 2.0), b is (1.0, 1.0)</code></pre> <p><code>swapRefs</code> prints the swapped values from inside &mdash; its own two parameters really were exchanged &mdash; and then <code>main</code> prints the original order. Three assignments, all of them to local variables that stop existing one line later.</p> <p><code>swapContents</code> never touches <code>p</code> or <code>q</code> themselves. It moves <em>numbers</em> between the two objects, using getters and setters. <code>main</code>'s <code>a</code> and <code>b</code> still point where they always did, and those objects now hold each other's coordinates.</p> <p>Read what the two versions actually mean, because they are not equivalent even in principle. <code>swapContents</code> changes the objects, so <em>every</em> variable anywhere in the program pointing at those points sees the swap. A true C++-style reference swap would have changed only <code>main</code>'s two variables and left everybody else alone. Java simply does not offer the second thing.</p> <p>The idiomatic Java answer, when you really need to exchange two variables, is to do it in the caller where the variables live:</p> <pre><code class="language-java">Point temp = a;
+a = b;
+b = temp;</code></pre> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 8.12</div> <div class="bd"> <p>The method <code>shift</code> mutates, then rebinds, then returns. Give the three lines.</p> <p class="filename">ShiftDemo.java</p>
+<pre><code class="language-java">public class ShiftDemo {
+    public static Point shift(Point p, double dx) {
+        p.setX(p.getX() + dx);
+        p = new Point(0, 0);
+        p.setY(99);
+        return p;
+    }
+
+    public static void main(String args[]) {
+        Point p = new Point(1, 1);
+        Point r = shift(p, 5);
+        System.out.println("p = " + p);            // line (a)
+        System.out.println("r = " + r);            // line (b)
+        System.out.println("p == r? " + (p == r)); // line (c)
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> Line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>(6.0, 1.0)</code>. The method's first statement ran while its parameter still pointed at <code>main</code>'s object, so the <code>x</code> really was raised from 1 to 6. Everything the method did <em>afterwards</em> happened somewhere else.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>(0.0, 99.0)</code>. After <code>p = new Point(0, 0)</code> the parameter points at a second object; <code>p.setY(99)</code> edits that one, and it is that reference that is returned and stored in <code>r</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <pre class="out"><code>p = (6.0, 1.0)
+r = (0.0, 99.0)
+p == r? false</code></pre> <p><code>false</code>. Two objects; <code>main</code>'s <code>p</code> points at the first, <code>r</code> at the second.</p> <p><strong>Things to notice across all three parts.</strong> The parameter is called <code>p</code> and so is <code>main</code>'s variable, and they are two different variables that merely started out holding the same arrow. The moment the method reassigned its <code>p</code>, the two parted company permanently. Renaming the parameter would not change a single output &mdash; it would just make the program easier to read, which is a good enough reason to do it.</p> <p><code>return</code> is the escape hatch. It is the only mechanism by which a method can give the caller a reference to an object the caller did not already have.</p> </div></details> </div> </div> </div> <h2 id="prac"><span class="num">&#9733;</span>Practice Problems</h2> <div class="box prac"> <div class="hd">Practice Problems<span class="tag">&mdash; the two exam favorites, then three of our own</span></div> <div class="bd"> <p>Reference questions are worth ten points each on the CSCI 212 exams and they are pure bookkeeping &mdash; no cleverness required, no formula to remember. Draw the boxes and arrows, apply the five-step procedure from &sect;2, and read the answer off the page.</p> <p>Work them on paper. There is no compiler in the exam room, and a program you cannot trace by hand is a program you cannot debug.</p> </div> </div> <h3>Problem 1 &mdash; What is the output? <span class="muted">(from CSCI 212 Exam 1, Spring 2025)</span></h3> <p>Consider the following Java program. <code>DecimalFormat</code> lives in <code>java.text</code>, and <code>Double</code> is the wrapper class for the primitive <code>double</code> &mdash; so a <code>Double</code> variable, like any variable of a class type, holds a reference.</p> <p class="filename">Output.java</p>
+<pre><code class="language-java">import java.text.DecimalFormat;
+
+public class Output {
+    public static void main(String args[]) {
+        DecimalFormat f1, f2, f3;
+        f1 = new DecimalFormat("#.##");
+        f2 = f1;
+        f3 = new DecimalFormat("#.#");
+        Double x = 3.1415;
+        Double y = x;
+        Double z = 2.7182;
+        System.out.println(x);                              // line (a)
+        System.out.println(f1.format(z));                   // line (b)
+        f1 = f3;
+        System.out.println(f2.format(y));                   // line (c)
+        y = z;
+        System.out.println(x);                              // line (d)
+        System.out.println(f3.format(x) + y);               // line (e)
+        Double a[] = {x, y, z};
+        System.out.println(a[0]);                           // line (f)
+        a[1] = 1.1;
+        a[2] = 2.2;
+        x = a[1];
+        System.out.println(y);                              // line (g)
+        System.out.println(a[0] + "," + a[1] + "," + a[2]); // line (h)
+        System.out.println(a[0] + a[1] + a[2]);             // line (i)
+        System.out.println(z);                              // line (j)
+    }
+}</code></pre> <p>Before you start, note two things about <code>Double</code> that make this problem easier than it looks. It has <em>no setters</em> &mdash; a <code>Double</code> object can never be changed after it is built &mdash; so nothing in this program mutates anything. Every single one of the assignments is a rebinding. And <code>Double x = 3.1415;</code> is legal because Java <em>autoboxes</em> the primitive into a <code>Double</code> object for you.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> What is the output from the instruction beginning on line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>3.1415</code>. Printing a <code>Double</code> prints the number it wraps.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What is the output from the instruction beginning on line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>2.72</code>. <code>f1</code> points at the <code>"#.##"</code> formatter, which means "up to two decimal places". 2.7182 rounds to 2.72.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> What is the output from the instruction beginning on line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>3.14</code>. This is the first real reference question in the problem. The line before it, <code>f1 = f3;</code>, rebound <em>the variable <code>f1</code></em> onto the <code>"#.#"</code> formatter &mdash; and <code>f2</code> was never mentioned, so <code>f2</code> still points at the <code>"#.##"</code> object it was given on line 3. <code>y</code> is still an alias for the 3.1415 object, so <code>f2.format(y)</code> is <code>"#.##"</code> applied to 3.1415, which is <code>3.14</code>.</p> <p>If you answered <code>3.1</code>, you assumed <code>f2</code> follows <code>f1</code> around. It does not: <code>f2 = f1</code> copied an arrow once, on one line, and that was the end of any connection between the two variables.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> What is the output from the instruction beginning on line (d)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>3.1415</code>. Same trap in the other direction. <code>y = z;</code> moved <code>y</code> onto the 2.7182 object. <code>x</code> still points at 3.1415, exactly as it has since it was created.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> What is the output from the instruction beginning on line (e)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>3.12.7182</code>. Two separate things joined by <code>+</code> with no space between them:</p> <ul> <li><code>f3.format(x)</code> is the <code>"#.#"</code> formatter applied to 3.1415, giving the <code>String</code> <code>"3.1"</code>.</li> <li><code>+ y</code> &mdash; the left operand is already a <code>String</code>, so this concatenates. <code>y</code> is now the 2.7182 object, so <code>"2.7182"</code> is appended.</li> </ul> <p>This is the Lecture 1 rule about <code>+</code> meeting the Lecture 8 rule about references in one line, which is exactly why it is on the exam.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(f)</span> What is the output from the instruction beginning on line (f)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>3.1415</code>. <code>Double a[] = {x, y, z};</code> copies the three current arrows into the three slots. At that moment <code>x</code> points at 3.1415, so <code>a[0]</code> does too.</p> <p>Worth recording the whole picture here, because the last four parts all read off it: <code>a[0]</code> and <code>x</code> point at the 3.1415 object; <code>a[1]</code>, <code>a[2]</code>, <code>y</code> and <code>z</code> <em>all four</em> point at the single 2.7182 object, since <code>y = z</code> earlier made <code>y</code> an alias for it.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(g)</span> What is the output from the instruction beginning on line (g)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>2.7182</code>. The three lines before it &mdash; <code>a[1] = 1.1;</code>, <code>a[2] = 2.2;</code>, <code>x = a[1];</code> &mdash; are all rebindings. They point two array slots and the variable <code>x</code> at new objects. None of them touches <code>y</code>, which still points at the 2.7182 object it was aimed at on the <code>y = z</code> line.</p> <p>Compare this with <code>Example3</code> in &sect;6. There, writing into the array changed what <code>t1</code> printed &mdash; because the loop called setters. Here, writing into the array changes nothing else, because assignment into a slot only moves that slot's arrow.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(h)</span> What is the output from the instruction beginning on line (h)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>3.1415,1.1,2.2</code>. The <code>","</code> in the middle makes the whole expression a concatenation, so each <code>Double</code> is turned into text and joined. <code>a[0]</code> was never reassigned; <code>a[1]</code> and <code>a[2]</code> were.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(i)</span> What is the output from the instruction beginning on line (i)?</p> <details class="soln"><summary></summary><div class="ans"> <p>The exam answer is <code>6.4415</code>. The program actually prints <code>6.4415000000000004</code>, and it is worth knowing why.</p> <p>There is no <code>String</code> anywhere in this expression, so <code>+</code> means addition. Java unboxes each <code>Double</code> to a primitive <code>double</code> and adds: 3.1415 + 1.1 + 2.2. In exact arithmetic that is 6.4415. In binary floating point none of those three numbers is representable exactly, the tiny errors do not cancel, and the sum comes out a few units in the last place too high. Java prints enough digits to identify the stored value uniquely, so you see the error.</p> <p>On paper, write <code>6.4415</code> &mdash; that is what the question is testing and what the answer key expects. But recognize the pattern from Lecture 1: whenever a <code>double</code> sum produces a long tail of digits, this is what happened.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(j)</span> What is the output from the instruction beginning on line (j)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>2.7182</code>. <code>z</code> was assigned once, on the line that created it, and never again. Everything that happened to <code>y</code>, to the array slots and to <code>x</code> happened to <em>their</em> arrows.</p> <p>The full run, so you can check all ten at once:</p> <pre class="out"><code>3.1415
+2.72
+3.14
+3.1415
+3.12.7182
+3.1415
+2.7182
+3.1415,1.1,2.2
+6.4415000000000004
+2.7182</code></pre> <p><strong>Things to notice across all ten parts.</strong> Six of the ten lines print a number that was set at the top of the program and never changed, and students lose those points by assuming that assigning to one variable somehow reaches its former partners. It never does. <code>f2 = f1</code> and <code>y = x</code> create a relationship that lasts exactly one instant.</p> <p>The reason nothing surprising happens in this program &mdash; the reason it is all rebinding and no mutation &mdash; is that <code>Double</code> and <code>DecimalFormat</code> values here are only ever replaced, never edited. Put <code>Point</code> objects in the same program and add three calls to <code>setX</code>, and half the answers change. Knowing which class you are dealing with is part of the question.</p> <p>One practical note: as printed, the exam's program declares <code>DecimalFormat</code> without an <code>import java.text.DecimalFormat;</code> line. Add it before you try to compile this yourself.</p> </div></details> </div> <h3>Problem 2 &mdash; Predict the output at the marked lines <span class="muted">(from Exam 1 Practice Problems)</span></h3> <p>Predict the output generated at the marked <code>println</code> lines in the following program. The program makes use of the class <code>Employee</code> that is also given.</p> <p class="filename">Employee.java</p>
+<pre><code class="language-java">public class Employee {
+
+    private String name;
+    private double salary;
+
+    public Employee(String name, double salary) {
+        this.name = name;
+        this.salary = salary;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getSalary() {
+        return salary;
+    }
+
+    public void raiseSalary(double percent) {
+        double raise = salary * percent / 100;
+        salary += raise;
+    }
+}</code></pre> <p class="filename">Pr3.java</p>
+<pre><code class="language-java">public class Pr3 {
+    public static void main(String[] args) {
+        double percent = 10;
+        System.out.println("percent = " + percent);         //------------------(a)
+        doubleValue(percent);
+        System.out.println("percent = " + percent);         //------------------(b)
+
+        Employee john = new Employee("John", 75000);
+        System.out.println("Salary: $" + john.getSalary()); //------------------(c)
+        doubleSalary(john);
+        System.out.println("Salary: $" + john.getSalary()); //------------------(d)
+
+        Employee a = new Employee("Emily", 90000);
+        Employee b = new Employee("Henry", 100000);
+        System.out.println("a's Name: " + a.getName());     //------------------(e)
+        System.out.println("b's name: " + b.getName());     //------------------(f)
+        swap(a, b);
+        System.out.println("a's Name: " + a.getName());     //------------------(g)
+        System.out.println("b's name: " + b.getName());     //------------------(h)
+    }
+
+    public static void doubleValue(double x) {
+        x = 2 * x;
+        System.out.println("End of method: x = " + x);      //------------------(i)
+    }
+
+    public static void doubleSalary(Employee y) {
+        y.raiseSalary(200);
+        System.out.println("End of method: Salary : " + y.getSalary()); //------(j)
+    }
+
+    public static void swap(Employee x, Employee y) {
+        Employee temp = x;
+        x = y;
+        y = temp;
+        System.out.println("End of method: x is " + x.getName()); //------------(k)
+        System.out.println("End of method: y is " + y.getName()); //------------(l)
+    }
+}</code></pre> <p>The printed exam leaves answer spaces for (a) through (h). All twelve are done here, because the four lines printed <em>inside</em> the methods are where the lesson is.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>percent = 10.0</code>. <code>double percent = 10;</code> widens the <code>int</code> literal to a <code>double</code>, and a <code>double</code> always prints with a decimal point.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>percent = 10.0</code>, unchanged. <code>doubleValue</code> received a copy of the number and doubled the copy. This is the case nobody argues about &mdash; and the whole point of the problem is that the object cases work the same way.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Salary: $75000.0</code>. The constructor stored 75000 into a <code>double</code> field.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> Line (d)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Salary: $225000.0</code>. <code>doubleSalary</code> received a copy of the <em>reference</em> to John, and then used a dot: <code>y.raiseSalary(200)</code>. That reached the one and only <code>Employee</code> object and edited it. <code>raiseSalary(200)</code> computes a raise of 200% of 75000, which is 150000, and adds it &mdash; so the salary triples rather than doubling, despite the method's name.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> Line (e)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>a's Name: Emily</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(f)</span> Line (f)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>b's name: Henry</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(g)</span> Line (g)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>a's Name: Emily</code> &mdash; unchanged. <code>swap</code> exchanged its own two parameters and nothing else. <code>main</code>'s <code>a</code> and <code>b</code> never moved.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(h)</span> Line (h)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>b's name: Henry</code> &mdash; also unchanged, for the same reason.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(i)</span> Line (i)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>End of method: x = 20.0</code>. Inside the method the doubling really happened. It just happened to a local copy.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(j)</span> Line (j)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>End of method: Salary : 225000.0</code>. The same value <code>main</code> will print one line later, because there is only one <code>Employee</code> object.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(k)</span> Line (k)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>End of method: x is Henry</code>. Inside <code>swap</code>, the exchange did work: the parameter <code>x</code> now points at the Henry object.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(l)</span> Line (l)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>End of method: y is Emily</code>. And here is the complete run, in the order the lines actually appear on the screen &mdash; note that (i), (j), (k) and (l) are interleaved with the others, since each is printed while its method is running:</p> <pre class="out"><code>percent = 10.0
+End of method: x = 20.0
+percent = 10.0
+Salary: $75000.0
+End of method: Salary : 225000.0
+Salary: $225000.0
+a's Name: Emily
+b's name: Henry
+End of method: x is Henry
+End of method: y is Emily
+a's Name: Emily
+b's name: Henry</code></pre> <p><strong>Things to notice across all twelve parts.</strong> Three methods, one of which works and two of which do not, and the difference is a single character. <code>doubleSalary</code> contains a dot; <code>doubleValue</code> and <code>swap</code> contain only equals signs. That test settles every question of this type.</p> <p>Lines (k) and (g) are the pair to study. <code>swap</code> prints <code>Henry</code> from inside and <code>main</code> prints <code>Emily</code> immediately afterwards, from the same variable position. Both are correct. The parameters <code>x</code> and <code>y</code> are the method's own variables and they died at the closing brace.</p> <p>Finally, notice that <code>raiseSalary</code> is a method <em>on</em> <code>Employee</code> and it mutates <code>this</code> object's field &mdash; which is precisely why it works when called through a parameter. If you want a method to affect the caller's object, the change has to go through the object, not through the variable.</p> </div></details> </div> <h3>Problem 3 &mdash; What is the output? <span class="muted">(added for these notes)</span></h3> <p>Everything from today in one program. Draw the diagram first; there are only four <code>new Point</code> calls in it.</p> <p class="filename">Mixed.java</p>
+<pre><code class="language-java">public class Mixed {
+    public static void main(String args[]) {
+        Point p = new Point(1, 1);
+        Point q = new Point(2, 2);
+        Point r = p;
+
+        Triangle t = new Triangle(p, q, r);
+        System.out.println(t);                    // line (a)
+
+        p.setX(5);
+        System.out.println(t);                    // line (b)
+        System.out.println(r);                    // line (c)
+
+        r = q;
+        r.setY(9);
+        System.out.println(t);                    // line (d)
+        System.out.println(p == r);               // line (e)
+
+        Point s = null;
+        System.out.println(s == null);            // line (f)
+
+        Point arr[] = {p, q, r};
+        arr[0] = new Point(0, 0);
+        arr[1].setX(-1);
+        System.out.println(arr[0] + " " + arr[1] + " " + arr[2]);  // line (g)
+        System.out.println(p + " " + q);          // line (h)
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> Line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Triangle: (1.0, 1.0), (2.0, 2.0), (1.0, 1.0)</code>. Only two objects exist so far: #1 = (1,1) and #2 = (2,2). <code>r = p</code> made <code>r</code> an alias for #1, so the triangle's first and third fields hold the same arrow. A triangle with two identical vertices is geometric nonsense, and Java does not care.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Triangle: (5.0, 1.0), (2.0, 2.0), (5.0, 1.0)</code>. One <code>setX</code> call, two vertices changed, because both were arrows to #1.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>(5.0, 1.0)</code>. <code>r</code> is still aimed at #1.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> Line (d)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Triangle: (5.0, 1.0), (2.0, 9.0), (5.0, 1.0)</code>. <code>r = q</code> moved <code>r</code> onto #2 &mdash; which changed nothing at all about the triangle, since the triangle keeps its own arrows. Then <code>r.setY(9)</code> edited #2, and the triangle's middle vertex is #2.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> Line (e)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>false</code>. <code>p</code> points at #1, <code>r</code> now points at #2.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(f)</span> Line (f)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>true</code>. <code>s</code> was never given an object, and comparing a reference to <code>null</code> is always legal.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(g)</span> Line (g)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>(0.0, 0.0) (-1.0, 9.0) (-1.0, 9.0)</code>. The array literal <code>{p, q, r}</code> copied three arrows: <code>arr[0]</code> to #1, <code>arr[1]</code> to #2, <code>arr[2]</code> to #2 as well, because <code>r</code> had been moved onto #2 on an earlier line. Then <code>arr[0] = new Point(0, 0)</code> rebound slot 0 to a brand-new #3, and <code>arr[1].setX(-1)</code> mutated #2 &mdash; which slot 2 also sees.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(h)</span> Line (h)?</p> <details class="soln"><summary></summary><div class="ans"> <pre class="out"><code>Triangle: (1.0, 1.0), (2.0, 2.0), (1.0, 1.0)
+Triangle: (5.0, 1.0), (2.0, 2.0), (5.0, 1.0)
+(5.0, 1.0)
+Triangle: (5.0, 1.0), (2.0, 9.0), (5.0, 1.0)
+false
+true
+(0.0, 0.0) (-1.0, 9.0) (-1.0, 9.0)
+(5.0, 1.0) (-1.0, 9.0)</code></pre> <p><code>(5.0, 1.0) (-1.0, 9.0)</code>. <code>p</code> still points at #1, untouched since line (b). <code>q</code> points at #2, which was edited twice by other names &mdash; once through <code>r</code> and once through <code>arr[1]</code>.</p> <p class="filename">Mixed at the very end</p>
+<pre class="cmp"><code>p ---------&gt; #1 (5, 1)  &lt;--- t.a, t.c
+
+q ---\
+r -----&gt;  #2 (-1, 9)  &lt;--- t.b, arr[1], arr[2]
+arr[1] --/
+arr[2] --/
+
+arr[0] ----&gt; #3 (0, 0)         s ----&gt; null
+
+4 Point objects; #4 is the one arr[0] was rebound to... and #3 above IS it.</code></pre> <p><strong>Things to notice across all eight parts.</strong> Object #2 is edited by three different names over the course of the program and never by the name <code>q</code>, yet <code>q</code> reports every change. That is the shape of every hard aliasing bug you will meet: the variable that shows the wrong value is not the variable the buggy line mentioned.</p> <p>Also count the <code>new</code>s: four, and the diagram has exactly four boxes plus one <code>null</code>. If your diagram has more or fewer boxes than the program has <code>new</code> keywords, you have made a bookkeeping error, not a reasoning error &mdash; start again.</p> </div></details> </div> <div class="box sum" id="summary"> <div class="hd">Lecture Summary</div> <div class="bd"> <ul> <li>A variable of a class type holds a <strong>reference</strong> &mdash; the location of an object &mdash; not the object itself. A variable of a primitive type holds the value. Every surprise in this lecture follows from that one difference.</li> <li><code>Point c = a;</code> copies the reference, so <code>a</code> and <code>c</code> are two names for one object. That is <strong>aliasing</strong>. A change made through either name is visible through both, because there is only one object to change.</li> <li><code>null</code> means "this variable points at no object". Calling a method on it gives a <code>NullPointerException</code> at run time, not a compile error &mdash; the compiler cannot know what a reference will hold.</li> <li><code>==</code> between two object variables asks "same object?", not "same contents?". Two separately-constructed points at the same coordinates are never <code>==</code>. Comparing contents needs a method, and that method is <code>equals</code> &mdash; which is next lecture's business.</li> <li>An object stored inside another object is stored <strong>by reference</strong>. A <code>Triangle</code> built from three <code>Point</code>s does not own copies of them; it shares the caller's points, and a later <code>setX</code> on one of those points changes the triangle.</li> <li><strong>Mutating</strong> (<code>pts[i].setX(2)</code>) changes the object every name is pointing at. <strong>Rebinding</strong> (<code>pts[i] = new Point(2, 0)</code>) changes only which object <em>that one name</em> points at and leaves every other name looking at the old object. Her <code>Example3</code> and <code>Example3b</code> differ by exactly this and produce different answers.</li> <li>Java passes <strong>everything</strong> by value. For an object the value passed is the reference, so a method can change the object's contents, but assigning to the parameter only re-points the method's own local copy &mdash; the caller's variable is untouched. This is why a <code>swap(a, b)</code> method cannot work in Java.</li> <li>The defence is a <strong>defensive copy</strong>: if a constructor stores <code>new Point(p)</code> rather than <code>p</code>, nobody outside can reach in and change the object's insides later.</li> <li>When a program confuses you, stop reading and draw the boxes and arrows. Count the <code>new</code> keywords &mdash; that is exactly how many boxes your diagram should have.</li> </ul> <p><strong>Coming up in Lecture 9 &mdash; <code>static</code> Members, <code>equals</code> and <code>toString</code>.</strong> Today ended with a question we could not answer: if <code>==</code> is the wrong way to ask whether two points are at the same place, what is the right way? Next time we write our own <code>equals</code> and <code>toString</code>, find out what <code>System.out.println(myObject)</code> prints when you have not written one, and meet <code>static</code> &mdash; the keyword that has been sitting in front of <code>main</code> since Lecture 1
+    without an explanation.</p>
+  </div>
+</div>
+
+<nav class="pagenav">
+<span class="disabled"><div class="dir">&larr; Previous</div><div class="ttl">Lecture 7 &mdash; Classes and Objects</div><div class="pending">posts Tue Sep 22</div></span>
+<span class="disabled next"><div class="dir">Next &rarr;</div><div class="ttl">Lecture 9 &mdash; static Members, equals and toString</div><div class="pending">posts Tue Sep 29</div></span>
+</nav>
+<footer class="pf">CSCI 212 &middot; Object-Oriented Programming in Java &middot; Queens College, CUNY</footer>
+</div>
+<script>
+(()=>{var ut=Object.create;var xe=Object.defineProperty;var ft=Object.getOwnPropertyDescriptor;var gt=Object.getOwnPropertyNames;var ht=Object.getPrototypeOf,dt=Object.prototype.hasOwnProperty;var pt=(e,t)=>()=>{try{return t||e((t={exports:{}}).exports,t),t.exports}catch(n){throw t=0,n}};var Et=(e,t,n,l)=>{if(t&&typeof t=="object"||typeof t=="function")for(let d of gt(t))!dt.call(e,d)&&d!==n&&xe(e,d,{get:()=>t[d],enumerable:!(l=ft(t,d))||l.enumerable});return e};var bt=(e,t,n)=>(n=e!=null?ut(ht(e)):{},Et(t||!e||!e.__esModule?xe(n,"default",{value:e,enumerable:!0}):n,e));var Ke=pt((ln,Ge)=>{function Ie(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(t=>{let n=e[t],l=typeof n;(l==="object"||l==="function")&&!Object.isFrozen(n)&&Ie(n)}),e}var Z=class{constructor(t){t.data===void 0&&(t.data={}),this.data=t.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function Ce(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function k(e,...t){let n=Object.create(null);for(let l in e)n[l]=e[l];return t.forEach(function(l){for(let d in l)n[d]=l[d]}),n}var _t="</span>",Ne=e=>!!e.scope,Mt=(e,{prefix:t})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let n=e.split(".");return[`${t}${n.shift()}`,...n.map((l,d)=>`${l}${"_".repeat(d+1)}`)].join(" ")}return`${t}${e}`},oe=class{constructor(t,n){this.buffer="",this.classPrefix=n.classPrefix,t.walk(this)}addText(t){this.buffer+=Ce(t)}openNode(t){if(!Ne(t))return;let n=Mt(t.scope,{prefix:this.classPrefix});this.span(n)}closeNode(t){Ne(t)&&(this.buffer+=_t)}value(){return this.buffer}span(t){this.buffer+=`<span class="${t}">`}},Re=(e={})=>{let t={children:[]};return Object.assign(t,e),t},ae=class e{constructor(){this.rootNode=Re(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(t){this.top.children.push(t)}openNode(t){let n=Re({scope:t});this.add(n),this.stack.push(n)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(t){return this.constructor._walk(t,this.rootNode)}static _walk(t,n){return typeof n=="string"?t.addText(n):n.children&&(t.openNode(n),n.children.forEach(l=>this._walk(t,l)),t.closeNode(n)),t}static _collapse(t){typeof t!="string"&&t.children&&(t.children.every(n=>typeof n=="string")?t.children=[t.children.join("")]:t.children.forEach(n=>{e._collapse(n)}))}},le=class extends ae{constructor(t){super(),this.options=t}addText(t){t!==""&&this.add(t)}startScope(t){this.openNode(t)}endScope(){this.closeNode()}__addSublanguage(t,n){let l=t.root;n&&(l.scope=`language:${n}`),this.add(l)}toHTML(){return new oe(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function G(e){return e?typeof e=="string"?e:e.source:null}function De(e){return B("(?=",e,")")}function Ot(e){return B("(?:",e,")*")}function wt(e){return B("(?:",e,")?")}function B(...e){return e.map(n=>G(n)).join("")}function xt(e){let t=e[e.length-1];return typeof t=="object"&&t.constructor===Object?(e.splice(e.length-1,1),t):{}}function V(...e){return"("+(xt(e).capture?"":"?:")+e.map(l=>G(l)).join("|")+")"}function ke(e){return new RegExp(e.toString()+"|").exec("").length-1}function Nt(e,t){let n=e&&e.exec(t);return n&&n.index===0}var Rt=new RegExp(V(/\[(?:[^\\\]]|\\.)*\]/,/\(\?<(?![=!])[^>]+>/,/\(\?'[^']+'/,/\(\??/,/\\([1-9][0-9]*)/,/\\./));function fe(e,{joinWith:t}){let n=0;return e.map(l=>{n+=1;let d=n,_=G(l),c="";for(;_.length>0;){let r=Rt.exec(_);if(!r){c+=_;break}c+=_.substring(0,r.index),_=_.substring(r.index+r[0].length),r[0][0]==="\\"&&r[1]?c+="\\"+String(Number(r[1])+d):(c+=r[0],(r[0]==="("||/^\(\?[<']/.test(r[0]))&&n++)}return c}).map(l=>`(${l})`).join(t)}var yt=/\b\B/,ve="[a-zA-Z]\\w*",ge="[a-zA-Z_]\\w*",Le="\\b\\d+(\\.\\d+)?",Be="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Pe="\\b(0b[01]+)",St="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",At=(e={})=>{let t=/^#![ ]*\//;return e.binary&&(e.begin=B(t,/.*\b/,e.binary,/\b.*/)),k({scope:"meta",begin:t,end:/$/,relevance:0,"on:begin":(n,l)=>{n.index!==0&&l.ignoreMatch()}},e)},K={begin:"\\\\[\\s\\S]",relevance:0},Tt={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[K]},It={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[K]},Ct={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},Q=function(e,t,n={}){let l=k({scope:"comment",begin:e,end:t,contains:[]},n);l.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let d=V("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return l.contains.push({begin:B(/[ ]+/,"(",d,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),l},Dt=Q("//","$"),kt=Q("/\\*","\\*/"),vt=Q("#","$"),Lt={scope:"number",begin:Le,relevance:0},Bt={scope:"number",begin:Be,relevance:0},Pt={scope:"number",begin:Pe,relevance:0},$t={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[K,{begin:/\[/,end:/\]/,relevance:0,contains:[K]}]},Ht={scope:"title",begin:ve,relevance:0},Ut={scope:"title",begin:ge,relevance:0},jt={begin:"\\.\\s*"+ge,relevance:0},Gt=function(e){return Object.assign(e,{"on:begin":(t,n)=>{n.data._beginMatch=t[1]},"on:end":(t,n)=>{n.data._beginMatch!==t[1]&&n.ignoreMatch()}})},X=Object.freeze({__proto__:null,APOS_STRING_MODE:Tt,BACKSLASH_ESCAPE:K,BINARY_NUMBER_MODE:Pt,BINARY_NUMBER_RE:Pe,COMMENT:Q,C_BLOCK_COMMENT_MODE:kt,C_LINE_COMMENT_MODE:Dt,C_NUMBER_MODE:Bt,C_NUMBER_RE:Be,END_SAME_AS_BEGIN:Gt,HASH_COMMENT_MODE:vt,IDENT_RE:ve,MATCH_NOTHING_RE:yt,METHOD_GUARD:jt,NUMBER_MODE:Lt,NUMBER_RE:Le,PHRASAL_WORDS_MODE:Ct,QUOTE_STRING_MODE:It,REGEXP_MODE:$t,RE_STARTERS_RE:St,SHEBANG:At,TITLE_MODE:Ht,UNDERSCORE_IDENT_RE:ge,UNDERSCORE_TITLE_MODE:Ut});function Kt(e,t){e.input[e.index-1]==="."&&t.ignoreMatch()}function mt(e,t){e.className!==void 0&&(e.scope=e.className,delete e.className)}function Wt(e,t){t&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=Kt,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function Ft(e,t){Array.isArray(e.illegal)&&(e.illegal=V(...e.illegal))}function zt(e,t){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function Yt(e,t){e.relevance===void 0&&(e.relevance=1)}var Xt=(e,t)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let n=Object.assign({},e);Object.keys(e).forEach(l=>{delete e[l]}),e.keywords=n.keywords,e.begin=B(n.beforeMatch,De(n.begin)),e.starts={relevance:0,contains:[Object.assign(n,{endsParent:!0})]},e.relevance=0,delete n.beforeMatch},Zt=["of","and","for","in","not","or","if","then","parent","list","value"],Jt="keyword";function $e(e,t,n=Jt){let l=Object.create(null);return typeof e=="string"?d(n,e.split(" ")):Array.isArray(e)?d(n,e):Object.keys(e).forEach(function(_){Object.assign(l,$e(e[_],t,_))}),l;function d(_,c){t&&(c=c.map(r=>r.toLowerCase())),c.forEach(function(r){let u=r.split("|");l[u[0]]=[_,Vt(u[0],u[1])]})}}function Vt(e,t){return t?Number(t):Qt(e)?0:1}function Qt(e){return Zt.includes(e.toLowerCase())}var ye={},L=e=>{console.error(e)},Se=(e,...t)=>{console.log(`WARN: ${e}`,...t)},H=(e,t)=>{ye[`${e}/${t}`]||(console.log(`Deprecated as of ${e}. ${t}`),ye[`${e}/${t}`]=!0)},J=new Error;function He(e,t,{key:n}){let l=0,d=e[n],_={},c={};for(let r=1;r<=t.length;r++)c[r+l]=d[r],_[r+l]=!0,l+=ke(t[r-1]);e[n]=c,e[n]._emit=_,e[n]._multi=!0}function qt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw L("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),J;if(typeof e.beginScope!="object"||e.beginScope===null)throw L("beginScope must be object"),J;He(e,e.begin,{key:"beginScope"}),e.begin=fe(e.begin,{joinWith:""})}}function en(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw L("skip, excludeEnd, returnEnd not compatible with endScope: {}"),J;if(typeof e.endScope!="object"||e.endScope===null)throw L("endScope must be object"),J;He(e,e.end,{key:"endScope"}),e.end=fe(e.end,{joinWith:""})}}function tn(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function nn(e){tn(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),qt(e),en(e)}function sn(e){function t(c,r){return new RegExp(G(c),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(r?"g":""))}class n{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(r,u){u.position=this.position++,this.matchIndexes[this.matchAt]=u,this.regexes.push([u,r]),this.matchAt+=ke(r)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let r=this.regexes.map(u=>u[1]);this.matcherRe=t(fe(r,{joinWith:"|"}),!0),this.lastIndex=0}exec(r){this.matcherRe.lastIndex=this.lastIndex;let u=this.matcherRe.exec(r);if(!u)return null;let O=u.findIndex((P,I)=>I>0&&P!==void 0),M=this.matchIndexes[O];return u.splice(0,O),Object.assign(u,M)}}class l{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(r){if(this.multiRegexes[r])return this.multiRegexes[r];let u=new n;return this.rules.slice(r).forEach(([O,M])=>u.addRule(O,M)),u.compile(),this.multiRegexes[r]=u,u}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(r,u){this.rules.push([r,u]),u.type==="begin"&&this.count++}exec(r){let u=this.getMatcher(this.regexIndex);u.lastIndex=this.lastIndex;let O=u.exec(r);if(this.resumingScanAtSamePosition()&&!(O&&O.index===this.lastIndex)){let M=this.getMatcher(0);M.lastIndex=this.lastIndex+1,O=M.exec(r)}return O&&(this.regexIndex+=O.position+1,this.regexIndex===this.count&&this.considerAll()),O}}function d(c){let r=new l;return c.contains.forEach(u=>r.addRule(u.begin,{rule:u,type:"begin"})),c.terminatorEnd&&r.addRule(c.terminatorEnd,{type:"end"}),c.illegal&&r.addRule(c.illegal,{type:"illegal"}),r}function _(c,r){let u=c;if(c.isCompiled)return u;[mt,zt,nn,Xt].forEach(M=>M(c,r)),e.compilerExtensions.forEach(M=>M(c,r)),c.__beforeBegin=null,[Wt,Ft,Yt].forEach(M=>M(c,r)),c.isCompiled=!0;let O=null;return typeof c.keywords=="object"&&c.keywords.$pattern&&(c.keywords=Object.assign({},c.keywords),O=c.keywords.$pattern,delete c.keywords.$pattern),O=O||/\w+/,c.keywords&&(c.keywords=$e(c.keywords,e.case_insensitive)),u.keywordPatternRe=t(O,!0),r&&(c.begin||(c.begin=/\B|\b/),u.beginRe=t(u.begin),!c.end&&!c.endsWithParent&&(c.end=/\B|\b/),c.end&&(u.endRe=t(u.end)),u.terminatorEnd=G(u.end)||"",c.endsWithParent&&r.terminatorEnd&&(u.terminatorEnd+=(c.end?"|":"")+r.terminatorEnd)),c.illegal&&(u.illegalRe=t(c.illegal)),c.contains||(c.contains=[]),c.contains=[].concat(...c.contains.map(function(M){return rn(M==="self"?c:M)})),c.contains.forEach(function(M){_(M,u)}),c.starts&&_(c.starts,r),u.matcher=d(u),u}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=k(e.classNameAliases||{}),_(e)}function Ue(e){return e?e.endsWithParent||Ue(e.starts):!1}function rn(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(t){return k(e,{variants:null},t)})),e.cachedVariants?e.cachedVariants:Ue(e)?k(e,{starts:e.starts?k(e.starts):null}):Object.isFrozen(e)?k(e):e}var cn="11.12.0",ue=class extends Error{constructor(t,n){super(t),this.name="HTMLInjectionError",this.html=n}},ce=Ce,Ae=k,Te=Symbol("nomatch"),on=7,je=function(e){let t=Object.create(null),n=Object.create(null),l=[],d=!0,_="Could not find the language '{}', did you forget to load/include a language module?",c={disableAutodetect:!0,name:"Plain text",contains:[]},r={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:le};function u(i){return r.noHighlightRe.test(i)}function O(i){let a=i.className+" ";a+=i.parentNode?i.parentNode.className:"";let h=r.languageDetectRe.exec(a);if(h){let E=C(h[1]);return E||(Se(_.replace("{}",h[1])),Se("Falling back to no-highlight mode for this block.",i)),E?h[1]:"no-highlight"}return a.split(/\s+/).find(E=>u(E)||C(E))}function M(i,a,h){let E="",w="";typeof a=="object"?(E=i,h=a.ignoreIllegals,w=a.language):(H("10.7.0","highlight(lang, code, ...args) has been deprecated."),H("10.7.0",`Please use highlight(code, options) instead.
+(see the highlight.js issue tracker)`),w=i,E=a),h===void 0&&(h=!0);let y={code:E,language:w};W("before:highlight",y);let D=y.result?y.result:P(y.language,y.code,h);return D.code=y.code,W("after:highlight",D),D}function P(i,a,h,E){let w=Object.create(null);function y(s,o){return s.keywords[o]}function D(){if(!f.keywords){x.addText(b);return}let s=0;f.keywordPatternRe.lastIndex=0;let o=f.keywordPatternRe.exec(b),g="";for(;o;){g+=b.substring(s,o.index);let p=A.case_insensitive?o[0].toLowerCase():o[0],N=y(f,p);if(N){let[T,at]=N;if(x.addText(g),g="",w[p]=(w[p]||0)+1,w[p]<=on&&(Y+=at),T.startsWith("_"))g+=o[0];else{let lt=A.classNameAliases[T]||T;S(o[0],lt)}}else g+=o[0];s=f.keywordPatternRe.lastIndex,o=f.keywordPatternRe.exec(b)}g+=b.substring(s),x.addText(g)}function F(){if(b==="")return;let s=null;if(typeof f.subLanguage=="string"){if(!t[f.subLanguage]){x.addText(b);return}s=P(f.subLanguage,b,!0,we[f.subLanguage]),we[f.subLanguage]=s._top}else s=$(b,f.subLanguage.length?f.subLanguage:null);f.relevance>0&&(Y+=s.relevance),x.__addSublanguage(s._emitter,s.language)}function R(){f.subLanguage!=null?F():D(),b=""}function S(s,o){s!==""&&(x.startScope(o),x.addText(s),x.endScope())}function be(s,o){let g=1,p=o.length-1;for(;g<=p;){if(!s._emit[g]){g++;continue}let N=A.classNameAliases[s[g]]||s[g],T=o[g];N?S(T,N):(b=T,D(),b=""),g++}}function _e(s,o){return s.scope&&typeof s.scope=="string"&&x.openNode(A.classNameAliases[s.scope]||s.scope),s.beginScope&&(s.beginScope._wrap?(S(b,A.classNameAliases[s.beginScope._wrap]||s.beginScope._wrap),b=""):s.beginScope._multi&&(be(s.beginScope,o),b="")),f=Object.create(s,{parent:{value:f}}),f}function Me(s,o,g){let p=Nt(s.endRe,g);if(p){if(s["on:end"]){let N=new Z(s);s["on:end"](o,N),N.isMatchIgnored&&(p=!1)}if(p){for(;s.endsParent&&s.parent;)s=s.parent;return s}}if(s.endsWithParent)return Me(s.parent,o,g)}function it(s){return f.matcher.regexIndex===0?(b+=s[0],1):(re=!0,0)}function st(s){let o=s[0],g=s.rule,p=new Z(g),N=[g.__beforeBegin,g["on:begin"]];for(let T of N)if(T&&(T(s,p),p.isMatchIgnored))return it(o);return g.skip?b+=o:(g.excludeBegin&&(b+=o),R(),!g.returnBegin&&!g.excludeBegin&&(b=o)),_e(g,s),g.returnBegin?0:o.length}function rt(s){let o=s[0],g=a.substring(s.index),p=Me(f,s,g);if(!p)return Te;let N=f;f.endScope&&f.endScope._wrap?(R(),S(o,f.endScope._wrap)):f.endScope&&f.endScope._multi?(R(),be(f.endScope,s)):N.skip?b+=o:(N.returnEnd||N.excludeEnd||(b+=o),R(),N.excludeEnd&&(b=o));do f.scope&&x.closeNode(),!f.skip&&!f.subLanguage&&(Y+=f.relevance),f=f.parent;while(f!==p.parent);return p.starts&&_e(p.starts,s),N.returnEnd?0:o.length}function ct(){let s=[];for(let o=f;o!==A;o=o.parent)o.scope&&s.unshift(o.scope);s.forEach(o=>x.openNode(o))}let z={};function Oe(s,o){let g=o&&o[0];if(b+=s,g==null)return R(),0;if(z.type==="begin"&&o.type==="end"&&z.index===o.index&&g===""){if(b+=a.slice(o.index,o.index+1),!d){let p=new Error(`0 width match regex (${i})`);throw p.languageName=i,p.badRule=z.rule,p}return 1}if(z=o,o.type==="begin")return st(o);if(o.type==="illegal"&&!h){let p=new Error('Illegal lexeme "'+g+'" for mode "'+(f.scope||"<unnamed>")+'"');throw p.mode=f,p}else if(o.type==="end"){let p=rt(o);if(p!==Te)return p}if(o.type==="illegal"&&g==="")return o.index===a.length||(b+=`
+`),1;if(se>1e5&&se>o.index*3)throw new Error("potential infinite loop, way more iterations than matches");return b+=g,g.length}let A=C(i);if(!A)throw L(_.replace("{}",i)),new Error('Unknown language: "'+i+'"');let ot=sn(A),ie="",f=E||ot,we={},x=new r.__emitter(r);ct();let b="",Y=0,v=0,se=0,re=!1;try{if(A.__emitTokens)A.__emitTokens(a,x);else{for(f.matcher.considerAll();;){se++,re?re=!1:f.matcher.considerAll(),f.matcher.lastIndex=v;let s=f.matcher.exec(a);if(!s)break;let o=a.substring(v,s.index),g=Oe(o,s);v=s.index+g}Oe(a.substring(v))}return x.finalize(),ie=x.toHTML(),{language:i,value:ie,relevance:Y,illegal:!1,_emitter:x,_top:f}}catch(s){if(s.message&&s.message.includes("Illegal"))return{language:i,value:ce(a),illegal:!0,relevance:0,_illegalBy:{message:s.message,index:v,context:a.slice(v-100,v+100),mode:s.mode,resultSoFar:ie},_emitter:x};if(d)return{language:i,value:ce(a),illegal:!1,relevance:0,errorRaised:s,_emitter:x,_top:f};throw s}}function I(i){let a={value:ce(i),illegal:!1,relevance:0,_top:c,_emitter:new r.__emitter(r)};return a._emitter.addText(i),a}function $(i,a){a=a||r.languages||Object.keys(t);let h=I(i),E=a.filter(C).filter(Ee).map(R=>P(R,i,!1));E.unshift(h);let w=E.sort((R,S)=>{if(R.relevance!==S.relevance)return S.relevance-R.relevance;if(R.language&&S.language){if(C(R.language).supersetOf===S.language)return 1;if(C(S.language).supersetOf===R.language)return-1}return 0}),[y,D]=w,F=y;return F.secondBest=D,F}function te(i,a,h){let E=a&&n[a]||h;i.classList.add("hljs"),i.classList.add(`language-${E}`)}function ne(i){let a=null,h=O(i);if(u(h))return;if(W("before:highlightElement",{el:i,language:h}),i.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",i);return}if(i.children.length>0&&(r.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("(see the highlight.js security wiki)"),console.warn("The element with unescaped HTML:"),console.warn(i)),r.throwUnescapedHTML))throw new ue("One of your code blocks includes unescaped HTML.",i.innerHTML);a=i;let E=a.textContent,w=h?M(E,{language:h,ignoreIllegals:!0}):$(E);i.innerHTML=w.value,i.dataset.highlighted="yes",te(i,h,w.language),i.result={language:w.language,re:w.relevance,relevance:w.relevance},w.secondBest&&(i.secondBest={language:w.secondBest.language,relevance:w.secondBest.relevance}),W("after:highlightElement",{el:i,result:w,text:E})}function Ye(i){r=Ae(r,i)}let Xe=()=>{m(),H("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function Ze(){m(),H("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let de=!1;function m(){function i(){m()}if(document.readyState==="loading"){de||window.addEventListener("DOMContentLoaded",i,!1),de=!0;return}document.querySelectorAll(r.cssSelector).forEach(ne)}function Je(i,a){let h=null;try{h=a(e)}catch(E){if(L("Language definition for '{}' could not be registered.".replace("{}",i)),d)L(E);else throw E;h=c}h.name||(h.name=i),t[i]=h,h.rawDefinition=a.bind(null,e),h.aliases&&pe(h.aliases,{languageName:i})}function Ve(i){delete t[i];for(let a of Object.keys(n))n[a]===i&&delete n[a]}function Qe(){return Object.keys(t)}function C(i){return i=(i||"").toLowerCase(),t[i]||t[n[i]]}function pe(i,{languageName:a}){typeof i=="string"&&(i=[i]),i.forEach(h=>{n[h.toLowerCase()]=a})}function Ee(i){let a=C(i);return a&&!a.disableAutodetect}function qe(i){i["before:highlightBlock"]&&!i["before:highlightElement"]&&(i["before:highlightElement"]=a=>{i["before:highlightBlock"](Object.assign({block:a.el},a))}),i["after:highlightBlock"]&&!i["after:highlightElement"]&&(i["after:highlightElement"]=a=>{i["after:highlightBlock"](Object.assign({block:a.el},a))})}function et(i){qe(i),l.push(i)}function tt(i){let a=l.indexOf(i);a!==-1&&l.splice(a,1)}function W(i,a){let h=i;l.forEach(function(E){E[h]&&E[h](a)})}function nt(i){return H("10.7.0","highlightBlock will be removed entirely in v12.0"),H("10.7.0","Please use highlightElement now."),ne(i)}Object.assign(e,{highlight:M,highlightAuto:$,highlightAll:m,highlightElement:ne,highlightBlock:nt,configure:Ye,initHighlighting:Xe,initHighlightingOnLoad:Ze,registerLanguage:Je,unregisterLanguage:Ve,listLanguages:Qe,getLanguage:C,registerAliases:pe,autoDetection:Ee,inherit:Ae,addPlugin:et,removePlugin:tt}),e.debugMode=function(){d=!1},e.safeMode=function(){d=!0},e.versionString=cn,e.regex={concat:B,lookahead:De,either:V,optional:wt,anyNumberOfTimes:Ot};for(let i in X)typeof X[i]=="object"&&Ie(X[i]);return Object.assign(e,X),e},U=je({});U.newInstance=()=>je({});Ge.exports=U;U.HighlightJS=U;U.default=U});var me=bt(Ke(),1);var he=me.default;var j="[0-9](_*[0-9])*",q=`\\.(${j})`,ee="[0-9a-fA-F](_*[0-9a-fA-F])*",We={className:"number",variants:[{begin:`(\\b(${j})((${q})|\\.)?|(${q}))[eE][+-]?(${j})[fFdD]?\\b`},{begin:`\\b(${j})((${q})[fFdD]?\\b|\\.([fFdD]\\b)?)`},{begin:`(${q})[fFdD]?\\b`},{begin:`\\b(${j})[fFdD]\\b`},{begin:`\\b0[xX]((${ee})\\.?|(${ee})?\\.(${ee}))[pP][+-]?(${j})[fFdD]?\\b`},{begin:"\\b(0|[1-9](_*[0-9])*)[lL]?\\b"},{begin:`\\b0[xX](${ee})[lL]?\\b`},{begin:"\\b0(_*[0-7])*[lL]?\\b"},{begin:"\\b0[bB][01](_*[01])*[lL]?\\b"}],relevance:0};function Fe(e,t,n){return n===-1?"":e.replace(t,l=>Fe(e,t,n-1))}function ze(e){let t=e.regex,n="[\xC0-\u02B8a-zA-Z_$][\xC0-\u02B8a-zA-Z_$0-9]*",l="(?:(?:\\s*\\[\\s*])+)?",d=n+"<@@@>"+l,c="(?:"+("\\?(?:\\s+(?:extends|super)\\s+"+d+")?")+"|"+d+")",r=Fe("(?:\\s*<\\s*"+c+"(?:\\s*,\\s*"+c+")*\\s*>)?",/<@@@>/g,2),I={keyword:["synchronized","abstract","private","var","static","if","const ","for","while","strictfp","finally","protected","import","native","final","void","enum","else","break","transient","catch","instanceof","volatile","case","assert","package","default","public","try","switch","continue","throws","protected","public","private","module","requires","exports","do","sealed","yield","permits","goto","when"],literal:["false","true","null"],type:["char","boolean","long","float","int","byte","short","double"],built_in:["super","this"]},$={className:"meta",begin:"@"+n,contains:[{begin:/\(/,end:/\)/,contains:["self"]}]},te={className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[e.C_BLOCK_COMMENT_MODE],endsParent:!0};return{name:"Java",aliases:["jsp"],keywords:I,illegal:/<\/|#/,contains:[e.COMMENT("/\\*\\*","\\*/",{relevance:0,contains:[{begin:/\w+@/,relevance:0},{className:"doctag",begin:"@[A-Za-z]+"}]}),{begin:/import java\.[a-z]+\./,keywords:"import",relevance:2},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE,{begin:/"""/,end:/"""/,className:"string",contains:[e.BACKSLASH_ESCAPE]},e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,{match:[/\b(?:class|interface|enum|extends|implements|new)/,/\s+/,n],className:{1:"keyword",3:"title.class"}},{match:/non-sealed/,scope:"keyword"},{beginKeywords:"new throw return else yield assert",relevance:0},{begin:[n,t.concat(r,l,/\s+/),n,l,/\s*/,/=(?!=)/],className:{1:"type",3:"variable",6:"operator"}},{begin:[/record/,/\s+/,n],className:{1:"keyword",3:"title.class"},contains:[te,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},{begin:[n,t.concat(r,l,/\s+/),n,/\s*(?=\()/],className:{1:"type",3:"title.function"},keywords:I,contains:[{className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[$,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,We,e.C_BLOCK_COMMENT_MODE]},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},We,$]}}he.registerLanguage("java",ze);window.hljs=he;})();
+</script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---- 1. syntax highlighting -------------------------------------- */
+  function highlight() {
+    if (!window.hljs) return;
+    var blocks = document.querySelectorAll('pre code.language-java');
+    for (var i = 0; i < blocks.length; i++) {
+      try { window.hljs.highlightElement(blocks[i]); } catch (e) {}
+    }
+  }
+
+  /* ---- 2. every solution / reveal starts closed --------------------- */
+  function closeAll() {
+    var d = document.querySelectorAll('details.soln');
+    for (var i = 0; i < d.length; i++) { d[i].open = false; }
+  }
+
+  /* ---- 3. show all / hide all -------------------------------------- */
+  function wireToolbar() {
+    var show = document.getElementById('showAll');
+    var hide = document.getElementById('hideAll');
+    function setAll(v) {
+      var d = document.querySelectorAll('details.soln');
+      for (var i = 0; i < d.length; i++) { d[i].open = v; }
+    }
+    if (show) show.addEventListener('click', function () { setAll(true); });
+    if (hide) hide.addEventListener('click', function () { setAll(false); });
+  }
+
+  /* ---- 4. live-coding editors -------------------------------------- */
+  var INDENT = '    ';
+
+  function wireEditors() {
+    var eds = document.querySelectorAll('.editor');
+    for (var i = 0; i < eds.length; i++) { wireOne(eds[i]); }
+  }
+
+  function wireOne(box) {
+    var ta = box.querySelector('textarea');
+    if (!ta) return;
+    var starter = ta.value;
+
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Tab' || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+      ev.preventDefault();
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+
+      if (s === e && !ev.shiftKey) {
+        ta.value = v.slice(0, s) + INDENT + v.slice(e);
+        ta.selectionStart = ta.selectionEnd = s + INDENT.length;
+        return;
+      }
+      /* block indent / outdent over the selected lines */
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var le = v.indexOf('\n', e);
+      if (le === -1) le = v.length;
+      var seg = v.slice(ls, le);
+      var lines = seg.split('\n');
+      var delta0 = 0, total = 0;
+
+      for (var i = 0; i < lines.length; i++) {
+        if (ev.shiftKey) {
+          var m = lines[i].match(/^(\t| {1,4})/);
+          if (m) {
+            lines[i] = lines[i].slice(m[0].length);
+            if (i === 0) delta0 = -m[0].length;
+            total -= m[0].length;
+          }
+        } else {
+          lines[i] = INDENT + lines[i];
+          if (i === 0) delta0 = INDENT.length;
+          total += INDENT.length;
+        }
+      }
+      ta.value = v.slice(0, ls) + lines.join('\n') + v.slice(le);
+      ta.selectionStart = Math.max(ls, s + delta0);
+      ta.selectionEnd = Math.max(ta.selectionStart, e + total);
+    });
+
+    /* keep the indent of the current line when Enter is pressed */
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Enter' || ev.shiftKey || ev.ctrlKey || ev.metaKey) return;
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+      if (s !== e) return;
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var lead = (v.slice(ls, s).match(/^[ \t]*/) || [''])[0];
+      var extra = /[{(\[]\s*$/.test(v.slice(ls, s)) ? INDENT : '';
+      if (!lead && !extra) return;
+      ev.preventDefault();
+      var ins = '\n' + lead + extra;
+      ta.value = v.slice(0, s) + ins + v.slice(e);
+      ta.selectionStart = ta.selectionEnd = s + ins.length;
+    });
+
+    var rst = box.querySelector('[data-act="reset"]');
+    if (rst) rst.addEventListener('click', function () {
+      ta.value = starter;
+      ta.focus();
+      flash(box, 'Reset to starter code');
+    });
+
+    var cpy = box.querySelector('[data-act="copy"]');
+    if (cpy) cpy.addEventListener('click', function () {
+      var done = function () { flash(box, 'Copied — paste it into your IDE'); };
+      var fail = function () { flash(box, 'Copy failed — select the text and press Ctrl/Cmd+C'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value).then(done, function () { legacy(ta, done, fail); });
+      } else {
+        legacy(ta, done, fail);
+      }
+    });
+  }
+
+  function legacy(ta, done, fail) {
+    try {
+      var st = ta.selectionStart, en = ta.selectionEnd;
+      ta.select();
+      var ok = document.execCommand('copy');
+      ta.selectionStart = st; ta.selectionEnd = en;
+      ok ? done() : fail();
+    } catch (e) { fail(); }
+  }
+
+  function flash(box, msg) {
+    var f = box.querySelector('.foot');
+    if (!f) return;
+    if (f.getAttribute('data-base') === null || f.getAttribute('data-base') === undefined) {
+      f.setAttribute('data-base', f.textContent);
+    }
+    f.textContent = msg;
+    window.setTimeout(function () { f.textContent = f.getAttribute('data-base'); }, 2200);
+  }
+
+  /* ---- go ----------------------------------------------------------- */
+  function init() {
+    highlight();
+    closeAll();
+    wireToolbar();
+    wireEditors();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  /* belt and braces: some browsers restore <details> state on soft reload */
+  window.addEventListener('pageshow', closeAll);
+})();
+</script>
+</body>
+</html>

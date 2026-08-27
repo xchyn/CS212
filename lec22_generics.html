@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class 26 — Generics | CSCI 212</title>
+<style>
+:root{
+  --ink:#0f172a; --ink2:#334155; --muted:#64748b; --line:#e2e8f0;
+  --bg:#ffffff; --bg2:#f8fafc;
+  --obj:#4f46e5; --def:#2563eb; --ex:#059669; --alg:#7c3aed;
+  --key:#b45309; --warn:#dc2626; --qc:#0891b2; --prac:#be185d; --sum:#475569;
+  --edit:#ea580c; --edit-bg:#fff7ed;
+  --code-bg:#0d1117; --code-bd:#000000;   /* read-only listings: black */
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px 80px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:#0f172a;color:#e2e8f0;font-size:13.5px;
+  border-bottom:3px solid var(--obj);
+}
+.topbar .inner{max-width:900px;margin:0 auto;padding:10px 22px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.topbar a{color:#e2e8f0;text-decoration:none;border-bottom:1px solid transparent}
+.topbar a:hover{border-bottom-color:#94a3b8}
+.topbar .course{font-weight:700;letter-spacing:.02em}
+.topbar .sep{color:#475569}
+.topbar .spacer{flex:1}
+
+/* ---------- title block ---------- */
+.titleblock{padding:34px 0 10px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.eyebrow{
+  font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--obj);margin-bottom:8px;
+}
+.titleblock h1{font-size:33px;line-height:1.2;margin:0 0 10px;letter-spacing:-.015em}
+.titleblock .sub{margin:0;color:var(--muted);font-size:17px;line-height:1.5}
+
+h2{
+  font-size:24px;margin:46px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line);letter-spacing:-.01em;scroll-margin-top:14px;
+}
+h2 .num{color:var(--obj);font-weight:800;margin-right:11px}
+h3{font-size:18.5px;margin:30px 0 10px;color:var(--ink)}
+h4{font-size:16px;margin:20px 0 8px;color:var(--ink2)}
+p{margin:12px 0}
+ul,ol{margin:12px 0;padding-left:26px}
+li{margin:6px 0}
+a{color:var(--def)}
+hr{border:0;border-top:1px solid var(--line);margin:30px 0}
+strong{color:var(--ink)}
+.muted{color:var(--muted)}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--bg2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 20px 16px;margin:22px 0;
+}
+.toc .th{
+  font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;
+}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:30px}
+.toc li{margin:3px 0;font-size:14.5px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- show all / hide all ---------- */
+.tools{
+  display:flex;gap:9px;align-items:center;flex-wrap:wrap;
+  padding:11px 15px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:9px;margin:22px 0;font-size:13.5px;
+}
+.tools .lab{font-weight:700;color:var(--ink2)}
+.tools button{
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  background:#fff;color:var(--ink2);border:1px solid #cbd5e1;
+  border-radius:6px;padding:4px 12px;
+}
+.tools button:hover{background:var(--obj);border-color:var(--obj);color:#fff}
+.tools .muted{font-size:12.5px}
+
+/* ---------- boxes ---------- */
+.box{border:1px solid var(--line);border-left:5px solid var(--muted);border-radius:8px;margin:22px 0;overflow:hidden;background:#fff}
+.box>.hd{
+  padding:9px 16px;font-size:12.5px;font-weight:700;
+  letter-spacing:.075em;text-transform:uppercase;color:#fff;background:var(--muted);
+}
+.box>.hd .tag{margin-left:5px;font-weight:500;text-transform:none;letter-spacing:0;opacity:.92;font-size:13px}
+.box>.bd{padding:4px 18px 14px}
+.box>.bd>:first-child{margin-top:12px}
+.box>.bd>:last-child{margin-bottom:2px}
+
+.box.obj{border-left-color:var(--obj)}  .box.obj>.hd{background:var(--obj)}
+.box.def{border-left-color:var(--def)}  .box.def>.hd{background:var(--def)}
+.box.ex{border-left-color:var(--ex)}    .box.ex>.hd{background:var(--ex)}
+.box.alg{border-left-color:var(--alg)}  .box.alg>.hd{background:var(--alg)}
+.box.key{border-left-color:var(--key)}  .box.key>.hd{background:var(--key)}
+.box.warn{border-left-color:var(--warn)}.box.warn>.hd{background:var(--warn)}
+.box.qc{border-left-color:var(--qc)}    .box.qc>.hd{background:var(--qc)}
+.box.prac{border-left-color:var(--prac)}.box.prac>.hd{background:var(--prac)}
+.box.sum{border-left-color:var(--sum)}  .box.sum>.hd{background:var(--sum)}
+
+.box.obj{background:#f5f5ff}
+.box.qc{background:#f0fbfe}
+.box.warn{background:#fff7f7}
+.box.key{background:#fffbf2}
+.box.sum{background:#f8fafc}
+
+/* ---------- code ---------- */
+/* Read-only listings sit on black, matching CSCI 211, so a code block is never
+   mistaken for the editable live-coding box. */
+pre{
+  margin:14px 0;padding:13px 15px;overflow-x:auto;
+  background:var(--code-bg);border:1px solid var(--code-bd);border-radius:8px;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;color:#c9d1d9;
+}
+pre code{font-family:inherit;font-size:inherit;background:none;padding:0;border:0;color:inherit;display:block}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef2f7;
+  border:1px solid #e2e8f0;border-radius:4px;padding:1px 5px;color:#0b3a5b;
+}
+.filename{
+  font-family:var(--mono);font-size:12px;color:#475569;
+  margin:16px 0 -9px;font-weight:600;
+}
+
+/* comparison block: another language, never syntax-highlighted. Dark like the
+   Java listings, but desaturated and dashed so it reads as "not this course". */
+pre.cmp{background:#161b22;border-style:dashed;border-color:#3f4650;color:#9aa4b2}
+pre.cmp code{color:#9aa4b2}
+
+/* shell commands you type */
+pre.sh{background:#1e293b;border-color:#1e293b;color:#e2e8f0;position:relative;padding-top:26px}
+pre.sh code{color:#e2e8f0}
+pre.sh::before{
+  content:"Terminal";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#86efac;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* output / terminal blocks */
+pre.out{background:#111d33;border-color:#111d33;color:#e2e8f0;position:relative;padding-top:26px}
+pre.out code{color:#e2e8f0}
+pre.out::before{
+  content:"Output";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#7dd3fc;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+pre.err{background:#1f1416;border-color:#7f1d1d;color:#fecdd3;padding-top:26px;position:relative}
+pre.err code{color:#fecdd3}
+pre.err::before{
+  content:"Compiler message";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#fda4af;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* ---- highlight.js, GitHub-dark palette (hand-written, no external file) ---- */
+.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-template-tag,
+.hljs-template-variable,.hljs-type,.hljs-variable.language_{color:#ff7b72}
+.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#d2a8ff}
+.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,
+.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable{color:#79c0ff}
+.hljs-meta .hljs-string,.hljs-regexp,.hljs-string{color:#a5d6ff}
+.hljs-built_in,.hljs-symbol{color:#ffa657}
+.hljs-code,.hljs-comment,.hljs-formula{color:#8b949e;font-style:italic}
+.hljs-name,.hljs-quote,.hljs-selector-pseudo,.hljs-selector-tag{color:#7ee787}
+.hljs-subst{color:#c9d1d9}
+.hljs-section{color:#1f6feb;font-weight:700}
+.hljs-bullet{color:#f2cc60}
+.hljs-emphasis{color:#c9d1d9;font-style:italic}
+.hljs-strong{color:#c9d1d9;font-weight:700}
+
+/* ---------- trace tables ---------- */
+table{border-collapse:collapse;margin:16px 0;font-size:14px;width:100%}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg2);font-weight:700;font-size:13px}
+table.trace td:first-child,table.trace th:first-child{white-space:nowrap}
+table code{font-size:.88em}
+
+/* ---------- multi-part questions ---------- */
+.part{margin:16px 0;padding-left:14px;border-left:2px solid #cbd5e1}
+.part .q{margin:0 0 8px}
+.part .pl{font-weight:700;color:var(--qc);margin-right:6px}
+
+/* ---------- collapsible solutions ---------- */
+details.soln{margin:10px 0 4px}
+details.soln>summary{
+  list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  font-size:12.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:#fff;background:var(--sum);border-radius:6px;padding:5px 13px;
+  user-select:none;
+}
+details.soln>summary::-webkit-details-marker{display:none}
+details.soln>summary::before{content:"\25B6";font-size:9px;transition:transform .15s}
+details.soln[open]>summary::before{transform:rotate(90deg)}
+details.soln>summary::after{content:"Show Answer"}
+details.soln[open]>summary::after{content:"Hide Answer"}
+details.soln>summary:hover{filter:brightness(1.18)}
+
+details.soln.reveal>summary{background:var(--ex)}
+details.soln.reveal>summary::after{content:"Show Output & Explanation"}
+details.soln.reveal[open]>summary::after{content:"Hide Output & Explanation"}
+details.soln.reveal.noout>summary::after{content:"Show Explanation"}
+details.soln.reveal.noout[open]>summary::after{content:"Hide Explanation"}
+
+.ans{
+  margin-top:11px;padding:2px 16px 10px;background:#fff;
+  border:1px solid var(--line);border-left:3px solid var(--sum);border-radius:7px;
+}
+details.soln.reveal .ans{border-left-color:var(--ex)}
+.ans>:first-child{margin-top:12px}
+.ans>:last-child{margin-bottom:6px}
+
+/* ---------- live coding editor ---------- */
+.editor{
+  margin:18px 0;border:2px dashed var(--edit);border-radius:9px;
+  background:var(--edit-bg);overflow:hidden;
+}
+.editor .ehd{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:7px 13px;background:var(--edit);color:#fff;
+  font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+}
+.editor .ehd .etitle{flex:1}
+.editor .ehd button{
+  font:inherit;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  cursor:pointer;background:rgba(255,255,255,.16);color:#fff;
+  border:1px solid rgba(255,255,255,.5);border-radius:5px;padding:3px 10px;
+}
+.editor .ehd button:hover{background:#fff;color:var(--edit)}
+.editor textarea{
+  display:block;width:100%;border:0;outline:0;resize:vertical;
+  padding:12px 15px;background:var(--edit-bg);color:#431407;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;
+  tab-size:4;-moz-tab-size:4;min-height:150px;
+}
+.editor textarea:focus{background:#fff}
+.editor .foot{
+  padding:5px 13px 7px;font-size:11.5px;color:#9a3412;background:#ffedd5;
+  border-top:1px solid #fed7aa;
+}
+
+/* ---------- prev/next nav ---------- */
+.pagenav{display:flex;gap:14px;margin:52px 0 0;flex-wrap:wrap}
+.pagenav a,.pagenav span.disabled{
+  flex:1 1 260px;display:block;text-decoration:none;
+  border:1px solid var(--line);border-radius:9px;padding:12px 16px;background:#fff;
+}
+.pagenav a:hover{border-color:var(--obj);background:var(--bg2)}
+.pagenav .dir{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.pagenav .ttl{font-size:15px;font-weight:600;color:var(--ink);margin-top:3px}
+.pagenav .next{text-align:right}
+.pagenav span.disabled{opacity:.4}
+.pagenav span.disabled .ttl{color:var(--muted)}
+
+footer.pf{
+  margin-top:40px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--muted);text-align:center;
+}
+
+/* ---------- index page ---------- */
+table.sched{font-size:14.5px}
+table.sched th{background:#0f172a;color:#fff;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+table.sched td:first-child{white-space:nowrap;font-weight:700;color:var(--muted);width:60px}
+table.sched tr.examrow td{background:#fff1f2}
+table.sched tr.revrow td{background:#fffbeb}
+table.sched a{font-weight:600;text-decoration:none}
+table.sched a:hover{text-decoration:underline}
+
+
+/* ---------- release gating ---------- */
+.pending{
+  margin-top:4px;font-size:11.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:#b45309;
+}
+.pagenav span.disabled .pending{color:#b45309}
+table.sched tr.pendingrow td{background:#fcfcfd}
+table.sched .unrel{color:var(--muted)}
+table.sched .pending{display:block;margin-top:2px}
+table.sched td.cn{white-space:nowrap;width:52px;font-weight:700;color:var(--muted)}
+table.sched td.dt{white-space:nowrap;width:104px;color:var(--muted);font-size:13.5px}
+table.sched tr.offrow td{background:#f1f5f9;color:var(--muted);font-style:italic}
+.refcard{
+  display:block;text-decoration:none;border:1px solid var(--line);
+  border-left:5px solid var(--alg);border-radius:9px;padding:13px 17px;
+  margin:22px 0;background:#faf9ff;
+}
+.refcard:hover{background:#f5f3ff;border-color:var(--alg)}
+.refcard .rl{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--alg)}
+.refcard .rt{font-size:16px;font-weight:600;color:var(--ink);margin-top:3px}
+.refcard .rd{font-size:14px;color:var(--muted);margin-top:4px}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,.tools,.pagenav,.pending{display:none !important}
+  html,body{width:100%;font-size:10pt}
+  .wrap{max-width:100%;width:100%;padding:0}
+  /* a wide <pre> must wrap rather than widen the page and clip every other
+     element at the paper edge */
+  /* Screen shows code on black; paper does not. Restore a dark-on-light palette
+     for print only, or the dark theme's light tokens vanish on white. */
+  pre{white-space:pre-wrap;overflow:visible;overflow-wrap:anywhere;font-size:8.6pt;
+      background:#f8fafc !important;color:#24292e !important;border-color:#cbd5e1 !important;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  pre code{color:#24292e !important}
+  pre.cmp{background:#fff !important;color:#475569 !important;border-color:#94a3b8 !important}
+  pre.cmp code{color:#475569 !important}
+  pre .hljs-doctag,pre .hljs-keyword,pre .hljs-meta .hljs-keyword,pre .hljs-template-tag,
+  pre .hljs-template-variable,pre .hljs-type,pre .hljs-variable.language_{color:#d73a49 !important}
+  pre .hljs-title,pre .hljs-title.class_,pre .hljs-title.class_.inherited__,
+  pre .hljs-title.function_{color:#6f42c1 !important}
+  pre .hljs-attr,pre .hljs-attribute,pre .hljs-literal,pre .hljs-meta,pre .hljs-number,
+  pre .hljs-operator,pre .hljs-selector-attr,pre .hljs-selector-class,pre .hljs-selector-id,
+  pre .hljs-variable{color:#005cc5 !important}
+  pre .hljs-meta .hljs-string,pre .hljs-regexp,pre .hljs-string{color:#032f62 !important}
+  pre .hljs-built_in,pre .hljs-symbol{color:#e36209 !important}
+  pre .hljs-code,pre .hljs-comment,pre .hljs-formula{color:#6a737d !important}
+  pre .hljs-name,pre .hljs-quote,pre .hljs-selector-pseudo,
+  pre .hljs-selector-tag{color:#22863a !important}
+  pre .hljs-subst,pre .hljs-emphasis,pre .hljs-strong{color:#24292e !important}
+  .filename{color:#475569 !important}
+  table{table-layout:fixed;width:100%;word-wrap:break-word;overflow-wrap:anywhere}
+  .box,.toc{max-width:100%}
+  a{color:var(--ink);text-decoration:none}
+  .box,.part,pre,table,.editor{break-inside:avoid;page-break-inside:avoid}
+  h2{break-after:avoid;page-break-after:avoid}
+  details.soln>summary{display:none !important}
+  details.soln:not([open])>.ans{display:none !important}
+  details.soln::before{
+    content:"Answer withheld — see the online notes.";
+    display:block;font-size:9pt;font-style:italic;color:#64748b;margin:6px 0;
+  }
+  details.soln[open]::before{content:""}
+  .editor textarea{display:none !important}
+  .editor{border:1.5px solid #fdba74 !important;background:#fff;border-style:solid}
+  .editor .ehd{background:#fff !important;color:#9a3412 !important;border-bottom:1px solid #fdba74}
+  .editor .ehd button{display:none}
+  .editor .foot{display:none}
+  .editor::after{content:"";display:block;height:2.1in;background:#fff}
+  pre.out,pre.sh{background:#f1f5f9 !important;color:#0f172a !important;border-color:#94a3b8 !important}
+  pre.err{background:#fef2f2 !important;color:#7f1d1d !important;border-color:#fca5a5 !important}
+  pre.out code,pre.sh code{color:#0f172a !important}
+  pre.err code{color:#7f1d1d !important}
+  pre.out::before,pre.sh::before{color:#475569}
+  pre.err::before{color:#b91c1c}
+  .box>.hd{color:#000;background:#fff !important;border-bottom:1px solid #cbd5e1}
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="inner">
+<span class="course">CSCI 212</span>
+<span class="sep">|</span>
+<a href="index.html">Course index</a>
+<span class="sep">|</span>
+<span>Class 26 of 28</span>
+<span class="sep">|</span>
+<span>Thursday, December 3</span>
+<span class="spacer"></span>
+<span>Queens College, CUNY</span>
+</div></div>
+<div class="wrap">
+<div class="titleblock">
+  <div class="eyebrow">Session 26 &middot; Lecture 22</div>
+  <h1>Generics</h1>
+  <p class="sub">How to write a container once and let the compiler check, at compile time, exactly what you are allowed to put in it.</p>
+</div>
+
+<div class="box obj">
+  <div class="hd">Learning Objectives</div>
+  <div class="bd">
+    <p>By the end of today's session you should be able to:</p>
+    <ol>
+      <li>Explain what goes wrong with a container that stores <code>Object</code> &mdash; the cast on every retrieval, and the <code>ClassCastException</code> that arrives at run time instead of at compile time.</li> <li>State the four benefits of generics her notes list: type safety, elimination of casts, code reusability, better readability.</li> <li>Read a type argument: say what <code>ArrayList&lt;String&gt;</code>, <code>Stack&lt;JButton&gt;</code> and <code>LinkedList&lt;Integer&gt;</code> each mean, and predict which calls the compiler will reject.</li> <li>Explain why <code>ArrayList&lt;int&gt;</code> does not compile, and name the wrapper class you use instead.</li> <li>Write a generic class of your own &mdash; <code>class Box&lt;T&gt;</code> &mdash; and instantiate it with both the long form and the diamond <code>new Box&lt;&gt;()</code>.</li> <li>Write a generic method, put the <code>&lt;T&gt;</code> in the right place, and say why it goes there.</li> <li>Use a bounded type parameter, <code>&lt;T extends Number&gt;</code> or <code>&lt;T extends Comparable&lt;T&gt;&gt;</code>, and explain what the bound buys you inside the method body.</li> <li>Convert the <code>Node</code>, <code>LinkedList</code>, <code>Stack</code> and <code>Queue</code> you wrote last time into generic classes, and use them with three different element types.</li> <li>Explain type erasure at the level it bites you: why <code>new T[n]</code> is illegal, why two methods whose parameters are <code>T</code> and <code>V</code> clash, and why an <code>ArrayList&lt;String&gt;</code> and an <code>ArrayList&lt;Integer&gt;</code> have the same class at run time.</li> </ol> </div> </div> <div class="toc"> <div class="th">On this page</div> <ol> <li><a href="#s1">The problem: a container that holds <code>Object</code></a></li> <li><a href="#s2">Using the generic classes and methods you already have</a></li> <li><a href="#s3">Why a type argument must be a reference type</a></li> <li><a href="#s4">Writing your own generic class</a></li> <li><a href="#s5">Writing your own generic method</a></li> <li><a href="#s6">Bounded type parameters</a></li> <li><a href="#s7">Making last week's containers generic</a></li> <li><a href="#s8">Type erasure: what the compiler actually does</a></li> <li><a href="#prac">Practice Problems</a></li> <li><a href="#summary">Lecture Summary</a></li> </ol> </div> <div class="tools"> <span class="lab">Answers</span> <button id="showAll" type="button">Show all</button> <button id="hideAll" type="button">Hide all</button> <span class="muted">&mdash; every worked-example output and every solution is hidden when the page loads. Work it out first, then reveal.</span> </div> <hr> <h2 id="s1"><span class="num">1.</span>The problem: a container that holds <code>Object</code></h2> <p>Last time you built a <code>LinkedList</code>, a <code>Stack</code> and a <code>Queue</code> out of one small <code>Node</code> class, and the lecture ended on a complaint. Every one of those classes stores <code>Integer</code> and nothing else. <code>addTail("hello")</code> is a compile error. To get a list of <code>String</code>s you would copy all three files and change every <code>Integer</code> to <code>String</code>; to get a list of <code>Point</code>s you would copy them again. Her own summary of the situation is one line: <em>"Each data structure implemented with specific data types (e.g., Integer). Limited reusability across different data types."</em></p> <p>There is an obvious-looking escape. Every class in Java extends <code>Object</code>, so a field of type <code>Object</code> can hold a reference to <em>anything</em>. Store <code>Object</code> and one set of files serves every element type. This is genuinely how Java's collections worked before 2004, and it is worth seeing exactly what it costs, because that cost is the reason generics exist.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the pre-generics container, and where it breaks</span></div> <div class="bd"> <p>Here is the smallest possible container: a box that holds one thing. Written with <code>Object</code>, it will hold anything at all.</p> <p>Read it and decide two things before you open the toggle. First, which line will the compiler reject? Second, what does the program print?</p> <p class="filename">ObjectBoxDemo.java</p>
+<pre><code class="language-java">// A container of the kind people wrote before generics existed.
+// It holds Object, so it will hold anything -- and it checks nothing.
+class ObjectBox {
+    private Object item;
+
+    public void set(Object o) { item = o; }
+
+    public Object get() { return item; }
+}
+
+public class ObjectBoxDemo {
+    public static void main(String args[]) {
+        ObjectBox b = new ObjectBox();
+
+        b.set("CSCI 212");
+        String s = (String) b.get();          // cast required on the way out
+        System.out.println("stored: " + s + ", length " + s.length());
+
+        // Nothing at all stops us putting a different type in the same box.
+        b.set(212);
+        String t = (String) b.get();          // the compiler is happy with this
+        System.out.println("we never reach this line: " + t);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <p>The compiler rejects <em>nothing</em>. It compiles cleanly, runs, prints one line, and then dies:</p> <pre class="out"><code>stored: CSCI 212, length 8
+Exception in thread "main" java.lang.ClassCastException: class java.lang.Integer cannot be cast to class java.lang.String (java.lang.Integer and java.lang.String are in module java.base of loader 'bootstrap')
+	at ObjectBoxDemo.main(ObjectBoxDemo.java:21)</code></pre> <p>Three separate problems are visible in that short file, and they are exactly the three that generics fix.</p> <ul> <li><strong>A cast on every retrieval.</strong> <code>get()</code> returns <code>Object</code>, and an <code>Object</code> has no <code>length()</code>. To do anything useful you must write <code>(String)</code> in front of every single call. That is noise, and every one of those casts is a place to make a mistake.</li> <li><strong>The cast is a promise the compiler cannot check.</strong> <code>(String) b.get()</code> is you telling <code>javac</code> "trust me, this is a <code>String</code>." It does trust you. It inserts a run-time check and moves on.</li> <li><strong>The failure arrives at run time.</strong> <code>ClassCastException</code> is thrown while the program is running, in front of a user, possibly weeks after you shipped it. The information needed to prevent it &mdash; that this box was meant to hold <code>String</code>s &mdash; existed when you wrote the code, but there was no way to write it down.</li> </ul> 
+</div></details> </div> </div> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; generics</span></div> <div class="bd"> <p><strong>Generics</strong> let you write classes, interfaces and methods that operate on a <strong>type parameter</strong> &mdash; a stand-in for a type, filled in later at the point where the class or method is used.</p> <p>Her notes give four benefits, and each one is the mirror image of a problem in the box above:</p> <ul> <li><strong>Type safety</strong> &mdash; errors are caught at compile time, not run time.</li> <li><strong>Elimination of casts</strong> &mdash; no explicit type casting on the way out.</li> <li><strong>Code reusability</strong> &mdash; write once, use with multiple types.</li> <li><strong>Better readability</strong> &mdash; <code>ArrayList&lt;String&gt;</code> says what is in the list; <code>ArrayList</code> does not.</li> </ul> </div> </div> <p>Here is the same box, written once, with the element type left as a blank called <code>T</code>. Compare it line by line with the version above: the only difference is that <code>Object</code> has become <code>T</code>.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the same container, made generic</span></div> <div class="bd"> <p>Before you reveal: how many casts do you see, and what is the type of <code>value</code> on the line <code>int value = n.get();</code>?</p> <p class="filename">BoxDemo.java</p>
+<pre><code class="language-java">// The same container, written once, with the element type left as a blank.
+class Box&lt;T&gt; {
+    private T item;
+
+    public void set(T o) { item = o; }
+
+    public T get() { return item; }
+}
+
+public class BoxDemo {
+    public static void main(String args[]) {
+        Box&lt;String&gt; b = new Box&lt;String&gt;();
+        b.set("CSCI 212");
+        String s = b.get();               // no cast
+        System.out.println("stored: " + s + ", length " + s.length());
+
+        Box&lt;Integer&gt; n = new Box&lt;&gt;();     // the diamond: Java infers Integer
+        n.set(212);
+        int value = n.get();              // no cast; auto-unboxed to int
+        System.out.println("stored: " + value + ", doubled " + (value * 2));
+
+        // Same class, three different element types, one source file.
+        Box&lt;Double&gt; d = new Box&lt;&gt;();
+        d.set(3.5);
+        System.out.println("stored: " + d.get() + ", halved " + (d.get() / 2));
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>stored: CSCI 212, length 8
+stored: 212, doubled 424
+stored: 3.5, halved 1.75</code></pre> <p>Not one cast in the whole file. <code>b.get()</code> <em>is</em> a <code>String</code>, because <code>b</code> was declared <code>Box&lt;String&gt;</code>, so <code>.length()</code> is a perfectly ordinary call. <code>n.get()</code> is an <code>Integer</code>, which unboxes to an <code>int</code> on its own.</p> <p>And the mistake that blew up at run time in the previous program now cannot survive compilation at all:</p> <pre><code class="language-java">Box&lt;String&gt; b = new Box&lt;String&gt;();
+b.set("CSCI 212");
+b.set(212);
+// an int, into a Box of String</code></pre> <pre class="err"><code>BoxWrongType.java:11: error: incompatible types: int cannot be converted to String b.set(212);
+        // an int, into a Box of String
+^
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+1 error</code></pre> <p>That is the entire lecture in one comparison. Same mistake, same program; the only thing that changed is <em>when</em> you find out about it.</p> 
+</div></details> </div> </div> <div class="box key"> <div class="hd">Key Idea</div> <div class="bd"> <p>An <code>Object</code> container trades a compile error for a run-time crash. A generic container does not trade anything away: you keep the one-copy-serves-all reuse <em>and</em> you keep full type checking. That is why generics were added to the language in Java 5 and why every collection you have used since Lecture 6 has angle brackets in its name.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 22.1</div> <div class="bd"> <p>A colleague defends the <code>Object</code> version: "the cast documents the intent perfectly well, and my tests pass."</p> <div class="part"> <p class="q"><span class="pl">(a)</span> What is the difference between a cast and a type argument, in one sentence?</p> <details class="soln"><summary></summary><div class="ans"> <p>A cast is a <em>claim you make</em> that the compiler accepts without evidence and checks later at run time. A type argument is a <em>fact you declare</em> that the compiler enforces on every call, now.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Why do passing tests not settle the question?</p> <details class="soln"><summary></summary><div class="ans"> <p>Tests only exercise the paths you thought to write. The <code>ObjectBox</code> program above would pass any test that only ever stores a <code>String</code>; the crash appears the first time some other code path stores something else. A compile error, by contrast, is found on every path at once, including the ones nobody has tested yet.</p> <p><strong>Things to notice across both parts.</strong> "It compiles" is a much weaker statement about an <code>Object</code>-based container than about a generic one. Every cast in a program is a small unchecked promise, and generics exist to let you stop making them.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 22.2</div> <div class="bd"> <p>Using <code>ObjectBox</code> exactly as written above, what does each fragment do &mdash; compile error, run-time exception, or run normally? Assume <code>ObjectBox b = new ObjectBox();</code> each time.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>b.set(3.14); double d = (Double) b.get();</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Runs normally. <code>3.14</code> is auto-boxed into a <code>Double</code>, stored as an <code>Object</code>, cast back to <code>Double</code>, and unboxed into <code>d</code>. The cast is correct, so nothing complains &mdash; but notice you still had to write it.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>b.set("hi"); int n = b.get().length();</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compile error. <code>get()</code> is declared to return <code>Object</code>, and <code>Object</code> has no <code>length</code> method, so the compiler stops you before it ever considers what is actually inside. This is the "elimination of casts" benefit, seen from the other side: without generics the cast is not optional.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>b.set("hi"); Integer n = (Integer) b.get();</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compiles; throws <code>ClassCastException</code> at run time. Casting an <code>Object</code> down to <code>Integer</code> is legal as far as the compiler is concerned, because some <code>Object</code>s really are <code>Integer</code>s. The check happens when the line executes, and this one is holding a <code>String</code>.</p> <p><strong>Things to notice across all three parts.</strong> Part (b) is the only one the compiler catches, and it catches it for the wrong reason &mdash; not "you stored a <code>String</code> and asked for a number", just "<code>Object</code> has no <code>length</code>". The two parts where the type actually matters, (a) and (c), look identical to the compiler. That is precisely what a type parameter fixes.</p> </div></details> </div> </div> </div> <h2 id="s2"><span class="num">2.</span>Using the generic classes and methods you already have</h2> <p>You have been using generics since Lecture 6 without writing one. <code>ArrayList&lt;String&gt;</code> is not a special class called "ArrayList of String" &mdash; it is the one and only <code>ArrayList</code> class, told which type it is holding this time. Java's library is full of these: <code>ArrayList</code>, <code>LinkedList</code>, <code>Stack</code>, <code>Queue</code>, <code>HashMap</code>.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; type parameter, type argument, parameterized type</span></div> <div class="bd"> <p>A <strong>type parameter</strong> is the placeholder written in the class declaration: the <code>T</code> in <code>class Box&lt;T&gt;</code>, or the <code>E</code> in the library's <code>class ArrayList&lt;E&gt;</code>. It is a name for a type that is not known yet.</p> <p>A <strong>type argument</strong> is the real type you supply at the point of use: the <code>String</code> in <code>ArrayList&lt;String&gt;</code>.</p> <p>The combination &mdash; class name plus angle brackets plus type argument &mdash; is a <strong>parameterized type</strong>, and it is used exactly like any other type: as a variable type, a parameter type, or a return type.</p> </div> </div> <p>Her first example is a <code>Stack</code> restricted to Swing buttons. It reads five words from the keyboard, wraps each one in a <code>JButton</code>, pushes the buttons onto a stack, and then pops them into a window &mdash; so they appear in reverse order, five at the bottom and one at the top.</p> <p class="filename">Example1.java</p>
+<pre><code class="language-java">import java.awt.Font;
+import java.awt.GridLayout;
+import java.util.Scanner;
+import java.util.Stack;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+
+// applying a generic class
+public class Example1 {
+   public static void main(String args[]) {
+      Scanner s = new Scanner(System.in);
+      Stack&lt;JButton&gt; stack = new Stack&lt;JButton&gt;();
+      for (int i = 5; i &gt;= 1; i--) {
+         System.out.println("Enter text for label: ");
+         JButton b = new JButton("" + i + ". " + s.next());
+         b.setFont(new Font("Arial", Font.BOLD, 30));
+         stack.push(b);
+      }
+      JFrame frame = new JFrame();
+      frame.setSize(1200, 900);
+      frame.setLayout(new GridLayout(5,1));
+      while (!stack.empty()) frame.add(stack.pop());
+      frame.setVisible(true);
+   }
+}</code></pre> <p>This one opens a window rather than printing, so there is no console output to show. What appears is a 1200&nbsp;&times;&nbsp;900 frame divided by a <code>GridLayout(5,1)</code> into five equal rows, each holding one large Arial button. The button labelled <code>1.</code> is at the top, because it was pushed last and popped first &mdash; the Lecture 21 stack material, driving a Lecture 16 layout.</p> <p>The generics content is the single word <code>JButton</code> inside the angle brackets. Two things follow from it:</p> <ul> <li><strong><code>pop()</code> returns a <code>JButton</code>.</strong> <code>frame.add(stack.pop())</code> compiles because the compiler knows the type. With a pre-generics <code>Stack</code> you would have had to write <code>frame.add((JButton) stack.pop())</code>.</li> <li><strong><code>push</code> accepts nothing else.</strong> Slip a <code>String</code> into that loop and the file does not compile.</li> </ul> <pre class="err"><code>ButtonStack.java:8: error: incompatible types: String cannot be converted to JButton stack.push("2. world");
+        // a String, not a JButton
+^
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+1 error</code></pre> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the same stack, printed instead of displayed</span></div> <div class="bd"> <p>To see her example's ordering as real output, here it is with the window replaced by <code>println</code> and the keyboard input replaced by fixed words. The buttons are still real <code>JButton</code> objects; we just ask each one for its text instead of drawing it.</p> <p>The loop counts <em>down</em> from 5 and the stack reverses. Which label comes out first?</p> <p class="filename">ButtonStackDemo.java</p>
+<pre><code class="language-java">import java.util.Stack;
+import javax.swing.JButton;
+
+public class ButtonStackDemo {
+    public static void main(String args[]) {
+        // Exactly her Stack&lt;JButton&gt;, but we print the buttons instead of
+        // putting them in a window.
+        Stack&lt;JButton&gt; stack = new Stack&lt;JButton&gt;();
+        String[] labels = {"one", "two", "three", "four", "five"};
+
+        for (int i = 5; i &gt;= 1; i--) {
+            JButton b = new JButton("" + i + ". " + labels[5 - i]);
+            stack.push(b);
+        }
+
+        while (!stack.empty()) {
+            JButton b = stack.pop();          // no cast: pop() returns a JButton
+            System.out.println(b.getText());
+        }
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>1. five 2. four 3. three 4. two 5. one </code></pre> <p>The loop pushes <code>5. one</code> first and <code>1. five</code> last, so <code>1. five</code> is on top and comes off first. In her version those five buttons are added to the frame in that order, top row downward, which is why the finished window reads 1, 2, 3, 4, 5 from top to bottom even though the loop counted backwards.</p> <p>Look at the line <code>JButton b = stack.pop();</code>. No cast, and if you changed the declaration to <code>Stack&lt;String&gt;</code> this line would stop compiling immediately &mdash; not when somebody runs it.</p> 
+</div></details> </div> </div> <p>Generic <em>methods</em> from the library work the same way, except that you usually do not write the type argument at all. Her second example sorts two arrays of different types with one method.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; one <code>Arrays.sort</code> for every element type</span></div> <div class="bd"> <p><code>Arrays.sort</code> is declared once in the library and works on an array of any type whose elements can be compared. Predict both lines, and note the spacing: the loop prints two spaces after each value.</p> <p class="filename">Example2.java</p>
+<pre><code class="language-java">import java.util.Arrays;
+
+//applying a generic method
+public class Example2 {
+	public static void main(String args[]) {
+	   Integer[] data = {3, 1, 4, 1, 5};
+	   Double[] data2 = {3.14, 1.5, 4.7, 1.1, 5.8};
+	   
+	   Arrays.sort(data);
+	   for (int i = 0; i &lt; 5; i++) System.out.print(data[i] + "  ");
+	   System.out.println();  
+	   
+	   Arrays.sort(data2); 
+	   for (int i = 0; i &lt; 5; i++) System.out.print(data2[i] + "  ");
+	   System.out.println();
+	}
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>1  1  3  4  5 1.1  1.5  3.14  4.7  5.8 </code></pre> <p>Two things her notes point out about this example.</p> <ul> <li><strong>The compiler infers the type.</strong> You wrote <code>Arrays.sort(data)</code>, not <code>Arrays.&lt;Integer&gt;sort(data)</code>. Java looks at the argument, sees <code>Integer[]</code>, and works out the type argument for you. This is <strong>type inference</strong>, and it is the reason generic methods usually look like ordinary methods at the call site.</li> <li><strong>It works for any type that implements <code>Comparable</code>.</strong> <code>Integer</code> and <code>Double</code> both do, which is why both calls succeed. Hand it an array of a class of your own that has no ordering and it will not compile &mdash; we come back to exactly that in &sect;6.</li> </ul> <p>Note also that these are <code>Integer[]</code> and <code>Double[]</code>, not <code>int[]</code> and <code>double[]</code>. That is not decoration; it is forced, and &sect;3 explains why.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 22.3</div> <div class="bd"> <p>You have <code>ArrayList&lt;String&gt; names = new ArrayList&lt;String&gt;();</code> and <code>Stack&lt;Integer&gt; s = new Stack&lt;Integer&gt;();</code>. For each line say whether it compiles, and if it does, what its type is.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>names.add(42);</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compile error. <code>add</code> on an <code>ArrayList&lt;String&gt;</code> takes a <code>String</code>, and <code>42</code> is an <code>int</code>. There is no conversion from <code>int</code> to <code>String</code> &mdash; autoboxing turns an <code>int</code> into an <code>Integer</code>, not into text.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>int n = names.get(0).length();</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compiles. <code>get(0)</code> returns a <code>String</code>, so <code>.length()</code> is available and returns an <code>int</code>. Compare this with Quick Check 22.2(b), where the same idea failed because <code>get</code> returned <code>Object</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>s.push(7);</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compiles. <code>push</code> wants an <code>Integer</code>; the <code>int</code> <code>7</code> is auto-boxed into one. Autoboxing happens automatically at the boundary between primitives and their wrapper classes, so <code>push(7)</code> and <code>push(Integer.valueOf(7))</code> mean the same thing.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>String top = s.pop();</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compile error. <code>s.pop()</code> on a <code>Stack&lt;Integer&gt;</code> returns an <code>Integer</code>, and an <code>Integer</code> is not a <code>String</code>. You would have to write <code>Integer top = s.pop();</code> or <code>String top = "" + s.pop();</code>.</p> <p><strong>Things to notice across all four parts.</strong> Read the declaration first, every time. Once you know a variable is a <code>Stack&lt;Integer&gt;</code>, every method on it behaves as if it had been written specifically for <code>Integer</code> &mdash; <code>push</code> takes one, <code>pop</code> returns one &mdash; and the answers fall out of that with no further thought. That readability is the fourth benefit on her list, and it is the one students undervalue.</p> </div></details> </div> </div> </div> <h2 id="s3"><span class="num">3.</span>Why a type argument must be a reference type</h2> <p>Her examples all use <code>Integer[]</code> and <code>Double[]</code>, never <code>int[]</code> and <code>double[]</code>, and every collection you have written holds <code>Integer</code> rather than <code>int</code>. That is not a style choice. It is a hard rule of the language.</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; a type argument is always a reference type</span></div> <div class="bd"> <p>A type argument must name a class, an interface or an array type. The eight primitive types &mdash; <code>byte</code>, <code>short</code>, <code>int</code>, <code>long</code>, <code>float</code>, <code>double</code>, <code>char</code>, <code>boolean</code> &mdash; are not allowed. <code>ArrayList&lt;int&gt;</code> and <code>Box&lt;int&gt;</code> do not compile.</p> </div> </div> <pre class="err"><code>PrimitiveArg.java:5: error: unexpected type ArrayList&lt;int&gt; scores = new ArrayList&lt;int&gt;();
+^
+  required: reference
+  found:    int
+PrimitiveArg.java:5: error: unexpected type ArrayList&lt;int&gt; scores = new ArrayList&lt;int&gt;();
+^
+  required: reference
+  found:    int
+2 errors</code></pre> <p>Read the message: <em>required: reference, found: int</em>. It says exactly what the rule is, and it says it twice &mdash; once for the declaration and once for the <code>new</code>.</p> <p>The reason will make complete sense once you have seen &sect;8, so take it on trust for a moment: the compiler implements a generic class by compiling <em>one</em> copy in which every <code>T</code> behaves like an <code>Object</code>, and a primitive is not an <code>Object</code>. There is nowhere for an <code>int</code> to live in that scheme.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; wrapper class, autoboxing (recall, Lecture 6)</span></div> <div class="bd"> <p>Every primitive type has a matching <strong>wrapper class</strong> &mdash; an object whose only job is to hold one primitive value.</p> <table> <tr><th>Primitive</th><td><code>byte</code></td><td><code>short</code></td><td><code>int</code></td><td><code>long</code></td><td><code>float</code></td><td><code>double</code></td><td><code>char</code></td><td><code>boolean</code></td></tr> <tr><th>Wrapper</th><td><code>Byte</code></td><td><code>Short</code></td><td><code>Integer</code></td><td><code>Long</code></td><td><code>Float</code></td><td><code>Double</code></td><td><code>Character</code></td><td><code>Boolean</code></td></tr> </table> <p><strong>Autoboxing</strong> is Java converting a primitive into its wrapper automatically where an object is expected; <strong>unboxing</strong> is the reverse. Because of them you can write <code>list.add(90)</code> and <code>int n = list.get(0)</code> even though the list really holds <code>Integer</code> objects.</p> <p>Note the two spellings that catch people: <code>int</code> becomes <code>Integer</code>, not <code>Int</code>; and <code>char</code> becomes <code>Character</code>, not <code>Char</code>.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; boxing in and out of a generic container</span></div> <div class="bd"> <p>This program never writes the word <code>Integer</code> except in the declaration, and never writes a cast at all &mdash; yet what is actually stored in the list is objects. The fourth line of output proves it.</p> <p>Predict the average, and predict what <code>getClass().getName()</code> prints.</p> <p class="filename">WrapperDemo.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class WrapperDemo {
+    public static void main(String args[]) {
+        // The type argument is Integer, the wrapper class -- never int.
+        ArrayList&lt;Integer&gt; scores = new ArrayList&lt;Integer&gt;();
+
+        scores.add(90);                 // the int 90 is auto-boxed into an Integer
+        scores.add(85);
+        scores.add(78);
+
+        int total = 0;
+        for (int s : scores) total += s;      // each Integer is auto-unboxed
+
+        System.out.println("scores  " + scores);
+        System.out.println("total   " + total);
+        System.out.println("average " + total / 3.0);
+
+        // What is actually in the list is an object, not a primitive.
+        System.out.println("element 0 is really a " + scores.get(0).getClass().getName());
+
+        ArrayList&lt;Character&gt; letters = new ArrayList&lt;&gt;();
+        letters.add('J');
+        letters.add('a');
+        char first = letters.get(0);          // unboxed back to a char
+        System.out.println("letters " + letters + "   first as a number " + (int) first);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>scores  [90, 85, 78]
+total   253
+average 84.33333333333333
+element 0 is really a java.lang.Integer
+letters [J, a]   first as a number 74</code></pre> <p>Three details worth pulling out.</p> <ul> <li><strong><code>for (int s : scores)</code> unboxes on every iteration.</strong> The loop variable is declared <code>int</code>, the elements are <code>Integer</code>, and Java inserts the conversion. You could equally write <code>for (Integer s : scores)</code>.</li> <li><strong><code>getClass().getName()</code> is <code>java.lang.Integer</code>.</strong> The list holds real objects on the heap, not a block of 32-bit slots. That costs memory and a little speed, which is the honest price of the rule &mdash; and the reason <code>int[]</code> still exists and is still the right choice for a million numbers.</li> <li><strong>The average is <code>84.33333333333333</code>, not <code>84</code>.</strong> <code>total</code> is an <code>int</code> and <code>3.0</code> is a <code>double</code>, so real division happens &mdash; the Lecture 1 rule, unchanged by any of this.</li> </ul> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; comparing boxed values with <code>==</code></span></div> <div class="bd"> <p>Autoboxing is so smooth that it is easy to forget the elements are objects. They are, and <code>==</code> on objects compares references &mdash; the Lecture 9 lesson. Two <code>Integer</code> objects holding 128 are not <code>==</code> to each other, while two holding 127 usually are, because Java caches the small ones. Inside any generic container, compare elements with <code>equals</code>, never with <code>==</code>. Last week's <code>contains</code> and <code>indexOf</code> used <code>n.getData().equals(d)</code> for exactly this reason, and making the class generic does not change it.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 22.4</div> <div class="bd"> <p>Give the type argument you would write for each container, or say why it cannot be written.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> A list of test scores, whole numbers.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>ArrayList&lt;Integer&gt;</code>. Not <code>ArrayList&lt;int&gt;</code> &mdash; the wrapper class is required, and autoboxing means you can still write <code>add(90)</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> A stack of true/false answers.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Stack&lt;Boolean&gt;</code>. Same rule; the wrapper for <code>boolean</code> is <code>Boolean</code>, with a capital B and no abbreviation.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> A queue of single letters.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Queue&lt;Character&gt;</code>. The wrapper for <code>char</code> is <code>Character</code> &mdash; the one wrapper name that is not simply the primitive name capitalized, along with <code>Integer</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> A list of arrays of doubles &mdash; each element is itself a <code>double[]</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>ArrayList&lt;double[]&gt;</code>, and this one is legal. An <em>array</em> is a reference type even when its elements are primitives, so <code>double[]</code> is a perfectly good type argument. What is banned is a bare primitive, not everything that mentions one.</p> <p><strong>Things to notice across all four parts.</strong> The rule is about the type argument itself, one level down: <code>ArrayList&lt;int&gt;</code> is out, <code>ArrayList&lt;Integer&gt;</code> and <code>ArrayList&lt;int[]&gt;</code> are both in. When in doubt, ask "could a variable of this type hold <code>null</code>?" If yes, it is a reference type and it is allowed.</p> </div></details> </div> </div> </div> <h2 id="s4"><span class="num">4.</span>Writing your own generic class</h2> <p>Using the library's generics is easy because somebody else declared the type parameter. Now you declare one.</p> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; turning an ordinary class into a generic one</span></div> <div class="bd"> <ol> <li>Pick the type that should vary. In last week's <code>Node</code> that is the type of <code>data</code>.</li> <li>Add a type parameter to the class header: <code>public class Node</code> becomes <code>public class Node&lt;T&gt;</code>.</li> <li>Replace that type everywhere inside the class with <code>T</code> &mdash; in fields, in parameter lists, in return types.</li> <li>Anywhere the class refers to <em>itself</em>, carry the parameter along: <code>private Node next;</code> becomes <code>private Node&lt;T&gt; next;</code>.</li> <li>Nothing else changes. No new methods, no casts, no <code>instanceof</code>.</li> </ol> </div> </div> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the conventional names</span></div> <div class="bd"> <p>A type parameter can be called anything a class can be called, but by convention it is a single uppercase letter, so that a reader can tell instantly that <code>T</code> is a placeholder and not a real class:</p> <table> <tr><th>Letter</th><th>Read it as</th><th>Typical use</th></tr> <tr><td><code>T</code></td><td>Type</td><td>the general-purpose choice, and what her notes use</td></tr> <tr><td><code>E</code></td><td>Element</td><td>the element type of a collection &mdash; the library's <code>ArrayList&lt;E&gt;</code></td></tr> <tr><td><code>K</code>, <code>V</code></td><td>Key, Value</td><td>a pair or a map: <code>HashMap&lt;K,V&gt;</code></td></tr> <tr><td><code>N</code></td><td>Number</td><td>a numeric type parameter</td></tr> <tr><td><code>S</code>, <code>U</code>, <code>V</code></td><td>&mdash;</td><td>second, third, fourth type parameters</td></tr> </table> <p>These are conventions, not rules. <code>class Node&lt;ElementType&gt;</code> compiles. It just makes every reader stop and check whether <code>ElementType</code> is a class they have never heard of.</p> </div> </div> <p>Here is last week's <code>Node</code> and this week's, side by side. Read them as a diff: the changes are <code>Integer</code> becoming <code>T</code>, <code>Node</code> becoming <code>Node&lt;T&gt;</code>, and one addition to the class header.</p> <p class="filename">Lecture 21 &mdash; holds Integer and only Integer</p>
+<pre class="cmp"><code>public class Node { private Integer data; private Node next; public Node() { data = null; next = null; } public Node(Integer d, Node n) { data = d; next = n; } public Integer getData()      { return data; } public Node    getNext()      { return next; } public void    setData(Integer d) { data = d; } public void    setNext(Node n)    { next = n; } } </code></pre> <p class="filename">Node.java</p>
+<pre><code class="language-java">//a generic class
+public class Node&lt;T&gt; {
+   private T data;
+   private Node&lt;T&gt; next;
+
+   public Node() {
+      data = null;
+      next = null;
+   }
+
+   public Node(T d, Node&lt;T&gt; n) {
+      data = d;
+      next = n;
+   }
+
+   public T getData() { return data; }
+
+   public Node&lt;T&gt; getNext() { return next; }
+
+   public void setData(T d) { data = d; }
+
+   public void setNext(Node&lt;T&gt; n) { next = n; }
+}</code></pre> <p>Her notes list what that one letter bought:</p> <ul> <li>The type parameter <code>T</code> allows the <code>Node</code> to store any type of data.</li> <li>The class can be instantiated with different types &mdash; <code>Node&lt;Integer&gt;</code>, <code>Node&lt;String&gt;</code>.</li> <li>Methods return the exact type that was used to instantiate the class.</li> <li>The next-node reference uses the same type parameter, so a chain of <code>Node&lt;String&gt;</code> can only ever link to more <code>Node&lt;String&gt;</code>.</li> </ul> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; what <code>T</code> is</span></div> <div class="bd"> <p><code>T</code> is not a type. It is a <em>name for a type that has not been chosen yet</em>, and it is chosen at the moment somebody writes <code>new Node&lt;String&gt;(...)</code>. Inside the class you may use <code>T</code> exactly as if it were a real class name &mdash; declare fields of type <code>T</code>, take <code>T</code> parameters, return <code>T</code> &mdash; but you may not do anything that requires knowing which class it is: no <code>new T()</code>, no <code>new T[n]</code>, no <code>T.someStaticMethod()</code>.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; one <code>Node</code> class, three element types</span></div> <div class="bd"> <p>This builds a three-node chain of <code>String</code>, then a two-node chain of <code>Integer</code>, using the same class both times. Look closely at the line <code>n.getData().toUpperCase()</code> &mdash; that call is only legal because the compiler knows <code>T</code> is <code>String</code> here.</p> <p>Before you reveal: what does the last line print for <code>c.getNext()</code>?</p> <p class="filename">NodeDemo.java</p>
+<pre><code class="language-java">// Her generic Node, exactly as in the Spring 2025 notes.
+class Node&lt;T&gt; {
+    private T data;
+    private Node&lt;T&gt; next;
+
+    public Node() {
+        data = null;
+        next = null;
+    }
+
+    public Node(T d, Node&lt;T&gt; n) {
+        data = d;
+        next = n;
+    }
+
+    public T getData() { return data; }
+
+    public Node&lt;T&gt; getNext() { return next; }
+
+    public void setData(T d) { data = d; }
+
+    public void setNext(Node&lt;T&gt; n) { next = n; }
+}
+
+public class NodeDemo {
+    public static void main(String args[]) {
+        // A chain of Strings, built back to front exactly as in Lecture 21.
+        Node&lt;String&gt; third = new Node&lt;&gt;("green", null);
+        Node&lt;String&gt; second = new Node&lt;&gt;("blue", third);
+        Node&lt;String&gt; head = new Node&lt;&gt;("red", second);
+
+        Node&lt;String&gt; n = head;
+        while (n != null) {
+            // getData() is a String here, so String methods are available.
+            System.out.print(n.getData().toUpperCase() + " --&gt; ");
+            n = n.getNext();
+        }
+        System.out.println("null");
+
+        // The same class, holding Integers this time.
+        Node&lt;Integer&gt; b = new Node&lt;&gt;(20, null);
+        Node&lt;Integer&gt; a = new Node&lt;&gt;(10, b);
+        System.out.println("sum of the two numbers: "
+                           + (a.getData() + a.getNext().getData()));
+
+        // And a node whose data is itself a list-like object.
+        Node&lt;Character&gt; c = new Node&lt;&gt;('J', null);
+        System.out.println("char node: " + c.getData()
+                           + "   next is " + c.getNext());
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>RED --&gt; BLUE --&gt; GREEN --&gt; null
+sum of the two numbers: 30
+char node: J   next is null</code></pre> <p><code>c.getNext()</code> is <code>null</code>, and concatenating a <code>null</code> reference onto a <code>String</code> gives the four characters <code>null</code> rather than throwing &mdash; the same behaviour you met in Lecture 4.</p> <p>Two more things this program demonstrates without saying so:</p> <ul> <li><strong><code>a.getData() + a.getNext().getData()</code> is arithmetic, not concatenation.</strong> Both are <code>Integer</code>, both unbox, and 10 + 20 is 30. Had the nodes been <code>Node&lt;String&gt;</code> the same expression would have joined the two strings instead. Same source line, different meaning, decided entirely by the type argument.</li> <li><strong>The chains cannot be crossed.</strong> <code>Node&lt;String&gt;</code> and <code>Node&lt;Integer&gt;</code> are different types, so a node from one chain cannot be linked into the other:</li> </ul> <pre class="err"><code>NodeMix.java:14: error: incompatible types: Node&lt;Integer&gt; cannot be converted to Node&lt;String&gt; word.setNext(number);
+        // a Node&lt;Integer&gt; onto a Node&lt;String&gt;
+^
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+1 error</code></pre> 
+</div></details> </div> </div> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the diamond operator</span></div> <div class="bd"> <p>Writing the type argument twice is repetitive:</p> <p><code>Node&lt;String&gt; head = new Node&lt;String&gt;("red", null);</code></p> <p>Since Java 7 you may leave the right-hand pair empty and let the compiler copy the type from the left:</p> <p><code>Node&lt;String&gt; head = new Node&lt;&gt;("red", null);</code></p> <p>The empty <code>&lt;&gt;</code> is called the <strong>diamond</strong>. Both forms are correct and her notes use both. What you must not do is drop the brackets altogether &mdash; <code>new Node("red", null)</code> is a <em>raw type</em>, and &sect;8 shows what that costs you.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 22.5</div> <div class="bd"> <p>Write a generic class <code>Box&lt;T&gt;</code> with one private field <code>item</code> of type <code>T</code>, a one-parameter constructor, a <code>get</code>, a <code>set</code>, and a <code>toString</code> that returns the item inside square brackets, like <code>[hello]</code>. Then write a <code>main</code> that makes a <code>Box&lt;String&gt;</code> and a <code>Box&lt;Double&gt;</code> and prints both.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Follow the procedure at the top of this section. The field, the constructor parameter, the <code>set</code> parameter and the <code>get</code> return type are all the thing that varies, so all four become <code>T</code>. <code>toString</code> returns a <code>String</code> no matter what <code>T</code> is, because the <em>description</em> of a box is text whatever is in it &mdash; that one is not <code>T</code>, and deciding which types change and which do not is the whole skill here.</p> <p class="filename">BoxOfT.java</p>
+<pre><code class="language-java">class Box&lt;T&gt; {
+    private T item;
+
+    public Box(T item) { this.item = item; }
+
+    public T get() { return item; }
+
+    public void set(T item) { this.item = item; }
+
+    public String toString() { return "[" + item + "]"; }
+}
+
+public class BoxOfT {
+    public static void main(String args[]) {
+        Box&lt;String&gt; word = new Box&lt;String&gt;("hello");
+        Box&lt;Double&gt; price = new Box&lt;&gt;(19.99);
+
+        System.out.println("word  " + word + "   length " + word.get().length());
+        System.out.println("price " + price + "   doubled " + (price.get() * 2));
+
+        word.set("goodbye");
+        System.out.println("word  " + word);
+    }
+}</code></pre> <pre class="out"><code>word  [hello]   length 5 price [19.99]   doubled 39.98 word  [goodbye] </code></pre> <p><strong>Things to notice.</strong> <code>"[" + item + "]"</code> works for any <code>T</code> because <code>+</code> on a <code>String</code> calls <code>toString()</code> on the other operand, and every object has one. That is the one thing you may always assume about an unbounded <code>T</code>: it is at least an <code>Object</code>, so <code>toString</code>, <code>equals</code> and <code>hashCode</code> are available. Nothing else is &mdash; which is what &sect;6 is about.</p> <p><code>price.get() * 2</code> gives <code>39.98</code> rather than <code>39.980000000000004</code> here, but do not read too much into that; <code>double</code> arithmetic is still <code>double</code> arithmetic inside a generic class.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 22.5</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="6" aria-label="Live coding - Quick Check 22.5">class Box&lt;T&gt; {
+    // 1. one private field called item, of type T // 2. a one-parameter constructor // 3. get() and set() // 4. toString() returning the item in square brackets } public class BoxOfT { public static void main(String args[]) { // Make a Box&lt;String&gt; and a Box&lt;Double&gt; and print them both. } }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 22.6</div> <div class="bd"> <p>Using the generic <code>Node&lt;T&gt;</code> above, decide whether each line compiles.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>Node&lt;Integer&gt; n = new Node&lt;&gt;(10, null);</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compiles. The diamond takes <code>Integer</code> from the left-hand side, the <code>int</code> <code>10</code> is auto-boxed, and <code>null</code> is a legal <code>Node&lt;Integer&gt;</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>Node&lt;String&gt; n = new Node&lt;Integer&gt;(10, null);</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compile error: <code>incompatible types: Node&lt;Integer&gt; cannot be converted to Node&lt;String&gt;</code>. The two parameterized types are unrelated, exactly as <code>String</code> and <code>Integer</code> are. Note that this is <em>not</em> like <code>Object o = "hi";</code> &mdash; a <code>Node&lt;String&gt;</code> is not a kind of <code>Node&lt;Object&gt;</code> either, which surprises people and is the reason the library has wildcard types you will meet in a later course.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>Node&lt;int&gt; n = new Node&lt;int&gt;(10, null);</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compile error: <em>unexpected type &mdash; required: reference, found: int</em>. The &sect;3 rule. Write <code>Node&lt;Integer&gt;</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> Inside the class, could you add a method <code>public T copyOfData() { return new T(); }</code>?</p> <details class="soln"><summary></summary><div class="ans"> <p>No. <code>new T()</code> does not compile, because at the point where the class is compiled there is no such class as <code>T</code> and no constructor to call. <code>T</code> names a type, but the compiler has no way to produce an <em>instance</em> of it.</p> <p><strong>Things to notice across all four parts.</strong> Everything you may do with <code>T</code> is something you could do with any reference type: declare it, pass it, return it, call <code>Object</code> methods on it. Everything you may not do &mdash; <code>new T()</code>, <code>new T[n]</code>, <code>T.parseInt(...)</code> &mdash; needs the compiler to know <em>which</em> class <code>T</code> is. Keep that one line in your head and you will predict these answers without memorizing a list.</p> </div></details> </div> </div> </div> <h2 id="s5"><span class="num">5.</span>Writing your own generic method</h2> <p>A generic <em>class</em> declares its type parameter once, in the class header, and every method in the class shares it. A generic <em>method</em> declares its own, and it belongs to that one method &mdash; which means a generic method can live perfectly happily in a class that is not generic at all.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; generic method</span></div> <div class="bd"> <p>A <strong>generic method</strong> declares its type parameter in angle brackets <em>immediately before the return type</em>:</p> <p><code>public static &lt;T&gt; T middle(T[] array)</code></p> <p>Read that left to right: <code>public static</code> &mdash; the modifiers; <code>&lt;T&gt;</code> &mdash; "this method introduces a type parameter called <code>T</code>"; <code>T</code> &mdash; the return type; <code>middle(T[] array)</code> &mdash; the name and the parameters.</p> <p>Her notes put it in one line: <em>the type parameter is declared before the return type</em>, and generic methods can be defined in both generic and non-generic classes.</p> </div> </div> <p>Why <em>there</em>? Because a name has to be introduced before it is used, and the return type is the first place <code>T</code> appears. If <code>&lt;T&gt;</code> came later, the compiler would reach the return type with no idea what <code>T</code> meant &mdash; and that is exactly the error you get if you leave it out:</p> <pre class="err"><code>MissingT.java:3: error: cannot find symbol public static T middle(T[] array) {
+^
+  symbol:   class T
+  location: class MissingT
+MissingT.java:3: error: cannot find symbol public static T middle(T[] array) {
+^
+  symbol:   class T
+  location: class MissingT
+2 errors</code></pre> <p><em>cannot find symbol &mdash; symbol: class T</em>. Without the declaration, <code>javac</code> assumes you meant a class called <code>T</code> and goes looking for one. Whenever you see that message on a method that uses a type parameter, the fix is almost always the missing <code>&lt;T&gt;</code>.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; her <code>middle</code> method</span></div> <div class="bd"> <p>One method, two calls, two different element types, no type argument written at the call site. Note that <code>Example4</code> itself is an ordinary non-generic class.</p> <p>Both arrays have five elements. Which index does <code>array.length / 2</code> reach, and what is printed?</p> <p class="filename">Example4.java</p>
+<pre><code class="language-java">//writing a generic method
+public class Example4 {
+	public static &lt;T&gt; T middle(T[] array) {
+	   return array[array.length / 2];
+	}
+	
+	public static void main(String args[]) {
+	   Integer[] a = {3, 1, 4, 1, 5};
+	   String[] b = {"an", "array", "of", "string", "data"};
+	   System.out.println(middle(a));
+	   System.out.println(middle(b));
+	}
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>4 of </code></pre> <p><code>5 / 2</code> is integer division, so it is <code>2</code>, and index 2 is the third element of each array: the <code>4</code> and the word <code>of</code>. (For an even-length array this returns the element just past the middle, and for a five-element array it is the exact middle &mdash; which is why the exam version of this question always uses an odd length.)</p> <table class="trace"> <tr><th>Call</th><th><code>T</code> is inferred as</th><th>The method's signature becomes</th><th>Result</th></tr> <tr><td><code>middle(a)</code></td><td><code>Integer</code></td><td><code>Integer middle(Integer[])</code></td><td><code>4</code></td></tr> <tr><td><code>middle(b)</code></td><td><code>String</code></td><td><code>String middle(String[])</code></td><td><code>of</code></td></tr> </table> <p>You never wrote <code>Integer</code> or <code>String</code> in either call. The compiler read the argument type and filled <code>T</code> in &mdash; the same type inference that made <code>Arrays.sort(data)</code> work in &sect;2. You <em>may</em> write it explicitly, <code>Example4.&lt;String&gt;middle(b)</code>, and you will occasionally have to when there is no argument to infer from, but in practice you almost never do.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 22.7</div> <div class="bd"> <p>Write a generic method <code>static &lt;T&gt; void printArray(T[] array)</code> that prints every element on one line separated by spaces, and a generic method <code>static &lt;T&gt; int countNulls(T[] array)</code> that returns how many elements are <code>null</code>. Test both on a <code>String[]</code> containing a <code>null</code> and on an <code>Integer[]</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Both methods work on the array as a sequence and never ask what the elements <em>are</em>, so an unbounded <code>T</code> is all they need. <code>printArray</code> uses the enhanced <code>for</code> loop and relies on <code>+</code> calling <code>toString</code>; <code>countNulls</code> compares each element with <code>null</code> using <code>==</code>, which is correct here because we genuinely are asking "is this reference nothing?" rather than comparing values.</p> <p class="filename">ArrayUtils.java</p>
+<pre><code class="language-java">public class ArrayUtils {
+    public static &lt;T&gt; void printArray(T[] array) {
+        for (T element : array) System.out.print(element + " ");
+        System.out.println();
+    }
+
+    public static &lt;T&gt; int countNulls(T[] array) {
+        int count = 0;
+        for (T element : array)
+            if (element == null) count++;
+        return count;
+    }
+
+    public static void main(String args[]) {
+        String[] words = {"an", null, "array", null, "data"};
+        Integer[] numbers = {3, 1, 4, 1, 5};
+
+        printArray(words);
+        printArray(numbers);
+
+        System.out.println("nulls in words:   " + countNulls(words));
+        System.out.println("nulls in numbers: " + countNulls(numbers));
+    }
+}</code></pre> <pre class="out"><code>an null array null data 
+3 1 4 1 5 
+nulls in words:   2
+nulls in numbers: 0</code></pre> <p><strong>Things to notice.</strong> <code>System.out.print(element + " ")</code> prints the four characters <code>null</code> for a null element rather than throwing, because string concatenation handles a null reference specially. Had the method called <code>element.toString()</code> directly it would have thrown a <code>NullPointerException</code> on the second element &mdash; a real difference between two lines that look equivalent.</p> <p>Both methods are <code>static</code> and both declare their own <code>&lt;T&gt;</code>. That is the normal shape for a utility method: the class holding it has no state and no type parameter of its own. <code>java.util.Arrays</code> is built entirely out of methods like these.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 22.7</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="6" aria-label="Live coding - Quick Check 22.7">public class ArrayUtils {
+    // 1. static &lt;T&gt; void printArray(T[] array) -- one line, space separated // 2. static &lt;T&gt; int countNulls(T[] array) public static void main(String args[]) { String[] words = {"an", null, "array", null, "data"}; Integer[] numbers = {3, 1, 4, 1, 5}; // Call both methods on both arrays. } }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <p>Her exercise for this lecture was: <em>implement a generic reverse method that reverses the input array</em>. Here is the version from her solution file. Notice what it does <em>not</em> do &mdash; it never creates an array.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; <code>GenericArrayReverse</code>, her exercise solution</span></div> <div class="bd"> <p>Two markers walk toward each other from the ends, swapping as they go. The <code>while</code> loop stops when they meet, so the middle element of an odd-length array is simply left alone.</p> <p>Predict the four lines of output, and decide what happens to the one-element array.</p> <p class="filename">GenericArrayReverse.java</p>
+<pre><code class="language-java">public class GenericArrayReverse {
+
+    public static &lt;T&gt; void reverse(T[] array) {
+        if (array == null || array.length &lt;= 1) {
+            return; // Nothing to reverse
+        }
+
+        int left = 0;
+        int right = array.length - 1;
+
+        while (left &lt; right) {
+            // Swap elements at left and right indices
+            T temp = array[left];
+            array[left] = array[right];
+            array[right] = temp;
+
+            // Move indices toward the center
+            left++;
+            right--;
+        }
+    }
+
+    // Utility method to print array elements
+    public static &lt;T&gt; void printArray(T[] array) {
+        for (T element : array) {
+            System.out.print(element + " ");
+        }
+        System.out.println();
+    }
+
+    public static void main(String[] args) {
+        Integer[] numbers = {1, 2, 3, 4, 5};
+        System.out.println("Original Integer array:");
+        printArray(numbers);
+        reverse(numbers);
+        System.out.println("Reversed Integer array:");
+        printArray(numbers);
+
+        String[] fruits = {"apple", "banana", "cherry", "date", "elderberry"};
+        System.out.println("Original String array:");
+        printArray(fruits);
+        reverse(fruits);
+        System.out.println("Reversed String array:");
+        printArray(fruits);
+
+        Character[] chars = {'a', 'b', 'c', 'd', 'e'};
+        reverse(chars);
+        System.out.println("Reversed Character array:");
+        printArray(chars);
+
+        Double[] singleElement = {3.14};
+        reverse(singleElement);
+        System.out.println("Single-element array after reverse:");
+        printArray(singleElement);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Original Integer array:
+1 2 3 4 5 
+Reversed Integer array:
+5 4 3 2 1 
+Original String array:
+apple banana cherry date elderberry 
+Reversed String array:
+elderberry date cherry banana apple 
+Reversed Character array:
+e d c b a 
+Single-element array after reverse:
+3.14 </code></pre> <p>The single-element array comes back unchanged, and so would an empty one, because of the guard <code>if (array == null || array.length &lt;= 1) return;</code>. Even without the guard the <code>while</code> condition <code>left &lt; right</code> would be false immediately, so the guard is belt and braces &mdash; but it also protects against <code>array == null</code>, which the loop would not.</p> <p>Now the part worth the whole section. <code>reverse</code> returns <code>void</code> and modifies the array it was given. It has to, because <strong>a generic method cannot create an array of <code>T</code></strong>:</p> <pre><code class="language-java">public static &lt;T&gt; T[] reversedCopy(T[] array) {
+    T[] copy = new T[array.length];
+    // cannot do this for (int i = 0; i &lt; array.length; i++) copy[i] = array[array.length - 1 - i]; return copy; }</code></pre> <pre class="err"><code>NewTArray.java:3: error: generic array creation T[] copy = new T[array.length];
+        // cannot do this
+^
+1 error</code></pre> <p>Working in place sidesteps the problem entirely: the array already exists, the caller made it, and its real element type is whatever the caller chose. That is not a coincidence in her solution &mdash; it is the standard way generic array code is written.</p> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; handing a generic method a primitive array</span></div> <div class="bd"> <p><code>reverse</code> works on <code>Integer[]</code>, <code>String[]</code> and <code>Character[]</code>. It does <em>not</em> work on <code>int[]</code>, and the message is worth reading once now so you recognize it later:</p> <pre class="err"><code>IntArrayReverse.java:14: error: method reverse in class IntArrayReverse cannot be applied to given types; reverse(numbers);
+^
+  required: T[]
+  found:    int[]
+  reason: inference variable T has incompatible bounds equality constraints: int upper bounds: Object where T is a type-variable: T extends Object declared in method &lt;T&gt;reverse(T[])
+1 error</code></pre> <p>An <code>int[]</code> is not a <code>T[]</code> for any reference <code>T</code>, and autoboxing does not apply to whole arrays &mdash; Java will box a single <code>int</code> into an <code>Integer</code> for you, but it will not build you a new <code>Integer[]</code> out of an <code>int[]</code>. If you need both, you write two methods, or you declare the array as <code>Integer[]</code> in the first place.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 22.8</div> <div class="bd"> <p>You want a <code>reversedCopy</code> that leaves the original alone and returns a new, reversed array.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Why can you not simply write <code>T[] copy = new T[array.length];</code>?</p> <details class="soln"><summary></summary><div class="ans"> <p>Because the JVM has to know the element type of an array when it creates it &mdash; that type is stored in the array object and checked on every assignment &mdash; and by the time the program runs, <code>T</code> is gone. The compiler refuses with <code>error: generic array creation</code> rather than letting you build an array that could not police itself. &sect;8 explains where <code>T</code> went.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Write the method anyway, using <code>java.util.Arrays.copyOf</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> <code>Arrays.copyOf(array, n)</code> is itself a generic method, and the crucial thing about it is that it builds the new array by asking the <em>existing</em> array what its element type is. That information does survive to run time, because it lives in the array object rather than in the type parameter. So we get a real <code>String[]</code> back when we pass a <code>String[]</code> in.</p> <p class="filename">ReverseCopy.java</p>
+<pre><code class="language-java">import java.util.Arrays;
+
+public class ReverseCopy {
+    // Returns a NEW array, reversed. The original is left alone.
+    public static &lt;T&gt; T[] reversedCopy(T[] array) {
+        // new T[n] is illegal. Arrays.copyOf makes an array of the same
+        // run-time type as the one it is given, which is exactly what we need.
+        T[] copy = Arrays.copyOf(array, array.length);
+        for (int i = 0; i &lt; array.length; i++)
+            copy[i] = array[array.length - 1 - i];
+        return copy;
+    }
+
+    public static void main(String args[]) {
+        String[] fruits = {"apple", "banana", "cherry"};
+        String[] backwards = reversedCopy(fruits);
+
+        System.out.println("original " + Arrays.toString(fruits));
+        System.out.println("copy     " + Arrays.toString(backwards));
+        System.out.println("copy is really a " + backwards.getClass().getName());
+    }
+}</code></pre> <pre class="out"><code>original [apple, banana, cherry]
+copy     [cherry, banana, apple]
+copy is really a [Ljava.lang.String;</code></pre> <p><strong>Things to notice across both parts.</strong> The last line is the proof. The returned array really is a <code>String[]</code>, not an <code>Object[]</code> in disguise &mdash; the JVM's printed name for "array of <code>java.lang.String</code>" is <code>[Ljava.lang.String;</code>, with the leading <code>[</code> meaning "array of" and the <code>L</code> meaning "of a class type". Had we cheated with <code>(T[]) new Object[n]</code> the code would have compiled with a warning and then thrown a <code>ClassCastException</code> the moment the caller assigned the result to a <code>String[]</code>.</p> <p><code>Arrays.copyOf</code> also fills the initial contents, so the loop overwrites values that were already there. That is slightly wasteful and completely clear, which is the right trade for teaching code.</p> </div></details> </div> </div> </div> <h2 id="s6"><span class="num">6.</span>Bounded type parameters</h2> <p>An unbounded <code>T</code> is a very weak promise. All the compiler knows is that it is <em>some</em> reference type, so all you may call on it are the methods every object has: <code>toString</code>, <code>equals</code>, <code>hashCode</code>. That was enough for <code>middle</code> and <code>reverse</code>, which only ever moved elements around. It is not enough the moment you want to do arithmetic on them, or compare them.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; bounded type parameter</span></div> <div class="bd"> <p>A <strong>bounded type parameter</strong> restricts which types may be supplied as the type argument, using the keyword <code>extends</code>:</p> <p><code>public static &lt;T extends Number&gt; double sum(T[] array)</code></p> <p>This says "<code>T</code> may be <code>Number</code> or any subclass of <code>Number</code>". <code>Number</code> is called the <strong>upper bound</strong>. Two consequences, and they are two sides of one coin:</p> <ul> <li>Callers are <em>restricted</em> &mdash; <code>sum(stringArray)</code> no longer compiles.</li> <li>You are <em>enabled</em> &mdash; inside the method you may call any <code>Number</code> method on a <code>T</code>, because the compiler now knows every possible <code>T</code> has them.</li> </ul> <p>Note the keyword: it is <code>extends</code> even when the bound is an <em>interface</em>. Java reuses the word here rather than adding <code>implements</code> to the grammar, so <code>&lt;T extends Comparable&lt;T&gt;&gt;</code> is normal and correct.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; her <code>sum</code>, restricted to numbers</span></div> <div class="bd"> <p><code>Number</code> is the superclass of <code>Integer</code>, <code>Double</code>, <code>Long</code>, <code>Float</code>, <code>Byte</code> and <code>Short</code>, and it declares <code>doubleValue()</code>. The bound is what makes the call on the line <code>sum += element.doubleValue();</code> legal.</p> <p>She left the third call commented out. Predict the two lines that do run &mdash; in particular, will the first one print <code>15</code> or <code>15.0</code>?</p> <p class="filename">Example5.java</p>
+<pre><code class="language-java">public class Example5 {
+	// This method works only with Number and its subclasses
+	public static &lt;T extends Number&gt; double sum(T[] array) {
+		double sum = 0.0;
+		for (T element : array) {
+			sum += element.doubleValue(); // Call Number's doubleValue method
+		}
+		return sum;
+	}
+   
+	public static void main(String[] args) {
+		Integer[] integers = {1, 2, 3, 4, 5};
+		Double[] doubles = {1.1, 2.2, 3.3, 4.4, 5.5};
+		String[] strings = {"one", "two", "three"}; 
+  
+		System.out.println("Sum of integers: " + sum(integers));
+		System.out.println("Sum of doubles: " + sum(doubles));
+//		System.out.println(sum(strings)); // This would not compile
+	}
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Sum of integers: 15.0 Sum of doubles: 16.5 </code></pre> <p><code>15.0</code>, not <code>15</code>: the method is declared to return <code>double</code>, and <code>sum</code> was seeded with <code>0.0</code>. Every element goes through <code>doubleValue()</code> on the way in, so even an array of <code>Integer</code> comes back as a <code>double</code>. And 1.1 + 2.2 + 3.3 + 4.4 + 5.5 lands exactly on <code>16.5</code> here, which is luckier than floating-point addition usually is.</p> <p>Uncomment the third line and the compiler explains itself at some length:</p> <pre class="err"><code>Example5Bad.java:13: error: method sum in class Example5Bad cannot be applied to given types; System.out.println(sum(strings));
+^
+  required: T[]
+  found:    String[]
+  reason: inference variable T has incompatible bounds upper bounds: Number lower bounds: String where T is a type-variable: T extends Number declared in method &lt;T&gt;sum(T[])</code></pre> <p>Read the two lines in the middle: the <em>upper bound</em> is <code>Number</code>, because that is what you declared, and the <em>lower bound</em> is <code>String</code>, because that is what you passed. There is no type that is both, so there is nothing <code>T</code> could be.</p> 
+</div></details> </div> </div> <p>It is worth seeing the other half of the bargain, because it is the half students forget. Take the bound off and the method stops compiling &mdash; not at the call site, but <em>inside</em>:</p> <pre><code class="language-java">// No bound: T could be any reference type at all. public static &lt;T&gt; double sum(T[] array) { double sum = 0.0; for (T element : array) { sum += element.doubleValue(); } return sum; } </code></pre> <pre class="err"><code>NoBound.java:6: error: cannot find symbol sum += element.doubleValue();
+^
+  symbol:   method doubleValue()
+  location: variable element of type T where T is a type-variable: T extends Object declared in method &lt;T&gt;sum(T[])</code></pre> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; a bound is a capability, not a restriction</span></div> <div class="bd"> <p>It is tempting to read <code>&lt;T extends Number&gt;</code> as "only numbers allowed", as if the point were to keep people out. The more useful reading is the opposite: a bound is how you <em>tell the compiler what <code>T</code> can do</em>, so that you are allowed to do it. Look at the last message again &mdash; <code>T extends Object</code> is what an unbounded <code>T</code> really means, and <code>Object</code> has no <code>doubleValue</code>.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 22.9</div> <div class="bd"> <p>Write a generic method <code>static &lt;T extends Comparable&lt;T&gt;&gt; T max(T[] array)</code> that returns the largest element of an array, and test it on an <code>Integer[]</code>, a <code>String[]</code> and a <code>Double[]</code>. What does "largest" mean for an array of <code>String</code>?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> To find a maximum you must compare elements, and comparison is not something every object can do &mdash; so <code>T</code> needs a bound. The interface for it is <code>Comparable&lt;T&gt;</code>, whose single method <code>compareTo(T other)</code> returns a negative number, zero, or a positive number according as <code>this</code> is less than, equal to, or greater than <code>other</code>. Seed the answer from element 0 rather than from a made-up starting value, exactly as in the Lecture 21 <code>max</code>, and then keep whichever element compares greater.</p> <p class="filename">MaxDemo.java</p>
+<pre><code class="language-java">public class MaxDemo {
+    // T must be a type that knows how to compare itself with another T.
+    public static &lt;T extends Comparable&lt;T&gt;&gt; T max(T[] array) {
+        T best = array[0];
+        for (T element : array)
+            if (element.compareTo(best) &gt; 0) best = element;
+        return best;
+    }
+
+    public static void main(String args[]) {
+        Integer[] numbers = {3, 1, 4, 1, 5, 9, 2, 6};
+        String[] words = {"an", "array", "of", "string", "data"};
+        Double[] prices = {3.14, 1.5, 4.7, 1.1, 5.8};
+
+        System.out.println("max number: " + max(numbers));
+        System.out.println("max word:   " + max(words));
+        System.out.println("max price:  " + max(prices));
+    }
+}</code></pre> <pre class="out"><code>max number: 9 max word:   string max price:  5.8 </code></pre> <p><strong>Things to notice.</strong> "Largest" for a <code>String</code> means last in <em>lexicographic</em> order &mdash; dictionary order, comparing character by character by Unicode value. Among <code>an</code>, <code>array</code>, <code>of</code>, <code>string</code>, <code>data</code> the winner is <code>string</code>, because <code>s</code> comes after <code>o</code>, <code>d</code> and <code>a</code>. Be careful with case: every uppercase letter sorts before every lowercase one, so <code>"Zebra".compareTo("apple")</code> is negative.</p> <p>The bound reads awkwardly the first time: <code>T extends Comparable&lt;T&gt;</code> means "<code>T</code> is a type that can be compared with other <code>T</code>s", and the <code>T</code> inside the angle brackets is the same <code>T</code>. Without the bound, <code>element.compareTo(best)</code> is <code>cannot find symbol</code>, exactly like <code>doubleValue</code> above. And passing an array of a class of your own that does not implement <code>Comparable</code> fails at the call site:</p> <pre class="err"><code>MaxNotComparable.java:16: error: method max in class MaxNotComparable cannot be applied to given types; System.out.println(max(points));
+^
+  required: T[]
+  found:    Point[]
+  reason: inference variable T has incompatible bounds upper bounds: Comparable&lt;T&gt; lower bounds: Point where T is a type-variable: T extends Comparable&lt;T&gt; declared in method &lt;T&gt;max(T[])</code></pre> <p>This is also the missing piece from &sect;2: <code>Arrays.sort</code> is declared with essentially this bound, which is why her notes say it "works for arrays of any type that implements <code>Comparable</code>". <code>Integer</code>, <code>Double</code>, <code>String</code> and <code>Character</code> all do. A <code>Point</code> of your own does not until you make it.</p> <p>One real limitation: <code>max</code> throws <code>ArrayIndexOutOfBoundsException</code> on an empty array, because <code>array[0]</code> does not exist. Guard it, or document the precondition &mdash; the same decision the Lecture 21 <code>max</code> made by throwing on an empty list.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 22.9</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="6" aria-label="Live coding - Quick Check 22.9">public class MaxDemo {
+    // Write:  static &lt;T extends Comparable&lt;T&gt;&gt; T max(T[] array) //   seed best from array[0], then keep whichever element compares greater public static void main(String args[]) { Integer[] numbers = {3, 1, 4, 1, 5, 9, 2, 6}; String[] words = {"an", "array", "of", "string", "data"}; // Call max on both and print the results. } }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 22.10</div> <div class="bd"> <p>For each method header, say whether the body shown underneath it compiles.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>static &lt;T&gt; T first(T[] a) { return a[0]; }</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compiles. Reading an element out of an array and returning it needs nothing at all from <code>T</code> &mdash; no methods are called on it. Unbounded is exactly right here.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>static &lt;T&gt; boolean same(T a, T b) { return a.equals(b); }</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compiles. <code>equals</code> is declared on <code>Object</code>, and every <code>T</code> is at least an <code>Object</code>, so it is always available. So are <code>toString</code> and <code>hashCode</code>. Those three are the complete list of what an unbounded <code>T</code> gives you.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>static &lt;T&gt; int len(T x) { return x.length(); }</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Does not compile: <code>cannot find symbol: method length()</code>. <code>length()</code> belongs to <code>String</code>, not to <code>Object</code>. If you meant it for text, the header should be <code>static &lt;T extends CharSequence&gt; int len(T x)</code> &mdash; or, more sensibly, the method should just take a <code>String</code> and not be generic at all. A method that only works for one type has no business having a type parameter.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>static &lt;T extends Number&gt; boolean positive(T x) { return x.doubleValue() &gt; 0; }</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compiles. The bound gives access to <code>doubleValue()</code>, and <code>&gt; 0</code> compares two <code>double</code> values. It would accept <code>Integer</code>, <code>Double</code>, <code>Long</code>, <code>Float</code>, <code>Byte</code>, <code>Short</code> &mdash; and would reject <code>String</code>, <code>Character</code> and <code>Boolean</code>, none of which extend <code>Number</code>.</p> <p><strong>Things to notice across all four parts.</strong> The test is mechanical: list the methods the body calls on a <code>T</code>, then ask what type declares them, and put <em>that</em> in the bound. If the body calls nothing, leave <code>T</code> unbounded. Adding a bound you do not need is not harmless &mdash; it turns away callers for no reason.</p> </div></details> </div> </div> </div> <h2 id="s7"><span class="num">7.</span>Making last week's containers generic</h2> <p>Everything so far has been groundwork for this. <code>Node</code> is already done &mdash; &sect;4 showed her generic version. <code>LinkedList</code>, <code>Stack</code> and <code>Queue</code> need the same four-step treatment, and because they are built on top of one another, the type parameter has to be carried up through each layer.</p> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; the three edits, per class</span></div> <div class="bd"> <ol> <li>Add <code>&lt;T&gt;</code> to the class header.</li> <li>Change every <code>Integer</code> in the class to <code>T</code>.</li> <li>Change every mention of a class you also made generic so that it carries the parameter: <code>Node</code> becomes <code>Node&lt;T&gt;</code>, and inside <code>Stack</code> the field <code>private LinkedList data;</code> becomes <code>private LinkedList&lt;T&gt; data;</code>.</li> </ol> <p>Nothing else. No method bodies change, no algorithm changes, no casts appear or disappear. If you find yourself rewriting logic, you have gone off the path.</p> </div> </div> <p>Here is the whole <code>LinkedList</code>, generic. Compare it against last week's file: apart from the header, every difference is the word <code>Integer</code> replaced by <code>T</code> or the word <code>Node</code> replaced by <code>Node&lt;T&gt;</code>.</p> <p class="filename">LinkedList.java</p>
+<pre><code class="language-java">public class LinkedList&lt;T&gt; {
+   private Node&lt;T&gt; head, tail;
+   private int size;
+
+   public LinkedList() {
+      head = tail = null;
+      size = 0;
+   }
+
+   public int size() { return size; }
+
+   public boolean isEmpty() { return size == 0; }
+
+   public void addHead(T d) {
+      Node&lt;T&gt; n = new Node&lt;T&gt;(d, head);
+      head = n;
+      size++;
+      if (tail == null) tail = head;
+   }
+
+   public void addTail(T d) {
+      Node&lt;T&gt; n = new Node&lt;T&gt;(d, null);
+      if (tail == null) head = tail = n;
+      else { tail.setNext(n); tail = n; }
+      size++;
+   }
+
+   public T removeHead() throws Exception {
+      if (head == null) throw new Exception("Empty List");
+      Node&lt;T&gt; n = head;
+      head = head.getNext();
+      if (head == null) tail = head;
+      size--;
+      return n.getData();
+   }
+
+   public T peekHead() throws Exception {
+      if (head == null) throw new Exception("Empty List");
+      return head.getData();
+   }
+
+   public boolean contains(T d) {
+      Node&lt;T&gt; n = head;
+      while (n != null) {
+         if (n.getData().equals(d)) return true;
+         n = n.getNext();
+      }
+      return false;
+   }
+
+   public String toString() {
+      String ans = "";
+      Node&lt;T&gt; n = head;
+      while (n != null) {
+         ans += n.getData();
+         ans += "--&gt;";
+         n = n.getNext();
+      }
+      return ans;
+   }
+}</code></pre> <p>Two lines are worth a second look. <code>size()</code> still returns <code>int</code>, and <code>isEmpty()</code> still returns <code>boolean</code> &mdash; those are not the element type, and turning <em>everything</em> into <code>T</code> is the commonest mistake when doing this conversion. <code>toString()</code> returns <code>String</code> for the same reason. Only the things that were <code>Integer</code> <em>because they held an element</em> become <code>T</code>.</p> <p><code>Stack</code> and <code>Queue</code> change even less, because all their work is delegated:</p> <p class="filename">Stack.java</p>
+<pre><code class="language-java">public class Stack&lt;T&gt; {
+   private LinkedList&lt;T&gt; data;      // the underlying LinkedList, now generic too
+
+   public Stack() {
+      data = new LinkedList&lt;T&gt;();
+   }
+
+   // Remove from top (LIFO principle)
+   public T pop() throws Exception {
+      return data.removeHead();
+   }
+
+   // Add to top
+   public void push(T x) {
+      data.addHead(x);
+   }
+
+   // Look at the top without removing it
+   public T peek() throws Exception {
+      return data.peekHead();
+   }
+
+   public boolean isEmpty() { return data.isEmpty(); }
+
+   public int size() { return data.size(); }
+}</code></pre> <p class="filename">Queue.java</p>
+<pre><code class="language-java">public class Queue&lt;T&gt; {
+   private LinkedList&lt;T&gt; data;
+
+   public Queue() {
+      data = new LinkedList&lt;T&gt;();
+   }
+
+   // Remove from front (FIFO principle)
+   public T dequeue() throws Exception {
+      return data.removeHead();
+   }
+
+   // Add to rear
+   public void enqueue(T x) {
+      data.addTail(x);
+   }
+
+   // Look at the front without removing it
+   public T front() throws Exception {
+      return data.peekHead();
+   }
+
+   public boolean isEmpty() { return data.isEmpty(); }
+
+   public int size() { return data.size(); }
+}</code></pre> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; the parameter travels through composition</span></div> <div class="bd"> <p><code>private LinkedList&lt;T&gt; data;</code> inside <code>Stack&lt;T&gt;</code> is the line that makes the whole thing hang together. A <code>Stack&lt;String&gt;</code> contains a <code>LinkedList&lt;String&gt;</code>, which contains <code>Node&lt;String&gt;</code> objects. The one type argument you wrote at the top &mdash; <code>new Stack&lt;String&gt;()</code> &mdash; propagates all the way down to the <code>data</code> field of every node, and the compiler checks each layer.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; four element types, one set of classes</span></div> <div class="bd"> <p>This driver uses the generic <code>LinkedList</code>, <code>Stack</code> and <code>Queue</code> above with <code>Integer</code>, <code>String</code> and <code>Character</code> elements. Look for the two places the element type is doing real work: <code>first.length()</code> on a <code>String</code>, and <code>total += numbers.removeHead()</code> on an <code>Integer</code>.</p> <p>Predict the <code>words</code> line after the <code>addHead</code>, and predict the sum.</p> <p class="filename">GenericListDemo.java</p>
+<pre><code class="language-java">public class GenericListDemo {
+    public static void main(String args[]) throws Exception {
+        // One LinkedList class. Three element types. No casts anywhere.
+        LinkedList&lt;Integer&gt; numbers = new LinkedList&lt;&gt;();
+        numbers.addTail(10);
+        numbers.addTail(20);
+        numbers.addTail(30);
+        System.out.println("numbers  " + numbers + "   size " + numbers.size());
+
+        LinkedList&lt;String&gt; words = new LinkedList&lt;&gt;();
+        words.addTail("red");
+        words.addTail("green");
+        words.addHead("blue");
+        System.out.println("words    " + words + "   contains red? "
+                           + words.contains("red"));
+
+        // removeHead now returns exactly the type you asked for.
+        String first = words.removeHead();
+        System.out.println("removed  " + first + " (length " + first.length() + ")");
+
+        int total = 0;
+        while (!numbers.isEmpty()) total += numbers.removeHead();
+        System.out.println("sum of the numbers: " + total);
+
+        // The same trick works all the way up the stack of classes.
+        Stack&lt;String&gt; s = new Stack&lt;&gt;();
+        s.push("a"); s.push("b"); s.push("c");
+        System.out.print("stack pops:  ");
+        while (!s.isEmpty()) System.out.print(s.pop() + " ");
+        System.out.println();
+
+        Queue&lt;Character&gt; q = new Queue&lt;&gt;();
+        q.enqueue('x'); q.enqueue('y'); q.enqueue('z');
+        System.out.print("queue serves: ");
+        while (!q.isEmpty()) System.out.print(q.dequeue() + " ");
+        System.out.println();
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>numbers  10--&gt;20--&gt;30--&gt;   size 3
+words    blue--&gt;red--&gt;green--&gt;   contains red? true
+removed  blue (length 4)
+sum of the numbers: 60
+stack pops:  c b a 
+queue serves: x y z </code></pre> <p><code>addHead("blue")</code> puts <code>blue</code> at the front, so the list reads <code>blue--&gt;red--&gt;green--&gt;</code> and <code>removeHead()</code> takes the <code>blue</code> &mdash; four characters long. The trailing <code>--&gt;</code> is still there, because <code>toString</code> is unchanged from last week.</p> <p>Three lines could not have been written at all a week ago:</p> <ul> <li><code>LinkedList&lt;String&gt; words</code> &mdash; last week's class refused anything but <code>Integer</code>.</li> <li><code>String first = words.removeHead();</code> &mdash; no cast. Last week <code>removeHead</code> returned <code>Integer</code>; with <code>Object</code> storage it would have returned <code>Object</code> and needed <code>(String) words.removeHead()</code>.</li> <li><code>total += numbers.removeHead();</code> &mdash; the <code>Integer</code> unboxes, because in <code>numbers</code> the type argument really is <code>Integer</code>.</li> </ul> <p>And the mistake the whole exercise is designed to prevent is now a compile error:</p> <pre class="err"><code>WrongElement.java:5: error: incompatible types: int cannot be converted to String words.addTail(10);
+        // an int, into a list of String
+^
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+1 error</code></pre> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; leaving the angle brackets off entirely</span></div> <div class="bd"> <p><code>LinkedList list = new LinkedList();</code> still compiles after you make the class generic. It does not mean "a list of anything sensible"; it means a <strong>raw type</strong>, which is the generic class with all its type checking switched off for backward compatibility with code written before 2004. You get the <code>Object</code> behaviour of &sect;1 back, complete with the run-time crash. Here it is on the <code>Box</code> class from &sect;1:</p> <p class="filename">RawBox.java</p>
+<pre><code class="language-java">class Box&lt;T&gt; {
+    private T item;
+    public void set(T o) { item = o; }
+    public T get() { return item; }
+}
+
+public class RawBox {
+    public static void main(String args[]) {
+        Box b = new Box();          // raw type: no type argument at all
+        b.set("CSCI 212");
+        b.set(212);                 // no complaint
+        String s = (String) b.get();
+        System.out.println(s);
+    }
+}</code></pre> <p><code>javac</code> does warn, but only in a note you have to ask about:</p> <pre class="err"><code>Note: RawBox.java uses unchecked or unsafe operations. Note: Recompile with -Xlint:unchecked for details. </code></pre> <p>And then, at run time:</p> <pre class="out"><code>Exception in thread "main" java.lang.ClassCastException: class java.lang.Integer cannot be cast to class java.lang.String (java.lang.Integer and java.lang.String are in module java.base of loader 'bootstrap')
+	at RawBox.main(RawBox.java:12)</code></pre> <p>Never write a raw type on purpose. If you do not know the element type yet, that is what a type parameter of your own is for.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 22.11</div> <div class="bd"> <p>Write a generic <em>method</em> <code>static &lt;T&gt; void transfer(Stack&lt;T&gt; from, Queue&lt;T&gt; to)</code> that empties a stack into a queue, using the generic <code>Stack</code> and <code>Queue</code> above. Then test it with <code>String</code> elements and with <code>Integer</code> elements, and say what order the queue serves.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> This is a generic method whose parameters are themselves parameterized types. Both must use the <em>same</em> <code>T</code>, because an element leaving the stack has to be acceptable to the queue. The body is one loop, exactly as it would be for a non-generic version &mdash; <code>pop</code> hands back a <code>T</code> and <code>enqueue</code> takes a <code>T</code>, so nothing has to be converted. <code>pop</code> is declared <code>throws Exception</code>, so <code>transfer</code> must declare it too.</p> <p class="filename">Transfer.java</p>
+<pre><code class="language-java">public class Transfer {
+    // Empty a Stack&lt;T&gt; into a Queue&lt;T&gt;. One method, any element type.
+    public static &lt;T&gt; void transfer(Stack&lt;T&gt; from, Queue&lt;T&gt; to) throws Exception {
+        while (!from.isEmpty()) to.enqueue(from.pop());
+    }
+
+    public static void main(String args[]) throws Exception {
+        Stack&lt;String&gt; s = new Stack&lt;&gt;();
+        s.push("a"); s.push("b"); s.push("c");
+
+        Queue&lt;String&gt; q = new Queue&lt;&gt;();
+        transfer(s, q);
+
+        System.out.print("queue now serves: ");
+        while (!q.isEmpty()) System.out.print(q.dequeue() + " ");
+        System.out.println();
+        System.out.println("stack size after transfer: " + s.size());
+
+        Stack&lt;Integer&gt; si = new Stack&lt;&gt;();
+        for (int i = 1; i &lt;= 4; i++) si.push(i);
+        Queue&lt;Integer&gt; qi = new Queue&lt;&gt;();
+        transfer(si, qi);
+        System.out.print("integers:         ");
+        while (!qi.isEmpty()) System.out.print(qi.dequeue() + " ");
+        System.out.println();
+    }
+}</code></pre> <pre class="out"><code>queue now serves: c b a 
+stack size after transfer: 0
+integers:         4 3 2 1 </code></pre> <p><strong>Things to notice.</strong> The queue serves the values in the order the stack popped them, which is reverse order &mdash; the stack did the reversing, the queue merely preserved it. That is the Lecture 21 lesson unchanged; generics did not alter any behaviour, only what the compiler will let you write.</p> <p>Declaring both parameters with the same <code>T</code> is doing real work. Try to pass a <code>Stack&lt;String&gt;</code> and a <code>Queue&lt;Integer&gt;</code> and the compiler works out that there is no single type <code>T</code> that fits both:</p> <pre class="err"><code>TransferBad.java:9: error: method transfer in class TransferBad cannot be applied to given types; transfer(s, q);
+^
+  required: Stack&lt;T&gt;,Queue&lt;T&gt;
+  found:    Stack&lt;String&gt;,Queue&lt;Integer&gt;
+  reason: inference variable T has incompatible equality constraints Integer,String where T is a type-variable: T extends Object declared in method &lt;T&gt;transfer(Stack&lt;T&gt;,Queue&lt;T&gt;)
+1 error</code></pre> <p>Had you written <code>transfer(Stack&lt;String&gt; from, Queue&lt;String&gt; to)</code> you would have had to write it again for <code>Integer</code>, and again for every other element type. One method with a type parameter replaces all of them &mdash; the third benefit on her list, doing its job.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 22.11</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="6" aria-label="Live coding - Quick Check 22.11">public class Transfer {
+    // Write: static &lt;T&gt; void transfer(Stack&lt;T&gt; from, Queue&lt;T&gt; to) throws Exception //   while the stack is not empty, pop and enqueue public static void main(String args[]) throws Exception { Stack&lt;String&gt; s = new Stack&lt;&gt;(); s.push("a"); s.push("b"); s.push("c"); Queue&lt;String&gt; q = new Queue&lt;&gt;(); // Call transfer, then drain the queue and print what comes out. } }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s8"><span class="num">8.</span>Type erasure: what the compiler actually does</h2> <p>Three times now something has been forbidden for a reason we postponed: no primitive type arguments, no <code>new T[n]</code>, no <code>new T()</code>. One idea explains all three, and it also explains an exam question you will meet in the practice section.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; type erasure</span></div> <div class="bd"> <p>Generics are a <strong>compile-time</strong> feature. The compiler uses the type arguments to check every call, and then <strong>erases</strong> them: in the <code>.class</code> file that comes out, every unbounded <code>T</code> has become <code>Object</code>, every <code>&lt;T extends Number&gt;</code> has become <code>Number</code>, and the angle brackets are gone. Casts are inserted automatically wherever they are needed.</p> <p>There is <em>one</em> compiled copy of <code>ArrayList</code>, not one per element type. The information that a particular list was declared <code>ArrayList&lt;String&gt;</code> does not exist at run time.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; two lists, one class</span></div> <div class="bd"> <p>If <code>ArrayList&lt;String&gt;</code> and <code>ArrayList&lt;Integer&gt;</code> were really different types, they would have different <code>Class</code> objects. Ask them.</p> <p class="filename">ErasureDemo.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class ErasureDemo {
+    public static void main(String args[]) {
+        ArrayList&lt;String&gt; words = new ArrayList&lt;&gt;();
+        ArrayList&lt;Integer&gt; numbers = new ArrayList&lt;&gt;();
+
+        words.add("hello");
+        numbers.add(212);
+
+        System.out.println("words.getClass()   = " + words.getClass());
+        System.out.println("numbers.getClass() = " + numbers.getClass());
+        System.out.println("same class object? " +
+                           (words.getClass() == numbers.getClass()));
+
+        // At run time an ArrayList is just an ArrayList. This test compiles,
+        // but notice what it can and cannot ask about.
+        Object o = words;
+        System.out.println("o instanceof ArrayList: " + (o instanceof ArrayList));
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>words.getClass()   = class java.util.ArrayList
+numbers.getClass() = class java.util.ArrayList
+same class object? true
+o instanceof ArrayList: true</code></pre> <p><code>==</code> on the two <code>Class</code> objects is <code>true</code>: there is literally one class here. At run time both objects are plain <code>ArrayList</code>s holding plain <code>Object</code> references, and the JVM has no idea that one of them was promised to hold only <code>String</code>s.</p> <p>That promise was kept a different way. <code>javac</code> checked every <code>add</code> and every <code>get</code> while it was compiling, and because it checked them all, nothing wrong can be in there &mdash; so nothing needs checking again later. Type safety without run-time cost is the whole design.</p> <p>The last line also shows the limit. You may ask <code>o instanceof ArrayList</code>, but not <code>o instanceof ArrayList&lt;String&gt;</code>, because the answer is unknowable:</p> <pre class="err"><code>InstOf.java:6: error: Object cannot be safely cast to ArrayList&lt;String&gt; System.out.println(o instanceof ArrayList&lt;String&gt;);
+^
+1 error</code></pre> 
+</div></details> </div> </div> <p>Everything that has been forbidden so far now has one explanation.</p> <table> <tr><th>Not allowed</th><th>Because after erasure&hellip;</th></tr> <tr><td><code>ArrayList&lt;int&gt;</code></td><td>&hellip;<code>T</code> becomes <code>Object</code>, and an <code>int</code> is not an <code>Object</code>. There is nowhere to put it.</td></tr> <tr><td><code>new T[n]</code></td><td>&hellip;the JVM would have to be told the element type, and by then there is none. An array checks the type of everything stored in it, and this array could not.</td></tr> <tr><td><code>new T()</code></td><td>&hellip;there is no class <code>T</code> to find a constructor in.</td></tr> <tr><td><code>o instanceof List&lt;String&gt;</code></td><td>&hellip;the object no longer remembers what it was declared to hold.</td></tr> <tr><td><code>static T shared;</code> in a generic class</td><td>&hellip;a static field belongs to the one class, and there is only one class &mdash; so which <code>T</code> would it be?</td></tr> </table> <pre class="err"><code>Holder.java:2: error: non-static type variable T cannot be referenced from a static context private static T shared;
+        // line 1
+^</code></pre> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; two methods whose parameters are <code>T</code> and <code>V</code></span></div> <div class="bd"> <p>This is an exam question, and it is the clearest single demonstration of erasure. Overload a method on two different type parameters:</p> <pre><code class="language-java">class MyGen&lt;T, V&gt; {
+    T t;
+    V v;
+    void set(T o) {
+        t = o;
+    }
+    // line (b) void set(V o) { v = o; }      // line (c) }</code></pre> <p>Two methods with the same name and different parameter types is ordinary overloading, and it looks perfectly legal. It is not:</p> <pre class="err"><code>MyGenDemo.java:5: error: name clash: set(V) and set(T) have the same erasure void set(V o) { v = o; }
+        // line (c)
+^
+where V,T are type-variables: V extends Object declared in class MyGen T extends Object declared in class MyGen
+1 error</code></pre> <p>After erasure both methods are <code>void set(Object o)</code>. Two methods with identical signatures cannot exist in one class, so the file is rejected &mdash; and it is rejected even if you only ever create <code>MyGen&lt;String, Integer&gt;</code>, because the class is compiled once, on its own, without reference to how anybody uses it.</p> <p>Her solution file puts the same point in one sentence: <em>"T and V could be the same type at runtime, so the methods should have different names."</em> Rename one of them &mdash; <code>setT</code> and <code>setV</code>, or <code>setKey</code> and <code>setValue</code> &mdash; and the class compiles.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 22.12</div> <div class="bd"> <p>Answer each part from the erasure rule alone.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Does <code>new Box&lt;String&gt;()</code> and <code>new Box&lt;Integer&gt;()</code> produce objects of the same class at run time?</p> <details class="soln"><summary></summary><div class="ans"> <p>Yes. There is one compiled <code>Box</code> class, and <code>getClass()</code> returns the same <code>Class</code> object for both. The <code>String</code> and the <code>Integer</code> existed only for the compiler.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> A generic class declares <code>&lt;T extends Number&gt;</code>. What does <code>T</code> become in the bytecode?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Number</code>, not <code>Object</code>. Erasure replaces a type parameter with its <em>bound</em>, and the bound is what makes <code>element.doubleValue()</code> compile into an ordinary call on a <code>Number</code>. An unbounded <code>T</code> erases to <code>Object</code> because its implicit bound <em>is</em> <code>Object</code> &mdash; which is exactly what the error message in &sect;6 said: <code>T extends Object</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Does the following pair of methods compile in one class? <code>void add(T x)</code> and <code>void add(String x)</code>, where <code>T</code> is the class's own unbounded type parameter.</p> <details class="soln"><summary></summary><div class="ans"> <p>Yes. After erasure they are <code>void add(Object x)</code> and <code>void add(String x)</code>, which are genuinely different signatures. The <code>MyGen</code> clash happened because <code>T</code> and <code>V</code> both erase to <code>Object</code>; here only one of them does.</p> <p>Whether it is a <em>good</em> idea is another question. For a <code>Box&lt;String&gt;</code> both methods would apply to a <code>String</code> argument and the compiler would pick the more specific one, which is the kind of subtlety that produces bug reports.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> Somebody proposes adding a method <code>public boolean holdsStrings() { return item instanceof String; }</code> to <code>Box&lt;T&gt;</code>, to find out at run time what a box was declared to hold. Does it work?</p> <details class="soln"><summary></summary><div class="ans"> <p>It compiles, and it answers a different question from the one intended. <code>item</code> is an actual object, and asking an object whether it is a <code>String</code> is perfectly reasonable &mdash; so for a <code>Box&lt;String&gt;</code> holding <code>"hi"</code> it returns <code>true</code>. But for an <em>empty</em> <code>Box&lt;String&gt;</code> whose <code>item</code> is still <code>null</code> it returns <code>false</code>, because <code>null instanceof String</code> is <code>false</code>. The method reports what is in the box right now, not what the box was declared to hold, and the second thing is simply not recorded anywhere at run time.</p> <p><strong>Things to notice across all four parts.</strong> The single sentence to carry away is: <em>generics are checked by the compiler and then erased</em>. Every restriction in this lecture follows from it, and so does the reassurance &mdash; the check really did happen, so the absence of the type at run time costs you nothing in safety.</p> </div></details> </div> </div> </div> <h2 id="prac"><span class="num">&#9733;</span>Practice Problems</h2> <div class="box prac"> <div class="hd">Practice Problems<span class="tag">&mdash; four from her exams, two written for these notes</span></div> <div class="bd"> <p>Generics show up on the final in two shapes: "write a generic class" (Problems 1 and 2) and "write a single generic function" (Problem 3). Problem 4 is the error-identification question, and it is the one place her exams test type erasure directly. The last two are here because they exercise the two things people get wrong under time pressure: deciding which types in a class should become <code>T</code>, and handling more than one type parameter.</p> <p>Work them on paper first. The exam is closed book and there is no compiler in the room.</p> </div> </div> <h3>Problem 1 &mdash; A generic <code>Point</code> class <span class="muted">(from Exam 3 Practice Problems, Question 1; the same question appears on the Final Practice Problems)</span></h3> <p>Create the <code>Point</code> class that depends on a generic data type parameter <code>T</code>. It has two instance variables called <code>xCoordinate</code> and <code>yCoordinate</code> that both have type <code>T</code>. Write a two-parameter constructor to initialize the instance variables.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Read the specification for the three things it names: a type parameter called <code>T</code>, two instance variables both of type <code>T</code>, and a constructor taking two arguments. The header is <code>public class Point&lt;T&gt;</code>; the two fields are <code>private T</code>; the constructor takes two <code>T</code>s. That is the whole exam answer &mdash; four lines and a header. Note that both coordinates share <em>one</em> type parameter, so a <code>Point&lt;Integer&gt;</code> has two <code>Integer</code> coordinates. You could not make a point with an <code>Integer</code> x and a <code>String</code> y, and the question does not ask you to.</p> <p>Here is the answer as her solution file gives it:</p> <pre><code class="language-java">public class Point&lt;T&gt; {
+    private T xCoordinate;
+    private T yCoordinate;
+    public Point(T x, T y) {
+        xCoordinate = x;
+        yCoordinate = y;
+    }
+}</code></pre> <p>To actually run it we need a little more &mdash; getters, a <code>toString</code>, and a <code>main</code>. Nothing below changes the answer; it just makes it testable.</p> <p class="filename">PointDemo.java</p>
+<pre><code class="language-java">// The exam answer is the class and the two-parameter constructor.
+// The getters, toString and main are added so we can run it.
+class Point&lt;T&gt; {
+    private T xCoordinate;
+    private T yCoordinate;
+
+    public Point(T x, T y) {
+        xCoordinate = x;
+        yCoordinate = y;
+    }
+
+    public T getX() { return xCoordinate; }
+
+    public T getY() { return yCoordinate; }
+
+    public String toString() { return "(" + xCoordinate + ", " + yCoordinate + ")"; }
+}
+
+public class PointDemo {
+    public static void main(String args[]) {
+        Point&lt;Integer&gt; grid = new Point&lt;Integer&gt;(3, 4);
+        Point&lt;Double&gt; plane = new Point&lt;&gt;(1.5, -2.25);
+        Point&lt;String&gt; label = new Point&lt;&gt;("left", "top");
+
+        System.out.println("grid  " + grid);
+        System.out.println("plane " + plane);
+        System.out.println("label " + label);
+
+        // No cast is needed to use the coordinates as their real type.
+        int sum = grid.getX() + grid.getY();
+        System.out.println("grid x + y = " + sum);
+        System.out.println("label x uppercased = " + label.getX().toUpperCase());
+    }
+}</code></pre> <pre class="out"><code>grid  (3, 4)
+plane (1.5, -2.25)
+label (left, top)
+grid x + y = 7
+label x uppercased = LEFT</code></pre> <p><strong>Things to notice.</strong> <code>int sum = grid.getX() + grid.getY();</code> works because <code>T</code> is <code>Integer</code> for that object, so both calls return <code>Integer</code>, both unbox, and the addition is arithmetic. In <code>label</code> the identical expression would be concatenation. One class, two meanings, decided by the type argument &mdash; the same observation as the <code>Node</code> example in &sect;4.</p> <p>A follow-up worth thinking about: how would you add a <code>distanceTo</code> method? You could not, not with an unbounded <code>T</code>, because subtraction and <code>Math.sqrt</code> are not available on an arbitrary object. You would need <code>class Point&lt;T extends Number&gt;</code> and then work in <code>doubleValue()</code> &mdash; which is &sect;6 turning up in a place you did not expect it.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 1</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="6" aria-label="Live coding - Practice Problem 1">class Point&lt;T&gt; {
+    // 1. two private instance variables, xCoordinate and yCoordinate, both of type T // 2. a two-parameter constructor that initializes them // 3. (extra, to test it) getX, getY and toString } public class PointDemo { public static void main(String args[]) { // Make a Point&lt;Integer&gt; and a Point&lt;String&gt; and print them. } }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 2 &mdash; The <code>StorageBox</code> class <span class="muted">(from CSCI 212 Final - Summer 2026, Problem 3)</span></h3> <p>Write Java code for a generic class called <code>StorageBox</code>.</p> <ul> <li>The class <code>StorageBox</code> should depend on one generic data type parameter <code>T</code>.</li> <li>It should have exactly two private instance variables, <code>item</code> of type <code>T</code> and <code>count</code> of type <code>int</code>.</li> <li>It should have a two-parameter constructor, <code>getItem</code>, <code>getCount</code>, <code>addOne</code>, <code>removeOne</code> and <code>toString</code>.</li> <li>The <code>removeOne</code> method should subtract one from <code>count</code> only if <code>count</code> is greater than 0.</li> <li>The <code>toString</code> method should return the box in this form: <code>item + ": " + count</code>.</li> </ul> <p>As an example, the following application code should work with your implementation:</p> <pre><code class="language-java">StorageBox&lt;String&gt; pens = new StorageBox&lt;String&gt;("pen", 3);
+pens.addOne();
+System.out.println(pens.toString());
+// prints: pen: 4 pens.removeOne(); System.out.println(pens.getCount());       // prints: 3 StorageBox&lt;Integer&gt; ids = new StorageBox&lt;Integer&gt;(212, 2); System.out.println(ids.toString());        // prints: 212: 2</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> This is the &sect;4 procedure applied to a specification you are read rather than given. Work through the required members and decide the type of each one before writing anything:</p> <table class="trace"> <tr><th>Member</th><th>Type</th><th>Why</th></tr> <tr><td><code>item</code></td><td><code>T</code></td><td>the thing that varies &mdash; a pen, an id number</td></tr> <tr><td><code>count</code></td><td><code>int</code></td><td>a count is a whole number whatever is being counted</td></tr> <tr><td>constructor</td><td><code>(T, int)</code></td><td>one parameter per instance variable, in that order</td></tr> <tr><td><code>getItem</code></td><td>returns <code>T</code></td><td>hands back the stored item at its real type</td></tr> <tr><td><code>getCount</code></td><td>returns <code>int</code></td><td>not <code>T</code> &mdash; the trap in this question</td></tr> <tr><td><code>addOne</code>, <code>removeOne</code></td><td><code>void</code></td><td>they change <code>count</code> and return nothing</td></tr> <tr><td><code>toString</code></td><td>returns <code>String</code></td><td>a description is text whatever <code>T</code> is</td></tr> </table> <p>Two of the seven mention <code>T</code>. Turning <code>count</code> or <code>getCount</code> into <code>T</code> is the commonest way this question loses points.</p> <p class="filename">StorageBoxDemo.java</p>
+<pre><code class="language-java">class StorageBox&lt;T&gt; {
+    private T item;
+    private int count;
+
+    public StorageBox(T item, int count) {
+        this.item = item;
+        this.count = count;
+    }
+
+    public T getItem() { return item; }
+
+    public int getCount() { return count; }
+
+    public void addOne() { count++; }
+
+    public void removeOne() {
+        if (count &gt; 0) count--;
+    }
+
+    public String toString() { return item + ": " + count; }
+}
+
+public class StorageBoxDemo {
+    public static void main(String args[]) {
+        StorageBox&lt;String&gt; pens = new StorageBox&lt;String&gt;("pen", 3);
+        pens.addOne();
+        System.out.println(pens.toString());       // prints: pen: 4
+        pens.removeOne();
+        System.out.println(pens.getCount());       // prints: 3
+
+        StorageBox&lt;Integer&gt; ids = new StorageBox&lt;Integer&gt;(212, 2);
+        System.out.println(ids.toString());        // prints: 212: 2
+
+        // The count can never go below zero.
+        StorageBox&lt;String&gt; empty = new StorageBox&lt;&gt;("stapler", 0);
+        empty.removeOne();
+        empty.removeOne();
+        System.out.println(empty);
+    }
+}</code></pre> <pre class="out"><code>pen: 4 3 212: 2 stapler: 0 </code></pre> <p><strong>Things to notice.</strong> <code>this.item = item;</code> is needed because the parameter and the field share a name &mdash; the Lecture 7 rule, and the rubric awards points for the constructor doing the assignment correctly. Writing <code>item = item;</code> assigns the parameter to itself and leaves the field <code>null</code>.</p> <p><code>return item + ": " + count;</code> returns a <code>String</code> even though <code>item</code> is a <code>T</code>, because <code>+</code> with a <code>String</code> on either side converts the other operand by calling its <code>toString</code>. For <code>StorageBox&lt;Integer&gt;</code> that gives <code>212: 2</code>, which is exactly what the specification asks for.</p> <p><code>System.out.println(empty)</code> with no <code>.toString()</code> prints the same thing as <code>println(empty.toString())</code>: <code>println</code> calls <code>toString</code> for you on any object. Both forms appear in the specification's sample code, and both are correct.</p> </div></details> <h3>Problem 3 &mdash; The <code>middleElement</code> function <span class="muted">(from CSCI 212 Final - Spring 2025, Problem 4(c); the same function is asked for on the Summer 2026 final)</span></h3> <p>The following <code>main</code> calls three functions that have been omitted. Write <code>middleElement</code>: a single (generic) function that returns the middle element of an array with an unknown base type.</p> <pre><code class="language-java">public class Functions {
+    public static void main(String args[]) {
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Enter a positive odd number:");
+        String input = scan.next();
+        int num = getNum(input);
+        // (a) if (num == -1) redSquare();                 // (b) else { Double []arrayD = new Double[num]; String []arrayS = new String[num]; for (int i = 0; i &lt; num; i++) { Double d = Math.random(); arrayD[i] = d; arrayS[i] = "" + d; } System.out.println(middleElement(arrayD));   // (c) System.out.println(middleElement(arrayS)); } } }</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The word "single" in the specification is doing the work: <code>main</code> calls it once with a <code>Double[]</code> and once with a <code>String[]</code>, so it cannot be two overloaded methods. It has to be one generic method. That fixes the header immediately &mdash; <code>&lt;T&gt;</code> before the return type, <code>T</code> as the return type, <code>T[]</code> as the parameter &mdash; and the body is one line, the same <code>array[array.length / 2]</code> as her Example 4 in &sect;5. The rubric's version adds a guard for a null or empty array, returning <code>null</code>.</p> <p>Note that both arrays are <code>Double[]</code> and <code>String[]</code>, never <code>double[]</code>: the &sect;5 warning box is exactly why the exam question is written that way.</p> <p class="filename">Functions.java</p>
+<pre><code class="language-java">public class Functions {
+    // A single generic function: the middle element of an array of any type.
+    public static &lt;T&gt; T middleElement(T[] array) {
+        if (array == null || array.length == 0) return null;
+        return array[array.length / 2];
+    }
+
+    public static void main(String args[]) {
+        int num = 5;                       // a positive odd number
+        Double[] arrayD = new Double[num];
+        String[] arrayS = new String[num];
+        for (int i = 0; i &lt; num; i++) {
+            Double d = (i + 1) / 2.0;      // fixed values instead of Math.random()
+            arrayD[i] = d;
+            arrayS[i] = "" + d;
+        }
+        System.out.println(middleElement(arrayD));
+        System.out.println(middleElement(arrayS));
+
+        Integer[] arrayI = {3, 1, 4, 1, 5};
+        System.out.println(middleElement(arrayI));
+        System.out.println(middleElement(new String[0]));
+    }
+}</code></pre> <p>The exam's <code>main</code> reads a number from the keyboard and fills the arrays with <code>Math.random()</code>, which would print a different pair of numbers every run. To get output you can check, this version fixes <code>num</code> at 5 and uses <code>(i + 1) / 2.0</code> instead, so the arrays hold 0.5, 1.0, 1.5, 2.0, 2.5.</p> <pre class="out"><code>1.5 1.5 4 null </code></pre> <p><strong>Things to notice.</strong> The first two lines are the same because <code>arrayS[i]</code> was built as <code>"" + d</code> from the very same values &mdash; the second one is the four characters <code>1.5</code>, the first is a <code>Double</code>. <code>println</code> prints them identically, which is a nice reminder that identical output does not mean identical type.</p> <p><code>middleElement(arrayI)</code> returns <code>4</code>, index 2 of a five-element array. And the empty array returns <code>null</code> because of the guard; without the guard it would compute <code>array[0]</code> on a zero-length array and throw <code>ArrayIndexOutOfBoundsException</code>.</p> <p>The rubric gives 2 points for the title line and 3 for the implementation. That split is worth remembering: on a generic-method question, most of the marks are in getting <code>public static &lt;T&gt; T middleElement(T[] array)</code> exactly right.</p> </div></details> <h3>Problem 4 &mdash; What is wrong with lines (b) and (c)? <span class="muted">(from Exam 3 Practice Problems, error-identification question, Part 2)</span></h3> <p>In the following code the marked lines contain errors. Explain what is wrong with lines (b) and (c), and give a correction.</p> <pre><code class="language-java">class MyGen&lt;T, V&gt; {
+    T t;
+    V v;
+    void set(T o) {
+        t = o;
+    }
+    // line (b) void set(V o) { v = o; }      // line (c) }</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Ask what the class looks like after the compiler has erased the type parameters, because that is the form the two signatures are compared in. Both <code>T</code> and <code>V</code> are unbounded, so both erase to <code>Object</code>, and both methods become <code>void set(Object o)</code>. A class cannot contain two methods with the same name and the same parameter types.</p> <p>Her solution file states it as: <em>"T and V could be the same type at runtime, so the methods should have different names."</em> Notice that this is not a hypothetical &mdash; nothing stops somebody writing <code>MyGen&lt;String, String&gt;</code>, in which case even before erasure the two methods would be identical.</p> <pre class="err"><code>MyGenDemo.java:5: error: name clash: set(V) and set(T) have the same erasure void set(V o) { v = o; }
+        // line (c)
+^
+where V,T are type-variables: V extends Object declared in class MyGen T extends Object declared in class MyGen
+1 error</code></pre> <p><strong>The correction:</strong> give the two methods different names.</p> <p class="filename">MyGenFixed.java</p>
+<pre><code class="language-java">class MyGen&lt;T, V&gt; {
+    T t;
+    V v;
+
+    void setT(T o) { t = o; }     // line (b), renamed
+
+    void setV(V o) { v = o; }     // line (c), renamed
+
+    public String toString() { return "t = " + t + ", v = " + v; }
+}
+
+public class MyGenFixed {
+    public static void main(String args[]) {
+        MyGen&lt;String, Integer&gt; a = new MyGen&lt;&gt;();
+        a.setT("hello");
+        a.setV(212);
+        System.out.println(a);
+
+        // Nothing stops both type parameters being the same type.
+        MyGen&lt;String, String&gt; b = new MyGen&lt;&gt;();
+        b.setT("first");
+        b.setV("second");
+        System.out.println(b);
+    }
+}</code></pre> <pre class="out"><code>t = hello, v = 212 t = first, v = second </code></pre> <p><strong>Things to notice.</strong> The error is reported when <code>MyGen</code> itself is compiled, not when somebody uses it. A generic class is compiled once, on its own, and must be correct for every possible type argument &mdash; including the awkward case where <code>T</code> and <code>V</code> are the same. That is the general shape of the erasure rule, and it is why "but I would never instantiate it that way" is not a defence.</p> <p>The library follows the same convention. <code>HashMap&lt;K,V&gt;</code> does not have two <code>put</code> methods; it has <code>put(K key, V value)</code> &mdash; one method taking both. Where two type parameters are involved, a single method with two parameters, or two differently named methods, are the only options.</p> </div></details> <h3>Problem 5 &mdash; Find the four errors <span class="muted">(added for these notes)</span></h3> <p>The following class is meant to be a generic holder. Exactly four of the numbered lines contain errors. Identify them, say what is wrong, and give a corrected version of each.</p> <p class="filename">Holder.java</p>
+<pre><code class="language-java">public class Holder&lt;T&gt; {
+    private static T shared;                       // line 1
+    private T item;
+
+    public Holder(T item) { this.item = item; }
+
+    public T get() { return item; }
+
+    public static T identity(T x) { return x; }    // line 2
+
+    public T[] copies(int n) {
+        T[] a = new T[n];                          // line 3
+        for (int i = 0; i &lt; n; i++) a[i] = item;
+        return a;
+    }
+
+    public static void main(String args[]) {
+        Holder&lt;int&gt; h = new Holder&lt;int&gt;(5);        // line 4
+        System.out.println(h.get());
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Every one of these is a case of the compiler needing to know something about <code>T</code> that erasure has taken away, or needing <code>T</code> to exist somewhere it does not. Go through them by asking, for each line, "which <code>T</code> is this, and does it exist here?"</p> <p><strong>Line 1 &mdash; a static field cannot use <code>T</code>.</strong> A static field belongs to the class, and there is exactly one <code>Holder</code> class shared by <code>Holder&lt;String&gt;</code> and <code>Holder&lt;Integer&gt;</code> alike. There is no single <code>T</code> for it to be.</p> <pre class="err"><code>Holder.java:2: error: non-static type variable T cannot be referenced from a static context private static T shared;
+        // line 1
+^</code></pre> <p>Corrected: <code>private T shared;</code> &mdash; make it an instance field. (If it genuinely has to be shared across all boxes, its type has to be something concrete, such as <code>Object</code>.)</p> <p><strong>Line 2 &mdash; a static method cannot use the class's <code>T</code> either</strong>, for the same reason: there is no object, so there is no type argument.</p> <pre class="err"><code>Holder.java:9: error: non-static type variable T cannot be referenced from a static context public static T identity(T x) { return x; }
+        // line 2
+^</code></pre> <p>Corrected: give the method a type parameter of its own &mdash; <code>public static &lt;E&gt; E identity(E x) { return x; }</code>. A different letter is used deliberately, so nobody thinks it is the class's <code>T</code>.</p> <p><strong>Line 3 &mdash; <code>new T[n]</code> is generic array creation</strong>, forbidden because the JVM would have no element type to record in the new array.</p> <pre class="err"><code>Holder.java:12: error: generic array creation T[] a = new T[n];
+        // line 3
+^</code></pre> <p>Corrected: return a collection instead of an array &mdash; <code>ArrayList&lt;T&gt;</code> has no such problem, because it stores <code>Object</code> references internally and the compiler does the checking.</p> <p><strong>Line 4 &mdash; a type argument must be a reference type.</strong></p> <pre class="err"><code>Holder.java:18: error: unexpected type Holder&lt;int&gt; h = new Holder&lt;int&gt;(5);
+        // line 4
+^
+  required: reference
+  found:    int</code></pre> <p>Corrected: <code>Holder&lt;Integer&gt; h = new Holder&lt;Integer&gt;(5);</code> &mdash; and the <code>5</code> is auto-boxed.</p> <p>All four fixed, and running:</p> <p class="filename">HolderFixed.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+class Holder&lt;T&gt; {
+    private T shared;                                  // line 1 fixed: not static
+
+    private T item;
+
+    public Holder(T item) { this.item = item; }
+
+    public T get() { return item; }
+
+    public T getShared() { return shared; }
+
+    public void setShared(T s) { shared = s; }
+
+    // line 2 fixed: a static method needs its own type parameter
+    public static &lt;E&gt; E identity(E x) { return x; }
+
+    // line 3 fixed: you cannot write new T[n], so build an ArrayList instead
+    public ArrayList&lt;T&gt; copies(int n) {
+        ArrayList&lt;T&gt; a = new ArrayList&lt;T&gt;();
+        for (int i = 0; i &lt; n; i++) a.add(item);
+        return a;
+    }
+}
+
+public class HolderFixed {
+    public static void main(String args[]) {
+        Holder&lt;Integer&gt; h = new Holder&lt;Integer&gt;(5);    // line 4 fixed: Integer
+        System.out.println("get()      " + h.get());
+        System.out.println("copies(3)  " + h.copies(3));
+        System.out.println("identity   " + Holder.identity("still generic"));
+
+        Holder&lt;String&gt; g = new Holder&lt;&gt;("hi");
+        g.setShared("mine");
+        System.out.println("shared     " + g.getShared());
+    }
+}</code></pre> <pre class="out"><code>get()      5
+copies(3)  [5, 5, 5]
+identity   still generic
+shared     mine</code></pre> <p><strong>Things to notice.</strong> <code>javac</code> reported all six messages at once here (lines 1 and 4 produce two each), which is unusual &mdash; these are semantic errors rather than syntax errors, so the parser gets through the whole file before complaining. Compare Lecture 1's find-the-errors problem, where a single missing semicolon hid everything after it.</p> <p><code>Holder.identity("still generic")</code> returns a <code>String</code>, inferred from the argument, even though it lives in a class parameterized on something else entirely. That is the point of giving a static method its own type parameter: it is generic in its own right and owes nothing to the class around it.</p> </div></details> <h3>Problem 6 &mdash; A class with two type parameters <span class="muted">(added for these notes)</span></h3> <p>Write a generic class <code>Pair&lt;K, V&gt;</code> with private fields <code>key</code> of type <code>K</code> and <code>value</code> of type <code>V</code>, a two-parameter constructor, <code>getKey</code>, <code>getValue</code>, a <code>toString</code> of the form <code>(key, value)</code>, and a method <code>swap()</code> that returns a new pair with the two components exchanged. Think carefully about the return type of <code>swap</code>. Then write a <code>main</code> that makes a <code>Pair&lt;String, Integer&gt;</code>, swaps it, and uses both components at their real types.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The only hard part is <code>swap</code>. Its return type cannot be <code>Pair&lt;K, V&gt;</code>, because the components have changed places &mdash; the key of the result is a <code>V</code> and the value is a <code>K</code>. So the return type is <code>Pair&lt;V, K&gt;</code>, and the body is <code>return new Pair&lt;V, K&gt;(value, key);</code>. Getting that right is the whole exercise; everything else is Problem 2 with two letters instead of one.</p> <p class="filename">PairDemo.java</p>
+<pre><code class="language-java">// A class with two type parameters. K and V are the conventional names
+// for a key and a value.
+class Pair&lt;K, V&gt; {
+    private K key;
+    private V value;
+
+    public Pair(K key, V value) {
+        this.key = key;
+        this.value = value;
+    }
+
+    public K getKey() { return key; }
+
+    public V getValue() { return value; }
+
+    // The swapped pair has the type arguments the other way round.
+    public Pair&lt;V, K&gt; swap() {
+        return new Pair&lt;V, K&gt;(value, key);
+    }
+
+    public String toString() { return "(" + key + ", " + value + ")"; }
+}
+
+public class PairDemo {
+    public static void main(String args[]) {
+        Pair&lt;String, Integer&gt; score = new Pair&lt;&gt;("Ana", 95);
+        System.out.println("score          " + score);
+        System.out.println("key   " + score.getKey().toUpperCase());
+        System.out.println("value " + (score.getValue() + 5));
+
+        Pair&lt;Integer, String&gt; flipped = score.swap();
+        System.out.println("swapped        " + flipped);
+        System.out.println("key + 1 = " + (flipped.getKey() + 1));
+        System.out.println("value lower = " + flipped.getValue().toLowerCase());
+
+        // Both type parameters may be the same type. Nothing says they differ.
+        Pair&lt;String, String&gt; capital = new Pair&lt;&gt;("France", "Paris");
+        System.out.println("capital        " + capital + "  swapped " + capital.swap());
+    }
+}</code></pre> <pre class="out"><code>score          (Ana, 95)
+key   ANA
+value 100
+swapped        (95, Ana)
+key + 1 = 96
+value lower = ana
+capital        (France, Paris)  swapped (Paris, France)</code></pre> <p><strong>Things to notice.</strong> The four lines after each construction are the proof that the types really did travel. <code>score.getKey().toUpperCase()</code> is a <code>String</code> method; <code>flipped.getKey() + 1</code> is arithmetic on an <code>Integer</code>. Swap the two and neither line compiles. Declaring <code>swap</code> as returning <code>Pair&lt;K, V&gt;</code> would break <code>flipped.getKey() + 1</code> immediately, which is how you would catch the mistake even without thinking it through first.</p> <p>The last line makes the Problem 4 point concretely: <code>Pair&lt;String, String&gt;</code> is perfectly legal, and it is why <code>MyGen</code> could not have two methods called <code>set</code>. Here there is no clash, because <code>getKey</code> and <code>getValue</code> have different names and <code>swap</code> takes no parameters at all.</p> <p><code>K</code> and <code>V</code> are only conventions. <code>Pair&lt;A, B&gt;</code> would compile identically. Use <code>K</code> and <code>V</code> when the two really are a key and a value, and <code>T</code> and <code>U</code> when they are just two types.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 6</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="6" aria-label="Live coding - Practice Problem 6">class Pair&lt;K, V&gt; {
+    // private K key;  private V value; // two-parameter constructor, getKey, getValue, toString -&gt; (key, value) // swap() -- what is its return type? } public class PairDemo { public static void main(String args[]) { Pair&lt;String, Integer&gt; score = new Pair&lt;&gt;("Ana", 95); // Print the pair, then swap it and print that too. // Then use flipped.getKey() as a number and flipped.getValue() as text. } }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <div class="box sum" id="summary"> <div class="hd">Lecture Summary</div> <div class="bd"> <ul> <li>A container that stores <code>Object</code> is reusable but unsafe: every retrieval needs a cast, the compiler cannot check the cast, and a wrong one becomes a <code>ClassCastException</code> at <em>run</em> time. Generics give you the reuse and keep the checking.</li> <li>Her four benefits: <strong>type safety</strong> (errors at compile time), <strong>elimination of casts</strong>, <strong>code reusability</strong>, and <strong>better readability</strong>.</li> <li>A <strong>type parameter</strong> is the placeholder in the declaration &mdash; the <code>T</code> in <code>class Box&lt;T&gt;</code>. A <strong>type argument</strong> is the real type you supply &mdash; the <code>String</code> in <code>Box&lt;String&gt;</code>. Convention: <code>T</code> for type, <code>E</code> for element, <code>K</code> and <code>V</code> for key and value.</li> <li>Instantiate with <code>new Box&lt;String&gt;()</code> or with the <strong>diamond</strong>, <code>new Box&lt;&gt;()</code>. Leaving the brackets off altogether gives a <strong>raw type</strong>, which switches the checking back off.</li> <li>A type argument must be a <strong>reference type</strong>. <code>ArrayList&lt;int&gt;</code> does not compile; use the wrapper class <code>Integer</code> and let autoboxing do the rest.</li> <li>A <strong>generic method</strong> declares its own type parameter immediately before the return type: <code>public static &lt;T&gt; T middle(T[] array)</code>. Omit the <code>&lt;T&gt;</code> and you get <code>cannot find symbol: class T</code>. The type argument is normally inferred from the arguments, so you write <code>middle(a)</code>, not <code>Example4.&lt;Integer&gt;middle(a)</code>.</li> <li>An unbounded <code>T</code> gives you only <code>Object</code>'s methods. A <strong>bound</strong> &mdash; <code>&lt;T extends Number&gt;</code>, <code>&lt;T extends Comparable&lt;T&gt;&gt;</code> &mdash; restricts who may call the method and, in exchange, lets you call that type's methods inside it. The keyword is <code>extends</code> even for an interface.</li> <li>Making a class generic is mechanical: add <code>&lt;T&gt;</code> to the header, change the element type to <code>T</code>, and carry the parameter through anything the class holds &mdash; <code>Node&lt;T&gt;</code> inside <code>LinkedList&lt;T&gt;</code>, <code>LinkedList&lt;T&gt;</code> inside <code>Stack&lt;T&gt;</code>. <code>size()</code> stays <code>int</code> and <code>toString()</code> stays <code>String</code>.</li> <li><strong>Type erasure</strong>: the compiler checks the type arguments and then removes them, so there is one compiled class for every element type and <code>T</code> becomes <code>Object</code> (or its bound). That single fact explains why there are no primitive type arguments, no <code>new T[n]</code>, no <code>new T()</code>, no <code>static T</code> field, no <code>instanceof List&lt;String&gt;</code>, and why <code>set(T)</code> and <code>set(V)</code> clash.</li> </ul> <p><strong>Coming up in Lecture 23.</strong> Iterators, and a first look at threads. Every generic container you have written can be walked with a <code>while</code> loop over <code>getNext()</code> &mdash; but the library has a uniform way to walk <em>any</em> collection, <code>hasNext()</code> and <code>next()</code>, and once a class provides one, the enhanced <code>for</code> loop works on it too. Next time you write an <code>Iterator&lt;T&gt;</code> for the very <code>LinkedList&lt;T&gt;</code> you built today.</p>
+  </div>
+</div>
+
+<nav class="pagenav">
+<span class="disabled"><div class="dir">&larr; Previous</div><div class="ttl">Lecture 21 &mdash; Linked Lists, Stacks and Queues</div><div class="pending">posts Tue Dec 1</div></span>
+<span class="disabled next"><div class="dir">Next &rarr;</div><div class="ttl">Lecture 23 &mdash; Iterators, and a Look at Threads</div><div class="pending">posts Tue Dec 8</div></span>
+</nav>
+<footer class="pf">CSCI 212 &middot; Object-Oriented Programming in Java &middot; Queens College, CUNY</footer>
+</div>
+<script>
+(()=>{var ut=Object.create;var xe=Object.defineProperty;var ft=Object.getOwnPropertyDescriptor;var gt=Object.getOwnPropertyNames;var ht=Object.getPrototypeOf,dt=Object.prototype.hasOwnProperty;var pt=(e,t)=>()=>{try{return t||e((t={exports:{}}).exports,t),t.exports}catch(n){throw t=0,n}};var Et=(e,t,n,l)=>{if(t&&typeof t=="object"||typeof t=="function")for(let d of gt(t))!dt.call(e,d)&&d!==n&&xe(e,d,{get:()=>t[d],enumerable:!(l=ft(t,d))||l.enumerable});return e};var bt=(e,t,n)=>(n=e!=null?ut(ht(e)):{},Et(t||!e||!e.__esModule?xe(n,"default",{value:e,enumerable:!0}):n,e));var Ke=pt((ln,Ge)=>{function Ie(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(t=>{let n=e[t],l=typeof n;(l==="object"||l==="function")&&!Object.isFrozen(n)&&Ie(n)}),e}var Z=class{constructor(t){t.data===void 0&&(t.data={}),this.data=t.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function Ce(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function k(e,...t){let n=Object.create(null);for(let l in e)n[l]=e[l];return t.forEach(function(l){for(let d in l)n[d]=l[d]}),n}var _t="</span>",Ne=e=>!!e.scope,Mt=(e,{prefix:t})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let n=e.split(".");return[`${t}${n.shift()}`,...n.map((l,d)=>`${l}${"_".repeat(d+1)}`)].join(" ")}return`${t}${e}`},oe=class{constructor(t,n){this.buffer="",this.classPrefix=n.classPrefix,t.walk(this)}addText(t){this.buffer+=Ce(t)}openNode(t){if(!Ne(t))return;let n=Mt(t.scope,{prefix:this.classPrefix});this.span(n)}closeNode(t){Ne(t)&&(this.buffer+=_t)}value(){return this.buffer}span(t){this.buffer+=`<span class="${t}">`}},Re=(e={})=>{let t={children:[]};return Object.assign(t,e),t},ae=class e{constructor(){this.rootNode=Re(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(t){this.top.children.push(t)}openNode(t){let n=Re({scope:t});this.add(n),this.stack.push(n)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(t){return this.constructor._walk(t,this.rootNode)}static _walk(t,n){return typeof n=="string"?t.addText(n):n.children&&(t.openNode(n),n.children.forEach(l=>this._walk(t,l)),t.closeNode(n)),t}static _collapse(t){typeof t!="string"&&t.children&&(t.children.every(n=>typeof n=="string")?t.children=[t.children.join("")]:t.children.forEach(n=>{e._collapse(n)}))}},le=class extends ae{constructor(t){super(),this.options=t}addText(t){t!==""&&this.add(t)}startScope(t){this.openNode(t)}endScope(){this.closeNode()}__addSublanguage(t,n){let l=t.root;n&&(l.scope=`language:${n}`),this.add(l)}toHTML(){return new oe(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function G(e){return e?typeof e=="string"?e:e.source:null}function De(e){return B("(?=",e,")")}function Ot(e){return B("(?:",e,")*")}function wt(e){return B("(?:",e,")?")}function B(...e){return e.map(n=>G(n)).join("")}function xt(e){let t=e[e.length-1];return typeof t=="object"&&t.constructor===Object?(e.splice(e.length-1,1),t):{}}function V(...e){return"("+(xt(e).capture?"":"?:")+e.map(l=>G(l)).join("|")+")"}function ke(e){return new RegExp(e.toString()+"|").exec("").length-1}function Nt(e,t){let n=e&&e.exec(t);return n&&n.index===0}var Rt=new RegExp(V(/\[(?:[^\\\]]|\\.)*\]/,/\(\?<(?![=!])[^>]+>/,/\(\?'[^']+'/,/\(\??/,/\\([1-9][0-9]*)/,/\\./));function fe(e,{joinWith:t}){let n=0;return e.map(l=>{n+=1;let d=n,_=G(l),c="";for(;_.length>0;){let r=Rt.exec(_);if(!r){c+=_;break}c+=_.substring(0,r.index),_=_.substring(r.index+r[0].length),r[0][0]==="\\"&&r[1]?c+="\\"+String(Number(r[1])+d):(c+=r[0],(r[0]==="("||/^\(\?[<']/.test(r[0]))&&n++)}return c}).map(l=>`(${l})`).join(t)}var yt=/\b\B/,ve="[a-zA-Z]\\w*",ge="[a-zA-Z_]\\w*",Le="\\b\\d+(\\.\\d+)?",Be="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Pe="\\b(0b[01]+)",St="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",At=(e={})=>{let t=/^#![ ]*\//;return e.binary&&(e.begin=B(t,/.*\b/,e.binary,/\b.*/)),k({scope:"meta",begin:t,end:/$/,relevance:0,"on:begin":(n,l)=>{n.index!==0&&l.ignoreMatch()}},e)},K={begin:"\\\\[\\s\\S]",relevance:0},Tt={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[K]},It={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[K]},Ct={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},Q=function(e,t,n={}){let l=k({scope:"comment",begin:e,end:t,contains:[]},n);l.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let d=V("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return l.contains.push({begin:B(/[ ]+/,"(",d,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),l},Dt=Q("//","$"),kt=Q("/\\*","\\*/"),vt=Q("#","$"),Lt={scope:"number",begin:Le,relevance:0},Bt={scope:"number",begin:Be,relevance:0},Pt={scope:"number",begin:Pe,relevance:0},$t={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[K,{begin:/\[/,end:/\]/,relevance:0,contains:[K]}]},Ht={scope:"title",begin:ve,relevance:0},Ut={scope:"title",begin:ge,relevance:0},jt={begin:"\\.\\s*"+ge,relevance:0},Gt=function(e){return Object.assign(e,{"on:begin":(t,n)=>{n.data._beginMatch=t[1]},"on:end":(t,n)=>{n.data._beginMatch!==t[1]&&n.ignoreMatch()}})},X=Object.freeze({__proto__:null,APOS_STRING_MODE:Tt,BACKSLASH_ESCAPE:K,BINARY_NUMBER_MODE:Pt,BINARY_NUMBER_RE:Pe,COMMENT:Q,C_BLOCK_COMMENT_MODE:kt,C_LINE_COMMENT_MODE:Dt,C_NUMBER_MODE:Bt,C_NUMBER_RE:Be,END_SAME_AS_BEGIN:Gt,HASH_COMMENT_MODE:vt,IDENT_RE:ve,MATCH_NOTHING_RE:yt,METHOD_GUARD:jt,NUMBER_MODE:Lt,NUMBER_RE:Le,PHRASAL_WORDS_MODE:Ct,QUOTE_STRING_MODE:It,REGEXP_MODE:$t,RE_STARTERS_RE:St,SHEBANG:At,TITLE_MODE:Ht,UNDERSCORE_IDENT_RE:ge,UNDERSCORE_TITLE_MODE:Ut});function Kt(e,t){e.input[e.index-1]==="."&&t.ignoreMatch()}function mt(e,t){e.className!==void 0&&(e.scope=e.className,delete e.className)}function Wt(e,t){t&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=Kt,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function Ft(e,t){Array.isArray(e.illegal)&&(e.illegal=V(...e.illegal))}function zt(e,t){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function Yt(e,t){e.relevance===void 0&&(e.relevance=1)}var Xt=(e,t)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let n=Object.assign({},e);Object.keys(e).forEach(l=>{delete e[l]}),e.keywords=n.keywords,e.begin=B(n.beforeMatch,De(n.begin)),e.starts={relevance:0,contains:[Object.assign(n,{endsParent:!0})]},e.relevance=0,delete n.beforeMatch},Zt=["of","and","for","in","not","or","if","then","parent","list","value"],Jt="keyword";function $e(e,t,n=Jt){let l=Object.create(null);return typeof e=="string"?d(n,e.split(" ")):Array.isArray(e)?d(n,e):Object.keys(e).forEach(function(_){Object.assign(l,$e(e[_],t,_))}),l;function d(_,c){t&&(c=c.map(r=>r.toLowerCase())),c.forEach(function(r){let u=r.split("|");l[u[0]]=[_,Vt(u[0],u[1])]})}}function Vt(e,t){return t?Number(t):Qt(e)?0:1}function Qt(e){return Zt.includes(e.toLowerCase())}var ye={},L=e=>{console.error(e)},Se=(e,...t)=>{console.log(`WARN: ${e}`,...t)},H=(e,t)=>{ye[`${e}/${t}`]||(console.log(`Deprecated as of ${e}. ${t}`),ye[`${e}/${t}`]=!0)},J=new Error;function He(e,t,{key:n}){let l=0,d=e[n],_={},c={};for(let r=1;r<=t.length;r++)c[r+l]=d[r],_[r+l]=!0,l+=ke(t[r-1]);e[n]=c,e[n]._emit=_,e[n]._multi=!0}function qt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw L("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),J;if(typeof e.beginScope!="object"||e.beginScope===null)throw L("beginScope must be object"),J;He(e,e.begin,{key:"beginScope"}),e.begin=fe(e.begin,{joinWith:""})}}function en(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw L("skip, excludeEnd, returnEnd not compatible with endScope: {}"),J;if(typeof e.endScope!="object"||e.endScope===null)throw L("endScope must be object"),J;He(e,e.end,{key:"endScope"}),e.end=fe(e.end,{joinWith:""})}}function tn(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function nn(e){tn(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),qt(e),en(e)}function sn(e){function t(c,r){return new RegExp(G(c),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(r?"g":""))}class n{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(r,u){u.position=this.position++,this.matchIndexes[this.matchAt]=u,this.regexes.push([u,r]),this.matchAt+=ke(r)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let r=this.regexes.map(u=>u[1]);this.matcherRe=t(fe(r,{joinWith:"|"}),!0),this.lastIndex=0}exec(r){this.matcherRe.lastIndex=this.lastIndex;let u=this.matcherRe.exec(r);if(!u)return null;let O=u.findIndex((P,I)=>I>0&&P!==void 0),M=this.matchIndexes[O];return u.splice(0,O),Object.assign(u,M)}}class l{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(r){if(this.multiRegexes[r])return this.multiRegexes[r];let u=new n;return this.rules.slice(r).forEach(([O,M])=>u.addRule(O,M)),u.compile(),this.multiRegexes[r]=u,u}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(r,u){this.rules.push([r,u]),u.type==="begin"&&this.count++}exec(r){let u=this.getMatcher(this.regexIndex);u.lastIndex=this.lastIndex;let O=u.exec(r);if(this.resumingScanAtSamePosition()&&!(O&&O.index===this.lastIndex)){let M=this.getMatcher(0);M.lastIndex=this.lastIndex+1,O=M.exec(r)}return O&&(this.regexIndex+=O.position+1,this.regexIndex===this.count&&this.considerAll()),O}}function d(c){let r=new l;return c.contains.forEach(u=>r.addRule(u.begin,{rule:u,type:"begin"})),c.terminatorEnd&&r.addRule(c.terminatorEnd,{type:"end"}),c.illegal&&r.addRule(c.illegal,{type:"illegal"}),r}function _(c,r){let u=c;if(c.isCompiled)return u;[mt,zt,nn,Xt].forEach(M=>M(c,r)),e.compilerExtensions.forEach(M=>M(c,r)),c.__beforeBegin=null,[Wt,Ft,Yt].forEach(M=>M(c,r)),c.isCompiled=!0;let O=null;return typeof c.keywords=="object"&&c.keywords.$pattern&&(c.keywords=Object.assign({},c.keywords),O=c.keywords.$pattern,delete c.keywords.$pattern),O=O||/\w+/,c.keywords&&(c.keywords=$e(c.keywords,e.case_insensitive)),u.keywordPatternRe=t(O,!0),r&&(c.begin||(c.begin=/\B|\b/),u.beginRe=t(u.begin),!c.end&&!c.endsWithParent&&(c.end=/\B|\b/),c.end&&(u.endRe=t(u.end)),u.terminatorEnd=G(u.end)||"",c.endsWithParent&&r.terminatorEnd&&(u.terminatorEnd+=(c.end?"|":"")+r.terminatorEnd)),c.illegal&&(u.illegalRe=t(c.illegal)),c.contains||(c.contains=[]),c.contains=[].concat(...c.contains.map(function(M){return rn(M==="self"?c:M)})),c.contains.forEach(function(M){_(M,u)}),c.starts&&_(c.starts,r),u.matcher=d(u),u}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=k(e.classNameAliases||{}),_(e)}function Ue(e){return e?e.endsWithParent||Ue(e.starts):!1}function rn(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(t){return k(e,{variants:null},t)})),e.cachedVariants?e.cachedVariants:Ue(e)?k(e,{starts:e.starts?k(e.starts):null}):Object.isFrozen(e)?k(e):e}var cn="11.12.0",ue=class extends Error{constructor(t,n){super(t),this.name="HTMLInjectionError",this.html=n}},ce=Ce,Ae=k,Te=Symbol("nomatch"),on=7,je=function(e){let t=Object.create(null),n=Object.create(null),l=[],d=!0,_="Could not find the language '{}', did you forget to load/include a language module?",c={disableAutodetect:!0,name:"Plain text",contains:[]},r={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:le};function u(i){return r.noHighlightRe.test(i)}function O(i){let a=i.className+" ";a+=i.parentNode?i.parentNode.className:"";let h=r.languageDetectRe.exec(a);if(h){let E=C(h[1]);return E||(Se(_.replace("{}",h[1])),Se("Falling back to no-highlight mode for this block.",i)),E?h[1]:"no-highlight"}return a.split(/\s+/).find(E=>u(E)||C(E))}function M(i,a,h){let E="",w="";typeof a=="object"?(E=i,h=a.ignoreIllegals,w=a.language):(H("10.7.0","highlight(lang, code, ...args) has been deprecated."),H("10.7.0",`Please use highlight(code, options) instead.
+(see the highlight.js issue tracker)`),w=i,E=a),h===void 0&&(h=!0);let y={code:E,language:w};W("before:highlight",y);let D=y.result?y.result:P(y.language,y.code,h);return D.code=y.code,W("after:highlight",D),D}function P(i,a,h,E){let w=Object.create(null);function y(s,o){return s.keywords[o]}function D(){if(!f.keywords){x.addText(b);return}let s=0;f.keywordPatternRe.lastIndex=0;let o=f.keywordPatternRe.exec(b),g="";for(;o;){g+=b.substring(s,o.index);let p=A.case_insensitive?o[0].toLowerCase():o[0],N=y(f,p);if(N){let[T,at]=N;if(x.addText(g),g="",w[p]=(w[p]||0)+1,w[p]<=on&&(Y+=at),T.startsWith("_"))g+=o[0];else{let lt=A.classNameAliases[T]||T;S(o[0],lt)}}else g+=o[0];s=f.keywordPatternRe.lastIndex,o=f.keywordPatternRe.exec(b)}g+=b.substring(s),x.addText(g)}function F(){if(b==="")return;let s=null;if(typeof f.subLanguage=="string"){if(!t[f.subLanguage]){x.addText(b);return}s=P(f.subLanguage,b,!0,we[f.subLanguage]),we[f.subLanguage]=s._top}else s=$(b,f.subLanguage.length?f.subLanguage:null);f.relevance>0&&(Y+=s.relevance),x.__addSublanguage(s._emitter,s.language)}function R(){f.subLanguage!=null?F():D(),b=""}function S(s,o){s!==""&&(x.startScope(o),x.addText(s),x.endScope())}function be(s,o){let g=1,p=o.length-1;for(;g<=p;){if(!s._emit[g]){g++;continue}let N=A.classNameAliases[s[g]]||s[g],T=o[g];N?S(T,N):(b=T,D(),b=""),g++}}function _e(s,o){return s.scope&&typeof s.scope=="string"&&x.openNode(A.classNameAliases[s.scope]||s.scope),s.beginScope&&(s.beginScope._wrap?(S(b,A.classNameAliases[s.beginScope._wrap]||s.beginScope._wrap),b=""):s.beginScope._multi&&(be(s.beginScope,o),b="")),f=Object.create(s,{parent:{value:f}}),f}function Me(s,o,g){let p=Nt(s.endRe,g);if(p){if(s["on:end"]){let N=new Z(s);s["on:end"](o,N),N.isMatchIgnored&&(p=!1)}if(p){for(;s.endsParent&&s.parent;)s=s.parent;return s}}if(s.endsWithParent)return Me(s.parent,o,g)}function it(s){return f.matcher.regexIndex===0?(b+=s[0],1):(re=!0,0)}function st(s){let o=s[0],g=s.rule,p=new Z(g),N=[g.__beforeBegin,g["on:begin"]];for(let T of N)if(T&&(T(s,p),p.isMatchIgnored))return it(o);return g.skip?b+=o:(g.excludeBegin&&(b+=o),R(),!g.returnBegin&&!g.excludeBegin&&(b=o)),_e(g,s),g.returnBegin?0:o.length}function rt(s){let o=s[0],g=a.substring(s.index),p=Me(f,s,g);if(!p)return Te;let N=f;f.endScope&&f.endScope._wrap?(R(),S(o,f.endScope._wrap)):f.endScope&&f.endScope._multi?(R(),be(f.endScope,s)):N.skip?b+=o:(N.returnEnd||N.excludeEnd||(b+=o),R(),N.excludeEnd&&(b=o));do f.scope&&x.closeNode(),!f.skip&&!f.subLanguage&&(Y+=f.relevance),f=f.parent;while(f!==p.parent);return p.starts&&_e(p.starts,s),N.returnEnd?0:o.length}function ct(){let s=[];for(let o=f;o!==A;o=o.parent)o.scope&&s.unshift(o.scope);s.forEach(o=>x.openNode(o))}let z={};function Oe(s,o){let g=o&&o[0];if(b+=s,g==null)return R(),0;if(z.type==="begin"&&o.type==="end"&&z.index===o.index&&g===""){if(b+=a.slice(o.index,o.index+1),!d){let p=new Error(`0 width match regex (${i})`);throw p.languageName=i,p.badRule=z.rule,p}return 1}if(z=o,o.type==="begin")return st(o);if(o.type==="illegal"&&!h){let p=new Error('Illegal lexeme "'+g+'" for mode "'+(f.scope||"<unnamed>")+'"');throw p.mode=f,p}else if(o.type==="end"){let p=rt(o);if(p!==Te)return p}if(o.type==="illegal"&&g==="")return o.index===a.length||(b+=`
+`),1;if(se>1e5&&se>o.index*3)throw new Error("potential infinite loop, way more iterations than matches");return b+=g,g.length}let A=C(i);if(!A)throw L(_.replace("{}",i)),new Error('Unknown language: "'+i+'"');let ot=sn(A),ie="",f=E||ot,we={},x=new r.__emitter(r);ct();let b="",Y=0,v=0,se=0,re=!1;try{if(A.__emitTokens)A.__emitTokens(a,x);else{for(f.matcher.considerAll();;){se++,re?re=!1:f.matcher.considerAll(),f.matcher.lastIndex=v;let s=f.matcher.exec(a);if(!s)break;let o=a.substring(v,s.index),g=Oe(o,s);v=s.index+g}Oe(a.substring(v))}return x.finalize(),ie=x.toHTML(),{language:i,value:ie,relevance:Y,illegal:!1,_emitter:x,_top:f}}catch(s){if(s.message&&s.message.includes("Illegal"))return{language:i,value:ce(a),illegal:!0,relevance:0,_illegalBy:{message:s.message,index:v,context:a.slice(v-100,v+100),mode:s.mode,resultSoFar:ie},_emitter:x};if(d)return{language:i,value:ce(a),illegal:!1,relevance:0,errorRaised:s,_emitter:x,_top:f};throw s}}function I(i){let a={value:ce(i),illegal:!1,relevance:0,_top:c,_emitter:new r.__emitter(r)};return a._emitter.addText(i),a}function $(i,a){a=a||r.languages||Object.keys(t);let h=I(i),E=a.filter(C).filter(Ee).map(R=>P(R,i,!1));E.unshift(h);let w=E.sort((R,S)=>{if(R.relevance!==S.relevance)return S.relevance-R.relevance;if(R.language&&S.language){if(C(R.language).supersetOf===S.language)return 1;if(C(S.language).supersetOf===R.language)return-1}return 0}),[y,D]=w,F=y;return F.secondBest=D,F}function te(i,a,h){let E=a&&n[a]||h;i.classList.add("hljs"),i.classList.add(`language-${E}`)}function ne(i){let a=null,h=O(i);if(u(h))return;if(W("before:highlightElement",{el:i,language:h}),i.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",i);return}if(i.children.length>0&&(r.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("(see the highlight.js security wiki)"),console.warn("The element with unescaped HTML:"),console.warn(i)),r.throwUnescapedHTML))throw new ue("One of your code blocks includes unescaped HTML.",i.innerHTML);a=i;let E=a.textContent,w=h?M(E,{language:h,ignoreIllegals:!0}):$(E);i.innerHTML=w.value,i.dataset.highlighted="yes",te(i,h,w.language),i.result={language:w.language,re:w.relevance,relevance:w.relevance},w.secondBest&&(i.secondBest={language:w.secondBest.language,relevance:w.secondBest.relevance}),W("after:highlightElement",{el:i,result:w,text:E})}function Ye(i){r=Ae(r,i)}let Xe=()=>{m(),H("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function Ze(){m(),H("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let de=!1;function m(){function i(){m()}if(document.readyState==="loading"){de||window.addEventListener("DOMContentLoaded",i,!1),de=!0;return}document.querySelectorAll(r.cssSelector).forEach(ne)}function Je(i,a){let h=null;try{h=a(e)}catch(E){if(L("Language definition for '{}' could not be registered.".replace("{}",i)),d)L(E);else throw E;h=c}h.name||(h.name=i),t[i]=h,h.rawDefinition=a.bind(null,e),h.aliases&&pe(h.aliases,{languageName:i})}function Ve(i){delete t[i];for(let a of Object.keys(n))n[a]===i&&delete n[a]}function Qe(){return Object.keys(t)}function C(i){return i=(i||"").toLowerCase(),t[i]||t[n[i]]}function pe(i,{languageName:a}){typeof i=="string"&&(i=[i]),i.forEach(h=>{n[h.toLowerCase()]=a})}function Ee(i){let a=C(i);return a&&!a.disableAutodetect}function qe(i){i["before:highlightBlock"]&&!i["before:highlightElement"]&&(i["before:highlightElement"]=a=>{i["before:highlightBlock"](Object.assign({block:a.el},a))}),i["after:highlightBlock"]&&!i["after:highlightElement"]&&(i["after:highlightElement"]=a=>{i["after:highlightBlock"](Object.assign({block:a.el},a))})}function et(i){qe(i),l.push(i)}function tt(i){let a=l.indexOf(i);a!==-1&&l.splice(a,1)}function W(i,a){let h=i;l.forEach(function(E){E[h]&&E[h](a)})}function nt(i){return H("10.7.0","highlightBlock will be removed entirely in v12.0"),H("10.7.0","Please use highlightElement now."),ne(i)}Object.assign(e,{highlight:M,highlightAuto:$,highlightAll:m,highlightElement:ne,highlightBlock:nt,configure:Ye,initHighlighting:Xe,initHighlightingOnLoad:Ze,registerLanguage:Je,unregisterLanguage:Ve,listLanguages:Qe,getLanguage:C,registerAliases:pe,autoDetection:Ee,inherit:Ae,addPlugin:et,removePlugin:tt}),e.debugMode=function(){d=!1},e.safeMode=function(){d=!0},e.versionString=cn,e.regex={concat:B,lookahead:De,either:V,optional:wt,anyNumberOfTimes:Ot};for(let i in X)typeof X[i]=="object"&&Ie(X[i]);return Object.assign(e,X),e},U=je({});U.newInstance=()=>je({});Ge.exports=U;U.HighlightJS=U;U.default=U});var me=bt(Ke(),1);var he=me.default;var j="[0-9](_*[0-9])*",q=`\\.(${j})`,ee="[0-9a-fA-F](_*[0-9a-fA-F])*",We={className:"number",variants:[{begin:`(\\b(${j})((${q})|\\.)?|(${q}))[eE][+-]?(${j})[fFdD]?\\b`},{begin:`\\b(${j})((${q})[fFdD]?\\b|\\.([fFdD]\\b)?)`},{begin:`(${q})[fFdD]?\\b`},{begin:`\\b(${j})[fFdD]\\b`},{begin:`\\b0[xX]((${ee})\\.?|(${ee})?\\.(${ee}))[pP][+-]?(${j})[fFdD]?\\b`},{begin:"\\b(0|[1-9](_*[0-9])*)[lL]?\\b"},{begin:`\\b0[xX](${ee})[lL]?\\b`},{begin:"\\b0(_*[0-7])*[lL]?\\b"},{begin:"\\b0[bB][01](_*[01])*[lL]?\\b"}],relevance:0};function Fe(e,t,n){return n===-1?"":e.replace(t,l=>Fe(e,t,n-1))}function ze(e){let t=e.regex,n="[\xC0-\u02B8a-zA-Z_$][\xC0-\u02B8a-zA-Z_$0-9]*",l="(?:(?:\\s*\\[\\s*])+)?",d=n+"<@@@>"+l,c="(?:"+("\\?(?:\\s+(?:extends|super)\\s+"+d+")?")+"|"+d+")",r=Fe("(?:\\s*<\\s*"+c+"(?:\\s*,\\s*"+c+")*\\s*>)?",/<@@@>/g,2),I={keyword:["synchronized","abstract","private","var","static","if","const ","for","while","strictfp","finally","protected","import","native","final","void","enum","else","break","transient","catch","instanceof","volatile","case","assert","package","default","public","try","switch","continue","throws","protected","public","private","module","requires","exports","do","sealed","yield","permits","goto","when"],literal:["false","true","null"],type:["char","boolean","long","float","int","byte","short","double"],built_in:["super","this"]},$={className:"meta",begin:"@"+n,contains:[{begin:/\(/,end:/\)/,contains:["self"]}]},te={className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[e.C_BLOCK_COMMENT_MODE],endsParent:!0};return{name:"Java",aliases:["jsp"],keywords:I,illegal:/<\/|#/,contains:[e.COMMENT("/\\*\\*","\\*/",{relevance:0,contains:[{begin:/\w+@/,relevance:0},{className:"doctag",begin:"@[A-Za-z]+"}]}),{begin:/import java\.[a-z]+\./,keywords:"import",relevance:2},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE,{begin:/"""/,end:/"""/,className:"string",contains:[e.BACKSLASH_ESCAPE]},e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,{match:[/\b(?:class|interface|enum|extends|implements|new)/,/\s+/,n],className:{1:"keyword",3:"title.class"}},{match:/non-sealed/,scope:"keyword"},{beginKeywords:"new throw return else yield assert",relevance:0},{begin:[n,t.concat(r,l,/\s+/),n,l,/\s*/,/=(?!=)/],className:{1:"type",3:"variable",6:"operator"}},{begin:[/record/,/\s+/,n],className:{1:"keyword",3:"title.class"},contains:[te,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},{begin:[n,t.concat(r,l,/\s+/),n,/\s*(?=\()/],className:{1:"type",3:"title.function"},keywords:I,contains:[{className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[$,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,We,e.C_BLOCK_COMMENT_MODE]},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},We,$]}}he.registerLanguage("java",ze);window.hljs=he;})();
+</script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---- 1. syntax highlighting -------------------------------------- */
+  function highlight() {
+    if (!window.hljs) return;
+    var blocks = document.querySelectorAll('pre code.language-java');
+    for (var i = 0; i < blocks.length; i++) {
+      try { window.hljs.highlightElement(blocks[i]); } catch (e) {}
+    }
+  }
+
+  /* ---- 2. every solution / reveal starts closed --------------------- */
+  function closeAll() {
+    var d = document.querySelectorAll('details.soln');
+    for (var i = 0; i < d.length; i++) { d[i].open = false; }
+  }
+
+  /* ---- 3. show all / hide all -------------------------------------- */
+  function wireToolbar() {
+    var show = document.getElementById('showAll');
+    var hide = document.getElementById('hideAll');
+    function setAll(v) {
+      var d = document.querySelectorAll('details.soln');
+      for (var i = 0; i < d.length; i++) { d[i].open = v; }
+    }
+    if (show) show.addEventListener('click', function () { setAll(true); });
+    if (hide) hide.addEventListener('click', function () { setAll(false); });
+  }
+
+  /* ---- 4. live-coding editors -------------------------------------- */
+  var INDENT = '    ';
+
+  function wireEditors() {
+    var eds = document.querySelectorAll('.editor');
+    for (var i = 0; i < eds.length; i++) { wireOne(eds[i]); }
+  }
+
+  function wireOne(box) {
+    var ta = box.querySelector('textarea');
+    if (!ta) return;
+    var starter = ta.value;
+
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Tab' || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+      ev.preventDefault();
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+
+      if (s === e && !ev.shiftKey) {
+        ta.value = v.slice(0, s) + INDENT + v.slice(e);
+        ta.selectionStart = ta.selectionEnd = s + INDENT.length;
+        return;
+      }
+      /* block indent / outdent over the selected lines */
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var le = v.indexOf('\n', e);
+      if (le === -1) le = v.length;
+      var seg = v.slice(ls, le);
+      var lines = seg.split('\n');
+      var delta0 = 0, total = 0;
+
+      for (var i = 0; i < lines.length; i++) {
+        if (ev.shiftKey) {
+          var m = lines[i].match(/^(\t| {1,4})/);
+          if (m) {
+            lines[i] = lines[i].slice(m[0].length);
+            if (i === 0) delta0 = -m[0].length;
+            total -= m[0].length;
+          }
+        } else {
+          lines[i] = INDENT + lines[i];
+          if (i === 0) delta0 = INDENT.length;
+          total += INDENT.length;
+        }
+      }
+      ta.value = v.slice(0, ls) + lines.join('\n') + v.slice(le);
+      ta.selectionStart = Math.max(ls, s + delta0);
+      ta.selectionEnd = Math.max(ta.selectionStart, e + total);
+    });
+
+    /* keep the indent of the current line when Enter is pressed */
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Enter' || ev.shiftKey || ev.ctrlKey || ev.metaKey) return;
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+      if (s !== e) return;
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var lead = (v.slice(ls, s).match(/^[ \t]*/) || [''])[0];
+      var extra = /[{(\[]\s*$/.test(v.slice(ls, s)) ? INDENT : '';
+      if (!lead && !extra) return;
+      ev.preventDefault();
+      var ins = '\n' + lead + extra;
+      ta.value = v.slice(0, s) + ins + v.slice(e);
+      ta.selectionStart = ta.selectionEnd = s + ins.length;
+    });
+
+    var rst = box.querySelector('[data-act="reset"]');
+    if (rst) rst.addEventListener('click', function () {
+      ta.value = starter;
+      ta.focus();
+      flash(box, 'Reset to starter code');
+    });
+
+    var cpy = box.querySelector('[data-act="copy"]');
+    if (cpy) cpy.addEventListener('click', function () {
+      var done = function () { flash(box, 'Copied — paste it into your IDE'); };
+      var fail = function () { flash(box, 'Copy failed — select the text and press Ctrl/Cmd+C'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value).then(done, function () { legacy(ta, done, fail); });
+      } else {
+        legacy(ta, done, fail);
+      }
+    });
+  }
+
+  function legacy(ta, done, fail) {
+    try {
+      var st = ta.selectionStart, en = ta.selectionEnd;
+      ta.select();
+      var ok = document.execCommand('copy');
+      ta.selectionStart = st; ta.selectionEnd = en;
+      ok ? done() : fail();
+    } catch (e) { fail(); }
+  }
+
+  function flash(box, msg) {
+    var f = box.querySelector('.foot');
+    if (!f) return;
+    if (f.getAttribute('data-base') === null || f.getAttribute('data-base') === undefined) {
+      f.setAttribute('data-base', f.textContent);
+    }
+    f.textContent = msg;
+    window.setTimeout(function () { f.textContent = f.getAttribute('data-base'); }, 2200);
+  }
+
+  /* ---- go ----------------------------------------------------------- */
+  function init() {
+    highlight();
+    closeAll();
+    wireToolbar();
+    wireEditors();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  /* belt and braces: some browsers restore <details> state on soft reload */
+  window.addEventListener('pageshow', closeAll);
+})();
+</script>
+</body>
+</html>

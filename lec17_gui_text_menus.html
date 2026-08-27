@@ -1,0 +1,1886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class 19 — GUI III: Text Components and Menus | CSCI 212</title>
+<style>
+:root{
+  --ink:#0f172a; --ink2:#334155; --muted:#64748b; --line:#e2e8f0;
+  --bg:#ffffff; --bg2:#f8fafc;
+  --obj:#4f46e5; --def:#2563eb; --ex:#059669; --alg:#7c3aed;
+  --key:#b45309; --warn:#dc2626; --qc:#0891b2; --prac:#be185d; --sum:#475569;
+  --edit:#ea580c; --edit-bg:#fff7ed;
+  --code-bg:#0d1117; --code-bd:#000000;   /* read-only listings: black */
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px 80px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:#0f172a;color:#e2e8f0;font-size:13.5px;
+  border-bottom:3px solid var(--obj);
+}
+.topbar .inner{max-width:900px;margin:0 auto;padding:10px 22px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.topbar a{color:#e2e8f0;text-decoration:none;border-bottom:1px solid transparent}
+.topbar a:hover{border-bottom-color:#94a3b8}
+.topbar .course{font-weight:700;letter-spacing:.02em}
+.topbar .sep{color:#475569}
+.topbar .spacer{flex:1}
+
+/* ---------- title block ---------- */
+.titleblock{padding:34px 0 10px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.eyebrow{
+  font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--obj);margin-bottom:8px;
+}
+.titleblock h1{font-size:33px;line-height:1.2;margin:0 0 10px;letter-spacing:-.015em}
+.titleblock .sub{margin:0;color:var(--muted);font-size:17px;line-height:1.5}
+
+h2{
+  font-size:24px;margin:46px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line);letter-spacing:-.01em;scroll-margin-top:14px;
+}
+h2 .num{color:var(--obj);font-weight:800;margin-right:11px}
+h3{font-size:18.5px;margin:30px 0 10px;color:var(--ink)}
+h4{font-size:16px;margin:20px 0 8px;color:var(--ink2)}
+p{margin:12px 0}
+ul,ol{margin:12px 0;padding-left:26px}
+li{margin:6px 0}
+a{color:var(--def)}
+hr{border:0;border-top:1px solid var(--line);margin:30px 0}
+strong{color:var(--ink)}
+.muted{color:var(--muted)}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--bg2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 20px 16px;margin:22px 0;
+}
+.toc .th{
+  font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;
+}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:30px}
+.toc li{margin:3px 0;font-size:14.5px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- show all / hide all ---------- */
+.tools{
+  display:flex;gap:9px;align-items:center;flex-wrap:wrap;
+  padding:11px 15px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:9px;margin:22px 0;font-size:13.5px;
+}
+.tools .lab{font-weight:700;color:var(--ink2)}
+.tools button{
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  background:#fff;color:var(--ink2);border:1px solid #cbd5e1;
+  border-radius:6px;padding:4px 12px;
+}
+.tools button:hover{background:var(--obj);border-color:var(--obj);color:#fff}
+.tools .muted{font-size:12.5px}
+
+/* ---------- boxes ---------- */
+.box{border:1px solid var(--line);border-left:5px solid var(--muted);border-radius:8px;margin:22px 0;overflow:hidden;background:#fff}
+.box>.hd{
+  padding:9px 16px;font-size:12.5px;font-weight:700;
+  letter-spacing:.075em;text-transform:uppercase;color:#fff;background:var(--muted);
+}
+.box>.hd .tag{margin-left:5px;font-weight:500;text-transform:none;letter-spacing:0;opacity:.92;font-size:13px}
+.box>.bd{padding:4px 18px 14px}
+.box>.bd>:first-child{margin-top:12px}
+.box>.bd>:last-child{margin-bottom:2px}
+
+.box.obj{border-left-color:var(--obj)}  .box.obj>.hd{background:var(--obj)}
+.box.def{border-left-color:var(--def)}  .box.def>.hd{background:var(--def)}
+.box.ex{border-left-color:var(--ex)}    .box.ex>.hd{background:var(--ex)}
+.box.alg{border-left-color:var(--alg)}  .box.alg>.hd{background:var(--alg)}
+.box.key{border-left-color:var(--key)}  .box.key>.hd{background:var(--key)}
+.box.warn{border-left-color:var(--warn)}.box.warn>.hd{background:var(--warn)}
+.box.qc{border-left-color:var(--qc)}    .box.qc>.hd{background:var(--qc)}
+.box.prac{border-left-color:var(--prac)}.box.prac>.hd{background:var(--prac)}
+.box.sum{border-left-color:var(--sum)}  .box.sum>.hd{background:var(--sum)}
+
+.box.obj{background:#f5f5ff}
+.box.qc{background:#f0fbfe}
+.box.warn{background:#fff7f7}
+.box.key{background:#fffbf2}
+.box.sum{background:#f8fafc}
+
+/* ---------- code ---------- */
+/* Read-only listings sit on black, matching CSCI 211, so a code block is never
+   mistaken for the editable live-coding box. */
+pre{
+  margin:14px 0;padding:13px 15px;overflow-x:auto;
+  background:var(--code-bg);border:1px solid var(--code-bd);border-radius:8px;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;color:#c9d1d9;
+}
+pre code{font-family:inherit;font-size:inherit;background:none;padding:0;border:0;color:inherit;display:block}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef2f7;
+  border:1px solid #e2e8f0;border-radius:4px;padding:1px 5px;color:#0b3a5b;
+}
+.filename{
+  font-family:var(--mono);font-size:12px;color:#475569;
+  margin:16px 0 -9px;font-weight:600;
+}
+
+/* comparison block: another language, never syntax-highlighted. Dark like the
+   Java listings, but desaturated and dashed so it reads as "not this course". */
+pre.cmp{background:#161b22;border-style:dashed;border-color:#3f4650;color:#9aa4b2}
+pre.cmp code{color:#9aa4b2}
+
+/* shell commands you type */
+pre.sh{background:#1e293b;border-color:#1e293b;color:#e2e8f0;position:relative;padding-top:26px}
+pre.sh code{color:#e2e8f0}
+pre.sh::before{
+  content:"Terminal";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#86efac;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* output / terminal blocks */
+pre.out{background:#111d33;border-color:#111d33;color:#e2e8f0;position:relative;padding-top:26px}
+pre.out code{color:#e2e8f0}
+pre.out::before{
+  content:"Output";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#7dd3fc;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+pre.err{background:#1f1416;border-color:#7f1d1d;color:#fecdd3;padding-top:26px;position:relative}
+pre.err code{color:#fecdd3}
+pre.err::before{
+  content:"Compiler message";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#fda4af;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* ---- highlight.js, GitHub-dark palette (hand-written, no external file) ---- */
+.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-template-tag,
+.hljs-template-variable,.hljs-type,.hljs-variable.language_{color:#ff7b72}
+.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#d2a8ff}
+.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,
+.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable{color:#79c0ff}
+.hljs-meta .hljs-string,.hljs-regexp,.hljs-string{color:#a5d6ff}
+.hljs-built_in,.hljs-symbol{color:#ffa657}
+.hljs-code,.hljs-comment,.hljs-formula{color:#8b949e;font-style:italic}
+.hljs-name,.hljs-quote,.hljs-selector-pseudo,.hljs-selector-tag{color:#7ee787}
+.hljs-subst{color:#c9d1d9}
+.hljs-section{color:#1f6feb;font-weight:700}
+.hljs-bullet{color:#f2cc60}
+.hljs-emphasis{color:#c9d1d9;font-style:italic}
+.hljs-strong{color:#c9d1d9;font-weight:700}
+
+/* ---------- trace tables ---------- */
+table{border-collapse:collapse;margin:16px 0;font-size:14px;width:100%}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg2);font-weight:700;font-size:13px}
+table.trace td:first-child,table.trace th:first-child{white-space:nowrap}
+table code{font-size:.88em}
+
+/* ---------- multi-part questions ---------- */
+.part{margin:16px 0;padding-left:14px;border-left:2px solid #cbd5e1}
+.part .q{margin:0 0 8px}
+.part .pl{font-weight:700;color:var(--qc);margin-right:6px}
+
+/* ---------- collapsible solutions ---------- */
+details.soln{margin:10px 0 4px}
+details.soln>summary{
+  list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  font-size:12.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:#fff;background:var(--sum);border-radius:6px;padding:5px 13px;
+  user-select:none;
+}
+details.soln>summary::-webkit-details-marker{display:none}
+details.soln>summary::before{content:"\25B6";font-size:9px;transition:transform .15s}
+details.soln[open]>summary::before{transform:rotate(90deg)}
+details.soln>summary::after{content:"Show Answer"}
+details.soln[open]>summary::after{content:"Hide Answer"}
+details.soln>summary:hover{filter:brightness(1.18)}
+
+details.soln.reveal>summary{background:var(--ex)}
+details.soln.reveal>summary::after{content:"Show Output & Explanation"}
+details.soln.reveal[open]>summary::after{content:"Hide Output & Explanation"}
+details.soln.reveal.noout>summary::after{content:"Show Explanation"}
+details.soln.reveal.noout[open]>summary::after{content:"Hide Explanation"}
+
+.ans{
+  margin-top:11px;padding:2px 16px 10px;background:#fff;
+  border:1px solid var(--line);border-left:3px solid var(--sum);border-radius:7px;
+}
+details.soln.reveal .ans{border-left-color:var(--ex)}
+.ans>:first-child{margin-top:12px}
+.ans>:last-child{margin-bottom:6px}
+
+/* ---------- live coding editor ---------- */
+.editor{
+  margin:18px 0;border:2px dashed var(--edit);border-radius:9px;
+  background:var(--edit-bg);overflow:hidden;
+}
+.editor .ehd{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:7px 13px;background:var(--edit);color:#fff;
+  font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+}
+.editor .ehd .etitle{flex:1}
+.editor .ehd button{
+  font:inherit;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  cursor:pointer;background:rgba(255,255,255,.16);color:#fff;
+  border:1px solid rgba(255,255,255,.5);border-radius:5px;padding:3px 10px;
+}
+.editor .ehd button:hover{background:#fff;color:var(--edit)}
+.editor textarea{
+  display:block;width:100%;border:0;outline:0;resize:vertical;
+  padding:12px 15px;background:var(--edit-bg);color:#431407;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;
+  tab-size:4;-moz-tab-size:4;min-height:150px;
+}
+.editor textarea:focus{background:#fff}
+.editor .foot{
+  padding:5px 13px 7px;font-size:11.5px;color:#9a3412;background:#ffedd5;
+  border-top:1px solid #fed7aa;
+}
+
+/* ---------- prev/next nav ---------- */
+.pagenav{display:flex;gap:14px;margin:52px 0 0;flex-wrap:wrap}
+.pagenav a,.pagenav span.disabled{
+  flex:1 1 260px;display:block;text-decoration:none;
+  border:1px solid var(--line);border-radius:9px;padding:12px 16px;background:#fff;
+}
+.pagenav a:hover{border-color:var(--obj);background:var(--bg2)}
+.pagenav .dir{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.pagenav .ttl{font-size:15px;font-weight:600;color:var(--ink);margin-top:3px}
+.pagenav .next{text-align:right}
+.pagenav span.disabled{opacity:.4}
+.pagenav span.disabled .ttl{color:var(--muted)}
+
+footer.pf{
+  margin-top:40px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--muted);text-align:center;
+}
+
+/* ---------- index page ---------- */
+table.sched{font-size:14.5px}
+table.sched th{background:#0f172a;color:#fff;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+table.sched td:first-child{white-space:nowrap;font-weight:700;color:var(--muted);width:60px}
+table.sched tr.examrow td{background:#fff1f2}
+table.sched tr.revrow td{background:#fffbeb}
+table.sched a{font-weight:600;text-decoration:none}
+table.sched a:hover{text-decoration:underline}
+
+
+/* ---------- release gating ---------- */
+.pending{
+  margin-top:4px;font-size:11.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:#b45309;
+}
+.pagenav span.disabled .pending{color:#b45309}
+table.sched tr.pendingrow td{background:#fcfcfd}
+table.sched .unrel{color:var(--muted)}
+table.sched .pending{display:block;margin-top:2px}
+table.sched td.cn{white-space:nowrap;width:52px;font-weight:700;color:var(--muted)}
+table.sched td.dt{white-space:nowrap;width:104px;color:var(--muted);font-size:13.5px}
+table.sched tr.offrow td{background:#f1f5f9;color:var(--muted);font-style:italic}
+.refcard{
+  display:block;text-decoration:none;border:1px solid var(--line);
+  border-left:5px solid var(--alg);border-radius:9px;padding:13px 17px;
+  margin:22px 0;background:#faf9ff;
+}
+.refcard:hover{background:#f5f3ff;border-color:var(--alg)}
+.refcard .rl{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--alg)}
+.refcard .rt{font-size:16px;font-weight:600;color:var(--ink);margin-top:3px}
+.refcard .rd{font-size:14px;color:var(--muted);margin-top:4px}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,.tools,.pagenav,.pending{display:none !important}
+  html,body{width:100%;font-size:10pt}
+  .wrap{max-width:100%;width:100%;padding:0}
+  /* a wide <pre> must wrap rather than widen the page and clip every other
+     element at the paper edge */
+  /* Screen shows code on black; paper does not. Restore a dark-on-light palette
+     for print only, or the dark theme's light tokens vanish on white. */
+  pre{white-space:pre-wrap;overflow:visible;overflow-wrap:anywhere;font-size:8.6pt;
+      background:#f8fafc !important;color:#24292e !important;border-color:#cbd5e1 !important;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  pre code{color:#24292e !important}
+  pre.cmp{background:#fff !important;color:#475569 !important;border-color:#94a3b8 !important}
+  pre.cmp code{color:#475569 !important}
+  pre .hljs-doctag,pre .hljs-keyword,pre .hljs-meta .hljs-keyword,pre .hljs-template-tag,
+  pre .hljs-template-variable,pre .hljs-type,pre .hljs-variable.language_{color:#d73a49 !important}
+  pre .hljs-title,pre .hljs-title.class_,pre .hljs-title.class_.inherited__,
+  pre .hljs-title.function_{color:#6f42c1 !important}
+  pre .hljs-attr,pre .hljs-attribute,pre .hljs-literal,pre .hljs-meta,pre .hljs-number,
+  pre .hljs-operator,pre .hljs-selector-attr,pre .hljs-selector-class,pre .hljs-selector-id,
+  pre .hljs-variable{color:#005cc5 !important}
+  pre .hljs-meta .hljs-string,pre .hljs-regexp,pre .hljs-string{color:#032f62 !important}
+  pre .hljs-built_in,pre .hljs-symbol{color:#e36209 !important}
+  pre .hljs-code,pre .hljs-comment,pre .hljs-formula{color:#6a737d !important}
+  pre .hljs-name,pre .hljs-quote,pre .hljs-selector-pseudo,
+  pre .hljs-selector-tag{color:#22863a !important}
+  pre .hljs-subst,pre .hljs-emphasis,pre .hljs-strong{color:#24292e !important}
+  .filename{color:#475569 !important}
+  table{table-layout:fixed;width:100%;word-wrap:break-word;overflow-wrap:anywhere}
+  .box,.toc{max-width:100%}
+  a{color:var(--ink);text-decoration:none}
+  .box,.part,pre,table,.editor{break-inside:avoid;page-break-inside:avoid}
+  h2{break-after:avoid;page-break-after:avoid}
+  details.soln>summary{display:none !important}
+  details.soln:not([open])>.ans{display:none !important}
+  details.soln::before{
+    content:"Answer withheld — see the online notes.";
+    display:block;font-size:9pt;font-style:italic;color:#64748b;margin:6px 0;
+  }
+  details.soln[open]::before{content:""}
+  .editor textarea{display:none !important}
+  .editor{border:1.5px solid #fdba74 !important;background:#fff;border-style:solid}
+  .editor .ehd{background:#fff !important;color:#9a3412 !important;border-bottom:1px solid #fdba74}
+  .editor .ehd button{display:none}
+  .editor .foot{display:none}
+  .editor::after{content:"";display:block;height:2.1in;background:#fff}
+  pre.out,pre.sh{background:#f1f5f9 !important;color:#0f172a !important;border-color:#94a3b8 !important}
+  pre.err{background:#fef2f2 !important;color:#7f1d1d !important;border-color:#fca5a5 !important}
+  pre.out code,pre.sh code{color:#0f172a !important}
+  pre.err code{color:#7f1d1d !important}
+  pre.out::before,pre.sh::before{color:#475569}
+  pre.err::before{color:#b91c1c}
+  .box>.hd{color:#000;background:#fff !important;border-bottom:1px solid #cbd5e1}
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="inner">
+<span class="course">CSCI 212</span>
+<span class="sep">|</span>
+<a href="index.html">Course index</a>
+<span class="sep">|</span>
+<span>Class 19 of 28</span>
+<span class="sep">|</span>
+<span>Thursday, November 5</span>
+<span class="spacer"></span>
+<span>Queens College, CUNY</span>
+</div></div>
+<div class="wrap">
+<div class="titleblock">
+  <div class="eyebrow">Session 19 &middot; Lecture 17</div>
+  <h1>GUI III: Text Components and Menus</h1>
+  <p class="sub">How a program reads what the user typed, turns it into a number, and organises its commands into menus instead of a row of buttons.</p>
+</div>
+
+<div class="box obj">
+  <div class="hd">Learning Objectives</div>
+  <div class="bd">
+    <p>By the end of today's session you should be able to:</p>
+    <ol>
+      <li>Choose correctly between <code>JLabel</code>, <code>JTextField</code>, <code>JTextArea</code> and <code>JPasswordField</code> for a given job, and change a label's text at run time with <code>setText</code>.</li> <li>Create a <code>JTextField</code>, say exactly what the number in <code>new JTextField(15)</code> does &mdash; and what it does <em>not</em> do &mdash; and read what the user typed with <code>getText()</code>.</li> <li>Convert the <code>String</code> from <code>getText()</code> into a number with <code>Integer.parseInt</code> or <code>Double.parseDouble</code>, and explain why <code>getText() + 1</code> does not add one.</li> <li>Recognise a <code>NumberFormatException</code>, say exactly which inputs cause it, and read its stack trace.</li> <li>Write the three-method GUI that every recent CSCI 212 final has asked for: a <code>main</code>, a constructor that lays out two text fields and a button, and an <code>actionPerformed</code> that reads, computes and displays.</li> <li>Use a <code>JTextArea</code> for multi-line text: <code>rows</code> and <code>columns</code>, <code>append</code>, <code>setText</code> and <code>setLineWrap</code>.</li> <li>Distinguish <code>setEditable(false)</code> from <code>setEnabled(false)</code> and say what the user can still do in each case.</li> <li>Build a menu correctly: <code>JMenuItem</code> on a <code>JMenu</code>, <code>JMenu</code> on a <code>JMenuBar</code>, <code>JMenuBar</code> on the frame with <code>setJMenuBar</code> &mdash; and <code>addActionListener</code> on the <strong>item</strong>.</li> <li>Write an <code>actionPerformed</code> that distinguishes several menu items with <code>e.getActionCommand()</code>, and connect it to the file writing you learned in Lecture 5.</li> </ol> </div> </div> <div class="toc"> <div class="th">On this page</div> <ol> <li><a href="#s1">The four text components</a></li> <li><a href="#s2">JLabel: text the program writes</a></li> <li><a href="#s3">JTextField: text the user writes</a></li> <li><a href="#s4">From text to number, and the exception waiting for you</a></li> <li><a href="#s5">JTextArea: many lines at once</a></li> <li><a href="#s6">setEditable and setEnabled</a></li> <li><a href="#s7">Menus: the bar, the menu, the item</a></li> <li><a href="#s8">A menu that saves to a file</a></li> <li><a href="#prac">Practice Problems</a></li> <li><a href="#summary">Lecture Summary</a></li> </ol> </div> <div class="tools"> <span class="lab">Answers</span> <button id="showAll" type="button">Show all</button> <button id="hideAll" type="button">Hide all</button> <span class="muted">&mdash; every worked-example output and every solution is hidden when the page loads. Work it out first, then reveal.</span> </div> <hr> <h2 id="s1"><span class="num">1.</span>The four text components</h2> <p>Two lectures ago you put a window on the screen. Last time you filled it: <code>FlowLayout</code>, <code>BorderLayout</code> and <code>GridLayout</code> decide <em>where</em> components go, a <code>JPanel</code> groups them, and a <code>JButton</code> runs your <code>actionPerformed</code> when it is clicked. All of that is assumed from here on and none of it is re-derived today.</p> <p>What is missing is the other half of a conversation. So far the user can only click. Every program you have written this semester that actually asked the user something used a <code>Scanner</code> and the keyboard. Today the window learns to accept typing, and &mdash; this is the part the final exam cares about &mdash; your program learns to turn what was typed into a number it can compute with.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the text components</span></div> <div class="bd"> <p>Swing provides several components for text input and display:</p> <table> <tr><th>Class</th><th>What it is for</th><th>Can the user type in it?</th></tr> <tr><td><code>JLabel</code></td><td>Display text or an image</td><td>No &mdash; it is display only</td></tr> <tr><td><code>JTextField</code></td><td>Single-line text input</td><td>Yes, one line</td></tr> <tr><td><code>JTextArea</code></td><td>Multi-line text input and display</td><td>Yes, many lines</td></tr> <tr><td><code>JPasswordField</code></td><td>Single-line field that masks what is typed</td><td>Yes, shown as dots</td></tr> </table> <p>All four live in <code>javax.swing</code>, so they all start with <code>J</code>, and all four are components that go into a container exactly the way a <code>JButton</code> does.</p> </div> </div> <p>Three of them share almost the same interface, which is why they are worth learning together rather than one at a time:</p> <table> <tr><th>Method</th><th><code>JLabel</code></th><th><code>JTextField</code></th><th><code>JTextArea</code></th></tr> <tr><td><code>getText()</code></td><td>yes</td><td>yes</td><td>yes</td></tr> <tr><td><code>setText(String)</code></td><td>yes</td><td>yes</td><td>yes</td></tr> <tr><td><code>setEditable(boolean)</code></td><td>no</td><td>yes</td><td>yes</td></tr> <tr><td><code>append(String)</code></td><td>no</td><td>no</td><td>yes</td></tr> <tr><td><code>setForeground(Color)</code> / <code>setBackground(Color)</code> / <code>setFont(Font)</code></td><td>yes</td><td>yes</td><td>yes</td></tr> </table> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; every text component is a String in a box</span></div> <div class="bd"> <p>Whatever else a text component does on screen, from your program's point of view it holds one <code>String</code>, and there are exactly two operations that matter: <code>getText()</code> hands you that <code>String</code>, and <code>setText(s)</code> replaces it. Almost every exam GUI in this course is <em>read a <code>String</code> out of one component, compute something, write a <code>String</code> into another</em>.</p> <p>Note the type carefully. <code>getText()</code> returns a <strong><code>String</code></strong> &mdash; never an <code>int</code>, never a <code>double</code>, even when the user typed digits. Converting is your job, and &sect;4 is about nothing else.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 17.1</div> <div class="bd"> <p>For each part of an interface, name the Swing class you would use.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> The words <em>Enter your name:</em> printed beside a box.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>JLabel</code>. It is text the program puts there and the user cannot change or type into. The giveaway is that clicking it does nothing.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> The box the user types their name into.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>JTextField</code>. A name is one line, so a single-line field is right.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> A large area where the user writes a paragraph of feedback.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>JTextArea</code>. Many lines, so it needs rows as well as columns.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> The box the user types their password into.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>JPasswordField</code>. It behaves like a <code>JTextField</code> but draws a dot for each character instead of the character itself.</p> <p><strong>Things to notice across all four parts.</strong> Parts (a) and (b) sit next to each other on screen and look similar, but they are opposite kinds of thing: the label is an <em>output</em> the program controls, the field is an <em>input</em> the user controls. Every GUI on the CSCI 212 finals is built out of exactly that pairing, usually twice: a label naming what to type, a field to type it in, a label naming the answer, and a field where the answer appears.</p> </div></details> </div> </div> </div> <h2 id="s2"><span class="num">2.</span>JLabel: text the program writes</h2> <p>You have used <code>JLabel</code> since Lecture 15, but only to put a fixed string in a window. It has one more trick, and it is the trick that makes it useful as an <em>output</em>.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; JLabel</span></div> <div class="bd"> <p>A <strong><code>JLabel</code></strong> displays a short piece of text, an image, or both. It is <strong>non-editable</strong>: the user can neither type into it nor click it into doing anything. It has no listener of its own.</p> <p>The methods you need today:</p> <ul> <li><code>new JLabel("some text")</code> &mdash; create it with its text.</li> <li><code>new JLabel()</code> &mdash; create it empty, and fill it in later.</li> <li><code>label.setText("new text")</code> &mdash; <strong>replace</strong> the text while the program is running. The window redraws itself; you do not have to ask.</li> <li><code>label.getText()</code> &mdash; read back whatever is currently shown.</li> <li><code>label.setForeground(Color.RED)</code> &mdash; the color of the <em>text</em>. <code>setBackground</code> is the color <em>behind</em> it, and on a label it only shows if you also call <code>setOpaque(true)</code>.</li> </ul> </div> </div> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; setText is how a GUI "prints"</span></div> <div class="bd"> <p>A console program answers the user with <code>System.out.println</code>. A GUI program has no console to print to, and the equivalent is <code>setText</code>. When an exam question says <em>"the GUI should display the message Are you sure!"</em>, the code it is asking for is one line: <code>message.setText("Are you sure!");</code></p> <p>That is why the label almost always has to be an <strong>instance variable</strong> rather than a local variable in the constructor. The constructor creates it; <code>actionPerformed</code>, a completely different method, has to change it. A local variable would be gone by then.</p> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; the label the listener cannot reach</span></div> <div class="bd"> <p>This constructor compiles, and the label appears on screen:</p> <pre><code class="language-java">public MyGui() {
+   JLabel answer = new JLabel("Result will appear here");   // local variable
+   getContentPane().add(answer);
+}
+
+public void actionPerformed(ActionEvent e) {
+   answer.setText("done");        // error: cannot find symbol
+}</code></pre> <p><code>answer</code> is a local variable of the constructor. It ceases to exist the moment the constructor returns, and <code>actionPerformed</code> has never heard of it. Declare it as a private field of the class and assign it in the constructor:</p> <pre><code class="language-java">private JLabel answer;           // field: every method of the class can see it
+
+public MyGui() {
+   answer = new JLabel("Result will appear here");
+   getContentPane().add(answer);
+}</code></pre> <p>The rule is easy to apply: <em>anything <code>actionPerformed</code> needs to read or change must be a field.</em> Anything the constructor uses once and forgets &mdash; a <code>JPanel</code>, a <code>JLabel</code> that never changes &mdash; can stay local.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 17.2</div> <div class="bd"> <p>A GUI has four components: a label reading <em>Enter the bill amount</em>, a field to type in, a label reading <em>20% tip</em>, and a field where the answer appears. When the user presses <em>Convert</em>, only the last one changes.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Which of the four must be instance variables of the class?</p> <details class="soln"><summary></summary><div class="ans"> <p>The two <em>fields</em>: the one that is read, and the one that is written. Both are touched by <code>actionPerformed</code>, so both must survive the constructor.</p> <p>The two labels are set once and never change, so they can be local &mdash; and in fact they usually do not get a variable at all. The instructor's own answers write <code>p.add(new JLabel("20% tip"));</code> in one line, creating the label and adding it without ever naming it.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Rewrite the header line <code>JTextField input, output;</code> so that the two fields are properly encapsulated, and say why the exam paper does not write it that way.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>private JTextField input, output;</code> &mdash; Lecture 7's rule, unchanged: instance variables are private unless you have a reason.</p> <p>The exam paper prints them without <code>private</code> because leaving the modifier off gives <em>package access</em>, which is perfectly legal and one word shorter to write on paper. Nothing about the question depends on it. Copy the header exactly as the question gives it &mdash; that is what the marker is matching against &mdash; and use <code>private</code> in your own code.</p> <p><strong>Things to notice across both parts.</strong> Look at any of the exam GUIs and you can predict the field list before reading the question: it is exactly the components that the response method has to touch. That is a useful check on your own answer. If you have declared a field you never mention again in <code>actionPerformed</code>, you probably did not need it.</p> </div></details> </div> </div> </div> <h2 id="s3"><span class="num">3.</span>JTextField: text the user writes</h2> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; JTextField</span></div> <div class="bd"> <p>A <strong><code>JTextField</code></strong> is a single-line box the user can type into. Its features:</p> <ul> <li>Fixed height, variable width &mdash; it is always one line tall.</li> <li>It can be set to read-only (&sect;6).</li> <li>It supports selection, copy and paste, for free, from the operating system.</li> </ul> <p>The methods:</p> <table> <tr><th>Call</th><th>What it does</th></tr> <tr><td><code>new JTextField(15)</code></td><td>Creates an empty field about 15 characters wide.</td></tr> <tr><td><code>new JTextField("hello", 15)</code></td><td>Same, but starting with the text <code>hello</code>.</td></tr> <tr><td><code>field.getText()</code></td><td>Returns whatever is in the box right now, as a <code>String</code>.</td></tr> <tr><td><code>field.setText("abc")</code></td><td>Replaces the contents. <code>setText("")</code> empties it.</td></tr> <tr><td><code>field.setColumns(20)</code></td><td>Changes the preferred width after construction.</td></tr> <tr><td><code>field.setEditable(false)</code></td><td>Makes it read-only (&sect;6).</td></tr> </table> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; the number is a width, not a limit</span></div> <div class="bd"> <p>The number in <code>new JTextField(15)</code> is a <strong>column count</strong>. A column is roughly the width of one character in the field's font, so the number is a request to the layout manager: <em>please make me about this wide.</em></p> <p>It is <strong>not</strong> a maximum length. The user can type as much as they like into a <code>new JTextField(5)</code>; the text simply scrolls sideways inside the little box, and <code>getText()</code> hands you every character of it. Here is a five-column field with forty characters put into it:</p> <p class="filename">ColumnProbe.java</p>
+<pre><code class="language-java">import javax.swing.JTextField;
+
+public class ColumnProbe {
+    public static void main(String args[]) {
+        JTextField small = new JTextField(5);
+        System.out.println("getColumns() -&gt; " + small.getColumns());
+
+        small.setText("0123456789012345678901234567890123456789");
+        System.out.println("length of getText() -&gt; " + small.getText().length());
+
+        JTextField wide = new JTextField();
+        System.out.println("new JTextField() columns -&gt; " + wide.getColumns());
+    }
+}</code></pre> <pre class="out"><code>getColumns() -&gt; 5
+length of getText() -&gt; 40
+new JTextField() columns -&gt; 0</code></pre> <p>Forty characters came back out of a five-column field. If you genuinely need to stop the user typing more than <em>n</em> characters you have to check the length yourself in your listener, or install a document filter &mdash; which is well beyond this course. Treat the constructor argument purely as a sizing hint.</p> <p>Note the last line too: <code>new JTextField()</code> with no argument has <strong>zero</strong> columns, so a layout manager will make it as narrow as it can get away with. That is why every example in this course passes a number.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; TextFieldDemo: read a name, greet it</span></div> <div class="bd"> <p>This is the smallest complete program that reads from the user through a window. Read the constructor first and count the components going into the content pane: a label, a field, a button, another label &mdash; four in a row, laid out by <code>FlowLayout</code>. Then read <code>actionPerformed</code> and notice that the field is read, not the button.</p> <p class="filename">TextFieldDemo.java</p>
+<pre><code class="language-java">import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class TextFieldDemo extends JFrame implements ActionListener {
+    private JTextField inputField;
+    private JLabel resultLabel;
+
+    public static final int WIDTH = 300;
+    public static final int HEIGHT = 150;
+
+    public TextFieldDemo() {
+        super("TextField Demo");
+        setSize(WIDTH, HEIGHT);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        Container contentPane = getContentPane();
+        contentPane.setLayout(new FlowLayout());
+
+        JLabel promptLabel = new JLabel("Enter your name:");
+        contentPane.add(promptLabel);
+
+        inputField = new JTextField(15);
+        contentPane.add(inputField);
+
+        JButton submitButton = new JButton("Submit");
+        submitButton.addActionListener(this);
+        contentPane.add(submitButton);
+
+        resultLabel = new JLabel("Result will appear here");
+        contentPane.add(resultLabel);
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        String name = inputField.getText();
+        if (name.trim().isEmpty()) {
+            resultLabel.setText("Please enter a name");
+        } else {
+            resultLabel.setText("Hello, " + name + "!");
+        }
+    }
+
+    public static void main(String[] args) {
+        TextFieldDemo demo = new TextFieldDemo();
+        demo.setVisible(true);
+    }
+}</code></pre> <p>A Swing program puts a window on the screen and prints nothing, so there is no console output to show you. What we <em>can</em> do is take <code>actionPerformed</code> at its word: it is an ordinary method on an ordinary object, so it can be called from a <code>main</code> with no window anywhere. Below is that method, character for character, moved into a class that is a listener but not a frame, with a driver that types four different things into the field and reports what the label says afterwards.</p> <p>Before you reveal, predict all four lines &mdash; especially the second one.</p> <p class="filename">GreetProbe.java</p>
+<pre><code class="language-java">import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+
+class Greeter implements ActionListener {
+    JTextField inputField  = new JTextField(15);
+    JLabel     resultLabel = new JLabel("Result will appear here");
+
+    public void actionPerformed(ActionEvent e) {
+        String name = inputField.getText();
+        if (name.trim().isEmpty()) {
+            resultLabel.setText("Please enter a name");
+        } else {
+            resultLabel.setText("Hello, " + name + "!");
+        }
+    }
+}
+
+public class GreetProbe {
+    public static void main(String args[]) {
+        Greeter g = new Greeter();
+        String typed[] = {"Ada", "  Ada  ", "", "   "};
+
+        System.out.println("label before any click: " + g.resultLabel.getText());
+        for (int i = 0; i &lt; typed.length; i++) {
+            g.inputField.setText(typed[i]);
+            g.actionPerformed(null);
+            System.out.println("field [" + typed[i] + "]  -&gt;  label ["
+                               + g.resultLabel.getText() + "]");
+        }
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>label before any click: Result will appear here
+field [Ada]  -&gt;  label [Hello, Ada!]
+field [  Ada  ]  -&gt;  label [Hello,   Ada  !]
+field []  -&gt;  label [Please enter a name]
+field [   ]  -&gt;  label [Please enter a name]</code></pre> <p>Three things are worth pulling out.</p> <ul> <li><strong><code>getText()</code> gives you exactly what is in the box</strong>, spaces and all. It does not tidy anything up.</li> <li><strong>Line two is a small bug in the original.</strong> The test uses <code>name.trim().isEmpty()</code>, but the greeting uses the untrimmed <code>name</code>, so <code>&nbsp;&nbsp;Ada&nbsp;&nbsp;</code> passes the test and then prints with its spaces still attached. Writing <code>String name = inputField.getText().trim();</code> on the first line fixes both at once, and is the version to write yourself.</li> <li><strong>A field containing only spaces counts as empty</strong>, because <code>trim()</code> removes them and leaves the empty string. That is deliberate and it is the right behavior; <code>name.isEmpty()</code> alone would have accepted three spaces as a name.</li> </ul> <p>Passing <code>null</code> to <code>actionPerformed</code> is safe here for one specific reason: this method never looks at <code>e</code>. We will need real <code>ActionEvent</code> objects in &sect;7, where the method asks the event which menu item was clicked.</p> 
+</div></details> <p>And here is what the window looks like when you run it on a machine that has a screen. <code>FlowLayout</code> puts the four components in a row and wraps when it runs out of width, so at 300 pixels the fourth one drops to a second row:</p> <p class="filename">TextFieldDemo &mdash; a sketch, not a screenshot</p>
+<pre class="cmp"><code>+--------------------------------------------+
+| TextField Demo                _   []   X   |
++--------------------------------------------+
+|  Enter your name: [Ada            ]        |
+|            [ Submit ]                      |
+|         Hello, Ada!                        |
+|                                            |
++--------------------------------------------+
+          300 x 150 pixels
+  [ ... ] = the JTextField, 15 columns wide</code></pre> </div> </div> <div class="box qc"> <div class="hd">Quick Check 17.3</div> <div class="bd"> <p>A <code>JTextField</code> called <code>field</code> currently contains the four characters <code>2025</code>.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> What is the type and value of <code>field.getText()</code>?</p> <details class="soln"><summary></summary><div class="ans"> <p>Type <code>String</code>, value <code>"2025"</code>. It looks like a number and it is not one. This is the single most important sentence in the lecture.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What does <code>System.out.println(field.getText() + 1);</code> print?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>20251</code>. Lecture 1's rule about <code>+</code>: one operand is a <code>String</code>, so this is concatenation, not addition. The <code>1</code> is appended as a character.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> The user then clears the box completely. What does <code>field.getText()</code> return now &mdash; <code>null</code>, or something else?</p> <details class="soln"><summary></summary><div class="ans"> <p>Not <code>null</code> &mdash; the <strong>empty string</strong> <code>""</code>, whose <code>length()</code> is 0. <code>getText()</code> on a text component never returns <code>null</code>. That matters, because it means you can safely call <code>.trim()</code> or <code>.length()</code> on the result without checking for <code>null</code> first.</p> <p><strong>Things to notice across all three parts.</strong> The three most common beginner bugs with a text field are all in this question: treating <code>getText()</code> as a number, using <code>+</code> and getting concatenation, and expecting <code>null</code> for an empty box. If you can answer (a), (b) and (c) without hesitating you have the hard part of &sect;4 already.</p> </div></details> </div> </div> </div> <h2 id="s4"><span class="num">4.</span>From text to number, and the exception waiting for you</h2> <p>This is the section the final exam is about. Every recent CSCI 212 final has one problem worth fifteen points that is a window with a text field, a button, and a calculation &mdash; a tip calculator, a temperature converter, a kilometre converter. The GUI part of those questions is last lecture's material. The part that decides whether the program works is three characters long: <code>getText()</code> returns a <code>String</code>, and you cannot multiply a <code>String</code>.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; parsing</span></div> <div class="bd"> <p>To <strong>parse</strong> a string is to read it as something else. Java's wrapper classes each provide a static method that parses text into their primitive type:</p> <table> <tr><th>Call</th><th>Takes</th><th>Returns</th><th>Example</th></tr> <tr><td><code>Integer.parseInt(s)</code></td><td>a <code>String</code></td><td>an <code>int</code></td><td><code>Integer.parseInt("25")</code> is <code>25</code></td></tr> <tr><td><code>Double.parseDouble(s)</code></td><td>a <code>String</code></td><td>a <code>double</code></td><td><code>Double.parseDouble("45.5")</code> is <code>45.5</code></td></tr> </table> <p>Both are <code>static</code>, so you call them on the class, not on an object: it is <code>Integer.parseInt(...)</code>, never <code>myString.parseInt()</code>. Both are in <code>java.lang</code>, so there is nothing to import.</p> </div> </div> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; the three lines inside every exam actionPerformed</span></div> <div class="bd"> <ol> <li><strong>Read.</strong> <code>String s = input.getText();</code> &mdash; pull the text out of the input field.</li> <li><strong>Convert and compute.</strong> <code>double bill = Double.parseDouble(s);</code> then <code>double tip = bill * 0.20;</code> &mdash; or both in one line, which is what the instructor's answers do.</li> <li><strong>Write.</strong> <code>output.setText("" + tip);</code> &mdash; put the answer into the output component. The leading <code>""</code> turns the number into a <code>String</code>, because <code>setText</code> will not accept a <code>double</code>.</li> </ol> <p>That is the whole method. Once you can write those three lines from memory, the fifteen point question is a layout exercise.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; what parsing does, and what <code>+</code> does instead</span></div> <div class="bd"> <p>Nothing here is a GUI. It is the arithmetic of &sect;4 on its own so you can see every value. Predict all seven lines &mdash; the third one is the bug you are being immunised against.</p> <p class="filename">ParseDemo.java</p>
+<pre><code class="language-java">public class ParseDemo {
+    public static void main(String args[]) {
+        String typed = "25";
+        int n = Integer.parseInt(typed);
+        System.out.println("Integer.parseInt(\"25\")     -&gt; " + n);
+        System.out.println("n + 1                      -&gt; " + (n + 1));
+        System.out.println("typed + 1                  -&gt; " + (typed + 1));
+
+        String money = "45.50";
+        double d = Double.parseDouble(money);
+        System.out.println("Double.parseDouble(\"45.50\") -&gt; " + d);
+        System.out.println("d * 0.20                   -&gt; " + (d * 0.20));
+
+        System.out.println("Double.parseDouble(\"25\")    -&gt; " + Double.parseDouble("25"));
+        System.out.println("Integer.parseInt(\"  7 \".trim()) -&gt; " + Integer.parseInt("  7 ".trim()));
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Integer.parseInt("25")     -&gt; 25
+n + 1                      -&gt; 26
+typed + 1                  -&gt; 251
+Double.parseDouble("45.50") -&gt; 45.5
+d * 0.20                   -&gt; 9.1
+Double.parseDouble("25")    -&gt; 25.0
+Integer.parseInt("  7 ".trim()) -&gt; 7</code></pre> <table class="trace"> <tr><th>Expression</th><th>Result</th><th>Why</th></tr> <tr><td><code>n + 1</code></td><td><code>26</code></td><td><code>n</code> is an <code>int</code>, so this is addition.</td></tr> <tr><td><code>typed + 1</code></td><td><code>251</code></td><td><code>typed</code> is a <code>String</code>, so this is concatenation. <strong>The bug.</strong></td></tr> <tr><td><code>Double.parseDouble("45.50")</code></td><td><code>45.5</code></td><td>The trailing zero is a fact about the text, not about the number.</td></tr> <tr><td><code>d * 0.20</code></td><td><code>9.1</code></td><td>Real multiplication, once <code>d</code> is genuinely a <code>double</code>.</td></tr> <tr><td><code>Double.parseDouble("25")</code></td><td><code>25.0</code></td><td>No decimal point needed in the text. <code>parseDouble</code> accepts anything <code>parseInt</code> would.</td></tr> <tr><td><code>Integer.parseInt("  7 ".trim())</code></td><td><code>7</code></td><td><code>trim()</code> first, then parse. Without the <code>trim()</code> this line would crash &mdash; see below.</td></tr> </table> <p>The third row is the whole reason this section exists. <code>typed + 1</code> compiles, runs, and produces <code>251</code>, which is not an error message and is not the answer. In a GUI it would put <code>251</code> in the output box and the user would believe it.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 17.4</div> <div class="bd"> <p>A <code>JTextField</code> named <code>input</code> contains <code>12</code>. For each expression, give the value and the type, or say that it does not compile.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>input.getText() * 2</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Does not compile. <code>*</code> is not defined for a <code>String</code>: <code>bad operand types for binary operator '*'</code>. This one at least the compiler catches for you, which makes it the friendliest of the four.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>input.getText() + 2</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compiles. Value <code>"122"</code>, a <code>String</code>. This is the dangerous one: no error, wrong answer.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>Integer.parseInt(input.getText()) * 2</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compiles. Value <code>24</code>, an <code>int</code>. This is the correct form.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>Double.parseDouble(input.getText()) / 5</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compiles. Value <code>2.4</code>, a <code>double</code>. Note that this is <em>not</em> integer division even though the <code>5</code> is written without a decimal point: <code>parseDouble</code> already made the left operand a <code>double</code>, and Lecture 1's rule says one <code>double</code> operand is enough.</p> <p><strong>Things to notice across all four parts.</strong> Compare (c) with the version a lot of students write first, <code>Integer.parseInt(input.getText() * 2)</code>. Look at where the closing parenthesis is: that one multiplies the <code>String</code> and then parses, which is (a) with extra steps and does not compile. Parse first, compute second &mdash; the <code>parseInt</code> call goes <em>around the <code>getText()</code> and nothing else</em>.</p> </div></details> </div> </div> </div> <p>Now the part nobody warns you about. <code>Integer.parseInt</code> is given a <code>String</code> that the user typed, and users type anything.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; NumberFormatException</span></div> <div class="bd"> <p>If the text handed to <code>parseInt</code> or <code>parseDouble</code> is not a valid number, the method cannot return anything sensible, so it <strong>throws</strong> a <strong><code>NumberFormatException</code></strong>. An exception thrown and not dealt with stops the method it was thrown in, then the method that called that one, and so on until the program itself stops and prints a stack trace.</p> <p>Exceptions proper &mdash; what throwing means, and how <code>try</code> and <code>catch</code> stop the damage &mdash; are Lecture 20. What you need today is to recognise this one on sight and know exactly which inputs cause it.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; watching it actually fail</span></div> <div class="bd"> <p>Four one-line programs, each parsing something a user could plausibly have typed into a box. Decide for each one whether it survives before you look.</p> <p class="filename">BadNumber.java</p>
+<pre><code class="language-java">public class BadNumber {
+    public static void main(String args[]) {
+        String typed = "twenty";          // what the user actually typed
+        System.out.println("About to parse: " + typed);
+        int n = Integer.parseInt(typed);
+        System.out.println("This line never runs. n = " + n);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>About to parse: twenty
+Exception in thread "main" java.lang.NumberFormatException: For input string: "twenty"
+	at java.base/java.lang.NumberFormatException.forInputString(NumberFormatException.java:67)
+	at java.base/java.lang.Integer.parseInt(Integer.java:662)
+	at java.base/java.lang.Integer.parseInt(Integer.java:778)
+	at BadNumber.main(BadNumber.java:5)</code></pre> <p>Read it the way you read the <code>HeadlessException</code> in Lecture 15 &mdash; bottom line first. <code>BadNumber.main</code>, at line 5 of <code>BadNumber.java</code>, called <code>Integer.parseInt</code>, which gave up and threw. The first line names the exception and, helpfully, quotes the exact text it choked on: <code>For input string: "twenty"</code>. When you meet this in your own program, that quoted string tells you immediately what the user typed.</p> <p>The last <code>println</code> never ran. That is what "the program stops" means.</p> 
+</div></details> <p>Three more, each a single statement. Which of these three crash?</p> <pre><code class="language-java">System.out.println(Integer.parseInt(""));       // the user typed nothing
+System.out.println(Integer.parseInt("3.5"));    // the user typed a decimal
+System.out.println(Integer.parseInt(" 7 "));    // the user typed a space, then 7</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <p><strong>All three.</strong> Here are the three real messages, one per program:</p> <pre class="out"><code>Exception in thread "main" java.lang.NumberFormatException: For input string: ""
+	at java.base/java.lang.Integer.parseInt(Integer.java:672)
+	at BadNumber2.main(BadNumber2.java:3)</code></pre> <pre class="out"><code>Exception in thread "main" java.lang.NumberFormatException: For input string: "3.5"
+	at java.base/java.lang.Integer.parseInt(Integer.java:662)
+	at BadNumber3.main(BadNumber3.java:3)</code></pre> <pre class="out"><code>Exception in thread "main" java.lang.NumberFormatException: For input string: " 7 "
+	at java.base/java.lang.Integer.parseInt(Integer.java:648)
+	at BadNumber4.main(BadNumber4.java:3)</code></pre> <table class="trace"> <tr><th>Text</th><th>Result</th><th>Why</th></tr> <tr><td><code>"25"</code></td><td>fine</td><td>Digits, nothing else.</td></tr> <tr><td><code>"-3"</code></td><td>fine</td><td>A leading minus sign is allowed.</td></tr> <tr><td><code>""</code></td><td>throws</td><td>An empty box is not a zero. This is the case a real user hits first, by pressing the button before typing.</td></tr> <tr><td><code>" 7 "</code></td><td>throws</td><td><code>parseInt</code> does not trim. A single stray space is enough. Call <code>.trim()</code> yourself.</td></tr> <tr><td><code>"3.5"</code></td><td>throws</td><td><code>parseInt</code> wants an <em>integer</em>. Use <code>Double.parseDouble</code> if decimals are legal input.</td></tr> <tr><td><code>"twenty"</code></td><td>throws</td><td>Letters.</td></tr> <tr><td><code>"1,000"</code></td><td>throws</td><td>The comma is not part of a Java number literal.</td></tr> </table> <p>The habit to build now: <strong>always <code>trim()</code> before you parse.</strong> <code>Integer.parseInt(input.getText().trim())</code> costs seven characters and removes the single most common accidental failure.</p> 
+</div></details> </div> </div> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; a crash inside a listener does not close the window</span></div> <div class="bd"> <p>In a console program an uncaught exception ends the program. In a Swing program it does not, and the difference confuses people badly. Your <code>actionPerformed</code> runs on the event dispatch thread from Lecture 15, and when an exception escapes it, that thread prints the stack trace and carries on waiting for the next click. The window stays open, the output box keeps its old contents, and unless the user happens to be watching a console they see <em>nothing at all</em> &mdash; a button that silently did nothing.</p> <p>That is why the instructor's answer to every one of these exam problems wraps the parse in <code>try</code> and <code>catch</code>. You will meet the mechanism properly in Lecture 20; you will meet the shape of it in the practice problems at the bottom of this page, because the rubric awards two points for it.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 17.5</div> <div class="bd"> <p>For each string, say whether <code>Integer.parseInt</code> succeeds, and if not, why.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>"0042"</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Succeeds, giving <code>42</code>. Leading zeros are fine; they are just digits.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>"42 "</code> (one trailing space)</p> <details class="soln"><summary></summary><div class="ans"> <p>Throws <code>NumberFormatException</code>. A space is not a digit and <code>parseInt</code> does not trim for you. <code>"42 ".trim()</code> would parse fine.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>"42.0"</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Throws. It <em>is</em> a valid number, but not a valid <code>int</code>. <code>Double.parseDouble</code> would accept it and give <code>42.0</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>"+5"</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Succeeds, giving <code>5</code>. A leading <code>+</code> is allowed, just as a leading <code>-</code> is. This one surprises people in both directions, and it is not worth memorising &mdash; the useful summary is <em>an optional sign, then digits, then nothing else at all.</em></p> <p><strong>Things to notice across all four parts.</strong> Every failing case here is something a user could type by accident in half a second. That is the point. The question is never "will bad input arrive?" but "what does my program do when it does?", and the answer today is <em>it throws, and the button appears to do nothing</em>.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 17.6</div> <div class="bd"> <p>Write the complete class <code>SquareIt</code> that <code>extends JFrame implements ActionListener</code>. The window is 350 by 120 pixels, titled <em>Square It</em>, uses <code>FlowLayout</code>, and contains a label reading <code>Enter a whole number:</code>, a text field 8 columns wide, a button reading <code>Square</code>, and a label where the answer appears. Clicking the button must read the field, square the number and put <code>n squared is n*n</code> into the answer label. Closing the window ends the program.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Two of the four components are touched by <code>actionPerformed</code> &mdash; the input field and the answer label &mdash; so those two are fields of the class and the other two are created inline. The constructor is the Lecture 15 checklist plus four <code>add</code> calls and one <code>addActionListener</code>. The response method is the three lines from the procedure box: read, parse and compute, write.</p> <p>Because the input is a whole number, <code>Integer.parseInt</code> is the right method, and because a user can type anything, the parse is wrapped so that bad input becomes a message rather than a silent nothing. Catching <code>NumberFormatException</code> by name is better style than catching <code>Exception</code>, and it is what you should write when the question does not print a template for you.</p> <p class="filename">SquareIt.java</p>
+<pre><code class="language-java">import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+
+public class SquareIt extends JFrame implements ActionListener {
+   public static final int WIDTH = 350;
+   public static final int HEIGHT = 120;
+
+   private JTextField input;
+   private JLabel answer;
+
+   public SquareIt() {
+      super("Square It");
+      setSize(WIDTH, HEIGHT);
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+      Container contentPane = getContentPane();
+      contentPane.setLayout(new FlowLayout());
+
+      contentPane.add(new JLabel("Enter a whole number:"));
+
+      input = new JTextField(8);
+      contentPane.add(input);
+
+      JButton square = new JButton("Square");
+      square.addActionListener(this);
+      contentPane.add(square);
+
+      answer = new JLabel("The answer will appear here");
+      contentPane.add(answer);
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      try {
+         int n = Integer.parseInt(input.getText().trim());
+         answer.setText(n + " squared is " + (n * n));
+      } catch (NumberFormatException ex) {
+         answer.setText("That is not a whole number");
+      }
+   }
+
+   public static void main(String args[]) {
+      SquareIt gui = new SquareIt();
+      gui.setVisible(true);
+   }
+}</code></pre> <p>Driving that same <code>actionPerformed</code> from a plain <code>main</code>, with six different things typed into the field, gives:</p> <pre class="out"><code>typed [7]  -&gt;  7 squared is 49
+typed [ 12 ]  -&gt;  12 squared is 144
+typed [-3]  -&gt;  -3 squared is 9
+typed [3.5]  -&gt;  That is not a whole number
+typed [seven]  -&gt;  That is not a whole number
+typed []  -&gt;  That is not a whole number</code></pre> <p><strong>Things to notice.</strong> <code>" 12 "</code> works because of the <code>.trim()</code>, and <code>-3</code> works because a leading minus is legal. <code>3.5</code> is rejected, which is correct for a question that says <em>whole number</em>; had the question said <em>number</em> you would reach for <code>Double.parseDouble</code> instead and the answer would be <code>12.25</code>.</p> <p>The parentheses in <code>(n * n)</code> are not optional. Without them, <code>answer.setText(n + " squared is " + n * n)</code> would still compile, because <code>*</code> binds tighter than <code>+</code>, so it happens to work &mdash; but <code>n + " is " + n + n</code> would give <code>77</code> instead of <code>14</code>. Parenthesise every computation you concatenate; Lecture 1's warning applies unchanged inside a GUI.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 17.6</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="28" aria-label="Live coding - Quick Check 17.6">import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+
+public class SquareIt extends JFrame implements ActionListener {
+    // 1. Which two components does actionPerformed need? Declare those as fields.
+
+    public SquareIt() {
+        super("Square It");
+        // 2. Size 350 x 120, EXIT_ON_CLOSE, FlowLayout on the content pane.
+
+        // 3. Add the label, the 8-column field, the button (with a listener),
+        //    and the answer label.
+
+    }
+
+    // 4. actionPerformed: read the field, parse it, square it, set the label.
+
+    public static void main(String args[]) {
+        SquareIt gui = new SquareIt();
+        gui.setVisible(true);
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s5"><span class="num">5.</span>JTextArea: many lines at once</h2> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; JTextArea</span></div> <div class="bd"> <p>A <strong><code>JTextArea</code></strong> is a rectangle of editable text with many lines. Its features:</p> <ul> <li>Variable height <em>and</em> width &mdash; unlike a <code>JTextField</code>, which is always one line tall.</li> <li>It can display and edit large amounts of text.</li> <li>It supports selection, copy and paste.</li> </ul> <p>The methods, on top of the <code>getText</code> and <code>setText</code> you already know:</p> <table> <tr><th>Call</th><th>What it does</th></tr> <tr><td><code>new JTextArea(10, 30)</code></td><td>An empty area about 10 rows tall and 30 columns wide. <strong>Rows first, then columns.</strong></td></tr> <tr><td><code>area.append("more\n")</code></td><td>Adds text at the end, keeping what is already there.</td></tr> <tr><td><code>area.setText("")</code></td><td>Replaces everything &mdash; the way to clear it.</td></tr> <tr><td><code>area.setLineWrap(true)</code></td><td>A line too long for the width continues on the next line instead of running off the edge.</td></tr> <tr><td><code>area.setWrapStyleWord(true)</code></td><td>When wrapping, break between words rather than in the middle of one.</td></tr> <tr><td><code>area.setRows(n)</code> / <code>area.setColumns(n)</code></td><td>Change the preferred size after construction.</td></tr> </table> </div> </div> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; append versus setText</span></div> <div class="bd"> <p><code>setText(s)</code> <strong>replaces</strong> everything in the component with <code>s</code>. <code>append(s)</code> <strong>adds</strong> <code>s</code> to the end. Confusing them is the commonest <code>JTextArea</code> bug: a log that only ever shows the most recent line was written with <code>setText</code> where it wanted <code>append</code>.</p> <p><code>append</code> exists only on <code>JTextArea</code>. To add to a <code>JTextField</code> you have to do it by hand: <code>field.setText(field.getText() + more);</code></p> </div> </div> <div class="box warn"> <div class="hd">Warning<span class="tag">&mdash; the rows and columns are a request, not a promise</span></div> <div class="bd"> <p><code>new JTextArea(10, 30)</code> does not mean "hold at most 10 lines of 30 characters". It means "when a layout manager asks how big I would like to be, say ten rows by thirty columns". The area will happily hold a thousand lines; you just will not be able to see them all, and there is no scroll bar unless you add one.</p> <p>That is why real code almost always puts a <code>JTextArea</code> inside a <strong><code>JScrollPane</code></strong>: <code>contentPane.add(new JScrollPane(area), BorderLayout.CENTER);</code> Scroll panes are the next lecture, so today's examples add the area directly, exactly as your instructor's notes do &mdash; but remember that any text area a user can type freely into wants a scroll pane around it.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; TextAreaDemo: two buttons, one area</span></div> <div class="bd"> <p>A text area in the center, two buttons along the bottom, and a listener that has to work out <em>which</em> button was pressed. Notice how it does that: <code>e.getSource()</code> compares the event's source against the two button objects with <code>==</code>, which is why both buttons had to be stored as fields.</p> <p class="filename">TextAreaDemo.java</p>
+<pre><code class="language-java">import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class TextAreaDemo extends JFrame implements ActionListener {
+    private JTextArea textArea;
+    private JButton clearButton;
+    private JButton addTextButton;
+
+    public static final int WIDTH = 400;
+    public static final int HEIGHT = 300;
+
+    public TextAreaDemo() {
+        super("TextArea Demo");
+        setSize(WIDTH, HEIGHT);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        Container contentPane = getContentPane();
+        contentPane.setLayout(new BorderLayout());
+
+        textArea = new JTextArea(10, 30);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+
+        contentPane.add(textArea, BorderLayout.CENTER);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout());
+
+        clearButton = new JButton("Clear");
+        clearButton.addActionListener(this);
+        buttonPanel.add(clearButton);
+
+        addTextButton = new JButton("Add Sample Text");
+        addTextButton.addActionListener(this);
+        buttonPanel.add(addTextButton);
+
+        contentPane.add(buttonPanel, BorderLayout.SOUTH);
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == clearButton) {
+            textArea.setText("");
+        } else if (e.getSource() == addTextButton) {
+            textArea.append("This is a sample text added to the JTextArea.\n");
+            textArea.append("JTextArea is useful for displaying multiple " +
+                            "lines of text.\n");
+        }
+    }
+
+    public static void main(String[] args) {
+        TextAreaDemo demo = new TextAreaDemo();
+        demo.setVisible(true);
+    }
+}</code></pre> <p>Again there is no console output to show, so again we take <code>actionPerformed</code> at its word and call it directly. This time the method <em>does</em> look at <code>e</code>, so the driver has to build a genuine <code>ActionEvent</code> naming the button as its source &mdash; exactly the object Swing would hand it. Before you reveal: after clicking <em>Add Sample Text</em> twice, how many lines does <code>getLineCount()</code> report?</p> <p class="filename">AreaProbe.java</p>
+<pre><code class="language-java">import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JTextArea;
+
+class AreaHandler implements ActionListener {
+    JTextArea textArea = new JTextArea(10, 30);
+    JButton clearButton = new JButton("Clear");
+    JButton addTextButton = new JButton("Add Sample Text");
+
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == clearButton) {
+            textArea.setText("");
+        } else if (e.getSource() == addTextButton) {
+            textArea.append("This is a sample text added to the JTextArea.\n");
+            textArea.append("JTextArea is useful for displaying multiple " +
+                            "lines of text.\n");
+        }
+    }
+}
+
+public class AreaProbe {
+    static AreaHandler h = new AreaHandler();
+
+    static void click(JButton b) {
+        h.actionPerformed(new ActionEvent(b, ActionEvent.ACTION_PERFORMED,
+                                          b.getActionCommand()));
+        System.out.println("after clicking \"" + b.getText() + "\": "
+                           + h.textArea.getLineCount() + " lines, "
+                           + h.textArea.getText().length() + " characters");
+    }
+
+    public static void main(String args[]) {
+        System.out.println("at the start: " + h.textArea.getLineCount() + " lines, "
+                           + h.textArea.getText().length() + " characters");
+        click(h.addTextButton);
+        click(h.addTextButton);
+        System.out.println("--- the text area now holds ---");
+        System.out.print(h.textArea.getText());
+        System.out.println("--- end ---");
+        click(h.clearButton);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>at the start: 1 lines, 0 characters
+after clicking "Add Sample Text": 3 lines, 105 characters
+after clicking "Add Sample Text": 5 lines, 210 characters
+--- the text area now holds ---
+This is a sample text added to the JTextArea.
+JTextArea is useful for displaying multiple lines of text.
+This is a sample text added to the JTextArea.
+JTextArea is useful for displaying multiple lines of text.
+--- end ---
+after clicking "Clear": 1 lines, 0 characters</code></pre> <p><strong>An empty text area has one line, not zero.</strong> That catches everybody. A line count is the number of newline characters plus one, and an empty document has no newlines, so it is one line long &mdash; the same way an empty text file still shows a cursor on line 1 in your editor.</p> <p><strong>Two appends per click, so two more lines per click.</strong> 1, then 3, then 5. The <code>"\n"</code> at the end of each appended string is what creates the line break; without it the two sentences would run together on one line. <code>append</code> adds nothing of its own.</p> <p><strong><code>setText("")</code> really does empty it</strong> &mdash; back to one line and zero characters. Compare that with <code>setText(" ")</code> with a space inside, which leaves one space behind; an earlier draft of your instructor's <code>MemoGUI</code> used the version with a space, and the final version uses <code>""</code>. Use <code>""</code>.</p> <p><strong>Why <code>==</code> is right here.</strong> <code>e.getSource()</code> returns the actual button object that fired, so <code>==</code> is asking "is this the very same object?", which is exactly the question. This is the one place in the course where <code>==</code> on objects is the correct tool rather than a bug &mdash; Lecture 8's rule stands, and this is the exception that proves it. The alternative, which we use from &sect;7 onward, is to compare the event's action <em>command string</em> with <code>.equals</code>.</p> 
+</div></details> <p class="filename">TextAreaDemo &mdash; a sketch, not a screenshot</p>
+<pre class="cmp"><code>+----------------------------------------------+
+| TextArea Demo                   _   []   X   |
++----------------------------------------------+
+| This is a sample text added to the           |
+| JTextArea.                                   |
+| JTextArea is useful for displaying multiple  |  &lt;- BorderLayout.CENTER
+| lines of text.                               |     stretches the text area
+|                                              |     over the whole middle
+|                                              |
++----------------------------------------------+
+|      [ Clear ]  [ Add Sample Text ]          |  &lt;- BorderLayout.SOUTH,
++----------------------------------------------+     a FlowLayout JPanel
+                400 x 300 pixels</code></pre> </div> </div> <div class="box qc"> <div class="hd">Quick Check 17.7</div> <div class="bd"> <p>A <code>JTextArea</code> called <code>log</code> has just been created by <code>new JTextArea(5, 20)</code>. The following statements run in order. Give the complete contents of <code>log</code> after each one.</p> <pre><code class="language-java">log.append("A");        // (a)
+log.append("B\n");      // (b)
+log.setText("C");       // (c)
+log.append("D\n");      // (d)
+log.setText("");        // (e)</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> After <code>log.append("A");</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>A</code>. The area started empty, and <code>append</code> put one character in it.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> After <code>log.append("B\n");</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>AB</code> followed by a newline. <code>append</code> adds at the end, so the <code>A</code> is still there. The area now has two lines: <code>AB</code>, and an empty second line after the newline.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> After <code>log.setText("C");</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>C</code>, and nothing else. <code>setText</code> replaced the whole document; the <code>A</code>, the <code>B</code> and the newline are gone. This is the step people do not expect.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> After <code>log.append("D\n");</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>CD</code> followed by a newline.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> After <code>log.setText("");</code> &mdash; and how many lines does <code>getLineCount()</code> report at that moment?</p> <details class="soln"><summary></summary><div class="ans"> <p>The area is empty, <code>getText()</code> returns <code>""</code> whose length is 0, and <code>getLineCount()</code> returns <strong>1</strong>.</p> <p><strong>Things to notice across all five parts.</strong> The <code>5, 20</code> in the constructor never appeared in any answer. Rows and columns describe how big the box <em>looks</em>; they have nothing to do with how much text it holds. A five-row area can hold five hundred lines &mdash; you would just have to scroll, which is why the next lecture's <code>JScrollPane</code> exists.</p> </div></details> </div> </div> </div> <h2 id="s6"><span class="num">6.</span>setEditable and setEnabled</h2> <p>Two methods that sound like the same thing and are not. Every text component has both, and exam questions and real interfaces use them for different purposes.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; read-only versus disabled</span></div> <div class="bd"> <p><strong><code>setEditable(false)</code></strong> makes a text component <em>read-only</em>. The user cannot type into it. Everything else still works: the text is drawn normally, the user can select it and copy it, the component still takes part in the interface, and <strong>your program can still change it with <code>setText</code></strong>.</p> <p><strong><code>setEnabled(false)</code></strong> <em>disables</em> the component altogether. It is drawn greyed out, it cannot take keyboard focus, it does not respond to the mouse, and if it is a button it fires no events at all. <code>setEnabled</code> exists on every component, not just text ones.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; three fields and two buttons</span></div> <div class="bd"> <p>The difference is easiest to believe when you watch it. This program makes one normal field, one read-only field and one disabled field, reports the state of each, writes into the read-only one from code, and then clicks an enabled button and a disabled button. Predict how many times the listener runs.</p> <p class="filename">EditableProbe.java</p>
+<pre><code class="language-java">import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JTextField;
+
+public class EditableProbe implements ActionListener {
+    static int fired = 0;
+
+    public void actionPerformed(ActionEvent e) {
+        fired++;
+        System.out.println("   listener ran; fired is now " + fired);
+    }
+
+    public static void main(String args[]) {
+        JTextField normal   = new JTextField("hello", 10);
+        JTextField readOnly = new JTextField("hello", 10);
+        JTextField disabled = new JTextField("hello", 10);
+
+        readOnly.setEditable(false);
+        disabled.setEnabled(false);
+
+        System.out.println("normal    editable=" + normal.isEditable()
+                         + " enabled=" + normal.isEnabled()
+                         + " getText=" + normal.getText());
+        System.out.println("read-only editable=" + readOnly.isEditable()
+                         + " enabled=" + readOnly.isEnabled()
+                         + " getText=" + readOnly.getText());
+        System.out.println("disabled  editable=" + disabled.isEditable()
+                         + " enabled=" + disabled.isEnabled()
+                         + " getText=" + disabled.getText());
+
+        readOnly.setText("set by the program");
+        System.out.println("after setText on the read-only field: " + readOnly.getText());
+
+        EditableProbe listener = new EditableProbe();
+
+        JButton on = new JButton("On");
+        on.addActionListener(listener);
+        JButton off = new JButton("Off");
+        off.addActionListener(listener);
+        off.setEnabled(false);
+
+        System.out.println("clicking the enabled button:");
+        on.doClick();
+        System.out.println("clicking the disabled button:");
+        off.doClick();
+        System.out.println("total times the listener ran: " + fired);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>normal    editable=true enabled=true getText=hello
+read-only editable=false enabled=true getText=hello
+disabled  editable=true enabled=false getText=hello
+after setText on the read-only field: set by the program
+clicking the enabled button:
+   listener ran; fired is now 1
+clicking the disabled button:
+total times the listener ran: 1</code></pre> <p><strong>The two properties are completely independent.</strong> The read-only field is still enabled; the disabled field is still editable. Setting one does not touch the other. They only meet in the user's experience, where "greyed out" and "cannot type" both look like "not for me".</p> <p><strong><code>setEditable(false)</code> does not stop your program.</strong> The line <code>readOnly.setText("set by the program")</code> worked. That is the whole point of read-only, and it is exactly what you want for the <em>output</em> field of the tip calculator: the answer box should show what the program computed and not be somewhere the user scribbles.</p> <p><strong>A disabled button fires nothing.</strong> <code>doClick()</code> is the programmatic equivalent of a user click, and on the disabled button it produced no line of output at all. <code>fired</code> ended at 1, not 2.</p> <p><code>doClick()</code> is worth knowing about for exactly this reason: it lets you test a listener without a mouse, and it is how this page checked the claim rather than asserting it.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 17.8</div> <div class="bd"> <p>You are writing the tip calculator from the final exam. It has an input field the user types the bill into and an output field where the tip appears.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Which of the two fields would you call <code>setEditable(false)</code> on, and why?</p> <details class="soln"><summary></summary><div class="ans"> <p>The <strong>output</strong> field. It exists to show a computed answer, so letting the user type into it can only confuse: they would edit the tip, nothing would recompute, and the box would be lying. Making it read-only says "this is a display" while still letting the user select the number and copy it.</p> <p>The input field must stay editable &mdash; that is the entire job of the program.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Would <code>setEnabled(false)</code> on the output field be as good a choice?</p> <details class="soln"><summary></summary><div class="ans"> <p>No. It would work in the sense that <code>setText</code> still updates a disabled component, but the field would be drawn greyed out, and the user could not select the answer to copy it. Grey means "unavailable", and the answer is not unavailable &mdash; it is the point of the program.</p> <p>Reserve <code>setEnabled(false)</code> for things that genuinely are not available <em>right now</em>: a <em>Save</em> button before anything has been typed, a <em>Next</em> button on the last page.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Your marked-up answer for the exam does not call either method. Have you lost marks?</p> <details class="soln"><summary></summary><div class="ans"> <p>No. Look at the published rubric for that question: the points are for the class header, the window size and title, the layout, the button with its listener, and the <code>actionPerformed</code>. Neither <code>setEditable</code> nor <code>setEnabled</code> is mentioned, and the instructor's own answer does not use them.</p> <p><strong>Things to notice across all three parts.</strong> Knowing the difference is worth more than using it. The two methods appear constantly in real Swing code and in multiple-choice or short-answer questions, and the one-line summary to memorise is: <em>read-only means the user cannot type but everything else is normal; disabled means the component is switched off.</em></p> </div></details> </div> </div> </div> <h2 id="s7"><span class="num">7.</span>Menus: the bar, the menu, the item</h2> <p><code>MemoSaver</code>, the program in your instructor's notes, puts five buttons in a row along the bottom of the window: <em>Save Memo 1</em>, <em>Save Memo 2</em>, <em>Clear</em>, <em>Get Memo 1</em>, <em>Get Memo 2</em>. It works, and it does not scale. Add three more commands and the row wraps; add ten and the window is mostly buttons. Real applications put commands in menus, and the same program with a menu instead of a button row is <code>MemoGUI</code>.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; JMenuBar, JMenu, JMenuItem</span></div> <div class="bd"> <p>Three classes, in <code>javax.swing</code>, that nest inside one another:</p> <ul> <li><strong><code>JMenuBar</code></strong> &mdash; the strip across the top of the window. It holds menus.</li> <li><strong><code>JMenu</code></strong> &mdash; one drop-down menu, such as <em>File</em> or <em>Memos</em>. It holds items.</li> <li><strong><code>JMenuItem</code></strong> &mdash; one clickable line inside a menu, such as <em>Save</em> or <em>Exit</em>. This is the thing the user actually chooses.</li> </ul> <p>And one method on <code>JFrame</code>, which is the only place the bar can go:</p> <ul> <li><strong><code>setJMenuBar(bar)</code></strong> &mdash; attaches a <code>JMenuBar</code> to the frame. Note the capital <code>J</code> in the middle of the name; it is not <code>setMenuBar</code>, which is the old AWT method for an AWT <code>MenuBar</code> and will not accept a <code>JMenuBar</code>.</li> </ul> </div> </div> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; the hierarchy, in the order you build it</span></div> <div class="bd"> <p>Everything about menus follows from four sentences, and every menu bug is one of them written backwards.</p> <ol> <li>A <strong><code>JMenuItem</code> goes on a <code>JMenu</code></strong>: <code>fileMenu.add(saveItem);</code></li> <li>A <strong><code>JMenu</code> goes on a <code>JMenuBar</code></strong>: <code>bar.add(fileMenu);</code></li> <li>A <strong><code>JMenuBar</code> goes on the frame</strong>: <code>setJMenuBar(bar);</code></li> <li>The <strong>listener goes on the <code>JMenuItem</code></strong>: <code>saveItem.addActionListener(this);</code></li> </ol> <p>Sentence 4 is the one that costs marks. The user clicks the item, so the item is the event source, so the item is what needs the listener. The menu is a container; it fires nothing you care about.</p> </div> </div> <p>Written out, the whole skeleton is eight lines:</p> <pre><code class="language-java">JMenuBar bar = new JMenuBar();           // 1. the bar
+JMenu fileMenu = new JMenu("File");      // 2. a menu
+bar.add(fileMenu);                       //    menu onto bar
+setJMenuBar(bar);                        //    bar onto frame
+
+JMenuItem saveItem = new JMenuItem("Save");   // 3. an item
+saveItem.addActionListener(this);             //    listener on the ITEM
+fileMenu.add(saveItem);                       //    item onto menu</code></pre> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; the listener on the menu instead of the item</span></div> <div class="bd"> <p>Here is the thing that makes this error so expensive: <code>JMenu</code> <em>has</em> an <code>addActionListener</code> method, inherited from <code>AbstractButton</code> &mdash; a menu is technically a kind of button, which is how it knows to open when clicked. So <code>fileMenu.addActionListener(this);</code> compiles perfectly, and then your menu items do nothing.</p> <p>This program registers the listener both ways and clicks the item in each case. <code>doClick()</code> on a <code>JMenuItem</code> fires exactly what a real click fires:</p> <p class="filename">MenuWiringProbe.java</p>
+<pre><code class="language-java">import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+
+public class MenuWiringProbe implements ActionListener {
+    public void actionPerformed(ActionEvent e) {
+        System.out.println("   listener ran, command = " + e.getActionCommand());
+    }
+
+    public static void main(String args[]) {
+        MenuWiringProbe listener = new MenuWiringProbe();
+
+        // WRONG: the listener is registered on the menu.
+        JMenu wrongMenu = new JMenu("File");
+        JMenuItem wrongItem = new JMenuItem("Clear");
+        wrongMenu.addActionListener(listener);
+        wrongMenu.add(wrongItem);
+
+        System.out.println("wrong wiring: clicking the item");
+        wrongItem.doClick();
+        System.out.println("   (nothing above this line means nothing happened)");
+
+        // RIGHT: the listener is registered on the item.
+        JMenu rightMenu = new JMenu("File");
+        JMenuItem rightItem = new JMenuItem("Clear");
+        rightItem.addActionListener(listener);
+        rightMenu.add(rightItem);
+
+        System.out.println("right wiring: clicking the item");
+        rightItem.doClick();
+    }
+}</code></pre> <pre class="out"><code>wrong wiring: clicking the item
+   (nothing above this line means nothing happened)
+right wiring: clicking the item
+   listener ran, command = Clear</code></pre> <p>No error, no warning, no exception &mdash; a menu that opens, an item that highlights when you point at it, and absolutely nothing when you choose it. When a menu item "does not work", check line 4 of the hierarchy before you look at <code>actionPerformed</code> at all.</p> </div> </div> <p>Once several menu items share one listener, <code>actionPerformed</code> has to work out which one was chosen. Section 5 did that with <code>e.getSource()</code> and <code>==</code>; from here on we use the other technique, which is what your instructor's notes use throughout.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the action command</span></div> <div class="bd"> <p>Every <code>ActionEvent</code> carries a <code>String</code> called its <strong>action command</strong>, read with <code>e.getActionCommand()</code>. For a <code>JButton</code> or a <code>JMenuItem</code> it defaults to the component's label, so the item created by <code>new JMenuItem("Save Memo 1")</code> delivers the command <code>"Save Memo 1"</code>.</p> <p class="filename">CommandProbe.java</p>
+<pre><code class="language-java">import javax.swing.JButton;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+
+public class CommandProbe {
+    public static void main(String args[]) {
+        JButton   b = new JButton("Convert");
+        JMenuItem m = new JMenuItem("Save Memo 1");
+        JMenu     u = new JMenu("Memos");
+
+        System.out.println("JButton(\"Convert\")       getActionCommand -&gt; " + b.getActionCommand());
+        System.out.println("JMenuItem(\"Save Memo 1\") getActionCommand -&gt; " + m.getActionCommand());
+        System.out.println("JMenu(\"Memos\")           getActionCommand -&gt; " + u.getActionCommand());
+
+        m.setActionCommand("SAVE1");
+        System.out.println("after m.setActionCommand(\"SAVE1\")          -&gt; " + m.getActionCommand()
+                           + "   (its label is still \"" + m.getText() + "\")");
+    }
+}</code></pre> <pre class="out"><code>JButton("Convert")       getActionCommand -&gt; Convert
+JMenuItem("Save Memo 1") getActionCommand -&gt; Save Memo 1
+JMenu("Memos")           getActionCommand -&gt; Memos
+after m.setActionCommand("SAVE1")          -&gt; SAVE1   (its label is still "Save Memo 1")</code></pre> <p>So an <code>actionPerformed</code> shared by six menu items is a chain of <code>else if</code> on one string. Compare with <code>.equals</code>, never with <code>==</code> &mdash; Lecture 4's rule for comparing strings has not changed just because we are in a window.</p> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; the label is the command</span></div> <div class="bd"> <p>Because the action command defaults to the label, changing the label of a menu item silently changes what <code>actionPerformed</code> receives. Rename the item to <code>"Save memo 1"</code> with a small <code>m</code> and the branch <code>command.equals("Save Memo 1")</code> stops matching, and the item quietly does nothing. The string in the constructor and the string in the comparison have to agree character for character, capitals included.</p> <p>If that makes you nervous &mdash; it should &mdash; the fix is <code>setActionCommand</code>, shown above: give the item a stable internal name like <code>"SAVE1"</code> and compare against that, and the visible label becomes free to change. Your instructor's notes do not use it, and neither do the exam answers, so for this course match the labels exactly.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; MemoGUI: five buttons become one menu</span></div> <div class="bd"> <p>This is <code>MemoSaver</code> with the button panel deleted and a menu put in its place. The <code>actionPerformed</code> is unchanged except for one extra branch, <em>Exit</em>, which a menu can afford and a row of buttons could not. Read the constructor and find the four sentences of the hierarchy in it.</p> <p>Notice the small trick with <code>JMenuItem m;</code> declared once and reused six times. Each <code>new JMenuItem(...)</code> makes a brand-new object; <code>m</code> is just a handle used to configure it and hand it to the menu, and after <code>memoMenu.add(m)</code> nothing needs the handle any more.</p> <p class="filename">MemoGUI.java</p>
+<pre><code class="language-java">import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class MemoGUI extends JFrame implements ActionListener {
+    public static final int WIDTH = 600;
+    public static final int HEIGHT = 300;
+    public static final int LINES = 10;
+    public static final int CHAR_PER_LINE = 40;
+
+    private Container contentPane;
+    private JTextArea theText;
+    private String memo1 = "No Memo 1.";
+    private String memo2 = "No Memo 2.";
+
+    public MemoGUI() {
+        super();
+        setSize(WIDTH, HEIGHT);
+        setTitle("Memo Saver");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        contentPane = getContentPane();
+        contentPane.setLayout(new BorderLayout());
+
+        JMenu memoMenu = new JMenu("Memos");
+        JMenuItem m;
+        JMenuBar mBar = new JMenuBar();
+        mBar.add(memoMenu);
+        setJMenuBar(mBar);
+
+        m = new JMenuItem("Save Memo 1");
+        m.addActionListener(this);
+        memoMenu.add(m);
+
+        m = new JMenuItem("Save Memo 2");
+        m.addActionListener(this);
+        memoMenu.add(m);
+
+        m = new JMenuItem("Get Memo 1");
+        m.addActionListener(this);
+        memoMenu.add(m);
+
+        m = new JMenuItem("Get Memo 2");
+        m.addActionListener(this);
+        memoMenu.add(m);
+
+        m = new JMenuItem("Clear");
+        m.addActionListener(this);
+        memoMenu.add(m);
+
+        m = new JMenuItem("Exit");
+        m.addActionListener(this);
+        memoMenu.add(m);
+
+        JPanel textPanel = new JPanel();
+        textPanel.setBackground(Color.BLUE);
+        theText = new JTextArea(LINES, CHAR_PER_LINE);
+        theText.setBackground(Color.WHITE);
+        textPanel.add(theText);
+        contentPane.add(textPanel, BorderLayout.CENTER);
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        String command = e.getActionCommand();
+        if (command.equals("Save Memo 1")) {
+            memo1 = theText.getText();
+        } else if (command.equals("Save Memo 2")) {
+            memo2 = theText.getText();
+        } else if (command.equals("Clear")) {
+            theText.setText("");
+        } else if (command.equals("Exit")) {
+            System.exit(0);
+        } else if (command.equals("Get Memo 1")) {
+            theText.setText(memo1);
+        } else if (command.equals("Get Memo 2")) {
+            theText.setText(memo2);
+        }
+    }
+
+    public static void main(String[] args) {
+        MemoGUI gui = new MemoGUI();
+        gui.setVisible(true);
+    }
+}</code></pre> <p class="filename">MemoGUI with its menu open &mdash; a sketch, not a screenshot</p>
+<pre class="cmp"><code>+---------------------------------------------------------+
+| Memo Saver                                _   []   X    |
++---------------------------------------------------------+
+| Memos |                                                 |  &lt;- the JMenuBar
++-------+-------------+###################################|
+| Save Memo 1         |###################################|
+| Save Memo 2         |###+-----------------------------+#|
+| Get Memo 1          |###|                             |#|
+| Get Memo 2          |###|  the JTextArea, white,      |#|
+| Clear               |###|  10 rows x 40 columns       |#|
+| Exit                |###|                             |#|
++---------------------+###+-----------------------------+#|
+|#########################################################|
++---------------------------------------------------------+
+       600 x 300 pixels;  # = the blue JPanel behind the text area</code></pre> <p>Now the behavior. <code>actionPerformed</code> is a plain method, so it can be driven from a <code>main</code> &mdash; and because it reads <code>e.getActionCommand()</code>, the driver builds real <code>JMenuItem</code> objects and constructs from each one the <code>ActionEvent</code> that clicking it would produce. That is as close to clicking as you can get without a screen.</p> <p>Before you reveal, work out the last two lines: after saving <em>Buy milk</em> as memo 1 and <em>Call Mom</em> as memo 2, what does the text area hold after <em>Get Memo 1</em>, and what are the two saved memos then?</p> <p class="filename">MemoProbe.java</p>
+<pre><code class="language-java">import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JMenuItem;
+import javax.swing.JTextArea;
+
+class MemoHandler implements ActionListener {
+    JTextArea theText = new JTextArea(10, 40);
+    String memo1 = "No Memo 1.";
+    String memo2 = "No Memo 2.";
+
+    public void actionPerformed(ActionEvent e) {
+        String command = e.getActionCommand();
+        if (command.equals("Save Memo 1")) {
+            memo1 = theText.getText();
+        } else if (command.equals("Save Memo 2")) {
+            memo2 = theText.getText();
+        } else if (command.equals("Clear")) {
+            theText.setText("");
+        } else if (command.equals("Get Memo 1")) {
+            theText.setText(memo1);
+        } else if (command.equals("Get Memo 2")) {
+            theText.setText(memo2);
+        }
+    }
+}
+
+public class MemoProbe {
+    static MemoHandler h = new MemoHandler();
+
+    // Build a real JMenuItem and fire the event it would fire when clicked.
+    static void click(String itemLabel) {
+        JMenuItem item = new JMenuItem(itemLabel);
+        item.addActionListener(h);
+        ActionEvent e = new ActionEvent(item, ActionEvent.ACTION_PERFORMED,
+                                        item.getActionCommand());
+        h.actionPerformed(e);
+        System.out.println("after \"" + itemLabel + "\"   text area = ["
+                           + h.theText.getText() + "]   memo1 = [" + h.memo1
+                           + "]   memo2 = [" + h.memo2 + "]");
+    }
+
+    public static void main(String args[]) {
+        h.theText.setText("Buy milk");
+        System.out.println("user typed              text area = [" + h.theText.getText()
+                           + "]   memo1 = [" + h.memo1 + "]   memo2 = [" + h.memo2 + "]");
+        click("Save Memo 1");
+        click("Clear");
+        h.theText.setText("Call Mom");
+        System.out.println("user typed              text area = [" + h.theText.getText()
+                           + "]   memo1 = [" + h.memo1 + "]   memo2 = [" + h.memo2 + "]");
+        click("Save Memo 2");
+        click("Get Memo 1");
+        click("Get Memo 2");
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>user typed              text area = [Buy milk]   memo1 = [No Memo 1.]   memo2 = [No Memo 2.]
+after "Save Memo 1"   text area = [Buy milk]   memo1 = [Buy milk]   memo2 = [No Memo 2.]
+after "Clear"   text area = []   memo1 = [Buy milk]   memo2 = [No Memo 2.]
+user typed              text area = [Call Mom]   memo1 = [Buy milk]   memo2 = [No Memo 2.]
+after "Save Memo 2"   text area = [Call Mom]   memo1 = [Buy milk]   memo2 = [Call Mom]
+after "Get Memo 1"   text area = [Buy milk]   memo1 = [Buy milk]   memo2 = [Call Mom]
+after "Get Memo 2"   text area = [Call Mom]   memo1 = [Buy milk]   memo2 = [Call Mom]</code></pre> <p><strong>"Save" copies out of the text area; "Get" copies into it.</strong> The two <code>String</code> fields <code>memo1</code> and <code>memo2</code> are the storage, and the text area is the view. That separation &mdash; data in fields, display in components &mdash; is the shape of every GUI program you will write.</p> <p><strong>"Clear" empties the text area but does not touch either memo.</strong> Look at the third line: the text area went empty and <code>memo1</code> stayed <code>Buy milk</code>. That is why the program is useful; clearing the screen does not lose your saved work.</p> <p><strong>The memos survive because they are fields.</strong> If <code>memo1</code> had been declared inside <code>actionPerformed</code> it would be created afresh on every click and every memo would vanish immediately. The initial values <code>"No Memo 1."</code> and <code>"No Memo 2."</code> are what <em>Get Memo 1</em> shows if you press it before saving anything &mdash; a small, deliberate piece of design worth copying.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 17.9</div> <div class="bd"> <p>The following four lines appear in a constructor. <code>bar</code> is a <code>JMenuBar</code>, <code>edit</code> is a <code>JMenu</code>, <code>copyItem</code> is a <code>JMenuItem</code>, and the class implements <code>ActionListener</code>. Exactly one of them fails to compile and the other three compile but are wrong. Identify the compile error, and then write the four lines correctly.</p> <pre><code class="language-java">edit.addActionListener(this);      // line 1
+bar.add(copyItem);                 // line 2
+edit.add(bar);                     // line 3
+setJMenuBar(edit);                 // line 4</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Take the four sentences from the Key Idea box and check each line against them: item onto menu, menu onto bar, bar onto frame, listener onto item. Every one of these lines has the right two objects and the wrong direction.</p> <p><strong>The compile error is line 4.</strong> <code>setJMenuBar</code> takes a <code>JMenuBar</code>, and <code>edit</code> is a <code>JMenu</code>:</p> <pre class="err"><code>MenuSkeleton.java:22: error: incompatible types: JMenu cannot be converted to JMenuBar
+        setJMenuBar(edit);                 // line 4
+                    ^
+1 error</code></pre> <p><strong>The other three compile.</strong> That is what makes them dangerous.</p> <ul> <li>Line 1: <code>JMenu</code> inherits <code>addActionListener</code> from <code>AbstractButton</code>, so registering a listener on the menu is legal. The item's clicks will never reach it.</li> <li>Line 2: <code>JMenuBar.add</code> accepts any <code>Component</code>, and a <code>JMenuItem</code> is a <code>Component</code>. You get an item sitting on the bar itself instead of inside a menu.</li> <li>Line 3: <code>JMenu.add</code> accepts any <code>Component</code> too, so a whole menu bar can be shoved inside a menu. Nothing stops you.</li> </ul> <p>Corrected, the four lines are a straight permutation of the originals:</p> <pre><code class="language-java">copyItem.addActionListener(this);  // line 1: listener on the ITEM
+edit.add(copyItem);                // line 2: item onto the menu
+bar.add(edit);                     // line 3: menu onto the bar
+setJMenuBar(bar);                  // line 4: bar onto the frame</code></pre> <p><strong>Things to notice.</strong> Three of these four mistakes are invisible to the compiler because Swing's containers are deliberately permissive &mdash; <code>add(Component)</code> exists everywhere so that unusual interfaces are possible. The price is that the compiler cannot tell a sensible menu from nonsense. Learn the four sentences in order and check your own code against them; that is the only defence.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 17.9</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="28" aria-label="Live coding - Quick Check 17.9">import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+
+public class MenuSkeleton extends JFrame implements ActionListener {
+    public MenuSkeleton() {
+        super("Menu Skeleton");
+        setSize(400, 200);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        JMenuBar bar = new JMenuBar();
+        JMenu edit = new JMenu("Edit");
+        JMenuItem copyItem = new JMenuItem("Copy");
+
+        // Write the four lines, in the right direction.
+
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        System.out.println(e.getActionCommand());
+    }
+
+    public static void main(String args[]) {
+        MenuSkeleton gui = new MenuSkeleton();
+        gui.setVisible(true);
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 17.10</div> <div class="bd"> <p>In <code>MemoGUI</code> the same variable <code>m</code> is reused for all six menu items, and no menu item is ever stored in a field.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> After the constructor finishes, how many <code>JMenuItem</code> objects exist, and what is keeping them alive?</p> <details class="soln"><summary></summary><div class="ans"> <p>Six objects. <code>m</code> is only a handle, and reassigning it does not destroy anything &mdash; Lecture 8's picture exactly. Each item is kept alive because <code>memoMenu.add(m)</code> stored a reference to it inside the menu, and the menu is inside the bar, which is inside the frame.</p> <p>When the constructor returns, <code>m</code> disappears and every item is still there, reachable through the menu.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>TextAreaDemo</code> in &sect;5 <em>did</em> keep its two buttons in fields. Why could <code>MemoGUI</code> get away without fields, and <code>TextAreaDemo</code> not?</p> <details class="soln"><summary></summary><div class="ans"> <p>Because of how each <code>actionPerformed</code> identifies the source. <code>TextAreaDemo</code> compares <code>e.getSource() == clearButton</code>, and to write that comparison it needs a variable naming the button, which must therefore be a field. <code>MemoGUI</code> compares <code>e.getActionCommand().equals("Clear")</code>, which needs nothing but a string literal.</p> <p><strong>Things to notice across both parts.</strong> That is the real trade-off between the two techniques. <code>getSource()</code> is exact and rename-proof but costs you a field per component; <code>getActionCommand()</code> costs nothing but silently breaks if a label changes. Both are correct Java and both appear in your instructor's code. For an exam answer with several menu items, <code>getActionCommand()</code> is much less to write.</p> </div></details> </div> </div> </div> <h2 id="s8"><span class="num">8.</span>A menu that saves to a file</h2> <p><code>MemoGUI</code> calls itself a memo saver and saves nothing. Close the window and both memos are gone, because they only ever lived in two <code>String</code> fields in memory. A program that saves should put the text somewhere that outlives the program &mdash; and you already know how, from Lecture 5.</p> <p>Nothing new is needed. <code>theText.getText()</code> gives you a <code>String</code>; a <code>PrintWriter</code> writes a <code>String</code> to a file; <code>close()</code> flushes it. The only genuinely new question is <em>where the file code goes</em>, and there is one obstacle.</p> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; you cannot put <code>throws</code> on <code>actionPerformed</code></span></div> <div class="bd"> <p>Every file program in Lecture 5 wrote <code>throws FileNotFoundException</code> on <code>main</code>. Try the same on a listener method:</p> <p class="filename">BadFiler.java</p>
+<pre><code class="language-java">public void actionPerformed(ActionEvent e) throws FileNotFoundException {
+   PrintWriter output = new PrintWriter("memo.txt");
+   output.print(theText.getText());
+   output.close();
+}</code></pre> <pre class="err"><code>BadFiler.java:11: error: actionPerformed(ActionEvent) in BadFiler cannot implement actionPerformed(ActionEvent) in ActionListener
+   public void actionPerformed(ActionEvent e) throws FileNotFoundException {
+               ^
+  overridden method does not throw FileNotFoundException
+1 error</code></pre> <p>Read the second line of the message: <em>overridden method does not throw FileNotFoundException</em>. <code>ActionListener</code> declares <code>void actionPerformed(ActionEvent e)</code> with no <code>throws</code> clause at all, and an implementing method is not allowed to add one. If it could, every piece of library code that calls a listener would suddenly have to handle exceptions it has never heard of.</p> <p>So inside a listener there is no <code>throws</code> escape hatch, and the file code has to deal with the exception itself &mdash; either with <code>try</code>/<code>catch</code> right there, or by calling a helper method that does. That is Lecture 20's material arriving a little early because Swing forces it, and it is the same reason the exam rubrics wrap every <code>parseDouble</code> in a <code>try</code>/<code>catch</code>.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; MemoFiler: a File menu that really writes a file</span></div> <div class="bd"> <p>A text area, a <code>File</code> menu with <em>Save</em> and <em>Exit</em>, and a label along the bottom reporting what happened. The file work lives in its own <code>static</code> method, <code>saveMemo</code>, which knows nothing about Swing &mdash; that is the design point of the whole example, and the reason the next code block can be run for real.</p> <p class="filename">MemoFiler.java</p>
+<pre><code class="language-java">import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JTextArea;
+
+public class MemoFiler extends JFrame implements ActionListener {
+   public static final int WIDTH = 500;
+   public static final int HEIGHT = 300;
+   public static final String FILE_NAME = "memo.txt";
+
+   private JTextArea theText;
+   private JLabel status;
+
+   public MemoFiler() {
+      super("Memo Filer");
+      setSize(WIDTH, HEIGHT);
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+      JMenuBar bar = new JMenuBar();          // 1. the bar
+      JMenu fileMenu = new JMenu("File");     // 2. a menu
+      bar.add(fileMenu);                      //    menu goes on the bar
+      setJMenuBar(bar);                       //    bar goes on the frame
+
+      JMenuItem saveItem = new JMenuItem("Save");   // 3. an item
+      saveItem.addActionListener(this);             //    listener on the ITEM
+      fileMenu.add(saveItem);                       //    item goes on the menu
+
+      JMenuItem exitItem = new JMenuItem("Exit");
+      exitItem.addActionListener(this);
+      fileMenu.add(exitItem);
+
+      Container contentPane = getContentPane();
+      contentPane.setLayout(new BorderLayout());
+
+      theText = new JTextArea(10, 40);
+      theText.setLineWrap(true);
+      contentPane.add(theText, BorderLayout.CENTER);
+
+      status = new JLabel(" Nothing saved yet.");
+      contentPane.add(status, BorderLayout.SOUTH);
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      String command = e.getActionCommand();
+      if (command.equals("Save")) {
+         status.setText(" " + saveMemo(theText.getText()));
+      } else if (command.equals("Exit")) {
+         System.exit(0);
+      }
+   }
+
+   // Everything here is Lecture 5 and nothing here is Swing.
+   public static String saveMemo(String memo) {
+      try {
+         PrintWriter output = new PrintWriter(FILE_NAME);
+         output.print(memo);
+         output.close();
+         return "Saved " + memo.length() + " characters to " + FILE_NAME;
+      } catch (FileNotFoundException e) {
+         return "Could not write " + FILE_NAME;
+      }
+   }
+
+   public static void main(String args[]) {
+      MemoFiler gui = new MemoFiler();
+      gui.setVisible(true);
+   }
+}</code></pre> <p>Because <code>saveMemo</code> is <code>static</code> and takes a plain <code>String</code>, it can be called without a window ever existing. This driver hands it three lines of text and then reads the file back with a <code>Scanner</code>, exactly as in Lecture 5. Predict the byte count before you reveal &mdash; the text is <code>Buy milk</code>, <code>Call Mom</code> and <code>Finish CSCI 212 lab</code> on three lines.</p> <p class="filename">MemoFilerProbe.java</p>
+<pre><code class="language-java">import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+public class MemoFilerProbe {
+   public static void main(String args[]) throws FileNotFoundException {
+      String typed = "Buy milk\nCall Mom\nFinish CSCI 212 lab";
+
+      System.out.println(MemoFiler.saveMemo(typed));
+      System.out.println("memo.txt is now " + new File("memo.txt").length() + " bytes");
+      System.out.println("--- contents of memo.txt ---");
+
+      Scanner in = new Scanner(new File("memo.txt"));
+      while (in.hasNextLine()) {
+         System.out.println(in.nextLine());
+      }
+      in.close();
+      System.out.println("--- end of memo.txt ---");
+   }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Saved 37 characters to memo.txt
+memo.txt is now 37 bytes
+--- contents of memo.txt ---
+Buy milk
+Call Mom
+Finish CSCI 212 lab
+--- end of memo.txt ---</code></pre> <p>That is a real file on a real disk, written and read back. Count the characters if you like: 8 + 8 + 19 is 35, plus the two newline characters that separate the three lines, makes 37.</p> <p><strong><code>print</code>, not <code>println</code>.</strong> The text area's own contents already contain the newlines the user typed. Using <code>println</code> would add a further newline at the very end, which is harmless but means the file no longer matches the text area exactly.</p> <p><strong><code>close()</code> is not optional.</strong> Lecture 5's warning applies unchanged: a <code>PrintWriter</code> buffers, and without the <code>close()</code> the file would exist and be zero bytes long. In a GUI that failure is even easier to miss, because there is no console to notice it in.</p> <p><strong>Why <code>saveMemo</code> returns a <code>String</code> rather than printing one.</strong> A GUI has nowhere to print. Returning the message lets <code>actionPerformed</code> decide where it goes &mdash; here, into the status label &mdash; and it lets a non-GUI driver like this one print it. A method that computes a result and hands it back is testable; a method that prints is not.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 17.11</div> <div class="bd"> <p>Give the exact output of this program. <code>Tally</code> is a listener holding a text field, a text area and a label; <code>main</code> types things into the field and calls <code>actionPerformed</code> directly.</p> <p class="filename">TallyQuiz.java</p>
+<pre><code class="language-java">import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JLabel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
+class Tally implements ActionListener {
+    JTextField field = new JTextField(10);
+    JTextArea  log   = new JTextArea(5, 20);
+    JLabel     total = new JLabel("0");
+    private int sum = 0;
+
+    public void actionPerformed(ActionEvent e) {
+        String s = field.getText();
+        int n = Integer.parseInt(s);
+        sum = sum + n;
+        log.append(s + " ");
+        total.setText("" + sum);
+        field.setText("");
+    }
+}
+
+public class TallyQuiz {
+    public static void main(String args[]) {
+        Tally t = new Tally();
+
+        t.field.setText("10");
+        t.actionPerformed(null);
+        System.out.println("(a) total = " + t.total.getText()
+                           + "   field = [" + t.field.getText() + "]");
+
+        t.field.setText("5");
+        t.actionPerformed(null);
+        System.out.println("(b) total = " + t.total.getText());
+
+        System.out.println("(c) log = [" + t.log.getText() + "]");
+
+        t.log.setText("");
+        t.field.setText("7");
+        t.actionPerformed(null);
+        System.out.println("(d) log = [" + t.log.getText()
+                           + "]   total = " + t.total.getText());
+
+        t.field.setText("2");
+        t.field.setText("3");
+        t.actionPerformed(null);
+        System.out.println("(e) total = " + t.total.getText());
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Keep two columns on paper: <code>sum</code>, which is a private <code>int</code> that survives every call, and the contents of the three components. Remember that <code>actionPerformed</code> ends by clearing the field, and that <code>append</code> adds while <code>setText</code> replaces.</p> <table class="trace"> <tr><th>Statement</th><th><code>sum</code> after</th><th><code>log</code> after</th><th><code>field</code> after</th></tr> <tr><td>field = 10, click</td><td>10</td><td><code>10 </code></td><td>empty</td></tr> <tr><td>field = 5, click</td><td>15</td><td><code>10 5 </code></td><td>empty</td></tr> <tr><td><code>log.setText("")</code></td><td>15</td><td>empty</td><td>empty</td></tr> <tr><td>field = 7, click</td><td>22</td><td><code>7 </code></td><td>empty</td></tr> <tr><td>field = 2, then field = 3, click</td><td>25</td><td><code>7 3 </code></td><td>empty</td></tr> </table> <pre class="out"><code>(a) total = 10   field = []
+(b) total = 15
+(c) log = [10 5 ]
+(d) log = [7 ]   total = 22
+(e) total = 25</code></pre> <p><strong>Things to notice.</strong> Line (d) is the one that separates the two kinds of state. <code>log.setText("")</code> wiped the visible log, and the total kept climbing &mdash; 22, not 7 &mdash; because <code>sum</code> is a field of the listener and has nothing to do with what any component is showing. Clearing a display never clears the data behind it, which is exactly what <em>Clear</em> did in <code>MemoGUI</code> and exactly what most students get wrong the first time.</p> <p>Line (e) is the other trap. The field was set to <code>2</code> and then immediately to <code>3</code>, and only one click followed, so only the <code>3</code> was ever read: 22 + 3 is 25. <code>setText</code> replaces; the <code>2</code> was never seen by anybody.</p> <p>Notice also that <code>log.append(s + " ")</code> appends the <em>original string</em> <code>s</code>, not the parsed number, which is why the log shows exactly what was typed. Had the user typed <code>007</code> the log would read <code>007</code> while the total went up by 7.</p> </div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 17.12</div> <div class="bd"> <p>Write a complete class <code>WordCounter</code> that <code>extends JFrame implements ActionListener</code>. The window is 450 by 300, titled <em>Word Counter</em>, and holds a <code>JTextArea</code> of 10 rows by 40 columns in the center with line wrapping on, and a <code>JLabel</code> along the bottom. A menu named <em>Tools</em> has three items: <em>Count Words</em>, which puts <code>n words</code> into the label; <em>Clear</em>, which empties the area and resets the label; and <em>Exit</em>. Put the counting itself in a <code>public static int countWords(String)</code> method so it can be tested on its own.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The constructor is &sect;7's four sentences three times over, plus a <code>BorderLayout</code> with the area in the center and the label in the south. Both the area and the label are touched by <code>actionPerformed</code>, so both are fields. <code>actionPerformed</code> is a three-branch <code>else if</code> chain on <code>e.getActionCommand()</code>.</p> <p>For the counting: <code>trim()</code> first, so that an area holding only spaces counts as zero rather than one. Then split on runs of whitespace. <code>split("\\s+")</code> means "one or more whitespace characters" &mdash; in a Java string literal the backslash has to be doubled, so what the regular expression engine sees is <code>\s+</code>. The empty case has to be handled separately because splitting an empty string gives an array of length one.</p> <p class="filename">WordCounter.java</p>
+<pre><code class="language-java">import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JTextArea;
+
+public class WordCounter extends JFrame implements ActionListener {
+   public static final int WIDTH = 450;
+   public static final int HEIGHT = 300;
+
+   private JTextArea theText;
+   private JLabel status;
+
+   public WordCounter() {
+      super("Word Counter");
+      setSize(WIDTH, HEIGHT);
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+      JMenuBar bar = new JMenuBar();
+      JMenu toolsMenu = new JMenu("Tools");
+      bar.add(toolsMenu);
+      setJMenuBar(bar);
+
+      JMenuItem countItem = new JMenuItem("Count Words");
+      countItem.addActionListener(this);
+      toolsMenu.add(countItem);
+
+      JMenuItem clearItem = new JMenuItem("Clear");
+      clearItem.addActionListener(this);
+      toolsMenu.add(clearItem);
+
+      JMenuItem exitItem = new JMenuItem("Exit");
+      exitItem.addActionListener(this);
+      toolsMenu.add(exitItem);
+
+      Container contentPane = getContentPane();
+      contentPane.setLayout(new BorderLayout());
+
+      theText = new JTextArea(10, 40);
+      theText.setLineWrap(true);
+      theText.setWrapStyleWord(true);
+      contentPane.add(theText, BorderLayout.CENTER);
+
+      status = new JLabel(" 0 words");
+      contentPane.add(status, BorderLayout.SOUTH);
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      String command = e.getActionCommand();
+      if (command.equals("Count Words")) {
+         status.setText(" " + countWords(theText.getText()) + " words");
+      } else if (command.equals("Clear")) {
+         theText.setText("");
+         status.setText(" 0 words");
+      } else if (command.equals("Exit")) {
+         System.exit(0);
+      }
+   }
+
+   public static int countWords(String text) {
+      String trimmed = text.trim();
+      if (trimmed.isEmpty()) {
+         return 0;
+      }
+      return trimmed.split("\\s+").length;
+   }
+
+   public static void main(String args[]) {
+      WordCounter gui = new WordCounter();
+      gui.setVisible(true);
+   }
+}</code></pre> <p>Feeding <code>countWords</code> six different strings, and then a real <code>JTextArea</code> that has been built up with two <code>append</code> calls, gives:</p> <pre class="out"><code>[]  -&gt;  0 words
+[   ]  -&gt;  0 words
+[hello]  -&gt;  1 words
+[the quick brown fox]  -&gt;  4 words
+[one\ntwo\nthree\n]  -&gt;  3 words
+[  spaced   out   words  ]  -&gt;  3 words
+text area holds [Object oriented programming in Java\n]  -&gt;  5 words
+the menu item would deliver command: Count Words</code></pre> <p><strong>Things to notice.</strong> The fifth line is why <code>split("\\s+")</code> and not <code>split(" ")</code>: newlines separate words just as spaces do, and <code>\s</code> covers spaces, tabs and newlines together. The sixth line is why the <code>+</code> matters: three consecutive spaces are one separator, not three, so <code>split(" ")</code> would have produced empty strings and counted seven words instead of three.</p> <p><strong>Why <code>countWords</code> is <code>static</code> and takes a <code>String</code>.</strong> It does not need the window, the menu or the text area &mdash; only some text. Written that way it can be called and checked from an ordinary <code>main</code>, which is exactly what produced the output above. Pulling the real work out of <code>actionPerformed</code> and into a plain method is the single most useful habit in GUI programming, and it is what &sect;8's <code>saveMemo</code> did too.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 17.12</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="28" aria-label="Live coding - Quick Check 17.12">import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JTextArea;
+
+public class WordCounter extends JFrame implements ActionListener {
+    // 1. Fields for the two components actionPerformed has to touch.
+
+    public WordCounter() {
+        super("Word Counter");
+        // 2. Size 450 x 300, EXIT_ON_CLOSE.
+
+        // 3. A JMenuBar, a "Tools" JMenu, three JMenuItems.
+        //    Remember: listener on the ITEM.
+
+        // 4. BorderLayout: text area (10 x 40, wrapped) CENTER, label SOUTH.
+
+    }
+
+    // 5. actionPerformed: switch on e.getActionCommand().
+
+    // 6. public static int countWords(String text)
+
+    public static void main(String args[]) {
+        WordCounter gui = new WordCounter();
+        gui.setVisible(true);
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="prac"><span class="num">&#9733;</span>Practice Problems</h2> <div class="box prac"> <div class="hd">Practice Problems<span class="tag">&mdash; exam-style, Lecture 17 material only</span></div> <div class="bd"> <p>Problems 1, 2 and 3 are the same question three times, from three different CSCI 212 papers. That is not padding &mdash; it is the strongest possible hint about what to practise. A window, two text fields, two labels, one button, and an <code>actionPerformed</code> that parses, computes and displays has been worth fifteen points on every recent final. Learn the shape once and the formula becomes the only thing you have to read off the paper.</p> <p>Problem 4 is your instructor's menu GUI from the Exam 2 practice set. Problems 5 and 6 target the two things most likely to cost you marks: the menu hierarchy, and the difference between what a component shows and what your program has stored.</p> <p>Work them on paper first. The exam is closed book and there is no compiler in the room.</p> </div> </div> <h3>Problem 1 &mdash; TipCalculator <span class="muted">(from CSCI 212 Final, Summer 2026)</span></h3> <p>The Java class <code>TipCalculator</code> displays and operates a GUI called <em>20% Tip Calculator</em> that computes a 20% tip from a bill amount. The window size is (300, 200). The class has exactly three methods. You will write these methods.</p> <pre><code class="language-java">public class TipCalculator extends JFrame implements ActionListener {
+JTextField input, output;
+// (a) main method to create the gui --- omitted
+// (b) constructor to set up the gui --- omitted
+// (c) method to respond to user actions --- omitted
+}</code></pre> <p>The GUI appears initially with both boxes empty; the user types a bill amount (here 200) into the first box; pressing <em>Convert</em> fills in the second. The formula is tip = bill &times; 20% = bill &times; 0.20.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Write the <code>main</code> method.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Two lines, and they are the same two lines in every GUI question on every paper: build one, show it. Worth two of the fifteen points, so write them first and bank them.</p> <pre><code class="language-java">public static void main(String[] args) {
+    TipCalculator calc = new TipCalculator();
+    calc.setVisible(true);
+}</code></pre> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Write the constructor.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Read the picture as a checklist. There is a title bar, so <code>super("20% Tip Calculator")</code>. There is a stated size, so <code>setSize(300, 200)</code>. The middle of the window is four things in two rows of two &mdash; label, field, label, field &mdash; which is a <code>GridLayout(2, 2)</code> on a <code>JPanel</code>. The button sits alone across the bottom, which is <code>BorderLayout.SOUTH</code>. So the content pane gets a <code>BorderLayout</code>, the panel goes in its center, and the button goes in its south.</p> <p>This is the instructor's own answer from the rubric:</p> <pre><code class="language-java">public TipCalculator() {
+    super("20% Tip Calculator");
+    setSize(300, 200);
+    input = new JTextField(50);
+    output = new JTextField(50);
+    Container content = getContentPane();
+    content.setLayout(new BorderLayout());
+    JPanel p = new JPanel();
+    content.add(p, BorderLayout.CENTER);
+    p.setLayout(new GridLayout(2, 2));
+    p.add(new JLabel("Enter the bill amount"));
+    p.add(input);
+    p.add(new JLabel("20% tip"));
+    p.add(output);
+    JButton b = new JButton("Convert");
+    b.addActionListener(this);
+    content.add(b, BorderLayout.SOUTH);
+}</code></pre> <p>The rubric awards 1 point for the title line, 2 for the frame set-up (size and title), 3 for the layout, and 2 for the button with its action listener.</p> <p class="filename">The three states of the window &mdash; a sketch, not a screenshot</p>
+<pre class="cmp"><code>initially:                       after typing 200:                after Convert:
++---------------------------+    +---------------------------+    +---------------------------+
+| 20% Tip Calculator  _ [] X|    | 20% Tip Calculator  _ [] X|    | 20% Tip Calculator  _ [] X|
++---------------------------+    +---------------------------+    +---------------------------+
+| Enter the bill  [        ]|    | Enter the bill  [200     ]|    | Enter the bill  [200     ]|
+| amount                    |    | amount                    |    | amount                    |
+| 20% tip         [        ]|    | 20% tip         [        ]|    | 20% tip         [40.0    ]|
++---------------------------+    +---------------------------+    +---------------------------+
+|         [ Convert ]       |    |         [ Convert ]       |    |         [ Convert ]       |
++---------------------------+    +---------------------------+    +---------------------------+
+  300 x 200; the four boxes in the middle are a GridLayout(2, 2) inside a JPanel</code></pre> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Write the method that programs the response when the user presses the <em>Convert</em> button.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The three lines from &sect;4: read the input field, parse and multiply, write the output field. Because the bill can have cents, it is <code>parseDouble</code>, not <code>parseInt</code>. The <code>""</code> in front of <code>tip</code> is what turns the number into the <code>String</code> that <code>setText</code> demands.</p> <p>The instructor's answer, from the rubric:</p> <pre><code class="language-java">public void actionPerformed(ActionEvent e) {
+    try {
+        Double tip = Double.parseDouble(input.getText()) * 0.20;
+        output.setText("" + tip);
+    } catch (Exception ex) {}
+}</code></pre> <p>The rubric awards 1 point for the title line, 2 for the <code>try</code> and <code>catch</code> block, and 2 for the computation and display.</p> <p>Putting the whole class together and driving that <code>actionPerformed</code> from a plain <code>main</code> with three different things typed into the input field gives:</p> <pre class="out"><code>bill 200        -&gt; tip     40.0
+bill 45.50      -&gt; tip     9.1
+bill free       -&gt; tip     Please enter a number</code></pre> <p><strong>Things to notice.</strong> Three details in the instructor's answer are worth understanding rather than just copying.</p> <ul> <li><strong><code>Double</code>, not <code>double</code>.</strong> The rubric declares the result as the wrapper class <code>Double</code> and assigns a <code>double</code> to it. That works because of autoboxing, and it is harmless. <code>double tip = ...</code> is what most people would write and it is equally correct.</li> <li><strong>The empty <code>catch</code> block.</strong> <code>catch (Exception ex) {}</code> swallows the problem: the output field is simply left holding whatever it held before. That is what the rubric asks for and what earns the two points, but as a program it is poor &mdash; the third line of the run above is from a version with <code>output.setText("Please enter a number");</code> inside the catch instead. Write the rubric's version on the exam; write the useful version in your own code.</li> <li><strong><code>new JTextField(50)</code>.</strong> Fifty columns is very wide, and inside a <code>GridLayout</code> the cell size wins anyway, so the number has almost no effect here. It is a habit rather than a calculation. Do not lose sleep over the exact number you choose.</li> </ul> <p>One thing is missing from the rubric answer and is worth adding in your own version: <code>setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</code>. Without it, closing the window leaves the program running &mdash; Lecture 15's <code>HIDE_ON_CLOSE</code> default. It is not on the marking scheme, so it will not gain you points, but it will not lose you any either.</p> </div></details> </div> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 1</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="26" aria-label="Live coding - Practice Problem 1">import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+public class TipCalculator extends JFrame implements ActionListener {
+    JTextField input, output;
+
+    // (a) main: build one and show it.
+
+    // (b) constructor: title "20% Tip Calculator", size 300 x 200,
+    //     a GridLayout(2, 2) JPanel in the CENTER holding
+    //     label / input / label / output, and a Convert button in the SOUTH.
+
+    // (c) actionPerformed: parse the input, multiply by 0.20, show the result.
+
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 2 &mdash; TemperatureConverter <span class="muted">(from CSCI 212 Final, Spring 2025)</span></h3> <p>The Java class <code>TemperatureConverter</code> displays and operates a GUI called <em>Temperature Conversion</em> that turns Celsius temperature measurements into Fahrenheit. The class has exactly three methods. You will write these methods.</p> <pre><code class="language-java">public class TemperatureConverter extends JFrame implements ActionListener {
+JTextField input, output;
+static final double FACTOR = 9.0/5.0;  // conversion factor for C to F
+static final double OFFSET = 32.0;     // offset for C to F formula
+// (a) main method to create the gui --- omitted
+// (b) constructor to set up the gui --- omitted
+// (c) method to respond to user actions --- omitted
+}</code></pre> <p>The window shows a label <em>Enter a temperature in Celsius</em> beside an input box, a label <em>Temperature in Fahrenheit</em> beside an output box, and a <em>Convert</em> button along the bottom. The formula is F = C &times; (9/5) + 32.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Structurally this is Problem 1 with different words. The one new thing is that two constants have been declared for you, which is a strong hint: use them. Writing <code>* 9.0/5.0 + 32.0</code> by hand would work and would waste the gift.</p> <p>Notice the constants are <code>9.0/5.0</code> and not <code>9/5</code>. Lecture 1's integer-division trap is waiting here: <code>9/5</code> is <code>1</code>, and a converter built on it would report that 100 &deg;C is 132 &deg;F.</p> <p>Here is the complete class &mdash; the three methods the question asks for, plus the header it gave you.</p> <p class="filename">TemperatureConverter.java</p>
+<pre><code class="language-java">import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+public class TemperatureConverter extends JFrame implements ActionListener {
+   JTextField input, output;
+   static final double FACTOR = 9.0 / 5.0;   // conversion factor for C to F
+   static final double OFFSET = 32.0;        // offset for C to F formula
+
+   public TemperatureConverter() {
+      super();
+      setSize(400, 200);
+      setTitle("Temperature Conversion");
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+      input = new JTextField(50);
+      output = new JTextField(50);
+
+      Container content = getContentPane();
+      content.setLayout(new BorderLayout());
+
+      JPanel p = new JPanel();
+      content.add(p, BorderLayout.CENTER);
+      p.setLayout(new GridLayout(2, 2));
+      p.add(new JLabel("Enter a temperature in Celsius"));
+      p.add(input);
+      p.add(new JLabel("Temperature in Fahrenheit"));
+      p.add(output);
+
+      JButton b = new JButton("Convert");
+      b.addActionListener(this);
+      content.add(b, BorderLayout.SOUTH);
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      try {
+         Double fahrenheit = Double.parseDouble(input.getText()) * FACTOR + OFFSET;
+         output.setText("" + fahrenheit);
+      } catch (Exception ex) {
+         output.setText("Please enter a number");
+      }
+   }
+
+   public static void main(String[] args) {
+      TemperatureConverter converter = new TemperatureConverter();
+      converter.setVisible(true);
+   }
+}</code></pre> <p>Driving that <code>actionPerformed</code> with three temperatures typed into the input field:</p> <pre class="out"><code>25 Celsius      -&gt; F       77.0
+100 Celsius     -&gt; F       212.0
+-40 Celsius     -&gt; F       -40.0</code></pre> <p><strong>Things to notice.</strong> The three test values are chosen so you can check them in your head: 25 &deg;C is 77 &deg;F, water boils at 100 &deg;C and 212 &deg;F, and &minus;40 is the one temperature that is the same on both scales. If your converter gets &minus;40 right it has both the multiplication and the addition in the correct order.</p> <p><strong>Two departures from the printed rubric, both deliberate.</strong> The published answer writes <code>setSize(1200, 800)</code>, which is an enormous window for two text boxes; any sensible size is accepted, and 400 by 200 is easier to picture. The published answer also leaves the <code>catch</code> block empty, for the reasons discussed in Problem 1.</p> <p><strong>The title is set with <code>setTitle</code> after <code>super()</code></strong>, rather than by passing it to <code>super</code>. Both work. Note that <code>super()</code> with no argument must still come first if you write it at all, and that <code>super("Temperature Conversion")</code> would let you delete the <code>setTitle</code> line.</p> </div></details> <h3>Problem 3 &mdash; Metric <span class="muted">(from Exam 3 Practice Problems; the same question is in the Final Practice Problems)</span></h3> <p>The Java class <code>Metric</code> displays and operates a GUI called <em>Kilometer Conversion</em> that turns kilometer measurements into miles. The class has exactly three methods.</p> <pre><code class="language-java">public class Metric extends JFrame implements ActionListener {
+JTextField input, output;
+static Double conversion = 0.621371; // the number of miles in 1 kilometer
+// (a) main method to create the gui --- omitted
+// (b) constructor to set up the gui --- omitted
+// (c) method to respond to user actions --- omitted
+}</code></pre> <p>The labels read <em>Enter a distance in kilometers</em> and <em>Distance converted to miles</em>, and the button reads <em>Convert</em>. The user types 80 and presses the button.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Identical to Problems 1 and 2. At this point you should be able to write the constructor without reading the question twice: <code>super()</code>, size, title, two fields, <code>BorderLayout</code> on the content pane, a <code>GridLayout(2, 2)</code> panel in the center with four things in it, a button in the south with a listener on it.</p> <p class="filename">Metric.java</p>
+<pre><code class="language-java">import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+public class Metric extends JFrame implements ActionListener {
+   JTextField input, output;
+   static Double conversion = 0.621371;   // the number of miles in 1 kilometer
+
+   public Metric() {
+      super();
+      setSize(400, 200);
+      setTitle("Kilometer Conversion");
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+      input = new JTextField(50);
+      output = new JTextField(50);
+
+      Container content = getContentPane();
+      content.setLayout(new BorderLayout());
+
+      JPanel p = new JPanel();
+      content.add(p, BorderLayout.CENTER);
+      p.setLayout(new GridLayout(2, 2));
+      p.add(new JLabel("Enter a distance in kilometers"));
+      p.add(input);
+      p.add(new JLabel("Distance converted to miles "));
+      p.add(output);
+
+      JButton b = new JButton("Convert");
+      b.addActionListener(this);
+      content.add(b, BorderLayout.SOUTH);
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      try {
+         Double miles = Double.parseDouble(input.getText()) * conversion;
+         output.setText("" + miles);
+      } catch (Exception ex) {
+         output.setText("Please enter a number");
+      }
+   }
+
+   public static void main(String args[]) {
+      Metric m = new Metric();
+      m.setVisible(true);
+   }
+}</code></pre> <pre class="out"><code>80 kilometers   -&gt; miles   49.70968
+5 kilometers    -&gt; miles   3.106855</code></pre> <p><strong>Things to notice.</strong> The multiplication <code>Double.parseDouble(...) * conversion</code> has a <code>double</code> on the left and a <code>Double</code> on the right, and Java unboxes the wrapper automatically to do the arithmetic. That is why the given declaration <code>static Double conversion</code> causes no trouble, even though <code>static double</code> would have been the natural choice.</p> <p>Compare the three problems side by side and the pattern is unmistakable. The <em>only</em> differences are the title, the two label strings, and one line of arithmetic:</p> <table class="trace"> <tr><th>Problem</th><th>Title</th><th>The one line that differs</th></tr> <tr><td>Tip</td><td>20% Tip Calculator</td><td><code>Double.parseDouble(input.getText()) * 0.20</code></td></tr> <tr><td>Temperature</td><td>Temperature Conversion</td><td><code>Double.parseDouble(input.getText()) * FACTOR + OFFSET</code></td></tr> <tr><td>Metric</td><td>Kilometer Conversion</td><td><code>Double.parseDouble(input.getText()) * conversion</code></td></tr> </table> <p>Memorise the surrounding forty lines and the exam question becomes: <em>copy the formula off the paper.</em></p> </div></details> <h3>Problem 4 &mdash; Find the errors <span class="muted">(added for these notes)</span></h3> <p>The window below is meant to read a whole number from the text field, double it when the button is clicked, and show the answer in the label. Three of the numbered lines are wrong. Give the number of each incorrect line and a corrected version of it. Any line without a number is correct as written.</p> <p class="filename">Broken.java</p>
+<pre><code class="language-java">import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class Broken extends JFrame implements ActionListener {
+    private JTextField input;
+    private JLabel result;
+
+    public Broken() {
+        setTitle("Doubler");
+        setSize(320, 120);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new FlowLayout());
+
+        input  = new JTextField(8);                       // line 1
+        JButton go = new JButton("Double it");
+        result = new JLabel("result");
+
+        go.addActionListener();                           // line 2
+        add(input);
+        add(go);
+        add(result);
+        setVisible(true);
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        int n = input.getText();                          // line 3
+        result.setText("" + (n * 2));                     // line 4
+    }
+
+    public static void main(String args[]) {
+        new Broken();
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Two of the three are compile errors, so start by asking what the compiler would object to. Read every method call and check that the argument types match what the method wants. The third is the one the compiler cannot see: a line that is legal Java but wrong about what the user might type.</p> <p><strong>Error 1 &mdash; line 2.</strong> <code>addActionListener</code> needs to be told <em>which</em> listener to notify. The class already says <code>implements ActionListener</code> and already has <code>actionPerformed</code>, so the listener is this very object:</p> <pre class="err"><code>Broken.java:19: error: method addActionListener in class AbstractButton cannot be applied to given types;
+        go.addActionListener();                           // line 2
+          ^
+  required: ActionListener
+  found:    no arguments
+  reason: actual and formal argument lists differ in length</code></pre> <p>Corrected: <code>go.addActionListener(this);</code></p> <p>Without it the program still compiles once the other errors are fixed, and it still opens a perfectly good-looking window &mdash; the button just does nothing when clicked. Forgetting <code>addActionListener</code> is the most common reason a Swing button is silent.</p> <p><strong>Error 2 &mdash; line 3.</strong> <code>getText()</code> returns a <code>String</code>, always. There is no automatic conversion to <code>int</code>:</p> <pre class="err"><code>Broken.java:27: error: incompatible types: String cannot be converted to int
+        int n = input.getText();                          // line 3
+                             ^</code></pre> <p>Corrected: <code>int n = Integer.parseInt(input.getText());</code></p> <p><strong>Error 3 &mdash; line 3 again, and this one the compiler will not help with.</strong> Even written correctly, <code>Integer.parseInt</code> throws a <code>NumberFormatException</code> the moment the user types something that is not a whole number &mdash; and a user typing into a text box will eventually type <code>twelve</code>, or a blank, or <code>3.5</code>. Proving it outside the GUI:</p> <p class="filename">Probe.java</p>
+<pre><code class="language-java">public class Probe {
+    public static void main(String args[]) {
+        String typed = "21";
+        int n = Integer.parseInt(typed);
+        System.out.println("typed \"" + typed + "\" -&gt; label shows: " + (n * 2));
+        try {
+            Integer.parseInt("twelve");
+        } catch (NumberFormatException ex) {
+            System.out.println("typed \"twelve\" -&gt; " + ex);
+        }
+    }
+}</code></pre> <pre class="out"><code>typed "21" -&gt; label shows: 42
+typed "twelve" -&gt; java.lang.NumberFormatException: For input string: "twelve"</code></pre> <p>In a real application you would wrap the parse in a <code>try</code>/<code>catch</code> and put a polite message in the label instead of letting the exception escape. That is Lecture 20's machinery, and on an exam it is enough to say so &mdash; but you should know the hole is there.</p> <p>Here is the corrected class, which compiles cleanly:</p> <p class="filename">Doubler.java</p>
+<pre><code class="language-java">import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class Doubler extends JFrame implements ActionListener {
+    private JTextField input;
+    private JLabel result;
+
+    public Doubler() {
+        setTitle("Doubler");
+        setSize(320, 120);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new FlowLayout());
+
+        input  = new JTextField(8);
+        JButton go = new JButton("Double it");
+        result = new JLabel("result");
+
+        go.addActionListener(this);
+        add(input);
+        add(go);
+        add(result);
+        setVisible(true);
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        int n = Integer.parseInt(input.getText());
+        result.setText("" + (n * 2));
+    }
+
+    public static void main(String args[]) {
+        new Doubler();
+    }
+}</code></pre> <p><strong>Things to notice.</strong> Line 4 is <em>correct</em>, and it is worth understanding why, because it looks suspicious. <code>setText</code> wants a <code>String</code> and <code>n * 2</code> is an <code>int</code>, so the leading <code>""</code> is doing real work: it forces the <code>+</code> to concatenate rather than add, exactly as in Lecture 1. Without it, <code>setText(n * 2)</code> would not compile.</p> <p>Notice also the shape of the class, because it is the shape every GUI question on your exams wants: the components that the listener has to reach are <strong>fields</strong>, everything else is a local variable, the frame itself implements <code>ActionListener</code>, and <code>addActionListener(this)</code> wires them together. <code>go</code> can be local because nothing outside the constructor ever mentions it again; <code>input</code> and <code>result</code> cannot, because <code>actionPerformed</code> needs them.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 4</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="28" aria-label="Live coding - Practice Problem 4">import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class Doubler extends JFrame implements ActionListener {
+    private JTextField input;
+    private JLabel result;
+
+    public Doubler() {
+        setTitle("Doubler");
+        setSize(320, 120);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new FlowLayout());
+
+        input  = new JTextField(8);
+        JButton go = new JButton("Double it");
+        result = new JLabel("result");
+
+        // fix the three errors below
+
+        add(input);
+        add(go);
+        add(result);
+        setVisible(true);
+    }
+
+    public void actionPerformed(ActionEvent e) {
+
+    }
+
+    public static void main(String args[]) {
+        new Doubler();
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <div class="box sum" id="summary"> <div class="hd">Lecture Summary</div> <div class="bd"> <ul> <li><code>JLabel</code> displays text the program controls; <code>JTextField</code> collects one line from the user; <code>JTextArea</code> handles many lines. All three are just components &mdash; you build them, add them to a container, and a layout manager places them.</li> <li><code>getText()</code> returns a <code>String</code>, always, and <code>setText()</code> takes a <code>String</code>, always. Nothing about a text component knows or cares about numbers.</li> <li>Turning typed text into a number is your job: <code>Integer.parseInt</code> or <code>Double.parseDouble</code>. Both throw a <code>NumberFormatException</code> on anything they cannot read, and a user will eventually type such a thing. Lecture 20 gives you the tool to handle it gracefully; today you at least know the hole is there.</li> <li>Going the other way, remember <code>"" +</code> &mdash; <code>setText</code> will not accept a number.</li> <li>A <code>JTextArea</code> normally lives inside a <code>JScrollPane</code>, and <code>setLineWrap(true)</code> is what stops long lines running off the right edge. Lecture 18 covers scroll panes properly.</li> <li><code>setEditable(false)</code> leaves a component looking normal but refusing typing; <code>setEnabled(false)</code> greys it out and stops it responding at all. Use <code>setEditable</code> for a results box, <code>setEnabled</code> for a control that is temporarily unavailable.</li> <li>Menus are a three-level hierarchy: a <code>JMenuBar</code> goes on the frame with <code>setJMenuBar</code>, a <code>JMenu</code> goes on the bar, and a <code>JMenuItem</code> goes on the menu. The <code>ActionListener</code> goes on the <strong>item</strong> &mdash; never on the menu or the bar.</li> <li>The exam pattern for every one of these questions is the same forty lines: fields for the components the listener must reach, a constructor that sets the title, size, close operation and layout and then builds and adds the components, <code>addActionListener(this)</code>, and an <code>actionPerformed</code> that reads, computes and writes back. Learn the frame; the question only ever changes the formula in the middle.</li> </ul> <p><strong>Coming up in Lecture 18 &mdash; GUI IV: Borders, Icons and Scroll Panes.</strong> Everything we have built so far works but looks unfinished: components crowd the window edge, related controls have nothing visually grouping them, and a <code>JTextArea</code> with more text than
+    room simply hides it. Next time we fix all three &mdash; borders to group and to pad, icons on
+    labels and buttons, and the scroll pane that a text area has been quietly waiting for.</p>
+  </div>
+</div>
+
+<nav class="pagenav">
+<span class="disabled"><div class="dir">&larr; Previous</div><div class="ttl">Lecture 16 &mdash; GUI II: Layout Managers and Buttons</div><div class="pending">posts Tue Nov 3</div></span>
+<span class="disabled next"><div class="dir">Next &rarr;</div><div class="ttl">Lecture 18 &mdash; GUI IV: Borders, Icons and Scroll Panes</div><div class="pending">posts Tue Nov 10</div></span>
+</nav>
+<footer class="pf">CSCI 212 &middot; Object-Oriented Programming in Java &middot; Queens College, CUNY</footer>
+</div>
+<script>
+(()=>{var ut=Object.create;var xe=Object.defineProperty;var ft=Object.getOwnPropertyDescriptor;var gt=Object.getOwnPropertyNames;var ht=Object.getPrototypeOf,dt=Object.prototype.hasOwnProperty;var pt=(e,t)=>()=>{try{return t||e((t={exports:{}}).exports,t),t.exports}catch(n){throw t=0,n}};var Et=(e,t,n,l)=>{if(t&&typeof t=="object"||typeof t=="function")for(let d of gt(t))!dt.call(e,d)&&d!==n&&xe(e,d,{get:()=>t[d],enumerable:!(l=ft(t,d))||l.enumerable});return e};var bt=(e,t,n)=>(n=e!=null?ut(ht(e)):{},Et(t||!e||!e.__esModule?xe(n,"default",{value:e,enumerable:!0}):n,e));var Ke=pt((ln,Ge)=>{function Ie(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(t=>{let n=e[t],l=typeof n;(l==="object"||l==="function")&&!Object.isFrozen(n)&&Ie(n)}),e}var Z=class{constructor(t){t.data===void 0&&(t.data={}),this.data=t.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function Ce(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function k(e,...t){let n=Object.create(null);for(let l in e)n[l]=e[l];return t.forEach(function(l){for(let d in l)n[d]=l[d]}),n}var _t="</span>",Ne=e=>!!e.scope,Mt=(e,{prefix:t})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let n=e.split(".");return[`${t}${n.shift()}`,...n.map((l,d)=>`${l}${"_".repeat(d+1)}`)].join(" ")}return`${t}${e}`},oe=class{constructor(t,n){this.buffer="",this.classPrefix=n.classPrefix,t.walk(this)}addText(t){this.buffer+=Ce(t)}openNode(t){if(!Ne(t))return;let n=Mt(t.scope,{prefix:this.classPrefix});this.span(n)}closeNode(t){Ne(t)&&(this.buffer+=_t)}value(){return this.buffer}span(t){this.buffer+=`<span class="${t}">`}},Re=(e={})=>{let t={children:[]};return Object.assign(t,e),t},ae=class e{constructor(){this.rootNode=Re(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(t){this.top.children.push(t)}openNode(t){let n=Re({scope:t});this.add(n),this.stack.push(n)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(t){return this.constructor._walk(t,this.rootNode)}static _walk(t,n){return typeof n=="string"?t.addText(n):n.children&&(t.openNode(n),n.children.forEach(l=>this._walk(t,l)),t.closeNode(n)),t}static _collapse(t){typeof t!="string"&&t.children&&(t.children.every(n=>typeof n=="string")?t.children=[t.children.join("")]:t.children.forEach(n=>{e._collapse(n)}))}},le=class extends ae{constructor(t){super(),this.options=t}addText(t){t!==""&&this.add(t)}startScope(t){this.openNode(t)}endScope(){this.closeNode()}__addSublanguage(t,n){let l=t.root;n&&(l.scope=`language:${n}`),this.add(l)}toHTML(){return new oe(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function G(e){return e?typeof e=="string"?e:e.source:null}function De(e){return B("(?=",e,")")}function Ot(e){return B("(?:",e,")*")}function wt(e){return B("(?:",e,")?")}function B(...e){return e.map(n=>G(n)).join("")}function xt(e){let t=e[e.length-1];return typeof t=="object"&&t.constructor===Object?(e.splice(e.length-1,1),t):{}}function V(...e){return"("+(xt(e).capture?"":"?:")+e.map(l=>G(l)).join("|")+")"}function ke(e){return new RegExp(e.toString()+"|").exec("").length-1}function Nt(e,t){let n=e&&e.exec(t);return n&&n.index===0}var Rt=new RegExp(V(/\[(?:[^\\\]]|\\.)*\]/,/\(\?<(?![=!])[^>]+>/,/\(\?'[^']+'/,/\(\??/,/\\([1-9][0-9]*)/,/\\./));function fe(e,{joinWith:t}){let n=0;return e.map(l=>{n+=1;let d=n,_=G(l),c="";for(;_.length>0;){let r=Rt.exec(_);if(!r){c+=_;break}c+=_.substring(0,r.index),_=_.substring(r.index+r[0].length),r[0][0]==="\\"&&r[1]?c+="\\"+String(Number(r[1])+d):(c+=r[0],(r[0]==="("||/^\(\?[<']/.test(r[0]))&&n++)}return c}).map(l=>`(${l})`).join(t)}var yt=/\b\B/,ve="[a-zA-Z]\\w*",ge="[a-zA-Z_]\\w*",Le="\\b\\d+(\\.\\d+)?",Be="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Pe="\\b(0b[01]+)",St="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",At=(e={})=>{let t=/^#![ ]*\//;return e.binary&&(e.begin=B(t,/.*\b/,e.binary,/\b.*/)),k({scope:"meta",begin:t,end:/$/,relevance:0,"on:begin":(n,l)=>{n.index!==0&&l.ignoreMatch()}},e)},K={begin:"\\\\[\\s\\S]",relevance:0},Tt={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[K]},It={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[K]},Ct={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},Q=function(e,t,n={}){let l=k({scope:"comment",begin:e,end:t,contains:[]},n);l.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let d=V("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return l.contains.push({begin:B(/[ ]+/,"(",d,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),l},Dt=Q("//","$"),kt=Q("/\\*","\\*/"),vt=Q("#","$"),Lt={scope:"number",begin:Le,relevance:0},Bt={scope:"number",begin:Be,relevance:0},Pt={scope:"number",begin:Pe,relevance:0},$t={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[K,{begin:/\[/,end:/\]/,relevance:0,contains:[K]}]},Ht={scope:"title",begin:ve,relevance:0},Ut={scope:"title",begin:ge,relevance:0},jt={begin:"\\.\\s*"+ge,relevance:0},Gt=function(e){return Object.assign(e,{"on:begin":(t,n)=>{n.data._beginMatch=t[1]},"on:end":(t,n)=>{n.data._beginMatch!==t[1]&&n.ignoreMatch()}})},X=Object.freeze({__proto__:null,APOS_STRING_MODE:Tt,BACKSLASH_ESCAPE:K,BINARY_NUMBER_MODE:Pt,BINARY_NUMBER_RE:Pe,COMMENT:Q,C_BLOCK_COMMENT_MODE:kt,C_LINE_COMMENT_MODE:Dt,C_NUMBER_MODE:Bt,C_NUMBER_RE:Be,END_SAME_AS_BEGIN:Gt,HASH_COMMENT_MODE:vt,IDENT_RE:ve,MATCH_NOTHING_RE:yt,METHOD_GUARD:jt,NUMBER_MODE:Lt,NUMBER_RE:Le,PHRASAL_WORDS_MODE:Ct,QUOTE_STRING_MODE:It,REGEXP_MODE:$t,RE_STARTERS_RE:St,SHEBANG:At,TITLE_MODE:Ht,UNDERSCORE_IDENT_RE:ge,UNDERSCORE_TITLE_MODE:Ut});function Kt(e,t){e.input[e.index-1]==="."&&t.ignoreMatch()}function mt(e,t){e.className!==void 0&&(e.scope=e.className,delete e.className)}function Wt(e,t){t&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=Kt,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function Ft(e,t){Array.isArray(e.illegal)&&(e.illegal=V(...e.illegal))}function zt(e,t){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function Yt(e,t){e.relevance===void 0&&(e.relevance=1)}var Xt=(e,t)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let n=Object.assign({},e);Object.keys(e).forEach(l=>{delete e[l]}),e.keywords=n.keywords,e.begin=B(n.beforeMatch,De(n.begin)),e.starts={relevance:0,contains:[Object.assign(n,{endsParent:!0})]},e.relevance=0,delete n.beforeMatch},Zt=["of","and","for","in","not","or","if","then","parent","list","value"],Jt="keyword";function $e(e,t,n=Jt){let l=Object.create(null);return typeof e=="string"?d(n,e.split(" ")):Array.isArray(e)?d(n,e):Object.keys(e).forEach(function(_){Object.assign(l,$e(e[_],t,_))}),l;function d(_,c){t&&(c=c.map(r=>r.toLowerCase())),c.forEach(function(r){let u=r.split("|");l[u[0]]=[_,Vt(u[0],u[1])]})}}function Vt(e,t){return t?Number(t):Qt(e)?0:1}function Qt(e){return Zt.includes(e.toLowerCase())}var ye={},L=e=>{console.error(e)},Se=(e,...t)=>{console.log(`WARN: ${e}`,...t)},H=(e,t)=>{ye[`${e}/${t}`]||(console.log(`Deprecated as of ${e}. ${t}`),ye[`${e}/${t}`]=!0)},J=new Error;function He(e,t,{key:n}){let l=0,d=e[n],_={},c={};for(let r=1;r<=t.length;r++)c[r+l]=d[r],_[r+l]=!0,l+=ke(t[r-1]);e[n]=c,e[n]._emit=_,e[n]._multi=!0}function qt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw L("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),J;if(typeof e.beginScope!="object"||e.beginScope===null)throw L("beginScope must be object"),J;He(e,e.begin,{key:"beginScope"}),e.begin=fe(e.begin,{joinWith:""})}}function en(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw L("skip, excludeEnd, returnEnd not compatible with endScope: {}"),J;if(typeof e.endScope!="object"||e.endScope===null)throw L("endScope must be object"),J;He(e,e.end,{key:"endScope"}),e.end=fe(e.end,{joinWith:""})}}function tn(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function nn(e){tn(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),qt(e),en(e)}function sn(e){function t(c,r){return new RegExp(G(c),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(r?"g":""))}class n{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(r,u){u.position=this.position++,this.matchIndexes[this.matchAt]=u,this.regexes.push([u,r]),this.matchAt+=ke(r)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let r=this.regexes.map(u=>u[1]);this.matcherRe=t(fe(r,{joinWith:"|"}),!0),this.lastIndex=0}exec(r){this.matcherRe.lastIndex=this.lastIndex;let u=this.matcherRe.exec(r);if(!u)return null;let O=u.findIndex((P,I)=>I>0&&P!==void 0),M=this.matchIndexes[O];return u.splice(0,O),Object.assign(u,M)}}class l{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(r){if(this.multiRegexes[r])return this.multiRegexes[r];let u=new n;return this.rules.slice(r).forEach(([O,M])=>u.addRule(O,M)),u.compile(),this.multiRegexes[r]=u,u}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(r,u){this.rules.push([r,u]),u.type==="begin"&&this.count++}exec(r){let u=this.getMatcher(this.regexIndex);u.lastIndex=this.lastIndex;let O=u.exec(r);if(this.resumingScanAtSamePosition()&&!(O&&O.index===this.lastIndex)){let M=this.getMatcher(0);M.lastIndex=this.lastIndex+1,O=M.exec(r)}return O&&(this.regexIndex+=O.position+1,this.regexIndex===this.count&&this.considerAll()),O}}function d(c){let r=new l;return c.contains.forEach(u=>r.addRule(u.begin,{rule:u,type:"begin"})),c.terminatorEnd&&r.addRule(c.terminatorEnd,{type:"end"}),c.illegal&&r.addRule(c.illegal,{type:"illegal"}),r}function _(c,r){let u=c;if(c.isCompiled)return u;[mt,zt,nn,Xt].forEach(M=>M(c,r)),e.compilerExtensions.forEach(M=>M(c,r)),c.__beforeBegin=null,[Wt,Ft,Yt].forEach(M=>M(c,r)),c.isCompiled=!0;let O=null;return typeof c.keywords=="object"&&c.keywords.$pattern&&(c.keywords=Object.assign({},c.keywords),O=c.keywords.$pattern,delete c.keywords.$pattern),O=O||/\w+/,c.keywords&&(c.keywords=$e(c.keywords,e.case_insensitive)),u.keywordPatternRe=t(O,!0),r&&(c.begin||(c.begin=/\B|\b/),u.beginRe=t(u.begin),!c.end&&!c.endsWithParent&&(c.end=/\B|\b/),c.end&&(u.endRe=t(u.end)),u.terminatorEnd=G(u.end)||"",c.endsWithParent&&r.terminatorEnd&&(u.terminatorEnd+=(c.end?"|":"")+r.terminatorEnd)),c.illegal&&(u.illegalRe=t(c.illegal)),c.contains||(c.contains=[]),c.contains=[].concat(...c.contains.map(function(M){return rn(M==="self"?c:M)})),c.contains.forEach(function(M){_(M,u)}),c.starts&&_(c.starts,r),u.matcher=d(u),u}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=k(e.classNameAliases||{}),_(e)}function Ue(e){return e?e.endsWithParent||Ue(e.starts):!1}function rn(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(t){return k(e,{variants:null},t)})),e.cachedVariants?e.cachedVariants:Ue(e)?k(e,{starts:e.starts?k(e.starts):null}):Object.isFrozen(e)?k(e):e}var cn="11.12.0",ue=class extends Error{constructor(t,n){super(t),this.name="HTMLInjectionError",this.html=n}},ce=Ce,Ae=k,Te=Symbol("nomatch"),on=7,je=function(e){let t=Object.create(null),n=Object.create(null),l=[],d=!0,_="Could not find the language '{}', did you forget to load/include a language module?",c={disableAutodetect:!0,name:"Plain text",contains:[]},r={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:le};function u(i){return r.noHighlightRe.test(i)}function O(i){let a=i.className+" ";a+=i.parentNode?i.parentNode.className:"";let h=r.languageDetectRe.exec(a);if(h){let E=C(h[1]);return E||(Se(_.replace("{}",h[1])),Se("Falling back to no-highlight mode for this block.",i)),E?h[1]:"no-highlight"}return a.split(/\s+/).find(E=>u(E)||C(E))}function M(i,a,h){let E="",w="";typeof a=="object"?(E=i,h=a.ignoreIllegals,w=a.language):(H("10.7.0","highlight(lang, code, ...args) has been deprecated."),H("10.7.0",`Please use highlight(code, options) instead.
+(see the highlight.js issue tracker)`),w=i,E=a),h===void 0&&(h=!0);let y={code:E,language:w};W("before:highlight",y);let D=y.result?y.result:P(y.language,y.code,h);return D.code=y.code,W("after:highlight",D),D}function P(i,a,h,E){let w=Object.create(null);function y(s,o){return s.keywords[o]}function D(){if(!f.keywords){x.addText(b);return}let s=0;f.keywordPatternRe.lastIndex=0;let o=f.keywordPatternRe.exec(b),g="";for(;o;){g+=b.substring(s,o.index);let p=A.case_insensitive?o[0].toLowerCase():o[0],N=y(f,p);if(N){let[T,at]=N;if(x.addText(g),g="",w[p]=(w[p]||0)+1,w[p]<=on&&(Y+=at),T.startsWith("_"))g+=o[0];else{let lt=A.classNameAliases[T]||T;S(o[0],lt)}}else g+=o[0];s=f.keywordPatternRe.lastIndex,o=f.keywordPatternRe.exec(b)}g+=b.substring(s),x.addText(g)}function F(){if(b==="")return;let s=null;if(typeof f.subLanguage=="string"){if(!t[f.subLanguage]){x.addText(b);return}s=P(f.subLanguage,b,!0,we[f.subLanguage]),we[f.subLanguage]=s._top}else s=$(b,f.subLanguage.length?f.subLanguage:null);f.relevance>0&&(Y+=s.relevance),x.__addSublanguage(s._emitter,s.language)}function R(){f.subLanguage!=null?F():D(),b=""}function S(s,o){s!==""&&(x.startScope(o),x.addText(s),x.endScope())}function be(s,o){let g=1,p=o.length-1;for(;g<=p;){if(!s._emit[g]){g++;continue}let N=A.classNameAliases[s[g]]||s[g],T=o[g];N?S(T,N):(b=T,D(),b=""),g++}}function _e(s,o){return s.scope&&typeof s.scope=="string"&&x.openNode(A.classNameAliases[s.scope]||s.scope),s.beginScope&&(s.beginScope._wrap?(S(b,A.classNameAliases[s.beginScope._wrap]||s.beginScope._wrap),b=""):s.beginScope._multi&&(be(s.beginScope,o),b="")),f=Object.create(s,{parent:{value:f}}),f}function Me(s,o,g){let p=Nt(s.endRe,g);if(p){if(s["on:end"]){let N=new Z(s);s["on:end"](o,N),N.isMatchIgnored&&(p=!1)}if(p){for(;s.endsParent&&s.parent;)s=s.parent;return s}}if(s.endsWithParent)return Me(s.parent,o,g)}function it(s){return f.matcher.regexIndex===0?(b+=s[0],1):(re=!0,0)}function st(s){let o=s[0],g=s.rule,p=new Z(g),N=[g.__beforeBegin,g["on:begin"]];for(let T of N)if(T&&(T(s,p),p.isMatchIgnored))return it(o);return g.skip?b+=o:(g.excludeBegin&&(b+=o),R(),!g.returnBegin&&!g.excludeBegin&&(b=o)),_e(g,s),g.returnBegin?0:o.length}function rt(s){let o=s[0],g=a.substring(s.index),p=Me(f,s,g);if(!p)return Te;let N=f;f.endScope&&f.endScope._wrap?(R(),S(o,f.endScope._wrap)):f.endScope&&f.endScope._multi?(R(),be(f.endScope,s)):N.skip?b+=o:(N.returnEnd||N.excludeEnd||(b+=o),R(),N.excludeEnd&&(b=o));do f.scope&&x.closeNode(),!f.skip&&!f.subLanguage&&(Y+=f.relevance),f=f.parent;while(f!==p.parent);return p.starts&&_e(p.starts,s),N.returnEnd?0:o.length}function ct(){let s=[];for(let o=f;o!==A;o=o.parent)o.scope&&s.unshift(o.scope);s.forEach(o=>x.openNode(o))}let z={};function Oe(s,o){let g=o&&o[0];if(b+=s,g==null)return R(),0;if(z.type==="begin"&&o.type==="end"&&z.index===o.index&&g===""){if(b+=a.slice(o.index,o.index+1),!d){let p=new Error(`0 width match regex (${i})`);throw p.languageName=i,p.badRule=z.rule,p}return 1}if(z=o,o.type==="begin")return st(o);if(o.type==="illegal"&&!h){let p=new Error('Illegal lexeme "'+g+'" for mode "'+(f.scope||"<unnamed>")+'"');throw p.mode=f,p}else if(o.type==="end"){let p=rt(o);if(p!==Te)return p}if(o.type==="illegal"&&g==="")return o.index===a.length||(b+=`
+`),1;if(se>1e5&&se>o.index*3)throw new Error("potential infinite loop, way more iterations than matches");return b+=g,g.length}let A=C(i);if(!A)throw L(_.replace("{}",i)),new Error('Unknown language: "'+i+'"');let ot=sn(A),ie="",f=E||ot,we={},x=new r.__emitter(r);ct();let b="",Y=0,v=0,se=0,re=!1;try{if(A.__emitTokens)A.__emitTokens(a,x);else{for(f.matcher.considerAll();;){se++,re?re=!1:f.matcher.considerAll(),f.matcher.lastIndex=v;let s=f.matcher.exec(a);if(!s)break;let o=a.substring(v,s.index),g=Oe(o,s);v=s.index+g}Oe(a.substring(v))}return x.finalize(),ie=x.toHTML(),{language:i,value:ie,relevance:Y,illegal:!1,_emitter:x,_top:f}}catch(s){if(s.message&&s.message.includes("Illegal"))return{language:i,value:ce(a),illegal:!0,relevance:0,_illegalBy:{message:s.message,index:v,context:a.slice(v-100,v+100),mode:s.mode,resultSoFar:ie},_emitter:x};if(d)return{language:i,value:ce(a),illegal:!1,relevance:0,errorRaised:s,_emitter:x,_top:f};throw s}}function I(i){let a={value:ce(i),illegal:!1,relevance:0,_top:c,_emitter:new r.__emitter(r)};return a._emitter.addText(i),a}function $(i,a){a=a||r.languages||Object.keys(t);let h=I(i),E=a.filter(C).filter(Ee).map(R=>P(R,i,!1));E.unshift(h);let w=E.sort((R,S)=>{if(R.relevance!==S.relevance)return S.relevance-R.relevance;if(R.language&&S.language){if(C(R.language).supersetOf===S.language)return 1;if(C(S.language).supersetOf===R.language)return-1}return 0}),[y,D]=w,F=y;return F.secondBest=D,F}function te(i,a,h){let E=a&&n[a]||h;i.classList.add("hljs"),i.classList.add(`language-${E}`)}function ne(i){let a=null,h=O(i);if(u(h))return;if(W("before:highlightElement",{el:i,language:h}),i.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",i);return}if(i.children.length>0&&(r.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("(see the highlight.js security wiki)"),console.warn("The element with unescaped HTML:"),console.warn(i)),r.throwUnescapedHTML))throw new ue("One of your code blocks includes unescaped HTML.",i.innerHTML);a=i;let E=a.textContent,w=h?M(E,{language:h,ignoreIllegals:!0}):$(E);i.innerHTML=w.value,i.dataset.highlighted="yes",te(i,h,w.language),i.result={language:w.language,re:w.relevance,relevance:w.relevance},w.secondBest&&(i.secondBest={language:w.secondBest.language,relevance:w.secondBest.relevance}),W("after:highlightElement",{el:i,result:w,text:E})}function Ye(i){r=Ae(r,i)}let Xe=()=>{m(),H("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function Ze(){m(),H("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let de=!1;function m(){function i(){m()}if(document.readyState==="loading"){de||window.addEventListener("DOMContentLoaded",i,!1),de=!0;return}document.querySelectorAll(r.cssSelector).forEach(ne)}function Je(i,a){let h=null;try{h=a(e)}catch(E){if(L("Language definition for '{}' could not be registered.".replace("{}",i)),d)L(E);else throw E;h=c}h.name||(h.name=i),t[i]=h,h.rawDefinition=a.bind(null,e),h.aliases&&pe(h.aliases,{languageName:i})}function Ve(i){delete t[i];for(let a of Object.keys(n))n[a]===i&&delete n[a]}function Qe(){return Object.keys(t)}function C(i){return i=(i||"").toLowerCase(),t[i]||t[n[i]]}function pe(i,{languageName:a}){typeof i=="string"&&(i=[i]),i.forEach(h=>{n[h.toLowerCase()]=a})}function Ee(i){let a=C(i);return a&&!a.disableAutodetect}function qe(i){i["before:highlightBlock"]&&!i["before:highlightElement"]&&(i["before:highlightElement"]=a=>{i["before:highlightBlock"](Object.assign({block:a.el},a))}),i["after:highlightBlock"]&&!i["after:highlightElement"]&&(i["after:highlightElement"]=a=>{i["after:highlightBlock"](Object.assign({block:a.el},a))})}function et(i){qe(i),l.push(i)}function tt(i){let a=l.indexOf(i);a!==-1&&l.splice(a,1)}function W(i,a){let h=i;l.forEach(function(E){E[h]&&E[h](a)})}function nt(i){return H("10.7.0","highlightBlock will be removed entirely in v12.0"),H("10.7.0","Please use highlightElement now."),ne(i)}Object.assign(e,{highlight:M,highlightAuto:$,highlightAll:m,highlightElement:ne,highlightBlock:nt,configure:Ye,initHighlighting:Xe,initHighlightingOnLoad:Ze,registerLanguage:Je,unregisterLanguage:Ve,listLanguages:Qe,getLanguage:C,registerAliases:pe,autoDetection:Ee,inherit:Ae,addPlugin:et,removePlugin:tt}),e.debugMode=function(){d=!1},e.safeMode=function(){d=!0},e.versionString=cn,e.regex={concat:B,lookahead:De,either:V,optional:wt,anyNumberOfTimes:Ot};for(let i in X)typeof X[i]=="object"&&Ie(X[i]);return Object.assign(e,X),e},U=je({});U.newInstance=()=>je({});Ge.exports=U;U.HighlightJS=U;U.default=U});var me=bt(Ke(),1);var he=me.default;var j="[0-9](_*[0-9])*",q=`\\.(${j})`,ee="[0-9a-fA-F](_*[0-9a-fA-F])*",We={className:"number",variants:[{begin:`(\\b(${j})((${q})|\\.)?|(${q}))[eE][+-]?(${j})[fFdD]?\\b`},{begin:`\\b(${j})((${q})[fFdD]?\\b|\\.([fFdD]\\b)?)`},{begin:`(${q})[fFdD]?\\b`},{begin:`\\b(${j})[fFdD]\\b`},{begin:`\\b0[xX]((${ee})\\.?|(${ee})?\\.(${ee}))[pP][+-]?(${j})[fFdD]?\\b`},{begin:"\\b(0|[1-9](_*[0-9])*)[lL]?\\b"},{begin:`\\b0[xX](${ee})[lL]?\\b`},{begin:"\\b0(_*[0-7])*[lL]?\\b"},{begin:"\\b0[bB][01](_*[01])*[lL]?\\b"}],relevance:0};function Fe(e,t,n){return n===-1?"":e.replace(t,l=>Fe(e,t,n-1))}function ze(e){let t=e.regex,n="[\xC0-\u02B8a-zA-Z_$][\xC0-\u02B8a-zA-Z_$0-9]*",l="(?:(?:\\s*\\[\\s*])+)?",d=n+"<@@@>"+l,c="(?:"+("\\?(?:\\s+(?:extends|super)\\s+"+d+")?")+"|"+d+")",r=Fe("(?:\\s*<\\s*"+c+"(?:\\s*,\\s*"+c+")*\\s*>)?",/<@@@>/g,2),I={keyword:["synchronized","abstract","private","var","static","if","const ","for","while","strictfp","finally","protected","import","native","final","void","enum","else","break","transient","catch","instanceof","volatile","case","assert","package","default","public","try","switch","continue","throws","protected","public","private","module","requires","exports","do","sealed","yield","permits","goto","when"],literal:["false","true","null"],type:["char","boolean","long","float","int","byte","short","double"],built_in:["super","this"]},$={className:"meta",begin:"@"+n,contains:[{begin:/\(/,end:/\)/,contains:["self"]}]},te={className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[e.C_BLOCK_COMMENT_MODE],endsParent:!0};return{name:"Java",aliases:["jsp"],keywords:I,illegal:/<\/|#/,contains:[e.COMMENT("/\\*\\*","\\*/",{relevance:0,contains:[{begin:/\w+@/,relevance:0},{className:"doctag",begin:"@[A-Za-z]+"}]}),{begin:/import java\.[a-z]+\./,keywords:"import",relevance:2},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE,{begin:/"""/,end:/"""/,className:"string",contains:[e.BACKSLASH_ESCAPE]},e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,{match:[/\b(?:class|interface|enum|extends|implements|new)/,/\s+/,n],className:{1:"keyword",3:"title.class"}},{match:/non-sealed/,scope:"keyword"},{beginKeywords:"new throw return else yield assert",relevance:0},{begin:[n,t.concat(r,l,/\s+/),n,l,/\s*/,/=(?!=)/],className:{1:"type",3:"variable",6:"operator"}},{begin:[/record/,/\s+/,n],className:{1:"keyword",3:"title.class"},contains:[te,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},{begin:[n,t.concat(r,l,/\s+/),n,/\s*(?=\()/],className:{1:"type",3:"title.function"},keywords:I,contains:[{className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[$,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,We,e.C_BLOCK_COMMENT_MODE]},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},We,$]}}he.registerLanguage("java",ze);window.hljs=he;})();
+</script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---- 1. syntax highlighting -------------------------------------- */
+  function highlight() {
+    if (!window.hljs) return;
+    var blocks = document.querySelectorAll('pre code.language-java');
+    for (var i = 0; i < blocks.length; i++) {
+      try { window.hljs.highlightElement(blocks[i]); } catch (e) {}
+    }
+  }
+
+  /* ---- 2. every solution / reveal starts closed --------------------- */
+  function closeAll() {
+    var d = document.querySelectorAll('details.soln');
+    for (var i = 0; i < d.length; i++) { d[i].open = false; }
+  }
+
+  /* ---- 3. show all / hide all -------------------------------------- */
+  function wireToolbar() {
+    var show = document.getElementById('showAll');
+    var hide = document.getElementById('hideAll');
+    function setAll(v) {
+      var d = document.querySelectorAll('details.soln');
+      for (var i = 0; i < d.length; i++) { d[i].open = v; }
+    }
+    if (show) show.addEventListener('click', function () { setAll(true); });
+    if (hide) hide.addEventListener('click', function () { setAll(false); });
+  }
+
+  /* ---- 4. live-coding editors -------------------------------------- */
+  var INDENT = '    ';
+
+  function wireEditors() {
+    var eds = document.querySelectorAll('.editor');
+    for (var i = 0; i < eds.length; i++) { wireOne(eds[i]); }
+  }
+
+  function wireOne(box) {
+    var ta = box.querySelector('textarea');
+    if (!ta) return;
+    var starter = ta.value;
+
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Tab' || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+      ev.preventDefault();
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+
+      if (s === e && !ev.shiftKey) {
+        ta.value = v.slice(0, s) + INDENT + v.slice(e);
+        ta.selectionStart = ta.selectionEnd = s + INDENT.length;
+        return;
+      }
+      /* block indent / outdent over the selected lines */
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var le = v.indexOf('\n', e);
+      if (le === -1) le = v.length;
+      var seg = v.slice(ls, le);
+      var lines = seg.split('\n');
+      var delta0 = 0, total = 0;
+
+      for (var i = 0; i < lines.length; i++) {
+        if (ev.shiftKey) {
+          var m = lines[i].match(/^(\t| {1,4})/);
+          if (m) {
+            lines[i] = lines[i].slice(m[0].length);
+            if (i === 0) delta0 = -m[0].length;
+            total -= m[0].length;
+          }
+        } else {
+          lines[i] = INDENT + lines[i];
+          if (i === 0) delta0 = INDENT.length;
+          total += INDENT.length;
+        }
+      }
+      ta.value = v.slice(0, ls) + lines.join('\n') + v.slice(le);
+      ta.selectionStart = Math.max(ls, s + delta0);
+      ta.selectionEnd = Math.max(ta.selectionStart, e + total);
+    });
+
+    /* keep the indent of the current line when Enter is pressed */
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Enter' || ev.shiftKey || ev.ctrlKey || ev.metaKey) return;
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+      if (s !== e) return;
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var lead = (v.slice(ls, s).match(/^[ \t]*/) || [''])[0];
+      var extra = /[{(\[]\s*$/.test(v.slice(ls, s)) ? INDENT : '';
+      if (!lead && !extra) return;
+      ev.preventDefault();
+      var ins = '\n' + lead + extra;
+      ta.value = v.slice(0, s) + ins + v.slice(e);
+      ta.selectionStart = ta.selectionEnd = s + ins.length;
+    });
+
+    var rst = box.querySelector('[data-act="reset"]');
+    if (rst) rst.addEventListener('click', function () {
+      ta.value = starter;
+      ta.focus();
+      flash(box, 'Reset to starter code');
+    });
+
+    var cpy = box.querySelector('[data-act="copy"]');
+    if (cpy) cpy.addEventListener('click', function () {
+      var done = function () { flash(box, 'Copied — paste it into your IDE'); };
+      var fail = function () { flash(box, 'Copy failed — select the text and press Ctrl/Cmd+C'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value).then(done, function () { legacy(ta, done, fail); });
+      } else {
+        legacy(ta, done, fail);
+      }
+    });
+  }
+
+  function legacy(ta, done, fail) {
+    try {
+      var st = ta.selectionStart, en = ta.selectionEnd;
+      ta.select();
+      var ok = document.execCommand('copy');
+      ta.selectionStart = st; ta.selectionEnd = en;
+      ok ? done() : fail();
+    } catch (e) { fail(); }
+  }
+
+  function flash(box, msg) {
+    var f = box.querySelector('.foot');
+    if (!f) return;
+    if (f.getAttribute('data-base') === null || f.getAttribute('data-base') === undefined) {
+      f.setAttribute('data-base', f.textContent);
+    }
+    f.textContent = msg;
+    window.setTimeout(function () { f.textContent = f.getAttribute('data-base'); }, 2200);
+  }
+
+  /* ---- go ----------------------------------------------------------- */
+  function init() {
+    highlight();
+    closeAll();
+    wireToolbar();
+    wireEditors();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  /* belt and braces: some browsers restore <details> state on soft reload */
+  window.addEventListener('pageshow', closeAll);
+})();
+</script>
+</body>
+</html>

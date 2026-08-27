@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class 6 — ArrayList | CSCI 212</title>
+<style>
+:root{
+  --ink:#0f172a; --ink2:#334155; --muted:#64748b; --line:#e2e8f0;
+  --bg:#ffffff; --bg2:#f8fafc;
+  --obj:#4f46e5; --def:#2563eb; --ex:#059669; --alg:#7c3aed;
+  --key:#b45309; --warn:#dc2626; --qc:#0891b2; --prac:#be185d; --sum:#475569;
+  --edit:#ea580c; --edit-bg:#fff7ed;
+  --code-bg:#0d1117; --code-bd:#000000;   /* read-only listings: black */
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px 80px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:#0f172a;color:#e2e8f0;font-size:13.5px;
+  border-bottom:3px solid var(--obj);
+}
+.topbar .inner{max-width:900px;margin:0 auto;padding:10px 22px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.topbar a{color:#e2e8f0;text-decoration:none;border-bottom:1px solid transparent}
+.topbar a:hover{border-bottom-color:#94a3b8}
+.topbar .course{font-weight:700;letter-spacing:.02em}
+.topbar .sep{color:#475569}
+.topbar .spacer{flex:1}
+
+/* ---------- title block ---------- */
+.titleblock{padding:34px 0 10px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.eyebrow{
+  font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--obj);margin-bottom:8px;
+}
+.titleblock h1{font-size:33px;line-height:1.2;margin:0 0 10px;letter-spacing:-.015em}
+.titleblock .sub{margin:0;color:var(--muted);font-size:17px;line-height:1.5}
+
+h2{
+  font-size:24px;margin:46px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line);letter-spacing:-.01em;scroll-margin-top:14px;
+}
+h2 .num{color:var(--obj);font-weight:800;margin-right:11px}
+h3{font-size:18.5px;margin:30px 0 10px;color:var(--ink)}
+h4{font-size:16px;margin:20px 0 8px;color:var(--ink2)}
+p{margin:12px 0}
+ul,ol{margin:12px 0;padding-left:26px}
+li{margin:6px 0}
+a{color:var(--def)}
+hr{border:0;border-top:1px solid var(--line);margin:30px 0}
+strong{color:var(--ink)}
+.muted{color:var(--muted)}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--bg2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 20px 16px;margin:22px 0;
+}
+.toc .th{
+  font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;
+}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:30px}
+.toc li{margin:3px 0;font-size:14.5px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- show all / hide all ---------- */
+.tools{
+  display:flex;gap:9px;align-items:center;flex-wrap:wrap;
+  padding:11px 15px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:9px;margin:22px 0;font-size:13.5px;
+}
+.tools .lab{font-weight:700;color:var(--ink2)}
+.tools button{
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  background:#fff;color:var(--ink2);border:1px solid #cbd5e1;
+  border-radius:6px;padding:4px 12px;
+}
+.tools button:hover{background:var(--obj);border-color:var(--obj);color:#fff}
+.tools .muted{font-size:12.5px}
+
+/* ---------- boxes ---------- */
+.box{border:1px solid var(--line);border-left:5px solid var(--muted);border-radius:8px;margin:22px 0;overflow:hidden;background:#fff}
+.box>.hd{
+  padding:9px 16px;font-size:12.5px;font-weight:700;
+  letter-spacing:.075em;text-transform:uppercase;color:#fff;background:var(--muted);
+}
+.box>.hd .tag{margin-left:5px;font-weight:500;text-transform:none;letter-spacing:0;opacity:.92;font-size:13px}
+.box>.bd{padding:4px 18px 14px}
+.box>.bd>:first-child{margin-top:12px}
+.box>.bd>:last-child{margin-bottom:2px}
+
+.box.obj{border-left-color:var(--obj)}  .box.obj>.hd{background:var(--obj)}
+.box.def{border-left-color:var(--def)}  .box.def>.hd{background:var(--def)}
+.box.ex{border-left-color:var(--ex)}    .box.ex>.hd{background:var(--ex)}
+.box.alg{border-left-color:var(--alg)}  .box.alg>.hd{background:var(--alg)}
+.box.key{border-left-color:var(--key)}  .box.key>.hd{background:var(--key)}
+.box.warn{border-left-color:var(--warn)}.box.warn>.hd{background:var(--warn)}
+.box.qc{border-left-color:var(--qc)}    .box.qc>.hd{background:var(--qc)}
+.box.prac{border-left-color:var(--prac)}.box.prac>.hd{background:var(--prac)}
+.box.sum{border-left-color:var(--sum)}  .box.sum>.hd{background:var(--sum)}
+
+.box.obj{background:#f5f5ff}
+.box.qc{background:#f0fbfe}
+.box.warn{background:#fff7f7}
+.box.key{background:#fffbf2}
+.box.sum{background:#f8fafc}
+
+/* ---------- code ---------- */
+/* Read-only listings sit on black, matching CSCI 211, so a code block is never
+   mistaken for the editable live-coding box. */
+pre{
+  margin:14px 0;padding:13px 15px;overflow-x:auto;
+  background:var(--code-bg);border:1px solid var(--code-bd);border-radius:8px;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;color:#c9d1d9;
+}
+pre code{font-family:inherit;font-size:inherit;background:none;padding:0;border:0;color:inherit;display:block}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef2f7;
+  border:1px solid #e2e8f0;border-radius:4px;padding:1px 5px;color:#0b3a5b;
+}
+.filename{
+  font-family:var(--mono);font-size:12px;color:#475569;
+  margin:16px 0 -9px;font-weight:600;
+}
+
+/* comparison block: another language, never syntax-highlighted. Dark like the
+   Java listings, but desaturated and dashed so it reads as "not this course". */
+pre.cmp{background:#161b22;border-style:dashed;border-color:#3f4650;color:#9aa4b2}
+pre.cmp code{color:#9aa4b2}
+
+/* shell commands you type */
+pre.sh{background:#1e293b;border-color:#1e293b;color:#e2e8f0;position:relative;padding-top:26px}
+pre.sh code{color:#e2e8f0}
+pre.sh::before{
+  content:"Terminal";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#86efac;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* output / terminal blocks */
+pre.out{background:#111d33;border-color:#111d33;color:#e2e8f0;position:relative;padding-top:26px}
+pre.out code{color:#e2e8f0}
+pre.out::before{
+  content:"Output";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#7dd3fc;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+pre.err{background:#1f1416;border-color:#7f1d1d;color:#fecdd3;padding-top:26px;position:relative}
+pre.err code{color:#fecdd3}
+pre.err::before{
+  content:"Compiler message";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#fda4af;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* ---- highlight.js, GitHub-dark palette (hand-written, no external file) ---- */
+.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-template-tag,
+.hljs-template-variable,.hljs-type,.hljs-variable.language_{color:#ff7b72}
+.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#d2a8ff}
+.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,
+.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable{color:#79c0ff}
+.hljs-meta .hljs-string,.hljs-regexp,.hljs-string{color:#a5d6ff}
+.hljs-built_in,.hljs-symbol{color:#ffa657}
+.hljs-code,.hljs-comment,.hljs-formula{color:#8b949e;font-style:italic}
+.hljs-name,.hljs-quote,.hljs-selector-pseudo,.hljs-selector-tag{color:#7ee787}
+.hljs-subst{color:#c9d1d9}
+.hljs-section{color:#1f6feb;font-weight:700}
+.hljs-bullet{color:#f2cc60}
+.hljs-emphasis{color:#c9d1d9;font-style:italic}
+.hljs-strong{color:#c9d1d9;font-weight:700}
+
+/* ---------- trace tables ---------- */
+table{border-collapse:collapse;margin:16px 0;font-size:14px;width:100%}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg2);font-weight:700;font-size:13px}
+table.trace td:first-child,table.trace th:first-child{white-space:nowrap}
+table code{font-size:.88em}
+
+/* ---------- multi-part questions ---------- */
+.part{margin:16px 0;padding-left:14px;border-left:2px solid #cbd5e1}
+.part .q{margin:0 0 8px}
+.part .pl{font-weight:700;color:var(--qc);margin-right:6px}
+
+/* ---------- collapsible solutions ---------- */
+details.soln{margin:10px 0 4px}
+details.soln>summary{
+  list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  font-size:12.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:#fff;background:var(--sum);border-radius:6px;padding:5px 13px;
+  user-select:none;
+}
+details.soln>summary::-webkit-details-marker{display:none}
+details.soln>summary::before{content:"\25B6";font-size:9px;transition:transform .15s}
+details.soln[open]>summary::before{transform:rotate(90deg)}
+details.soln>summary::after{content:"Show Answer"}
+details.soln[open]>summary::after{content:"Hide Answer"}
+details.soln>summary:hover{filter:brightness(1.18)}
+
+details.soln.reveal>summary{background:var(--ex)}
+details.soln.reveal>summary::after{content:"Show Output & Explanation"}
+details.soln.reveal[open]>summary::after{content:"Hide Output & Explanation"}
+details.soln.reveal.noout>summary::after{content:"Show Explanation"}
+details.soln.reveal.noout[open]>summary::after{content:"Hide Explanation"}
+
+.ans{
+  margin-top:11px;padding:2px 16px 10px;background:#fff;
+  border:1px solid var(--line);border-left:3px solid var(--sum);border-radius:7px;
+}
+details.soln.reveal .ans{border-left-color:var(--ex)}
+.ans>:first-child{margin-top:12px}
+.ans>:last-child{margin-bottom:6px}
+
+/* ---------- live coding editor ---------- */
+.editor{
+  margin:18px 0;border:2px dashed var(--edit);border-radius:9px;
+  background:var(--edit-bg);overflow:hidden;
+}
+.editor .ehd{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:7px 13px;background:var(--edit);color:#fff;
+  font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+}
+.editor .ehd .etitle{flex:1}
+.editor .ehd button{
+  font:inherit;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  cursor:pointer;background:rgba(255,255,255,.16);color:#fff;
+  border:1px solid rgba(255,255,255,.5);border-radius:5px;padding:3px 10px;
+}
+.editor .ehd button:hover{background:#fff;color:var(--edit)}
+.editor textarea{
+  display:block;width:100%;border:0;outline:0;resize:vertical;
+  padding:12px 15px;background:var(--edit-bg);color:#431407;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;
+  tab-size:4;-moz-tab-size:4;min-height:150px;
+}
+.editor textarea:focus{background:#fff}
+.editor .foot{
+  padding:5px 13px 7px;font-size:11.5px;color:#9a3412;background:#ffedd5;
+  border-top:1px solid #fed7aa;
+}
+
+/* ---------- prev/next nav ---------- */
+.pagenav{display:flex;gap:14px;margin:52px 0 0;flex-wrap:wrap}
+.pagenav a,.pagenav span.disabled{
+  flex:1 1 260px;display:block;text-decoration:none;
+  border:1px solid var(--line);border-radius:9px;padding:12px 16px;background:#fff;
+}
+.pagenav a:hover{border-color:var(--obj);background:var(--bg2)}
+.pagenav .dir{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.pagenav .ttl{font-size:15px;font-weight:600;color:var(--ink);margin-top:3px}
+.pagenav .next{text-align:right}
+.pagenav span.disabled{opacity:.4}
+.pagenav span.disabled .ttl{color:var(--muted)}
+
+footer.pf{
+  margin-top:40px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--muted);text-align:center;
+}
+
+/* ---------- index page ---------- */
+table.sched{font-size:14.5px}
+table.sched th{background:#0f172a;color:#fff;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+table.sched td:first-child{white-space:nowrap;font-weight:700;color:var(--muted);width:60px}
+table.sched tr.examrow td{background:#fff1f2}
+table.sched tr.revrow td{background:#fffbeb}
+table.sched a{font-weight:600;text-decoration:none}
+table.sched a:hover{text-decoration:underline}
+
+
+/* ---------- release gating ---------- */
+.pending{
+  margin-top:4px;font-size:11.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:#b45309;
+}
+.pagenav span.disabled .pending{color:#b45309}
+table.sched tr.pendingrow td{background:#fcfcfd}
+table.sched .unrel{color:var(--muted)}
+table.sched .pending{display:block;margin-top:2px}
+table.sched td.cn{white-space:nowrap;width:52px;font-weight:700;color:var(--muted)}
+table.sched td.dt{white-space:nowrap;width:104px;color:var(--muted);font-size:13.5px}
+table.sched tr.offrow td{background:#f1f5f9;color:var(--muted);font-style:italic}
+.refcard{
+  display:block;text-decoration:none;border:1px solid var(--line);
+  border-left:5px solid var(--alg);border-radius:9px;padding:13px 17px;
+  margin:22px 0;background:#faf9ff;
+}
+.refcard:hover{background:#f5f3ff;border-color:var(--alg)}
+.refcard .rl{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--alg)}
+.refcard .rt{font-size:16px;font-weight:600;color:var(--ink);margin-top:3px}
+.refcard .rd{font-size:14px;color:var(--muted);margin-top:4px}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,.tools,.pagenav,.pending{display:none !important}
+  html,body{width:100%;font-size:10pt}
+  .wrap{max-width:100%;width:100%;padding:0}
+  /* a wide <pre> must wrap rather than widen the page and clip every other
+     element at the paper edge */
+  /* Screen shows code on black; paper does not. Restore a dark-on-light palette
+     for print only, or the dark theme's light tokens vanish on white. */
+  pre{white-space:pre-wrap;overflow:visible;overflow-wrap:anywhere;font-size:8.6pt;
+      background:#f8fafc !important;color:#24292e !important;border-color:#cbd5e1 !important;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  pre code{color:#24292e !important}
+  pre.cmp{background:#fff !important;color:#475569 !important;border-color:#94a3b8 !important}
+  pre.cmp code{color:#475569 !important}
+  pre .hljs-doctag,pre .hljs-keyword,pre .hljs-meta .hljs-keyword,pre .hljs-template-tag,
+  pre .hljs-template-variable,pre .hljs-type,pre .hljs-variable.language_{color:#d73a49 !important}
+  pre .hljs-title,pre .hljs-title.class_,pre .hljs-title.class_.inherited__,
+  pre .hljs-title.function_{color:#6f42c1 !important}
+  pre .hljs-attr,pre .hljs-attribute,pre .hljs-literal,pre .hljs-meta,pre .hljs-number,
+  pre .hljs-operator,pre .hljs-selector-attr,pre .hljs-selector-class,pre .hljs-selector-id,
+  pre .hljs-variable{color:#005cc5 !important}
+  pre .hljs-meta .hljs-string,pre .hljs-regexp,pre .hljs-string{color:#032f62 !important}
+  pre .hljs-built_in,pre .hljs-symbol{color:#e36209 !important}
+  pre .hljs-code,pre .hljs-comment,pre .hljs-formula{color:#6a737d !important}
+  pre .hljs-name,pre .hljs-quote,pre .hljs-selector-pseudo,
+  pre .hljs-selector-tag{color:#22863a !important}
+  pre .hljs-subst,pre .hljs-emphasis,pre .hljs-strong{color:#24292e !important}
+  .filename{color:#475569 !important}
+  table{table-layout:fixed;width:100%;word-wrap:break-word;overflow-wrap:anywhere}
+  .box,.toc{max-width:100%}
+  a{color:var(--ink);text-decoration:none}
+  .box,.part,pre,table,.editor{break-inside:avoid;page-break-inside:avoid}
+  h2{break-after:avoid;page-break-after:avoid}
+  details.soln>summary{display:none !important}
+  details.soln:not([open])>.ans{display:none !important}
+  details.soln::before{
+    content:"Answer withheld — see the online notes.";
+    display:block;font-size:9pt;font-style:italic;color:#64748b;margin:6px 0;
+  }
+  details.soln[open]::before{content:""}
+  .editor textarea{display:none !important}
+  .editor{border:1.5px solid #fdba74 !important;background:#fff;border-style:solid}
+  .editor .ehd{background:#fff !important;color:#9a3412 !important;border-bottom:1px solid #fdba74}
+  .editor .ehd button{display:none}
+  .editor .foot{display:none}
+  .editor::after{content:"";display:block;height:2.1in;background:#fff}
+  pre.out,pre.sh{background:#f1f5f9 !important;color:#0f172a !important;border-color:#94a3b8 !important}
+  pre.err{background:#fef2f2 !important;color:#7f1d1d !important;border-color:#fca5a5 !important}
+  pre.out code,pre.sh code{color:#0f172a !important}
+  pre.err code{color:#7f1d1d !important}
+  pre.out::before,pre.sh::before{color:#475569}
+  pre.err::before{color:#b91c1c}
+  .box>.hd{color:#000;background:#fff !important;border-bottom:1px solid #cbd5e1}
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="inner">
+<span class="course">CSCI 212</span>
+<span class="sep">|</span>
+<a href="index.html">Course index</a>
+<span class="sep">|</span>
+<span>Class 6 of 28</span>
+<span class="sep">|</span>
+<span>Thursday, September 17</span>
+<span class="spacer"></span>
+<span>Queens College, CUNY</span>
+</div></div>
+<div class="wrap">
+<div class="titleblock">
+  <div class="eyebrow">Session 6 &middot; Lecture 6</div>
+  <h1>ArrayList</h1>
+  <p class="sub">A list that grows and shrinks while the program runs &mdash; and the handful of traps that come with it.</p>
+</div>
+
+<div class="box obj">
+  <div class="hd">Learning Objectives</div>
+  <div class="bd">
+    <p>By the end of today's session you should be able to:</p>
+    <ol>
+      <li>Explain why an array's length is fixed the moment it is created, and decide when an <code>ArrayList</code> is the better tool.</li> <li>Write the <code>import</code>, declare an <code>ArrayList</code>, create it, and say what the type in angle brackets is doing.</li> <li>Explain why that type must be a class type &mdash; why <code>ArrayList&lt;Integer&gt;</code> is legal and <code>ArrayList&lt;int&gt;</code> is not &mdash; and describe autoboxing and unboxing.</li> <li>Use <code>add</code>, <code>get</code>, <code>set</code>, <code>size</code>, <code>indexOf</code>, <code>contains</code>, <code>remove</code>, <code>clear</code> and <code>isEmpty</code>, and say what each one gives back.</li> <li>Decide which of the two <code>remove</code> methods a given call selects, and force the one you meant.</li> <li>Traverse a list with an indexed <code>for</code> loop and with a for-each loop, and say when only the indexed loop will do.</li> <li>Delete elements from a list while looping over it without silently skipping any.</li> <li>Compare two <code>Integer</code> elements correctly with <code>equals</code>, and say exactly what goes wrong when you use <code>==</code> instead.</li> </ol> </div> </div> <div class="toc"> <div class="th">On this page</div> <ol> <li><a href="#s1">Why <code>ArrayList</code> exists</a></li> <li><a href="#s2">Declaring one: the import and the type in angle brackets</a></li> <li><a href="#s3">The methods you will actually use</a></li> <li><a href="#s4"><code>remove</code>: one name, two meanings</a></li> <li><a href="#s5">Walking a list: <code>for</code> and for-each</a></li> <li><a href="#s6">Removing while you loop</a></li> <li><a href="#s7"><code>equals</code> versus <code>==</code> for the elements</a></li> <li><a href="#s8">Putting it together: the scores program</a></li> <li><a href="#prac">Practice Problems</a></li> <li><a href="#summary">Lecture Summary</a></li> </ol> </div> <div class="tools"> <span class="lab">Answers</span> <button id="showAll" type="button">Show all</button> <button id="hideAll" type="button">Hide all</button> <span class="muted">&mdash; every worked-example output and every solution is hidden when the page loads. Work it out first, then reveal.</span> </div> <hr> <h2 id="s1"><span class="num">1.</span>Why <code>ArrayList</code> exists</h2> <p>Last time you read data out of a file and wrote results back into one. Almost every one of those programs ran into the same awkward moment: you had to decide how many values to make room for <em>before</em> you had looked at the data. In Lecture 3 you learned that a Java array's length is fixed at the moment you create it &mdash; <code>new int[10]</code> is ten slots, forever &mdash; so reading "some scores, we don't know how many" out of a file meant guessing high and wasting space, or guessing low and crashing.</p> <p>Today we fix that. Everything else in this lecture follows from one idea: a container that resizes itself.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the wall you hit with an array</span></div> <div class="bd"> <p>Three students, one array of three. Then a fourth student enrolls. Before you reveal: the program does print two lines successfully &mdash; what happens on the third?</p> <p class="filename">FixedArray.java</p>
+<pre><code class="language-java">public class FixedArray {
+    public static void main(String args[]) {
+        String[] names = new String[3];
+        names[0] = "Ana";
+        names[1] = "Ben";
+        names[2] = "Cid";
+
+        System.out.println("Length is " + names.length);
+        System.out.println("Now a fourth student enrolls...");
+        names[3] = "Dev";
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Length is 3
+Now a fourth student enrolls...
+Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: Index 3 out of bounds for length 3
+	at FixedArray.main(FixedArray.java:10)</code></pre> <p>There is no such thing as "the array grows a slot". <code>names.length</code> is 3 and will be 3 until the array is garbage. The only way to hold a fourth name is to create a <em>new</em> array of length 4 and copy the three old names across &mdash; and then do it again for the fifth. That copying loop is real work, it is easy to get wrong, and you would write it in every single program.</p> <p>Notice also that this is a run-time crash, not a compile error. <code>javac</code> was perfectly happy; the JVM checked the index while the program was running and stopped it.</p> 
+</div></details> </div> </div> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; ArrayList</span></div> <div class="bd"> <p><strong><code>ArrayList</code></strong> is a class in the Java standard library that implements a <strong>dynamic array</strong>: a resizable array. It stores its elements in an ordinary array internally, and when that array fills up it quietly allocates a bigger one and copies everything across. You never see any of that happen. From the outside it simply looks like a list that grows and shrinks as you add and remove.</p> <p>An <code>ArrayList</code> keeps its elements <em>in order</em> and gives each one an <strong>index</strong> starting at 0, exactly like an array. What it adds is the ability to insert and delete in the middle, and to ask how many elements it is currently holding.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the same program with a list</span></div> <div class="bd"> <p>Here is the previous program rewritten. The only structural change is that <code>names.length</code> becomes <code>names.size()</code> and <code>names[0] = "Ana"</code> becomes <code>names.add("Ana")</code>.</p> <p class="filename">GrowableList.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class GrowableList {
+    public static void main(String args[]) {
+        ArrayList&lt;String&gt; names = new ArrayList&lt;String&gt;();
+        names.add("Ana");
+        names.add("Ben");
+        names.add("Cid");
+
+        System.out.println("Size is " + names.size());
+        System.out.println("Now a fourth student enrolls...");
+        names.add("Dev");
+        System.out.println("Size is " + names.size());
+        System.out.println(names);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Size is 3
+Now a fourth student enrolls...
+Size is 4
+[Ana, Ben, Cid, Dev]</code></pre> <p>Two things to file away from the last line. First, printing an <code>ArrayList</code> directly works and produces a readable list in square brackets with comma-space between elements &mdash; you do not have to write a loop just to see what is in it. That is unlike an array, where <code>System.out.println(names)</code> prints something like <code>[Ljava.lang.String;@1540e19d</code>. (That is a real line of output, but the hexadecimal part is a memory-related identifier and will be different every time you run it &mdash; yours will not match.)</p> <p>Second, <code>size()</code> is a <em>method call</em> with parentheses, while an array's <code>length</code> is a <em>field</em> with none. Mixing them up is the single most common typo in this lecture, and we will meet the compiler message for it in the Practice Problems.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 6.1</div> <div class="bd"> <p>For each situation, say whether you would reach for an array or an <code>ArrayList</code>, and why.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Storing the twelve month names.</p> <details class="soln"><summary></summary><div class="ans"> <p>An array. The size is known, fixed, and will never change &mdash; there will not be a thirteenth month. An array is the simpler, cheaper thing, and when the count is genuinely constant that simplicity is worth having.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Reading test scores typed by the user until they enter a negative number.</p> <details class="soln"><summary></summary><div class="ans"> <p>An <code>ArrayList</code>. You cannot know the count until the user stops typing, and any array size you pick in advance is a guess that is either wasteful or wrong. This is exactly the program we build in &sect;8.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> A to-do list in an app, where the user adds items and crosses them off.</p> <details class="soln"><summary></summary><div class="ans"> <p>An <code>ArrayList</code>. Both operations &mdash; insert and delete &mdash; change the number of elements, and deleting from the middle of an array would leave a hole you would have to manage yourself.</p> <p><strong>Things to notice across all three parts.</strong> The question is never "which one is better". It is "does the number of elements change while the program runs?" If the answer is no, an array is fine and slightly faster. If the answer is yes &mdash; or if you do not know the answer until run time &mdash; use an <code>ArrayList</code> and stop thinking about it.</p> </div></details> </div> </div> </div> <h2 id="s2"><span class="num">2.</span>Declaring one: the import and the type in angle brackets</h2> <p><code>ArrayList</code> is not built into the language the way <code>int</code> and <code>String</code> are. It lives in the package <code>java.util</code>, so every file that uses one starts with a line you must not forget:</p> <pre><code class="language-java">import java.util.ArrayList; </code></pre> <p>Leave it out and <code>javac</code> tells you <code>cannot find symbol ... class ArrayList</code>. Then the declaration itself, which has a piece of syntax you have not seen before:</p> <pre><code class="language-java">ArrayList&lt;String&gt; wordList = new ArrayList&lt;String&gt;(); </code></pre> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the type parameter (base type)</span></div> <div class="bd"> <p>The type inside the angle brackets is the <strong>type parameter</strong>, or as the course notes call it, the <strong>base type</strong>: the type of the elements this particular list is allowed to hold. <code>ArrayList&lt;String&gt;</code> is "a list of <code>String</code>"; <code>ArrayList&lt;Integer&gt;</code> is "a list of <code>Integer</code>".</p> <p>It is not decoration. It is a promise the compiler enforces in both directions: it refuses to let you <code>add</code> anything else, and it lets <code>get</code> hand you back a <code>String</code> without a cast. We come back to how this mechanism works in general &mdash; it is called <em>generics</em> &mdash; in Lecture 22. For now, read the angle brackets as "of".</p> </div> </div> <p>Since Java 7 you may leave the second pair of brackets empty, because the compiler can see what the first pair said. That empty pair is nicknamed the <strong>diamond</strong>:</p> <pre><code class="language-java">ArrayList&lt;String&gt; wordList = new ArrayList&lt;&gt;();     // identical to the line above </code></pre> <p>Both forms appear in your course materials and both are correct. You may also pass an initial <strong>capacity</strong>:</p> <pre><code class="language-java">ArrayList&lt;String&gt; wordList = new ArrayList&lt;&gt;(100); </code></pre> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; capacity is not size</span></div> <div class="bd"> <p><strong>Capacity</strong> is how many elements the internal array can hold before it has to be replaced by a bigger one; the default is 10. <strong>Size</strong> is how many elements you have actually put in. A brand-new <code>ArrayList</code>, whatever its capacity, has size 0.</p> <p>Capacity is a performance hint and nothing more. If you know you are about to add ten thousand things, passing 10000 saves the list some regrowing. It never changes what the program prints, and <code>size()</code> is the only one of the two you can even ask about.</p> </div> </div> <h3>Why the base type cannot be <code>int</code></h3> <p>Here is the first rule that catches everyone. The base type <strong>must be a class type</strong>. A primitive is not allowed:</p> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; <code>ArrayList&lt;int&gt;</code></span></div> <div class="bd"> <p>This is what <code>javac</code> says about <code>ArrayList&lt;int&gt; nums = new ArrayList&lt;int&gt;();</code>:</p> <pre class="err"><code>BadType.java:5: error: unexpected type ArrayList&lt;int&gt; nums = new ArrayList&lt;int&gt;();
+^
+  required: reference
+  found:    int
+BadType.java:5: error: unexpected type ArrayList&lt;int&gt; nums = new ArrayList&lt;int&gt;();
+^
+  required: reference
+  found:    int
+2 errors</code></pre> <p>Read the two lines under the caret: <em>required: reference, found: int</em>. An <code>ArrayList</code> stores <em>references to objects</em>, and an <code>int</code> is not an object &mdash; it is one of the eight primitives from Lecture 1, and primitives are the one thing in Java that is not an object. The fix is <code>ArrayList&lt;Integer&gt;</code>. Note that you get the same error twice, once for each pair of angle brackets.</p> </div> </div> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; wrapper class</span></div> <div class="bd"> <p>A <strong>wrapper class</strong> is a class whose only job is to hold one primitive value so that it can be used where an object is required. Every primitive has one, and the names are the giveaway: primitives are lowercase, wrappers are capitalized.</p> <table> <tr><th>Primitive</th><th>Wrapper class</th><th>Get the value back</th></tr> <tr><td><code>int</code></td><td><code>Integer</code></td><td><code>.intValue()</code></td></tr> <tr><td><code>double</code></td><td><code>Double</code></td><td><code>.doubleValue()</code></td></tr> <tr><td><code>char</code></td><td><code>Character</code></td><td><code>.charValue()</code></td></tr> <tr><td><code>boolean</code></td><td><code>Boolean</code></td><td><code>.booleanValue()</code></td></tr> </table> <p>Two of them carry conversion methods you will use constantly: <code>Integer.toString(25)</code> turns an <code>int</code> into the <code>String</code> <code>"25"</code>, and <code>Integer.parseInt("42")</code> turns a <code>String</code> into the <code>int</code> 42.</p> </div> </div> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; autoboxing and unboxing</span></div> <div class="bd"> <p><strong>Autoboxing</strong> is the compiler automatically wrapping a primitive in its wrapper class when an object is needed. <strong>Unboxing</strong> is the reverse: it automatically pulls the primitive back out when a primitive is needed.</p> <p>So <code>nums.add(7)</code> compiles even though <code>nums</code> is an <code>ArrayList&lt;Integer&gt;</code>: the compiler rewrites it as <code>nums.add(Integer.valueOf(7))</code>. And <code>int x = nums.get(0);</code> compiles because it rewrites the right-hand side as <code>nums.get(0).intValue()</code>.</p> <p>Autoboxing means you almost never <em>write</em> <code>Integer</code>. It does not mean <code>Integer</code> and <code>int</code> are the same thing &mdash; and &sect;7 is entirely about the day that difference bites.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; boxing, unboxing and the conversion methods</span></div> <div class="bd"> <p>Every line here mixes primitives and wrappers. Before you reveal: does the last line print <code>3.0</code> or <code>3</code>?</p> <p class="filename">BoxingDemo.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class BoxingDemo {
+    public static void main(String args[]) {
+        ArrayList&lt;Integer&gt; nums = new ArrayList&lt;Integer&gt;();
+
+        nums.add(7);                  // autoboxing: int 7 -&gt; Integer.valueOf(7)
+        nums.add(Integer.valueOf(8)); // the same thing, written out by hand
+        System.out.println(nums);
+
+        int first = nums.get(0);      // unboxing: Integer -&gt; int
+        int total = nums.get(0) + nums.get(1);
+        System.out.println("first = " + first + ", total = " + total);
+
+        Integer boxed = nums.get(1);
+        System.out.println("intValue() = " + boxed.intValue());
+        System.out.println("Integer.toString(25) = " + Integer.toString(25));
+        System.out.println("Integer.parseInt(\"42\") + 1 = " + (Integer.parseInt("42") + 1));
+
+        ArrayList&lt;Double&gt; reals = new ArrayList&lt;Double&gt;();
+        reals.add(2.5);
+        reals.add(0.5);
+        double sum = reals.get(0) + reals.get(1);
+        System.out.println("reals = " + reals + ", sum = " + sum);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>[7, 8]
+first = 7, total = 15
+intValue() = 8
+Integer.toString(25) = 25
+Integer.parseInt("42") + 1 = 43
+reals = [2.5, 0.5], sum = 3.0</code></pre> <p><code>3.0</code>, because <code>sum</code> is declared <code>double</code>. Two lines are worth a second look:</p> <ul> <li><code>nums.get(0) + nums.get(1)</code> unboxes <em>both</em> operands and then does ordinary <code>int</code> arithmetic. <code>+</code> is not defined on <code>Integer</code> objects; it is defined on numbers, and unboxing is what makes the expression legal.</li> <li><code>Integer.parseInt("42") + 1</code> needed the parentheses. Without them the <code>+</code> would have seen a <code>String</code> on its left and concatenated, giving <code>421</code>. That is the Lecture 1 rule about <code>+</code>, and it does not go away just because we are doing something more advanced.</li> </ul> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 6.2</div> <div class="bd"> <p>Which of these lines compile? For the ones that do not, say what is wrong. Assume <code>import java.util.ArrayList;</code> is present.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>ArrayList&lt;double&gt; temps = new ArrayList&lt;double&gt;();</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Does not compile. <code>double</code> is a primitive, and the base type must be a class type. Write <code>ArrayList&lt;Double&gt;</code>. The compiler says <em>unexpected type &mdash; required: reference, found: double</em>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>ArrayList&lt;Integer&gt; ids = new ArrayList&lt;&gt;();</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compiles. That is the diamond: the compiler reads the base type off the left-hand side and fills the empty brackets in for you.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>ArrayList&lt;String&gt; a = new ArrayList&lt;String&gt;(50);</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compiles. <code>50</code> is an initial capacity, not a size. <code>a.size()</code> is 0 immediately after this line, and <code>a.get(0)</code> would throw an <code>IndexOutOfBoundsException</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>ArrayList&lt;Integer&gt; ids = new ArrayList&lt;&gt;();</code> followed by <code>ids.add(3.7);</code></p> <details class="soln"><summary></summary><div class="ans"> <p>The declaration compiles; the <code>add</code> does not. <code>3.7</code> is a <code>double</code>, and no amount of autoboxing turns a <code>double</code> into an <code>Integer</code> &mdash; boxing converts <code>int</code> to <code>Integer</code> and <code>double</code> to <code>Double</code>, never across families.</p> <p><strong>Things to notice across all four parts.</strong> The base type is checked at compile time and it is checked strictly. That strictness is the whole benefit: a <code>ArrayList&lt;Integer&gt;</code> can never contain a <code>String</code> by accident, so <code>get</code> can hand you an <code>Integer</code> with no cast and no run-time surprise.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 6.3</div> <div class="bd"> <p>Write a complete program <code>Rainfall.java</code> that stores three rainfall readings &mdash; 1.2, 0.0 and 3.4 &mdash; in an <code>ArrayList</code> and prints the list and their average. Use an indexed <code>for</code> loop for the total.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The readings have fractional parts, so the base type is <code>Double</code> &mdash; capitalized, because a primitive cannot be a base type. Adding them is <code>rain.add(1.2)</code>, and autoboxing does the wrapping. For the total, keep a plain <code>double sum</code> and let each <code>rain.get(i)</code> unbox into it. Divide by <code>rain.size()</code>, which is an <code>int</code>, but <code>sum</code> is already a <code>double</code> so real division happens.</p> <p class="filename">Rainfall.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class Rainfall {
+    public static void main(String args[]) {
+        ArrayList&lt;Double&gt; rain = new ArrayList&lt;Double&gt;();
+        rain.add(1.2);
+        rain.add(0.0);
+        rain.add(3.4);
+
+        double sum = 0.0;
+        for (int i = 0; i &lt; rain.size(); i++) {
+            sum += rain.get(i);
+        }
+        System.out.println("Readings: " + rain);
+        System.out.println("Average:  " + sum / rain.size());
+    }
+}</code></pre> <pre class="out"><code>Readings: [1.2, 0.0, 3.4] Average:  1.5333333333333332 </code></pre> <p><strong>Things to notice.</strong> <code>sum / rain.size()</code> is a <code>double</code> divided by an <code>int</code>, so there is no integer-division trap here &mdash; but only because <code>sum</code> was declared <code>double</code>. Had you accumulated into an <code>int</code> you would have had a compile error instead, which is the friendly outcome.</p> <p>The trailing <code>...32</code> on the average is ordinary floating-point noise, exactly as in Lecture 1. If you wanted <code>1.53</code> you would use <code>DecimalFormat</code>, which we do use in &sect;8.</p> <p>Note <code>rain.add(0.0)</code> and not <code>rain.add(0)</code>. <code>0</code> is an <code>int</code>, and an <code>int</code> does not box into a <code>Double</code> &mdash; that line would not compile.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 6.3</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="6" aria-label="Live coding - Quick Check 6.3">import java.util.ArrayList;
+public class Rainfall {
+    public static void main(String args[]) {
+        // 1. Declare and create an ArrayList that holds decimal readings. // 2. Add 1.2, 0.0 and 3.4. // 3. Total them with an indexed for loop. // 4. Print the list, then the average. } }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s3"><span class="num">3.</span>The methods you will actually use</h2> <p>This is the whole working vocabulary. There are more methods on <code>ArrayList</code>, but these are the ones that appear in your notes, on the exams, and in almost every program you will write.</p> <table> <tr><th>Call</th><th>What it does</th><th>What it gives back</th></tr> <tr><td><code>add(e)</code></td><td>Appends <code>e</code> to the end.</td><td><code>true</code> (you normally ignore it)</td></tr> <tr><td><code>add(index, e)</code></td><td>Inserts <code>e</code> <em>at</em> <code>index</code>, shifting everything from there rightward.</td><td>nothing (<code>void</code>)</td></tr> <tr><td><code>get(index)</code></td><td>The element at <code>index</code>.</td><td>the element</td></tr> <tr><td><code>set(index, e)</code></td><td>Overwrites the element at <code>index</code>. The size does not change.</td><td><strong>the element that was there before</strong></td></tr> <tr><td><code>size()</code></td><td>How many elements are in the list right now.</td><td>an <code>int</code></td></tr> <tr><td><code>indexOf(e)</code></td><td>Position of the first element equal to <code>e</code>.</td><td>an <code>int</code>, or <code>-1</code> if not found</td></tr> <tr><td><code>contains(e)</code></td><td>Is there an element equal to <code>e</code>?</td><td>a <code>boolean</code></td></tr> <tr><td><code>remove(index)</code></td><td>Deletes the element at <code>index</code>, shifting everything after it leftward.</td><td>the deleted element</td></tr> <tr><td><code>remove(Object e)</code></td><td>Deletes the <em>first</em> element equal to <code>e</code>.</td><td><code>true</code> if something was deleted</td></tr> <tr><td><code>clear()</code></td><td>Deletes everything.</td><td>nothing (<code>void</code>)</td></tr> <tr><td><code>isEmpty()</code></td><td>Is <code>size()</code> zero?</td><td>a <code>boolean</code></td></tr> </table> <p>Three of those return values are easy to overlook and are examined constantly: <code>set</code> returns the <em>old</em> value, <code>indexOf</code> returns <code>-1</code> rather than throwing when there is no match, and <code>remove(index)</code> hands you back the thing it deleted. The two <code>remove</code> methods are important enough that they get their own section.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the course's <code>ArrayListExample.java</code></span></div> <div class="bd"> <p>This is the reference program from the course notes, and it exercises nearly the whole table above. Work down it with a pencil, writing the contents of <code>wordList</code> after every line that changes it. Three lines are worth extra care: the <code>add(1, ...)</code>, the <code>indexOf("World")</code> with a capital W, and the very last <code>println</code> of a <code>set</code>.</p> <p class="filename">ArrayListExample.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class ArrayListExample {
+    public static void main(String[] args) {
+        ArrayList&lt;String&gt; wordList = new ArrayList&lt;String&gt;();
+        wordList.add("Hello"); 
+        wordList.add("world"); 
+        wordList.add(1, "newElement"); 
+        System.out.println(wordList);
+        System.out.println(wordList.get(2));
+        System.out.println(wordList.indexOf("world"));
+        System.out.println(wordList.indexOf("World"));
+        System.out.println(wordList.size());
+        wordList.remove(wordList.size() - 1);
+        System.out.println(wordList);
+        wordList.remove("Hello");
+        System.out.println(wordList);
+        wordList.add(0, "Bye");         
+        // for loop
+        for(int i = 0; i &lt; wordList.size(); i++) {
+            System.out.println(wordList.get(i));
+        }
+        
+        // for-each loop
+        for(String s : wordList) {
+            System.out.print(s.charAt(0));
+        }
+        System.out.println();
+        
+        ArrayList&lt;Integer&gt; numList = new ArrayList&lt;Integer&gt;();
+        for(int i = 0; i &lt; 10; i++) {
+            numList.add(i);
+        }
+        System.out.println(numList);
+        System.out.println(numList.set(3, 0)); 
+        System.out.println(numList);
+        
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>[Hello, newElement, world]
+world
+2
+-1
+3
+[Hello, newElement]
+[newElement]
+Bye
+newElement
+Bn
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+3
+[0, 1, 2, 0, 4, 5, 6, 7, 8, 9]</code></pre> <table class="trace"> <tr><th>Statement</th><th><code>wordList</code> afterwards</th><th>Printed</th></tr> <tr><td><code>add("Hello")</code></td><td><code>[Hello]</code></td><td></td></tr> <tr><td><code>add("world")</code></td><td><code>[Hello, world]</code></td><td></td></tr> <tr><td><code>add(1, "newElement")</code></td><td><code>[Hello, newElement, world]</code></td><td></td></tr> <tr><td><code>println(wordList)</code></td><td>unchanged</td><td><code>[Hello, newElement, world]</code></td></tr> <tr><td><code>get(2)</code></td><td>unchanged</td><td><code>world</code></td></tr> <tr><td><code>indexOf("world")</code></td><td>unchanged</td><td><code>2</code> &mdash; it moved right when <code>newElement</code> was inserted</td></tr> <tr><td><code>indexOf("World")</code></td><td>unchanged</td><td><code>-1</code> &mdash; no match; <code>String</code> comparison is case-sensitive</td></tr> <tr><td><code>size()</code></td><td>unchanged</td><td><code>3</code></td></tr> <tr><td><code>remove(size() - 1)</code></td><td><code>[Hello, newElement]</code></td><td></td></tr> <tr><td><code>remove("Hello")</code></td><td><code>[newElement]</code></td><td></td></tr> <tr><td><code>add(0, "Bye")</code></td><td><code>[Bye, newElement]</code></td><td></td></tr> <tr><td>indexed <code>for</code> loop</td><td>unchanged</td><td><code>Bye</code> then <code>newElement</code>, on two lines</td></tr> <tr><td>for-each loop</td><td>unchanged</td><td><code>Bn</code> &mdash; the first character of each, with <code>print</code></td></tr> <tr><td><code>numList.set(3, 0)</code></td><td><code>[0, 1, 2, 0, 4, ...]</code></td><td><code>3</code> &mdash; <strong>the value that was replaced</strong></td></tr> </table> <p>Four points to take away.</p> <ul> <li><strong><code>add(1, "newElement")</code> inserts, it does not overwrite.</strong> <code>world</code> was at index 1 and is pushed to index 2. The list gets longer. If you had wanted to overwrite you would have written <code>set(1, "newElement")</code> and the size would have stayed at 2.</li> <li><strong><code>remove(wordList.size() - 1)</code> is the idiom for "delete the last one".</strong> Since indexes run from 0, the last index is always one less than the size.</li> <li><strong><code>indexOf</code> returns <code>-1</code> when there is no match</strong> &mdash; it does not crash and it does not return 0. If you test it with <code>if (list.indexOf(x) == 0)</code> you are asking "is it first?", not "is it there?". For that, use <code>contains</code>.</li> <li><strong><code>set</code> returns the old value.</strong> <code>println(numList.set(3, 0))</code> prints <code>3</code>, not <code>0</code> and not the list. The list <em>is</em> changed &mdash; the very next line proves it &mdash; but the value of the expression is what was evicted.</li> </ul> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 6.4</div> <div class="bd"> <p>Give the exact output of every labelled line.</p> <p class="filename">QC64.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class QC64 {
+    public static void main(String args[]) {
+        ArrayList&lt;String&gt; pets = new ArrayList&lt;String&gt;();
+        pets.add("cat");
+        pets.add("dog");
+        pets.add("fish");
+        pets.add(1, "bird");
+
+        System.out.println(pets);               // line (a)
+        System.out.println(pets.size());        // line (b)
+        System.out.println(pets.get(2));        // line (c)
+        System.out.println(pets.indexOf("fish"));   // line (d)
+        System.out.println(pets.indexOf("Fish"));   // line (e)
+        System.out.println(pets.contains("bird"));  // line (f)
+        System.out.println(pets.set(0, "hamster"));  // line (g)
+        System.out.println(pets);               // line (h)
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Write the list out after the four <code>add</code> calls and keep it beside you. The only line that changes the list after that is (g).</p> <pre class="out"><code>[cat, bird, dog, fish]
+4
+dog
+3
+-1
+true
+cat
+[hamster, bird, dog, fish]</code></pre> <p><strong>Things to notice.</strong> <code>add(1, "bird")</code> slid <code>dog</code> and <code>fish</code> one place to the right, which is why (c) is <code>dog</code> and not <code>fish</code>, and why (d) is 3 and not 2. Line (e) is <code>-1</code> purely because of the capital F. Line (g) prints <code>cat</code> &mdash; the evicted value &mdash; and line (h) then shows that <code>hamster</code> really did take its place.</p> <p>If you got (g) wrong, you are in good company; it is the single most missed line in this lecture. Remember: <em><code>set</code> returns what was there before.</em></p> </div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 6.5</div> <div class="bd"> <p>A student writes <code>ArrayList&lt;String&gt; a = new ArrayList&lt;&gt;(100);</code> and then, on the next line, <code>a.set(0, "hello");</code>. What happens, and what did they probably mean?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Separate capacity from size, then ask what <code>set</code> requires.</p> <p><code>100</code> is the initial <em>capacity</em> &mdash; room reserved inside the list &mdash; not a number of elements. After that line <code>a.size()</code> is 0 and <code>a.isEmpty()</code> is <code>true</code>. <code>set</code> only overwrites an element that already exists, so <code>set(0, ...)</code> on an empty list throws. The first line of the message is:</p> <pre class="out"><code>Exception in thread "main" java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0 </code></pre> <p>They meant <code>a.add("hello")</code>.</p> <p><strong>Things to notice.</strong> This is where the array habit misleads you. With <code>new String[100]</code> you really do get 100 usable slots, all holding <code>null</code>. With <code>new ArrayList&lt;&gt;(100)</code> you get zero usable slots and a promise that the first hundred <code>add</code> calls will not need to regrow anything. Every legal index in an <code>ArrayList</code> is strictly less than <code>size()</code> &mdash; capacity never enters into it.</p> </div></details> </div> </div> <h2 id="s4"><span class="num">4.</span><code>remove</code>: one name, two meanings</h2> <p><code>ArrayList</code> has two methods called <code>remove</code>. In Lecture 2 you met <em>overloading</em>: two methods may share a name as long as their parameter lists differ, and the compiler picks between them by looking at the argument types. Usually that is invisible and helpful. Here it is the most notorious trap in the class library.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the two removes</span></div> <div class="bd"> <ul> <li><code>remove(int index)</code> deletes <strong>by position</strong> and returns the element it deleted.</li> <li><code>remove(Object o)</code> deletes <strong>the first element equal to <code>o</code></strong> and returns a <code>boolean</code> saying whether it found one.</li> </ul> <p>For an <code>ArrayList&lt;String&gt;</code> this is harmless: <code>list.remove(0)</code> is clearly the index version and <code>list.remove("Hello")</code> is clearly the object version, because a <code>String</code> is not an <code>int</code>. Both appear in <code>ArrayListExample.java</code> above, and both do the obvious thing.</p> <p>For an <code>ArrayList&lt;Integer&gt;</code> it is a minefield, because the argument <code>5</code> could plausibly mean either.</p> </div> </div> <div class="box warn"> <div class="hd">Warning<span class="tag">&mdash; <code>list.remove(5)</code> on a list of <code>Integer</code></span></div> <div class="bd"> <p>Java's rule is: <strong>if there is a method that matches without boxing, it wins.</strong> <code>5</code> is an <code>int</code> and <code>remove(int)</code> takes an <code>int</code>, so <code>remove(int)</code> is chosen. The compiler never considers boxing <code>5</code> into an <code>Integer</code>. So on an <code>ArrayList&lt;Integer&gt;</code>, <code>list.remove(5)</code> means <em>delete position 5</em> &mdash; never <em>delete the value 5</em>.</p> <p>Both lists below start identical. The only difference between the two calls is a cast.</p> <p class="filename">RemoveTrap.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class RemoveTrap {
+    public static void main(String args[]) {
+        ArrayList&lt;Integer&gt; a = new ArrayList&lt;Integer&gt;();
+        ArrayList&lt;Integer&gt; b = new ArrayList&lt;Integer&gt;();
+        for (int i = 10; i &lt;= 60; i += 10) {
+            a.add(i);
+            b.add(i);
+        }
+        a.add(5);
+        b.add(5);
+
+        System.out.println("start:              " + a);
+
+        a.remove(5);                 // remove(int index)    -&gt; position 5
+        System.out.println("after a.remove(5):  " + a);
+
+        b.remove((Integer) 5);       // remove(Object o)     -&gt; the value 5
+        System.out.println("after b.remove((Integer) 5): " + b);
+    }
+}</code></pre> <pre class="out"><code>start:              [10, 20, 30, 40, 50, 60, 5]
+after a.remove(5):  [10, 20, 30, 40, 50, 5]
+after b.remove((Integer) 5): [10, 20, 30, 40, 50, 60]</code></pre> <p><code>a.remove(5)</code> deleted <code>60</code>, the element at index 5. <code>b.remove((Integer) 5)</code> deleted the value <code>5</code> at the end. No error, no warning &mdash; just two different lists.</p> <p><strong>The fix, and you will see it in this course's own solution code:</strong> cast the argument so that the object version is the only one that matches.</p> <pre><code class="language-java">list.remove((Integer) 5);
+// by value  -- the cast is doing real work list.remove(Integer.valueOf(5));     // by value  -- the same thing, spelled out list.remove(5);                      // by index</code></pre> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; when it does not fail quietly</span></div> <div class="bd"> <p>Sometimes the wrong <code>remove</code> crashes instead, which is a mercy. Here a student wants to drop the score 85 from a three-element list:</p> <p class="filename">RemoveOob.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class RemoveOob {
+    public static void main(String args[]) {
+        ArrayList&lt;Integer&gt; scores = new ArrayList&lt;Integer&gt;();
+        scores.add(90);
+        scores.add(85);
+        scores.add(78);
+        System.out.println(scores);
+        scores.remove(85);
+    }
+}</code></pre> <pre class="out"><code>[90, 85, 78]
+Exception in thread "main" java.lang.IndexOutOfBoundsException: Index 85 out of bounds for length 3
+	at java.base/jdk.internal.util.Preconditions.outOfBounds(Preconditions.java:100)
+	at java.base/jdk.internal.util.Preconditions.outOfBoundsCheckIndex(Preconditions.java:106)
+	at java.base/jdk.internal.util.Preconditions.checkIndex(Preconditions.java:302)
+	at java.base/java.util.Objects.checkIndex(Objects.java:385)
+	at java.base/java.util.ArrayList.remove(ArrayList.java:551)
+	at RemoveOob.main(RemoveOob.java:10)</code></pre> <p>Read the message: <em>Index 85 out of bounds for length 3</em>. The word <em>index</em> tells you which <code>remove</code> ran. Ignore the middle frames &mdash; they are inside the standard library. The last line, <code>at RemoveOob.main(RemoveOob.java:10)</code>, is the line in <em>your</em> file that started it, and that is the line to look at.</p> <p>The lesson generalizes: any time you see <code>IndexOutOfBoundsException</code> with a suspiciously data-shaped index in it, you meant <code>remove((Integer) x)</code>.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; what the two removes give back</span></div> <div class="bd"> <p>Both <code>remove</code> methods return something useful, and they return different kinds of thing. Before you reveal: what does removing something that is not in the list return?</p> <p class="filename">RemoveReturns.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class RemoveReturns {
+    public static void main(String args[]) {
+        ArrayList&lt;String&gt; words = new ArrayList&lt;String&gt;();
+        words.add("alpha");
+        words.add("beta");
+        words.add("gamma");
+
+        String gone = words.remove(1);
+        System.out.println("remove(1) returned: " + gone);
+
+        boolean did = words.remove("gamma");
+        System.out.println("remove(\"gamma\") returned: " + did);
+
+        boolean again = words.remove("gamma");
+        System.out.println("remove(\"gamma\") again returned: " + again);
+
+        System.out.println(words);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>remove(1) returned: beta
+remove("gamma") returned: true
+remove("gamma") again returned: false
+[alpha]</code></pre> <p><code>remove(int)</code> returns the deleted element, so <code>String gone = words.remove(1);</code> compiles and <code>gone</code> is <code>"beta"</code>. <code>remove(Object)</code> returns a <code>boolean</code>: <code>true</code> the first time, and <code>false</code> the second time because there is nothing left to delete. It does <em>not</em> throw when the element is absent &mdash; it just says no.</p> <p>That <code>false</code> is worth using. <code>if (!list.remove(x)) System.out.println("not found");</code> is a complete "delete it if it is there, and tell me if it was not" in one line.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 6.6</div> <div class="bd"> <p><code>ArrayList&lt;Integer&gt; v = new ArrayList&lt;&gt;();</code> then <code>v.add(2); v.add(4); v.add(1); v.add(4);</code> so that <code>v</code> is <code>[2, 4, 1, 4]</code>. For each call, say what <code>v</code> looks like afterwards, starting from that same <code>[2, 4, 1, 4]</code> each time.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>v.remove(1);</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>[2, 1, 4]</code>. The argument is an <code>int</code> literal, so this is <code>remove(int index)</code>: it deletes index 1, which holds <code>4</code>. It does <em>not</em> delete the value 1.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>v.remove((Integer) 4);</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>[2, 1, 4]</code>. The cast forces <code>remove(Object)</code>, which deletes the <em>first</em> element equal to 4 &mdash; the one at index 1. The second <code>4</code> survives; <code>remove(Object)</code> deletes one element, not all matches.</p> <p>The two answers being identical here is a coincidence of this data, and a good reminder that testing on one list proves nothing.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>v.remove(4);</code></p> <details class="soln"><summary></summary><div class="ans"> <p>It throws <code>IndexOutOfBoundsException: Index 4 out of bounds for length 4</code>. <code>remove(int)</code> is selected, and the legal indexes are 0 through 3.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>v.remove(Integer.valueOf(9));</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>[2, 4, 1, 4]</code> &mdash; unchanged. This is <code>remove(Object)</code>, there is no 9 in the list, so nothing is deleted and the call returns <code>false</code>.</p> <p><strong>Things to notice across all four parts.</strong> Read the argument's <em>type</em>, not its value. A bare <code>int</code> literal, an <code>int</code> variable, or anything that is an <code>int</code> before boxing selects <code>remove(int)</code>. Only an expression whose static type is already <code>Integer</code> &mdash; a cast, <code>Integer.valueOf(...)</code>, or an <code>Integer</code> variable &mdash; selects <code>remove(Object)</code>.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 6.7</div> <div class="bd"> <p>Write a <code>public static void removeAll(ArrayList&lt;Integer&gt; list, int value)</code> that deletes <em>every</em> occurrence of <code>value</code>, and a <code>main</code> that demonstrates it on <code>[3, 7, 3, 3, 9]</code> with <code>value</code> 3, and on <code>[300, 7, 300]</code> with <code>value</code> 300.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> <code>remove(Object)</code> deletes only the first match, so one call is not enough. You could loop <code>while (list.contains(value)) list.remove((Integer) value);</code> &mdash; that is exactly what the course's own scores program does &mdash; but it rescans the list from the front each time. A single backward pass is cleaner: walk from the last index down to 0 and delete as you go. Going backward matters, and &sect;6 explains why in full; the short version is that deleting index <code>i</code> moves everything after <code>i</code> leftward, and if you are moving leftward too you have already dealt with those elements.</p> <p>Compare with <code>list.get(i) == value</code>. That is an <code>Integer</code> on the left and an <code>int</code> on the right, so Java unboxes the <code>Integer</code> and compares two numbers &mdash; which is what we want. The second test case uses 300 deliberately, because if <em>both</em> sides had been <code>Integer</code> the comparison would have failed for values above 127. That is &sect;7.</p> <p class="filename">RemoveAllValue.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class RemoveAllValue {
+    public static void main(String args[]) {
+        ArrayList&lt;Integer&gt; nums = new ArrayList&lt;Integer&gt;();
+        nums.add(3);
+        nums.add(7);
+        nums.add(3);
+        nums.add(3);
+        nums.add(9);
+        System.out.println("before: " + nums);
+        removeAll(nums, 3);
+        System.out.println("after:  " + nums);
+
+        ArrayList&lt;Integer&gt; big = new ArrayList&lt;Integer&gt;();
+        big.add(300);
+        big.add(7);
+        big.add(300);
+        System.out.println("before: " + big);
+        removeAll(big, 300);
+        System.out.println("after:  " + big);
+    }
+
+    public static void removeAll(ArrayList&lt;Integer&gt; list, int value) {
+        for (int i = list.size() - 1; i &gt;= 0; i--) {
+            if (list.get(i) == value) {
+                list.remove(i);
+            }
+        }
+    }
+}</code></pre> <pre class="out"><code>before: [3, 7, 3, 3, 9]
+after:  [7, 9]
+before: [300, 7, 300]
+after:  [7]</code></pre> <p><strong>Things to notice.</strong> Inside the method, <code>list.remove(i)</code> really is the index version and that is deliberate &mdash; <code>i</code> is a position. This is the one place where you <em>want</em> <code>remove(int)</code>, and writing <code>list.remove((Integer) i)</code> here would be the bug.</p> <p>The method changes the caller's list, and it returns <code>void</code>. That works because a parameter of a class type holds a reference to the same object the caller has &mdash; there is one list, not a copy. Lecture 8 is about exactly that, and this method is a preview of why it matters.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 6.7</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="16" aria-label="Live coding - Quick Check 6.7">import java.util.ArrayList;
+public class RemoveAllValue {
+    public static void main(String args[]) {
+        ArrayList&lt;Integer&gt; nums = new ArrayList&lt;Integer&gt;();
+        nums.add(3);
+        nums.add(7);
+        nums.add(3);
+        nums.add(3);
+        nums.add(9);
+        System.out.println("before: " + nums);
+        removeAll(nums, 3);
+        System.out.println("after:  " + nums);
+    }
+    // Delete EVERY element equal to value. Walk the list backward. public static void removeAll(ArrayList&lt;Integer&gt; list, int value) { } }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s5"><span class="num">5.</span>Walking a list: <code>for</code> and for-each</h2> <p>There are two ways to visit every element, and <code>ArrayListExample.java</code> used both.</p> <pre><code class="language-java">// indexed for loop for (int i = 0; i &lt; wordList.size(); i++) { System.out.println(wordList.get(i)); } // for-each loop for (String s : wordList) { System.out.print(s.charAt(0)); } </code></pre> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the for-each loop</span></div> <div class="bd"> <p>The <strong>for-each</strong> loop (its formal name is the <em>enhanced for</em> loop) is read aloud as "for each <code>String</code> <code>s</code> in <code>wordList</code>". On each pass, <code>s</code> is set to the next element. There is no counter, no <code>size()</code>, no <code>get</code>, and therefore no way to run off the end.</p> <p>It works on arrays too, with the same syntax, and you have already seen it on the exams: <code>for (Circle c : data)</code>.</p> </div> </div> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; which loop to use</span></div> <div class="bd"> <p>Use the <strong>for-each</strong> loop when you only want to <em>look at</em> every element, in order. It is shorter and it cannot be off by one.</p> <p>Use the <strong>indexed</strong> loop when you need the index itself &mdash; to call <code>set</code>, to compare an element against another element, to visit only part of the list, to go backward, or to remove as you go.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; five loops over one list</span></div> <div class="bd"> <p>Loop 3 is the interesting one: it uppercases <code>s</code> on every pass. Predict what loop 3 does to the list before you reveal.</p> <p class="filename">LoopStyles.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class LoopStyles {
+    public static void main(String args[]) {
+        ArrayList&lt;String&gt; words = new ArrayList&lt;String&gt;();
+        words.add("Bye");
+        words.add("newElement");
+
+        // 1. indexed for loop
+        for (int i = 0; i &lt; words.size(); i++) {
+            System.out.println(i + ": " + words.get(i));
+        }
+
+        // 2. for-each loop
+        for (String s : words) {
+            System.out.print(s.charAt(0));
+        }
+        System.out.println();
+
+        // 3. for-each cannot write back into the list
+        for (String s : words) {
+            s = s.toUpperCase();
+        }
+        System.out.println(words);
+
+        // 4. an indexed loop with set() can
+        for (int i = 0; i &lt; words.size(); i++) {
+            words.set(i, words.get(i).toUpperCase());
+        }
+        System.out.println(words);
+
+        // 5. for-each over Integer unboxes into an int
+        ArrayList&lt;Integer&gt; nums = new ArrayList&lt;Integer&gt;();
+        nums.add(3);
+        nums.add(4);
+        nums.add(5);
+        int sum = 0;
+        for (int x : nums) sum += x;
+        System.out.println("sum = " + sum);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>0: Bye
+1: newElement
+Bn
+[Bye, newElement]
+[BYE, NEWELEMENT]
+sum = 12</code></pre> <p><strong>Loop 3 does nothing at all to the list.</strong> <code>s</code> is a local variable that is handed a copy of the reference on each pass; assigning to <code>s</code> re-points that local variable and the list never hears about it. This is the one thing the for-each loop genuinely cannot do, and it fails silently &mdash; no error, no warning, just an unchanged list.</p> <p><strong>Loop 4 is the fix</strong>, and it needs the index, because <code>set</code> needs an index. That is the clearest example of the rule in the Key Idea above.</p> <p><strong>Loop 5</strong> writes <code>for (int x : nums)</code> over an <code>ArrayList&lt;Integer&gt;</code>. That is legal: each element is unboxed into the <code>int</code> <code>x</code> as the loop hands it over. Writing <code>for (Integer x : nums)</code> would work equally well.</p> <p>Finally, <code>Bn</code> on the third line of output is not a typo. Loop 2 uses <code>print</code>, not <code>println</code>, so the first characters of <code>Bye</code> and <code>newElement</code> land side by side; the <code>System.out.println()</code> afterwards is what ends the line.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 6.8</div> <div class="bd"> <p>For each task, say whether a for-each loop is enough or whether you need an indexed loop.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Print every name in an <code>ArrayList&lt;String&gt;</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p>For-each. You are only reading, in order, from the front. <code>for (String n : names) System.out.println(n);</code></p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Print every name with its position, as <code>0: Ana</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p>Indexed. The position is part of what you are printing, and the for-each loop does not give you one. (You could keep a separate counter alongside a for-each loop, but at that point the indexed loop is simpler and says what it means.)</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Replace every name with its uppercase form.</p> <details class="soln"><summary></summary><div class="ans"> <p>Indexed, because you need <code>set(i, ...)</code>. Loop 3 of the worked example above is exactly the wrong version of this.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> Print the last three names.</p> <details class="soln"><summary></summary><div class="ans"> <p>Indexed: <code>for (int i = names.size() - 3; i &lt; names.size(); i++)</code>. A for-each loop always starts at the beginning and always finishes at the end &mdash; it has no way to express "part of".</p> <p><strong>Things to notice across all four parts.</strong> Only (a) is a pure read of the whole list in order, and only (a) gets the for-each loop. That is the test, and it is worth applying deliberately: reach for for-each first, and switch to the indexed loop the moment you catch yourself wanting the number <code>i</code>.</p> </div></details> </div> </div> </div> <h2 id="s6"><span class="num">6.</span>Removing while you loop</h2> <p>Deleting elements from a list you are in the middle of walking is where careful students lose marks, because the two obvious ways of doing it are both wrong &mdash; one loudly, one quietly.</p> <div class="box warn"> <div class="hd">Warning<span class="tag">&mdash; never remove inside a for-each loop</span></div> <div class="bd"> <p>The loud failure first. A for-each loop over a list keeps a hidden cursor into it, and that cursor notices if the list changes underneath it:</p> <p class="filename">ForEachRemove.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class ForEachRemove {
+    public static void main(String args[]) {
+        ArrayList&lt;Integer&gt; list = new ArrayList&lt;Integer&gt;();
+        list.add(4);
+        list.add(0);
+        list.add(0);
+        list.add(7);
+        System.out.println("before: " + list);
+
+        for (Integer x : list) {
+            if (x == 0) list.remove(x);
+        }
+        System.out.println("after:  " + list);
+    }
+}</code></pre> <pre class="out"><code>before: [4, 0, 0, 7]
+Exception in thread "main" java.util.ConcurrentModificationException
+	at java.base/java.util.ArrayList$Itr.checkForComodification(ArrayList.java:1095)
+	at java.base/java.util.ArrayList$Itr.next(ArrayList.java:1049)
+	at ForEachRemove.main(ForEachRemove.java:12)</code></pre> <p><code>ConcurrentModificationException</code> &mdash; "you changed the list while I was walking it". Nothing is running concurrently; the name is historical. The exception is thrown by the very next <code>next()</code> after the removal, so the loop dies partway through and <code>after:</code> never prints.</p> <p>Annoying as it looks, this is the <em>good</em> outcome: the JVM caught your mistake instead of quietly giving you a half-processed list. (The mechanism behind that hidden cursor is an <code>Iterator</code>, and we take it apart in Lecture 23.)</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the quiet failure: removing in a forward indexed loop</span></div> <div class="bd"> <p>So use an indexed loop instead. This program tries to delete every zero from <code>[4, 0, 0, 0, 7]</code> and prints its own state as it goes. It does not crash. Before you reveal: how many zeros are left at the end?</p> <p class="filename">SkipDemo.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class SkipDemo {
+    public static void main(String args[]) {
+        ArrayList&lt;Integer&gt; list = new ArrayList&lt;Integer&gt;();
+        list.add(4);
+        list.add(0);
+        list.add(0);
+        list.add(0);
+        list.add(7);
+        System.out.println("before: " + list);
+
+        for (int i = 0; i &lt; list.size(); i++) {
+            System.out.println("i = " + i + ", list.get(i) = " + list.get(i)
+                    + ", size = " + list.size());
+            if (list.get(i) == 0) {
+                list.remove(i);
+            }
+        }
+        System.out.println("after:  " + list);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>before: [4, 0, 0, 0, 7]
+i = 0, list.get(i) = 4, size = 5
+i = 1, list.get(i) = 0, size = 5
+i = 2, list.get(i) = 0, size = 4
+after:  [4, 0, 7]</code></pre> <p>One zero survives, and the loop body ran only three times on a five-element list. Here is why, step by step:</p> <table class="trace"> <tr><th><code>i</code></th><th>list at the top of the pass</th><th><code>list.get(i)</code></th><th>action</th><th>list afterwards</th></tr> <tr><td>0</td><td><code>[4, 0, 0, 0, 7]</code></td><td><code>4</code></td><td>keep</td><td><code>[4, 0, 0, 0, 7]</code></td></tr> <tr><td>1</td><td><code>[4, 0, 0, 0, 7]</code></td><td><code>0</code></td><td>remove index 1</td><td><code>[4, 0, 0, 7]</code></td></tr> <tr><td>2</td><td><code>[4, 0, 0, 7]</code></td><td><code>0</code></td><td>remove index 2</td><td><code>[4, 0, 7]</code></td></tr> <tr><td>3</td><td><code>[4, 0, 7]</code></td><td>&mdash;</td><td><code>3 &lt; 3</code> is false &mdash; loop ends</td><td><code>[4, 0, 7]</code></td></tr> </table> <p>Look at the pass where <code>i</code> is 1. We delete index 1, so every element after it slides one place left: the zero that was at index 2 is now at index 1. Then <code>i++</code> makes <code>i</code> equal to 2 &mdash; and we have just walked straight past that zero without ever testing it.</p> <p><strong>Removing at index <code>i</code> and then incrementing <code>i</code> skips exactly one element.</strong> Notice too that the loop condition re-reads <code>list.size()</code> on every pass, which is why the loop stops early: the list got shorter while we were walking it.</p> 
+</div></details> </div> </div> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; deleting elements while looping</span></div> <div class="bd"> <p>Pick one of these three. All of them are correct; the first is the one to reach for.</p> <ol> <li><strong>Walk backward.</strong> <code>for (int i = list.size() - 1; i &gt;= 0; i--)</code>. Deleting index <code>i</code> only disturbs the elements after <code>i</code>, and you have already visited those. Nothing is skipped and you do not have to think about it again.</li> <li><strong>Walk forward, but do not advance after a removal.</strong> <code>if (shouldGo) list.remove(i); else i++;</code> inside a <code>while</code> loop. Correct, but you have to remember the <code>else</code> every time.</li> <li><strong>Rescan from the start until there is nothing left to remove.</strong> <code>while (list.contains(x)) list.remove((Integer) x);</code>. Simple to read, and fine for short lists; it does more work than it needs to because it starts over each time.</li> </ol> </div> </div> <h3>The course exercise: <code>removeDuplicate</code></h3> <p>Here is the in-class exercise from the notes, and the solution puts the backward-walk rule to work in a way that is worth studying rather than memorizing.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; <code>removeDuplicate</code>, with the inner loop reversed</span></div> <div class="bd"> <p>The task: remove duplicate elements from an <code>ArrayList</code>, keeping the first occurrence of each. The plan is the obvious one &mdash; for every element <code>i</code>, look at every later element <code>j</code> and delete it if it matches. What is not obvious is that the inner loop counts <em>down</em>.</p> <p class="filename">Exercise1Solution.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class Exercise1Solution {
+    public static void main(String[] args) {
+        ArrayList&lt;Integer&gt; numList = new ArrayList&lt;Integer&gt;();
+        for(int i = 0; i &lt; 10; i++) {
+            if(i%2 == 0) numList.add(0);
+            else numList.add(i);
+        }
+        System.out.println(numList);
+        removeDuplicate(numList);
+        System.out.println(numList);
+    }
+    
+    public static void removeDuplicate(ArrayList&lt;Integer&gt; list) {
+        for(int i = 0; i &lt; list.size(); i++) {
+            for(int j = list.size()-1; j &gt; i; j--) {
+                if (list.get(i).equals(list.get(j))) { 
+                    list.remove(j);
+                }
+            }
+        }
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>[0, 1, 0, 3, 0, 5, 0, 7, 0, 9] [0, 1, 3, 5, 7, 9] </code></pre> <p>The starting list has five zeros, at indexes 0, 2, 4, 6 and 8. Here is the whole of the first outer pass, <code>i</code> = 0, comparing the element <code>0</code> against everything after it:</p> <table class="trace"> <tr><th><code>j</code></th><th><code>list.get(j)</code></th><th>match?</th><th>list afterwards</th></tr> <tr><td>9</td><td><code>9</code></td><td>no</td><td><code>[0, 1, 0, 3, 0, 5, 0, 7, 0, 9]</code></td></tr> <tr><td>8</td><td><code>0</code></td><td>yes &mdash; remove index 8</td><td><code>[0, 1, 0, 3, 0, 5, 0, 7, 9]</code></td></tr> <tr><td>7</td><td><code>7</code></td><td>no</td><td><code>[0, 1, 0, 3, 0, 5, 0, 7, 9]</code></td></tr> <tr><td>6</td><td><code>0</code></td><td>yes &mdash; remove index 6</td><td><code>[0, 1, 0, 3, 0, 5, 7, 9]</code></td></tr> <tr><td>5</td><td><code>5</code></td><td>no</td><td><code>[0, 1, 0, 3, 0, 5, 7, 9]</code></td></tr> <tr><td>4</td><td><code>0</code></td><td>yes &mdash; remove index 4</td><td><code>[0, 1, 0, 3, 5, 7, 9]</code></td></tr> <tr><td>3</td><td><code>3</code></td><td>no</td><td><code>[0, 1, 0, 3, 5, 7, 9]</code></td></tr> <tr><td>2</td><td><code>0</code></td><td>yes &mdash; remove index 2</td><td><code>[0, 1, 3, 5, 7, 9]</code></td></tr> <tr><td>1</td><td><code>1</code></td><td>no</td><td><code>[0, 1, 3, 5, 7, 9]</code></td></tr> </table> <p>The list is already finished after that single pass. The outer loop keeps going &mdash; <code>i</code> = 1 through 4, comparing <code>1</code>, <code>3</code>, <code>5</code>, <code>7</code> against what follows &mdash; and finds nothing more to delete.</p> <p><strong>Why the inner loop counts down.</strong> Every removal happens at index <code>j</code>, and the elements that shift left are the ones <em>after</em> <code>j</code>. Because <code>j</code> is decreasing, all of those have already been checked. Nothing is skipped, and &mdash; just as importantly &mdash; the elements at indexes <code>0</code> through <code>j-1</code>, which we have not looked at yet, do not move at all. The loop bound <code>list.size()-1</code> is evaluated once, when the inner loop starts, but that is harmless for the same reason: the list only ever gets shorter at positions we have already passed.</p> <p><strong>Why <code>j &gt; i</code> and not <code>j &gt;= 0</code>.</strong> The inner loop must stop before it reaches the element we are comparing against, or it would find <code>list.get(i)</code> equal to itself and delete the original.</p> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; the forward inner loop that passes the test anyway</span></div> <div class="bd"> <p>The natural thing to write is <code>for (int j = i + 1; j &lt; list.size(); j++)</code>. Run that on the exercise's own data, <code>[0, 1, 0, 3, 0, 5, 0, 7, 0, 9]</code>, and it produces <code>[0, 1, 3, 5, 7, 9]</code> &mdash; the right answer. So why bother reversing it?</p> <p>Because the exercise's data has no two duplicates <em>next to each other</em>. Give the two versions a list that does:</p> <p class="filename">ForwardVsBackward.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class ForwardVsBackward {
+    public static void main(String args[]) {
+        System.out.println("forward  inner loop: " + run(false));
+        System.out.println("backward inner loop: " + run(true));
+    }
+
+    public static ArrayList&lt;Integer&gt; run(boolean backward) {
+        ArrayList&lt;Integer&gt; list = new ArrayList&lt;Integer&gt;();
+        list.add(1);
+        list.add(2);
+        list.add(2);
+        list.add(2);
+        list.add(3);
+        if (backward) removeDuplicateBackward(list);
+        else removeDuplicateForward(list);
+        return list;
+    }
+
+    public static void removeDuplicateForward(ArrayList&lt;Integer&gt; list) {
+        for (int i = 0; i &lt; list.size(); i++) {
+            for (int j = i + 1; j &lt; list.size(); j++) {
+                if (list.get(i).equals(list.get(j))) list.remove(j);
+            }
+        }
+    }
+
+    public static void removeDuplicateBackward(ArrayList&lt;Integer&gt; list) {
+        for (int i = 0; i &lt; list.size(); i++) {
+            for (int j = list.size() - 1; j &gt; i; j--) {
+                if (list.get(i).equals(list.get(j))) list.remove(j);
+            }
+        }
+    }
+}</code></pre> <pre class="out"><code>forward  inner loop: [1, 2, 2, 3]
+backward inner loop: [1, 2, 3]</code></pre> <p>The forward version leaves a duplicate behind: it removed the <code>2</code> at index 2, the third <code>2</code> slid down into index 2, and then <code>j++</code> walked past it. The skip from the <code>SkipDemo</code> example, in a different disguise.</p> <p>This is the real lesson of the exercise. <em>Your test data passing is not the same as your code being correct.</em> When you write a loop that removes, deliberately test it on a list with two removable elements side by side, and on a list where the very last element must go.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 6.9</div> <div class="bd"> <p>This method is supposed to delete every negative number from the list. What does it actually leave behind when it is given <code>[5, -1, -2, -3, 8]</code>, and what one-word change fixes it?</p> <pre><code class="language-java">public static void dropNegatives(ArrayList&lt;Integer&gt; list) {
+    for (int i = 0; i &lt; list.size(); i++) {
+        if (list.get(i) &lt; 0) list.remove(i);
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Trace it. Track <code>i</code>, the list, and what <code>get(i)</code> actually sees.</p> <table class="trace"> <tr><th><code>i</code></th><th>list at the top of the pass</th><th><code>list.get(i)</code></th><th>action</th></tr> <tr><td>0</td><td><code>[5, -1, -2, -3, 8]</code></td><td><code>5</code></td><td>keep</td></tr> <tr><td>1</td><td><code>[5, -1, -2, -3, 8]</code></td><td><code>-1</code></td><td>remove index 1 &rarr; <code>[5, -2, -3, 8]</code></td></tr> <tr><td>2</td><td><code>[5, -2, -3, 8]</code></td><td><code>-3</code></td><td>remove index 2 &rarr; <code>[5, -2, 8]</code></td></tr> <tr><td>3</td><td><code>[5, -2, 8]</code></td><td>&mdash;</td><td><code>3 &lt; 3</code> is false &mdash; loop ends</td></tr> </table> <p>It leaves <code>[5, -2, 8]</code>. The <code>-2</code> was never tested: it slid from index 2 to index 1 the moment <code>-1</code> was deleted, and <code>i</code> had already moved past 1.</p> <p><strong>The fix: run the loop backward.</strong></p> <pre><code class="language-java">public static void dropNegatives(ArrayList&lt;Integer&gt; list) {
+    for (int i = list.size() - 1; i &gt;= 0; i--) {
+        if (list.get(i) &lt; 0) list.remove(i);
+    }
+}</code></pre> <p><strong>Things to notice.</strong> <code>list.get(i) &lt; 0</code> compares an <code>Integer</code> with the <code>int</code> literal <code>0</code>, so the <code>Integer</code> is unboxed and this is an ordinary numeric comparison &mdash; <code>&lt;</code> has no other meaning available. Comparison operators always unbox; only <code>==</code> and <code>!=</code> have the alternative of comparing references, which is the subject of the next section.</p> </div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 6.10</div> <div class="bd"> <p>Now write it yourself, from the course's own exercise skeleton. Fill in <code>removeDuplicate</code> so that the program prints <code>[0, 1, 0, 3, 0, 5, 0, 7, 0, 9]</code> and then <code>[0, 1, 3, 5, 7, 9]</code>. Do not look back at &sect;6 until you have tried it.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Two nested loops. The outer one picks the element we are keeping; the inner one scans everything after it and deletes matches. The inner loop must run backward, and it must stop at <code>j &gt; i</code> so that an element is never compared with itself. Compare elements with <code>equals</code>, not <code>==</code> &mdash; &sect;7 explains why in detail, but the short version is that <code>list.get(i)</code> gives you an <code>Integer</code> object, and <code>==</code> on two objects asks a different question.</p> <p class="filename">Exercise1Solution.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class Exercise1Solution {
+    public static void main(String[] args) {
+        ArrayList&lt;Integer&gt; numList = new ArrayList&lt;Integer&gt;();
+        for(int i = 0; i &lt; 10; i++) {
+            if(i%2 == 0) numList.add(0);
+            else numList.add(i);
+        }
+        System.out.println(numList);
+        removeDuplicate(numList);
+        System.out.println(numList);
+    }
+    
+    public static void removeDuplicate(ArrayList&lt;Integer&gt; list) {
+        for(int i = 0; i &lt; list.size(); i++) {
+            for(int j = list.size()-1; j &gt; i; j--) {
+                if (list.get(i).equals(list.get(j))) { 
+                    list.remove(j);
+                }
+            }
+        }
+    }
+}</code></pre> <pre class="out"><code>[0, 1, 0, 3, 0, 5, 0, 7, 0, 9] [0, 1, 3, 5, 7, 9] </code></pre> <p><strong>Things to notice.</strong> Three details separate this from a near miss:</p> <ul> <li><code>j</code> counts down, so removals never make the loop skip an element.</li> <li><code>j &gt; i</code>, not <code>j &gt;= i</code>, so the kept element is not deleted as a duplicate of itself.</li> <li><code>list.remove(j)</code> is the <em>index</em> version, which is what you want &mdash; <code>j</code> is a position. Writing <code>list.remove(list.get(j))</code> would also work but is slower and reads worse.</li> </ul> <p>The outer loop's condition <code>i &lt; list.size()</code> is re-evaluated every pass, which is correct: as duplicates disappear the list gets shorter and the outer loop should notice.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 6.10</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="15" aria-label="Live coding - Quick Check 6.10">import java.util.ArrayList;
+public class Exercise1 {
+    public static void main(String[] args) {
+        ArrayList&lt;Integer&gt; numList = new ArrayList&lt;Integer&gt;();
+        for(int i = 0; i &lt; 10; i++) {
+            if(i%2 == 0) numList.add(0);
+            else numList.add(i);
+        }
+        System.out.println(numList);
+        removeDuplicate(numList);
+        System.out.println(numList);
+    }
+    // implement the removeDuplicate method public static void removeDuplicate(ArrayList&lt;Integer&gt; list) { } }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s7"><span class="num">7.</span><code>equals</code> versus <code>==</code> for the elements</h2> <p>The solution above compares elements with <code>list.get(i).equals(list.get(j))</code>. Why not <code>list.get(i) == list.get(j)</code>, which is shorter and is what you would have written in C++?</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; two different questions</span></div> <div class="bd"> <p>On <strong>primitives</strong>, <code>==</code> asks <em>are these the same value?</em></p> <p>On <strong>objects</strong>, <code>==</code> asks <em>are these the same object?</em> &mdash; that is, do the two references point at the same place in memory. <code>equals</code> is the method that asks <em>do these two objects have the same contents?</em></p> <p><code>list.get(i)</code> returns an <code>Integer</code>, which is an object. So <code>get(i) == get(j)</code> is an identity test, and <code>get(i).equals(get(j))</code> is a value test. They are not the same question, and only the second one is what "is this a duplicate?" means.</p> </div> </div> <p>Now the awkward part, and the reason this bug survives so long in student code: for small numbers, <code>==</code> gives the right answer anyway.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the same comparison, two different answers</span></div> <div class="bd"> <p>Two lists, each holding the same number twice. One holds 100, the other holds 1000. Before you reveal: will the four comparisons agree?</p> <p class="filename">IntegerIdentity.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class IntegerIdentity {
+    public static void main(String args[]) {
+        ArrayList&lt;Integer&gt; small = new ArrayList&lt;Integer&gt;();
+        small.add(100);
+        small.add(100);
+        System.out.println("small: " + small);
+        System.out.println("  get(0) == get(1)      -&gt; " + (small.get(0) == small.get(1)));
+        System.out.println("  get(0).equals(get(1)) -&gt; " + small.get(0).equals(small.get(1)));
+
+        ArrayList&lt;Integer&gt; big = new ArrayList&lt;Integer&gt;();
+        big.add(1000);
+        big.add(1000);
+        System.out.println("big: " + big);
+        System.out.println("  get(0) == get(1)      -&gt; " + (big.get(0) == big.get(1)));
+        System.out.println("  get(0).equals(get(1)) -&gt; " + big.get(0).equals(big.get(1)));
+
+        int plain = big.get(0);
+        System.out.println("  plain == big.get(1)   -&gt; " + (plain == big.get(1)));
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>small: [100, 100]
+  get(0) == get(1)      -&gt; true
+  get(0).equals(get(1)) -&gt; true
+big: [1000, 1000]
+  get(0) == get(1)      -&gt; false
+  get(0).equals(get(1)) -&gt; true
+  plain == big.get(1)   -&gt; true</code></pre> <p>Read the two <code>==</code> lines together. Same code, same shape of data, and 100 says <code>true</code> while 1000 says <code>false</code>.</p> <p><strong>Why.</strong> Autoboxing does not call <code>new Integer(...)</code>; it calls <code>Integer.valueOf(...)</code>, and that method keeps a cache of ready-made <code>Integer</code> objects for the values &minus;128 through 127. Box 100 twice and you get the <em>same</em> cached object back, so <code>==</code> is <code>true</code> by accident. Box 1000 twice and you get two separate objects, so <code>==</code> is <code>false</code> &mdash; even though both hold 1000. <code>equals</code> compares the contents and is <code>true</code> in both cases, which is the answer you actually wanted both times.</p> <p><strong>The last line is the exception that matters.</strong> <code>plain == big.get(1)</code> is <code>true</code>, because <code>plain</code> is a primitive <code>int</code>. When one side of <code>==</code> is a primitive, Java has no choice but to unbox the other side and compare numbers. So <code>Integer == int</code> is a value comparison and always safe; it is <code>Integer == Integer</code> that is the reference comparison. That is why <code>list.get(i) == value</code> in <code>removeAll</code> back in &sect;4 was fine, and why <code>list.get(i) == list.get(j)</code> here is not.</p> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Warning<span class="tag">&mdash; the bug your test data will hide</span></div> <div class="bd"> <p>Here is <code>removeDuplicate</code> written both ways, run on small values and then on large ones. The only difference between the two methods is <code>equals</code> versus <code>==</code>.</p> <p class="filename">EqualsMatters.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class EqualsMatters {
+    public static void main(String args[]) {
+        System.out.println("small values, == : " + run(false, 5));
+        System.out.println("small values, equals: " + run(true, 5));
+        System.out.println("large values, == : " + run(false, 500));
+        System.out.println("large values, equals: " + run(true, 500));
+    }
+
+    public static ArrayList&lt;Integer&gt; run(boolean useEquals, int v) {
+        ArrayList&lt;Integer&gt; list = new ArrayList&lt;Integer&gt;();
+        list.add(v);
+        list.add(1);
+        list.add(v);
+        list.add(3);
+        list.add(v);
+        if (useEquals) removeDupEquals(list);
+        else removeDupIdentity(list);
+        return list;
+    }
+
+    public static void removeDupEquals(ArrayList&lt;Integer&gt; list) {
+        for (int i = 0; i &lt; list.size(); i++)
+            for (int j = list.size() - 1; j &gt; i; j--)
+                if (list.get(i).equals(list.get(j))) list.remove(j);
+    }
+
+    public static void removeDupIdentity(ArrayList&lt;Integer&gt; list) {
+        for (int i = 0; i &lt; list.size(); i++)
+            for (int j = list.size() - 1; j &gt; i; j--)
+                if (list.get(i) == list.get(j)) list.remove(j);
+    }
+}</code></pre> <pre class="out"><code>small values, == : [5, 1, 3]
+small values, equals: [5, 1, 3]
+large values, == : [500, 1, 500, 3, 500]
+large values, equals: [500, 1, 3]</code></pre> <p>With small values the <code>==</code> version looks perfect. With 500 it removes nothing at all. The course exercise happens to use the values 0 through 9, every one of them inside the cache &mdash; which is exactly why the solution writes <code>equals</code>, and exactly why you cannot trust the exercise's own output to tell you whether your version is right.</p> <p><strong>The rule to leave with: never compare two objects with <code>==</code> unless you genuinely mean "is this literally the same object?".</strong> For <code>Integer</code>, <code>Double</code>, <code>Character</code>, <code>String</code> and every class you write yourself, the comparison you want is <code>equals</code>. We build our own <code>equals</code> method in Lecture 9.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 6.11</div> <div class="bd"> <p>Let <code>ArrayList&lt;Integer&gt; a = new ArrayList&lt;&gt;();</code> with <code>a.add(200); a.add(200);</code> and let <code>int n = 200;</code>. Give the value of each expression.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>a.get(0) == a.get(1)</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>false</code>. Both sides are <code>Integer</code> objects, so this is a reference comparison, and 200 is outside the &minus;128..127 cache, so the two boxes are separate objects.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>a.get(0).equals(a.get(1))</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>true</code>. <code>Integer.equals</code> compares the wrapped values, and both wrap 200.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>n == a.get(0)</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>true</code>. <code>n</code> is a primitive <code>int</code>, so Java unboxes <code>a.get(0)</code> and compares two numbers. With a primitive on either side, <code>==</code> is always a value comparison.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>a.contains(200)</code> and <code>a.indexOf(200)</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>true</code> and <code>0</code>. Both methods take an <code>Object</code>, so the <code>200</code> is autoboxed, and both search using <code>equals</code> internally &mdash; not <code>==</code>. That is why they are reliable for any value, cached or not.</p> <p><strong>Things to notice across all four parts.</strong> The library methods (<code>contains</code>, <code>indexOf</code>, <code>remove(Object)</code>, and <code>ArrayList.equals</code> itself) all use <code>equals</code> under the hood, so they always do the sensible thing. The only place the cache can bite you is code <em>you</em> write with <code>==</code> between two objects. If you never do that, this entire section becomes trivia.</p> </div></details> </div> </div> </div> <h2 id="s8"><span class="num">8.</span>Putting it together: the scores program</h2> <p>The second in-class exercise pulls the whole lecture together with the <code>Scanner</code> from Lecture 3. The specification:</p> <ol> <li>Ask the user for some scores, terminated by a negative integer.</li> <li>Keep track of the maximum and minimum scores.</li> <li>Ask whether the maximum and minimum should be ignored.</li> <li>Compute and display the average.</li> </ol> <p>Every part of the specification needs something we could not do before this lecture. "Some scores" with no count given means an <code>ArrayList</code>. "Ignore the minimum" means deleting by value, possibly several times. And the average needs the list's <code>size()</code> after those deletions, not before.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the course's <code>Exercise2Solution.java</code></span></div> <div class="bd"> <p>One new class appears here: <code>DecimalFormat</code>, from <code>java.text</code>. A <code>DecimalFormat</code> built with the pattern <code>"#.##"</code> rounds a number to at most two decimal places and drops trailing zeros, so 3.875 prints as <code>3.88</code> and 4.0 prints as <code>4</code>. It is the tool we promised back in Lecture 1 for printing money and averages without fifteen digits of noise.</p> <p class="filename">Exercise2Solution.java</p>
+<pre><code class="language-java">import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class Exercise2Solution {
+    public static void main(String args[]) {
+          ArrayList&lt;Integer&gt; scores = new ArrayList&lt;&gt;();
+          int high = Integer.MIN_VALUE, low = Integer.MAX_VALUE;
+          Scanner input = new Scanner(System.in);
+          System.out.println("Enter scores, terminated by a negative integer: ");
+          while (true) {
+             int x = input.nextInt();
+             if (x &lt; 0) break;
+             scores.add(x);
+             if (x &lt; low) low = x;
+             if (x &gt; high) high = x;
+          }
+          System.out.println("Found " + scores.size() + " scores.  High is " + high
+                + " and low is " + low);
+          System.out.println("Ignore low scores? ");
+          String answer = input.next();
+          if (answer.trim().toUpperCase().charAt(0) == 'Y')
+             while (scores.contains(low)) scores.remove((Integer) low);
+          System.out.println("Ignore high scores? ");
+          answer = input.next();
+          if (answer.trim().toUpperCase().charAt(0) == 'Y')
+             while (scores.contains(high)) scores.remove((Integer) high);
+          
+          DecimalFormat rounder = new DecimalFormat("#.##");
+          System.out.println("The average is: " + rounder.format(average(scores)));
+          input.close();
+       }
+
+       private static double average(ArrayList&lt;Integer&gt; scores) {
+          int size = scores.size();
+          int sum = 0;
+          for (int i = 0; i &lt; size; i++) sum += scores.get(i);
+          return (double) sum / size;
+       }
+}</code></pre> <p>Below is a real terminal session with this program. The lines the user typed &mdash; <code>3 1 4 1 5 9 2 6 -1</code>, then <code>yes</code>, then <code>Yes</code> &mdash; appear in the transcript because a terminal echoes what you type. Work out the average before you reveal it: eight scores are entered, then both the low and the high are thrown away.</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Enter scores, terminated by a negative integer: 3 1 4 1 5 9 2 6 -1 Found 8 scores.  High is 9 and low is 1 Ignore low scores? yes Ignore high scores? Yes The average is: 4 </code></pre> <p>Both 1s go, and the single 9 goes, leaving <code>3 4 5 2 6</code>. That is 20 over 5, so the average is exactly 4 &mdash; and <code>"#.##"</code> prints it as <code>4</code>, not <code>4.0</code>, because the pattern has no mandatory decimal places.</p> <p>Five things in this program are worth naming.</p> <ul> <li><strong><code>while (true)</code> with a <code>break</code>.</strong> The loop cannot use a normal condition because the value that ends it is the value it has just read. Read first, test second, <code>break</code> if negative &mdash; and note that the negative sentinel is never added to the list.</li> <li><strong><code>scores.remove((Integer) low)</code>.</strong> There is the cast from &sect;4, in the course's own solution, doing real work. <code>scores.remove(low)</code> would delete the element at <em>position</em> <code>low</code> &mdash; here, position 1 &mdash; and on most inputs would throw <code>IndexOutOfBoundsException</code>.</li> <li><strong><code>while (scores.contains(low))</code>, not <code>if</code>.</strong> <code>remove(Object)</code> deletes one match. The input has two 1s, so a single call would leave one behind. This is option 3 of the Procedure in &sect;6.</li> <li><strong><code>answer.trim().toUpperCase().charAt(0) == 'Y'</code>.</strong> A chain of <code>String</code> methods from Lecture 4, which is why <code>yes</code>, <code>Yes</code> and <code>y</code> all work. <code>charAt</code> returns a <code>char</code>, a primitive, so <code>==</code> here is a genuine value comparison &mdash; &sect;7 does not apply.</li> <li><strong><code>(double) sum / size</code>.</strong> The cast is on <code>sum</code> alone so that real division happens. <code>sum / size</code> would be integer division and this program would report the average of 3, 4, 5, 2, 6 as <code>4</code> for the wrong reason and the average of 3, 4, 5, 2, 7 as <code>4</code> instead of <code>4.2</code>.</li> </ul> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Warning<span class="tag">&mdash; what happens when every score is thrown away</span></div> <div class="bd"> <p>Enter two identical scores and answer yes to both questions. The high and the low are the same number, so the list ends up empty and <code>average</code> divides by zero:</p> <pre class="out"><code>Enter scores, terminated by a negative integer: 5 5 -1 Found 2 scores.  High is 5 and low is 5 Ignore low scores? y Ignore high scores? y The average is: NaN </code></pre> <p><code>NaN</code> is "not a number", the <code>double</code> result of <code>0.0 / 0.0</code>. Recall from Lecture 1 that floating-point division by zero does not throw &mdash; only integer division does &mdash; so the program runs happily to the end and prints nonsense. (The exact text printed for <code>NaN</code> comes from the machine's default locale; on a US-English machine it is the three letters <code>NaN</code>.)</p> <p>A one-line guard fixes it: <code>if (scores.isEmpty()) { System.out.println("No scores left."); return; }</code> before the average is computed. This is what <code>isEmpty()</code> is for, and it is the kind of edge case worth checking for on every program you hand in.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 6.12</div> <div class="bd"> <p>Build the scores program yourself, starting from the course's exercise skeleton in the editor below. Uncomment and complete it so that this session works:</p> <pre class="out"><code>Enter scores, terminated by a negative integer: 3 1 4 1 5 9 2 6 -1 Found 8 scores.  High is 9 and low is 1 Ignore low scores? yes Ignore high scores? Yes The average is: 4 </code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Four stages, in the order the specification lists them.</p> <ol> <li><em>Read.</em> <code>while (true)</code>, read an <code>int</code>, <code>break</code> on a negative, otherwise <code>add</code> it and update <code>low</code> and <code>high</code>. Seeding <code>low</code> with <code>Integer.MAX_VALUE</code> and <code>high</code> with <code>Integer.MIN_VALUE</code> means the first real score always replaces both, with no special case for the first iteration.</li> <li><em>Report.</em> One <code>println</code> with <code>scores.size()</code>, <code>high</code> and <code>low</code>.</li> <li><em>Filter.</em> For each question, read a word, look at its first letter after <code>trim().toUpperCase()</code>, and if it is <code>Y</code>, loop <code>while (contains(...))</code> removing by value with the cast.</li> <li><em>Average.</em> A helper method that sums with an indexed loop and divides with a cast, then <code>DecimalFormat("#.##")</code> to print it.</li> </ol> <p>The full program is the <code>Exercise2Solution.java</code> listing at the top of this section, and the verified session is the one above.</p> <p><strong>Things to notice.</strong> Three details are easy to get wrong and are worth checking in your own version:</p> <ul> <li>The sentinel must not end up in the list. <code>if (x &lt; 0) break;</code> comes <em>before</em> <code>scores.add(x)</code>.</li> <li><code>low</code> and <code>high</code> are recorded while reading, and are <em>not</em> recomputed after the removals. That is deliberate: once the low scores are gone you still need the original <code>high</code> to remove it.</li> <li>The average must use the list's size <em>after</em> the removals. Writing <code>average(scores)</code> gets this for free, because <code>average</code> calls <code>scores.size()</code> itself. Capturing the size into a variable early would be a bug.</li> </ul> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 6.12</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="8" aria-label="Live coding - Quick Check 6.12">import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Scanner;
+public class Exercise2 {
+    public static void main(String args[]) {
+        //      ArrayList&lt;Integer&gt; scores = new ArrayList&lt;&gt;(); int high = Integer.MIN_VALUE, low = Integer.MAX_VALUE; //      Scanner input = new Scanner(System.in); //      System.out.println("Enter scores, terminated by a negative integer: "); //      while(true) { //          int x = input.nextInt(); //          if(x &lt; 0) break; //          scores.add(x); //          if(x &lt; low) low  = x; //          if(x &gt; high) high = x; //      } System.out.println(high); System.out.println(low); // Now: report the count, the high and the low. // Then ask whether to ignore the low scores, and the high scores. // Then print the average, rounded with DecimalFormat("#.##"). } }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="prac"><span class="num">&#9733;</span>Practice Problems</h2> <div class="box prac"> <div class="hd">Practice Problems<span class="tag">&mdash; exam-style, Lecture 6 material</span></div> <div class="bd"> <p>The first two come from the course's own practice sets; the last three were written for these notes to hit the ideas that cost the most marks &mdash; the two <code>remove</code> methods, the backward loop, and <code>size()</code> versus <code>length</code>. Work them on paper first; the exam is closed book and there is no compiler in the room.</p> </div> </div> <h3>Problem 1 &mdash; A sequence of list operations <span class="muted">(from Final Practice Problems)</span></h3> <p>Write a <code>main</code> method with instructions to perform the following tasks, in order: declare an <code>ArrayList</code> of <code>String</code> called <code>carModels</code>; add three models; print the size of the list; remove the model at index 1; insert a model at index 0; replace the model at index 2.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Read the six instructions as six statements and do not reorder them &mdash; the point of the question is that each operation acts on whatever the previous one left behind. "Remove the model at index 1" is <code>remove(1)</code>, the index version. "Insert at index 0" is the two-argument <code>add</code>, which shifts everything right. "Replace" is <code>set</code>, which does not change the size.</p> <p class="filename">CarModels.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class CarModels {
+    public static void main(String[] args) {
+        ArrayList&lt;String&gt; carModels = new ArrayList&lt;String&gt;();
+        carModels.add("Toyota");
+        carModels.add("Honda");
+        carModels.add("Ford");
+        System.out.println(carModels.size());
+        carModels.remove(1);
+        carModels.add(0, "BMW");
+        carModels.set(2, "Audi");
+        System.out.println(carModels);
+    }
+}</code></pre> <pre class="out"><code>3 [BMW, Toyota, Audi] </code></pre> <p><strong>Things to notice.</strong> Follow the list through:</p> <table class="trace"> <tr><th>Statement</th><th><code>carModels</code> afterwards</th></tr> <tr><td>three <code>add</code> calls</td><td><code>[Toyota, Honda, Ford]</code></td></tr> <tr><td><code>println(carModels.size())</code></td><td>unchanged &mdash; prints <code>3</code></td></tr> <tr><td><code>remove(1)</code></td><td><code>[Toyota, Ford]</code></td></tr> <tr><td><code>add(0, "BMW")</code></td><td><code>[BMW, Toyota, Ford]</code></td></tr> <tr><td><code>set(2, "Audi")</code></td><td><code>[BMW, Toyota, Audi]</code></td></tr> </table> <p>The last two instructions are the ones that separate answers. <code>add(0, ...)</code> pushed <code>Ford</code> from index 1 to index 2, so <code>set(2, "Audi")</code> overwrote <code>Ford</code> and not <code>Toyota</code>. Had the question said "insert at the end" you would have used the one-argument <code>add</code>, and the answer would have been different.</p> <p>The final <code>println(carModels)</code> was not asked for. It is worth adding anyway while you are developing &mdash; printing an <code>ArrayList</code> directly is the cheapest debugging tool in this lecture.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 1</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="6" aria-label="Live coding - Practice Problem 1">import java.util.ArrayList;
+public class CarModels {
+    public static void main(String[] args) {
+        // 1. Declare an ArrayList of String called carModels. // 2. Add three models. // 3. Print the size of the list. // 4. Remove the model at index 1. // 5. Insert a model at index 0. // 6. Replace the model at index 2. } }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 2 &mdash; What is the output? <span class="muted">(from CSCI 212 Final &mdash; Summer 2026)</span></h3> <p>Consider the following Java program. (The original exam question continues with a <code>Stack</code> and some <code>Iterator</code>s, which are Lecture 21 and Lecture 23 material; the lines below are the ones you can answer today.)</p> <p class="filename">Output.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class Output {
+    public static void main(String args[]) {
+        ArrayList&lt;String&gt; a1, a2, a3;
+
+        a1 = new ArrayList&lt;&gt;();
+        a2 = new ArrayList&lt;&gt;();
+        a3 = a2;
+
+        a1.add("red");    a2.add("red");
+        a1.add("blue");   a2.add("blue");
+        a1.add("green");  a2.add("green");
+
+        System.out.println("" + (a1 == a2) + " " + (a2 == a3));   // line (a)
+        System.out.println("" + a1.equals(a2));                   // line (b)
+
+        a3.add("yellow");
+        a3.add("orange");
+
+        for (String x : a2) System.out.print(x + " ");
+        System.out.println();                                     // line (c)
+
+        for (String x : a3) System.out.print(x + " ");
+        System.out.println();                                     // line (d)
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> What is the output at line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>false true</code>.</p> <p><code>a1</code> and <code>a2</code> were each given their own <code>new ArrayList</code>, so they are two different objects and <code>a1 == a2</code> is <code>false</code> &mdash; even though at this moment they hold identical contents. <code>a3 = a2</code> copied a <em>reference</em>, not a list, so <code>a2</code> and <code>a3</code> name the same single object and <code>a2 == a3</code> is <code>true</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What is the output at line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>true</code>. <code>ArrayList</code> overrides <code>equals</code> to mean "same size, and element <code>i</code> of one <code>equals</code> element <code>i</code> of the other, all the way along". Both lists hold <code>red</code>, <code>blue</code>, <code>green</code> in that order, so they are equal in contents even though they are different objects. Line (a) and line (b) asking different questions about the same two variables is the whole point of the pair.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> What is the output at line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>red blue green yellow orange </code> &mdash; with a trailing space, because every element is printed followed by <code>" "</code>.</p> <p>The two <code>add</code> calls were made through <code>a3</code>, but <code>a3</code> and <code>a2</code> are the same list, so <code>a2</code> sees them.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> What is the output at line (d)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>red blue green yellow orange </code> &mdash; identical to line (c), for the identical reason. Printing <code>a3</code> and printing <code>a2</code> are the same act.</p> <p>Here is the whole program's output:</p> <pre class="out"><code>false true
+true
+red blue green yellow orange 
+red blue green yellow orange </code></pre> <p><strong>Things to notice across all four parts.</strong> <code>a1</code> never changed: it still holds three colors, and after line (b) the two lists are no longer equal. Assignment between two variables of a class type copies the reference and never the object &mdash; there is one list with two names, and a change made through either name is visible through both. That is the subject of Lecture 8, and this exam question is the reason it is worth meeting early.</p> <p>For the exam, the reflex to build is: whenever you see <code>==</code> between two object variables, stop and ask <em>same object, or same contents?</em> <code>==</code> always answers the first question and <code>equals</code> always answers the second.</p> </div></details> </div> <h3>Problem 3 &mdash; What is the output? <span class="muted">(added for these notes)</span></h3> <p>Consider the following Java program.</p> <p class="filename">Output3.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class Output3 {
+    public static void main(String args[]) {
+        ArrayList&lt;Integer&gt; list = new ArrayList&lt;Integer&gt;();
+        for (int i = 1; i &lt;= 6; i++) list.add(i * 2);
+
+        System.out.println(list);                    // line (a)
+        System.out.println(list.indexOf(6));         // line (b)
+        System.out.println(list.contains(5));        // line (c)
+        System.out.println(list.set(0, 99));         // line (d)
+        System.out.println(list.remove(2));          // line (e)
+        System.out.println(list);                    // line (f)
+        System.out.println(list.remove((Integer) 8));// line (g)
+        System.out.println(list);                    // line (h)
+        System.out.println(list.size());             // line (i)
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> What is the output at line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>[2, 4, 6, 8, 10, 12]</code>. The loop runs <code>i</code> from 1 to 6 and adds <code>i * 2</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What is the output at line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>2</code>. <code>indexOf</code> takes an <code>Object</code>, so the <code>6</code> is autoboxed and searched for by value. The value 6 sits at index 2. Do not confuse the two numbers &mdash; the question asked for a position and the answer happens to look like data.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> What is the output at line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>false</code>. Every element is even; there is no 5. <code>contains</code> returns a <code>boolean</code>, unlike <code>indexOf</code>, which would have returned <code>-1</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> What is the output at line (d)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>2</code>. <code>set</code> returns the value it replaced, which was the <code>2</code> at index 0. The list is now <code>[99, 4, 6, 8, 10, 12]</code> and its size is still 6.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> What is the output at line (e)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>6</code>. <code>2</code> is an <code>int</code> literal, so this is <code>remove(int index)</code>: it deletes index 2, whose value is 6, and returns the deleted element.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(f)</span> What is the output at line (f)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>[99, 4, 8, 10, 12]</code>. Five elements &mdash; the 6 is gone and everything after it slid one place left.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(g)</span> What is the output at line (g)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>true</code>. The cast makes this <code>remove(Object)</code>, which looks for the <em>value</em> 8, finds it, deletes it, and returns <code>true</code> to say so.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(h)</span> What is the output at line (h)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>[99, 4, 10, 12]</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(i)</span> What is the output at line (i)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>4</code>. Here is the program's whole output:</p> <pre class="out"><code>[2, 4, 6, 8, 10, 12]
+2
+false
+2
+6
+[99, 4, 8, 10, 12]
+true
+[99, 4, 10, 12]
+4</code></pre> <p><strong>Things to notice across the whole problem.</strong> Lines (e) and (g) are the same method name with the same-looking argument and they do completely different things. The only signal is the cast. On an exam, whenever you see <code>remove</code> on a list of <code>Integer</code>, your first move should be to write "index" or "value" in the margin before you work out anything else.</p> <p>Lines (b), (d) and (e) all print a small number that could plausibly be either a position or an element. Keeping a running picture of the list beside the code is what stops those three from blurring together.</p> </div></details> </div> <h3>Problem 4 &mdash; Filter a list in place <span class="muted">(added for these notes)</span></h3> <p>Write a complete program <code>Multiples.java</code> containing a method</p> <pre><code class="language-java">public static void removeMultiplesOf(ArrayList&lt;Integer&gt; list, int k) </code></pre> <p>that deletes every element of <code>list</code> that is a multiple of <code>k</code>, changing the caller's list rather than returning a new one. The <code>main</code> method should build the list 1 through 12, print it, call <code>removeMultiplesOf(nums, 3)</code>, and print it again.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> This is a removing loop, so the shape is decided before any of the detail: walk backward from <code>list.size() - 1</code> down to 0. Then the body is a one-line test, <code>list.get(i) % k == 0</code> &mdash; the <code>Integer</code> is unboxed by <code>%</code>, so this is ordinary <code>int</code> arithmetic &mdash; and <code>list.remove(i)</code>, which is the index version because <code>i</code> is a position.</p> <p>Nothing is returned. The method receives a reference to the caller's list, so the deletions are visible to <code>main</code> when the method finishes.</p> <p class="filename">Multiples.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class Multiples {
+    public static void main(String args[]) {
+        ArrayList&lt;Integer&gt; nums = new ArrayList&lt;Integer&gt;();
+        for (int i = 1; i &lt;= 12; i++) nums.add(i);
+        System.out.println("before: " + nums);
+        removeMultiplesOf(nums, 3);
+        System.out.println("after:  " + nums);
+    }
+
+    public static void removeMultiplesOf(ArrayList&lt;Integer&gt; list, int k) {
+        for (int i = list.size() - 1; i &gt;= 0; i--) {
+            if (list.get(i) % k == 0) {
+                list.remove(i);
+            }
+        }
+    }
+}</code></pre> <pre class="out"><code>before: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+after:  [1, 2, 4, 5, 7, 8, 10, 11]</code></pre> <p><strong>Things to notice.</strong> Test it with <code>k</code> equal to 1. Every element is a multiple of 1, so every element must go &mdash; and the backward loop handles that without any special case, ending with an empty list. A forward loop would leave roughly half of them behind, because after every removal it skips the element that slid into place. That is the test case worth trying on any removing loop: <em>make everything removable and see whether the list empties.</em></p> <p>Two variations worth being able to write on demand. To count instead of delete, use a for-each loop and a counter &mdash; no index needed, no removal, nothing to get wrong. To build a new list of the survivors instead of editing this one, create a second <code>ArrayList</code>, loop forward with for-each, and <code>add</code> the elements that do not match; the original is then untouched, which is sometimes exactly what the caller wants.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 4</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="12" aria-label="Live coding - Practice Problem 4">import java.util.ArrayList;
+public class Multiples {
+    public static void main(String args[]) {
+        ArrayList&lt;Integer&gt; nums = new ArrayList&lt;Integer&gt;();
+        for (int i = 1; i &lt;= 12; i++) nums.add(i);
+        System.out.println("before: " + nums);
+        removeMultiplesOf(nums, 3);
+        System.out.println("after:  " + nums);
+    }
+    // Delete every element that is a multiple of k. // Which direction should this loop run? public static void removeMultiplesOf(ArrayList&lt;Integer&gt; list, int k) { } }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 5 &mdash; Find the three errors <span class="muted">(added for these notes)</span></h3> <p>Consider the following Java code, saved in a file called <code>Roster.java</code>. Exactly 3 of the numbered lines have errors. Identify the 3 different errors by giving the numbers of the incorrect lines. For each error also give a corrected version of the line. Any line without a number is correct as written and is not to be changed. Make sure that your corrections lead to the indicated output.</p> <p class="filename">Roster.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+public class Roster {
+    public static void main(String args[]) {
+        ArrayList&lt;int&gt; ids = new ArrayList&lt;int&gt;();
+        // line 1 ids.add(101); ids.add(207); ids.add(101); ids.add(315); System.out.println("Count: " + ids.length);      // line 2 // The output from the last line should be:  Count: 4 ids.remove(207);                                 // line 3 System.out.println(ids);                         // line 4 // The output from the last line should be:  [101, 101, 315] } }</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Look for three different kinds of trouble: a type that is not allowed where it is written, a member that does not exist, and a call that compiles but does the wrong thing at run time. The required outputs at the bottom are not decoration &mdash; they are what tell you which of two possible fixes is the intended one.</p> <p><strong>Error 1 &mdash; line 1.</strong> The base type of an <code>ArrayList</code> must be a class type, and <code>int</code> is a primitive.</p> <pre class="err"><code>Roster.java:5: error: unexpected type ArrayList&lt;int&gt; ids = new ArrayList&lt;int&gt;();
+        // line 1
+^
+  required: reference
+  found:    int</code></pre> <p>Corrected: <code>ArrayList&lt;Integer&gt; ids = new ArrayList&lt;Integer&gt;();</code> (or with the diamond, <code>new ArrayList&lt;&gt;()</code>). Note that <code>javac</code> reports this error twice, once for each pair of angle brackets, so the "2 errors" at the bottom of the real message is still one mistake.</p> <p><strong>Error 2 &mdash; line 2.</strong> <code>length</code> is a field on arrays. An <code>ArrayList</code> has no such field.</p> <pre class="err"><code>Roster.java:10: error: cannot find symbol System.out.println("Count: " + ids.length);
+        // line 2
+^
+  symbol:   variable length
+  location: variable ids of type ArrayList&lt;Integer&gt;</code></pre> <p>Corrected: <code>System.out.println("Count: " + ids.size());</code> &mdash; a method call, with parentheses.</p> <p><strong>Error 3 &mdash; line 3.</strong> This one <em>compiles</em>. With the first two errors fixed, running the program gives:</p> <pre class="out"><code>Count: 4
+Exception in thread "main" java.lang.IndexOutOfBoundsException: Index 207 out of bounds for length 4
+	at java.base/jdk.internal.util.Preconditions.outOfBounds(Preconditions.java:100)
+	at java.base/jdk.internal.util.Preconditions.outOfBoundsCheckIndex(Preconditions.java:106)
+	at java.base/jdk.internal.util.Preconditions.checkIndex(Preconditions.java:302)
+	at java.base/java.util.Objects.checkIndex(Objects.java:385)
+	at java.base/java.util.ArrayList.remove(ArrayList.java:551)
+	at Roster.main(Roster.java:11)</code></pre> <p><code>207</code> is an <code>int</code>, so <code>remove(int index)</code> was selected and the program asked for index 207 of a four-element list. The author meant "delete the value 207".</p> <p>Corrected: <code>ids.remove((Integer) 207);</code> (or <code>ids.remove(Integer.valueOf(207));</code>).</p> <p>With all three fixed:</p> <p class="filename">Roster.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class Roster {
+    public static void main(String args[]) {
+        ArrayList&lt;Integer&gt; ids = new ArrayList&lt;Integer&gt;();       // line 1
+        ids.add(101);
+        ids.add(207);
+        ids.add(101);
+        ids.add(315);
+        System.out.println("Count: " + ids.size());      // line 2
+        ids.remove((Integer) 207);                                 // line 3
+        System.out.println(ids);                         // line 4
+    }
+}</code></pre> <pre class="out"><code>Count: 4 [101, 101, 315] </code></pre> <p><strong>Things to notice.</strong> The required output for line 4 is what rules out the lazy fix. <code>ids.remove(1)</code> would also produce <code>[101, 101, 315]</code> on this exact data, but it deletes by position and would break the moment the list were ordered differently. When two fixes give the same output on one input, prefer the one that says what you mean.</p> <p>Notice the shape of the three errors: two the compiler catches, one it does not. That is the pattern of this whole lecture. The type system protects you from <code>ArrayList&lt;int&gt;</code> and from <code>.length</code>; nothing protects you from <code>remove(207)</code> except knowing that the two <code>remove</code> methods exist.</p> <p>Most of that stack trace is inside the standard library. The line that matters is always the last one, the one naming your own file and the line number in it.</p> </div></details> <div class="box sum" id="summary"> <div class="hd">Lecture Summary</div> <div class="bd"> <ul> <li>An array's length is fixed when it is created. An <strong><code>ArrayList</code></strong> resizes itself, so it is the right choice whenever the number of elements changes or is not known in advance. It needs <code>import java.util.ArrayList;</code>.</li> <li>The type in angle brackets is the <strong>base type</strong>, and it must be a class type: <code>ArrayList&lt;Integer&gt;</code>, never <code>ArrayList&lt;int&gt;</code>. Every primitive has a <strong>wrapper class</strong>, and <strong>autoboxing</strong> converts between them automatically so that <code>list.add(7)</code> just works.</li> <li><strong>Capacity is not size.</strong> <code>new ArrayList&lt;&gt;(100)</code> has size 0. Legal indexes are always <code>0</code> to <code>size() - 1</code>, and it is <code>size()</code> with parentheses, not <code>length</code>.</li> <li><code>set</code> returns the <strong>old</strong> value, <code>indexOf</code> returns <strong>&minus;1</strong> when there is no match, <code>remove(int)</code> returns the deleted element and <code>remove(Object)</code> returns a <code>boolean</code>.</li> <li>The trap: on an <code>ArrayList&lt;Integer&gt;</code>, <code>list.remove(5)</code> deletes <strong>index</strong> 5. To delete the <strong>value</strong> 5, write <code>list.remove((Integer) 5)</code>.</li> <li>Use a <strong>for-each</strong> loop to read the whole list in order; use an <strong>indexed</strong> loop when you need <code>i</code> &mdash; for <code>set</code>, for part of the list, or to go backward.</li> <li>Never remove inside a for-each loop; it throws <code>ConcurrentModificationException</code>. Removing in a forward indexed loop silently <strong>skips</strong> the next element. <strong>Loop backward</strong> and the problem disappears &mdash; which is why the course's <code>removeDuplicate</code> writes <code>for (int j = list.size()-1; j &gt; i; j--)</code>.</li> <li>Compare elements with <strong><code>equals</code></strong>, not <code>==</code>. <code>==</code> between two <code>Integer</code> objects compares references, and it accidentally works for values &minus;128 to 127 because of the boxing cache &mdash; so small test data will hide the bug.</li> </ul> <p><strong>Coming up in Lecture 7.</strong> We have spent six lectures using other people's classes &mdash; <code>String</code>, <code>Scanner</code>, <code>ArrayList</code>, <code>DecimalFormat</code>. Next time we write our own:
+    instance variables, constructors, getters and setters, and the difference between a class and
+    an object.</p>
+  </div>
+</div>
+
+<nav class="pagenav">
+<span class="disabled"><div class="dir">&larr; Previous</div><div class="ttl">Lecture 5 &mdash; File Input and Output</div><div class="pending">posts Tue Sep 15</div></span>
+<span class="disabled next"><div class="dir">Next &rarr;</div><div class="ttl">Lecture 7 &mdash; Classes and Objects</div><div class="pending">posts Tue Sep 22</div></span>
+</nav>
+<footer class="pf">CSCI 212 &middot; Object-Oriented Programming in Java &middot; Queens College, CUNY</footer>
+</div>
+<script>
+(()=>{var ut=Object.create;var xe=Object.defineProperty;var ft=Object.getOwnPropertyDescriptor;var gt=Object.getOwnPropertyNames;var ht=Object.getPrototypeOf,dt=Object.prototype.hasOwnProperty;var pt=(e,t)=>()=>{try{return t||e((t={exports:{}}).exports,t),t.exports}catch(n){throw t=0,n}};var Et=(e,t,n,l)=>{if(t&&typeof t=="object"||typeof t=="function")for(let d of gt(t))!dt.call(e,d)&&d!==n&&xe(e,d,{get:()=>t[d],enumerable:!(l=ft(t,d))||l.enumerable});return e};var bt=(e,t,n)=>(n=e!=null?ut(ht(e)):{},Et(t||!e||!e.__esModule?xe(n,"default",{value:e,enumerable:!0}):n,e));var Ke=pt((ln,Ge)=>{function Ie(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(t=>{let n=e[t],l=typeof n;(l==="object"||l==="function")&&!Object.isFrozen(n)&&Ie(n)}),e}var Z=class{constructor(t){t.data===void 0&&(t.data={}),this.data=t.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function Ce(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function k(e,...t){let n=Object.create(null);for(let l in e)n[l]=e[l];return t.forEach(function(l){for(let d in l)n[d]=l[d]}),n}var _t="</span>",Ne=e=>!!e.scope,Mt=(e,{prefix:t})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let n=e.split(".");return[`${t}${n.shift()}`,...n.map((l,d)=>`${l}${"_".repeat(d+1)}`)].join(" ")}return`${t}${e}`},oe=class{constructor(t,n){this.buffer="",this.classPrefix=n.classPrefix,t.walk(this)}addText(t){this.buffer+=Ce(t)}openNode(t){if(!Ne(t))return;let n=Mt(t.scope,{prefix:this.classPrefix});this.span(n)}closeNode(t){Ne(t)&&(this.buffer+=_t)}value(){return this.buffer}span(t){this.buffer+=`<span class="${t}">`}},Re=(e={})=>{let t={children:[]};return Object.assign(t,e),t},ae=class e{constructor(){this.rootNode=Re(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(t){this.top.children.push(t)}openNode(t){let n=Re({scope:t});this.add(n),this.stack.push(n)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(t){return this.constructor._walk(t,this.rootNode)}static _walk(t,n){return typeof n=="string"?t.addText(n):n.children&&(t.openNode(n),n.children.forEach(l=>this._walk(t,l)),t.closeNode(n)),t}static _collapse(t){typeof t!="string"&&t.children&&(t.children.every(n=>typeof n=="string")?t.children=[t.children.join("")]:t.children.forEach(n=>{e._collapse(n)}))}},le=class extends ae{constructor(t){super(),this.options=t}addText(t){t!==""&&this.add(t)}startScope(t){this.openNode(t)}endScope(){this.closeNode()}__addSublanguage(t,n){let l=t.root;n&&(l.scope=`language:${n}`),this.add(l)}toHTML(){return new oe(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function G(e){return e?typeof e=="string"?e:e.source:null}function De(e){return B("(?=",e,")")}function Ot(e){return B("(?:",e,")*")}function wt(e){return B("(?:",e,")?")}function B(...e){return e.map(n=>G(n)).join("")}function xt(e){let t=e[e.length-1];return typeof t=="object"&&t.constructor===Object?(e.splice(e.length-1,1),t):{}}function V(...e){return"("+(xt(e).capture?"":"?:")+e.map(l=>G(l)).join("|")+")"}function ke(e){return new RegExp(e.toString()+"|").exec("").length-1}function Nt(e,t){let n=e&&e.exec(t);return n&&n.index===0}var Rt=new RegExp(V(/\[(?:[^\\\]]|\\.)*\]/,/\(\?<(?![=!])[^>]+>/,/\(\?'[^']+'/,/\(\??/,/\\([1-9][0-9]*)/,/\\./));function fe(e,{joinWith:t}){let n=0;return e.map(l=>{n+=1;let d=n,_=G(l),c="";for(;_.length>0;){let r=Rt.exec(_);if(!r){c+=_;break}c+=_.substring(0,r.index),_=_.substring(r.index+r[0].length),r[0][0]==="\\"&&r[1]?c+="\\"+String(Number(r[1])+d):(c+=r[0],(r[0]==="("||/^\(\?[<']/.test(r[0]))&&n++)}return c}).map(l=>`(${l})`).join(t)}var yt=/\b\B/,ve="[a-zA-Z]\\w*",ge="[a-zA-Z_]\\w*",Le="\\b\\d+(\\.\\d+)?",Be="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Pe="\\b(0b[01]+)",St="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",At=(e={})=>{let t=/^#![ ]*\//;return e.binary&&(e.begin=B(t,/.*\b/,e.binary,/\b.*/)),k({scope:"meta",begin:t,end:/$/,relevance:0,"on:begin":(n,l)=>{n.index!==0&&l.ignoreMatch()}},e)},K={begin:"\\\\[\\s\\S]",relevance:0},Tt={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[K]},It={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[K]},Ct={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},Q=function(e,t,n={}){let l=k({scope:"comment",begin:e,end:t,contains:[]},n);l.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let d=V("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return l.contains.push({begin:B(/[ ]+/,"(",d,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),l},Dt=Q("//","$"),kt=Q("/\\*","\\*/"),vt=Q("#","$"),Lt={scope:"number",begin:Le,relevance:0},Bt={scope:"number",begin:Be,relevance:0},Pt={scope:"number",begin:Pe,relevance:0},$t={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[K,{begin:/\[/,end:/\]/,relevance:0,contains:[K]}]},Ht={scope:"title",begin:ve,relevance:0},Ut={scope:"title",begin:ge,relevance:0},jt={begin:"\\.\\s*"+ge,relevance:0},Gt=function(e){return Object.assign(e,{"on:begin":(t,n)=>{n.data._beginMatch=t[1]},"on:end":(t,n)=>{n.data._beginMatch!==t[1]&&n.ignoreMatch()}})},X=Object.freeze({__proto__:null,APOS_STRING_MODE:Tt,BACKSLASH_ESCAPE:K,BINARY_NUMBER_MODE:Pt,BINARY_NUMBER_RE:Pe,COMMENT:Q,C_BLOCK_COMMENT_MODE:kt,C_LINE_COMMENT_MODE:Dt,C_NUMBER_MODE:Bt,C_NUMBER_RE:Be,END_SAME_AS_BEGIN:Gt,HASH_COMMENT_MODE:vt,IDENT_RE:ve,MATCH_NOTHING_RE:yt,METHOD_GUARD:jt,NUMBER_MODE:Lt,NUMBER_RE:Le,PHRASAL_WORDS_MODE:Ct,QUOTE_STRING_MODE:It,REGEXP_MODE:$t,RE_STARTERS_RE:St,SHEBANG:At,TITLE_MODE:Ht,UNDERSCORE_IDENT_RE:ge,UNDERSCORE_TITLE_MODE:Ut});function Kt(e,t){e.input[e.index-1]==="."&&t.ignoreMatch()}function mt(e,t){e.className!==void 0&&(e.scope=e.className,delete e.className)}function Wt(e,t){t&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=Kt,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function Ft(e,t){Array.isArray(e.illegal)&&(e.illegal=V(...e.illegal))}function zt(e,t){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function Yt(e,t){e.relevance===void 0&&(e.relevance=1)}var Xt=(e,t)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let n=Object.assign({},e);Object.keys(e).forEach(l=>{delete e[l]}),e.keywords=n.keywords,e.begin=B(n.beforeMatch,De(n.begin)),e.starts={relevance:0,contains:[Object.assign(n,{endsParent:!0})]},e.relevance=0,delete n.beforeMatch},Zt=["of","and","for","in","not","or","if","then","parent","list","value"],Jt="keyword";function $e(e,t,n=Jt){let l=Object.create(null);return typeof e=="string"?d(n,e.split(" ")):Array.isArray(e)?d(n,e):Object.keys(e).forEach(function(_){Object.assign(l,$e(e[_],t,_))}),l;function d(_,c){t&&(c=c.map(r=>r.toLowerCase())),c.forEach(function(r){let u=r.split("|");l[u[0]]=[_,Vt(u[0],u[1])]})}}function Vt(e,t){return t?Number(t):Qt(e)?0:1}function Qt(e){return Zt.includes(e.toLowerCase())}var ye={},L=e=>{console.error(e)},Se=(e,...t)=>{console.log(`WARN: ${e}`,...t)},H=(e,t)=>{ye[`${e}/${t}`]||(console.log(`Deprecated as of ${e}. ${t}`),ye[`${e}/${t}`]=!0)},J=new Error;function He(e,t,{key:n}){let l=0,d=e[n],_={},c={};for(let r=1;r<=t.length;r++)c[r+l]=d[r],_[r+l]=!0,l+=ke(t[r-1]);e[n]=c,e[n]._emit=_,e[n]._multi=!0}function qt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw L("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),J;if(typeof e.beginScope!="object"||e.beginScope===null)throw L("beginScope must be object"),J;He(e,e.begin,{key:"beginScope"}),e.begin=fe(e.begin,{joinWith:""})}}function en(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw L("skip, excludeEnd, returnEnd not compatible with endScope: {}"),J;if(typeof e.endScope!="object"||e.endScope===null)throw L("endScope must be object"),J;He(e,e.end,{key:"endScope"}),e.end=fe(e.end,{joinWith:""})}}function tn(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function nn(e){tn(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),qt(e),en(e)}function sn(e){function t(c,r){return new RegExp(G(c),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(r?"g":""))}class n{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(r,u){u.position=this.position++,this.matchIndexes[this.matchAt]=u,this.regexes.push([u,r]),this.matchAt+=ke(r)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let r=this.regexes.map(u=>u[1]);this.matcherRe=t(fe(r,{joinWith:"|"}),!0),this.lastIndex=0}exec(r){this.matcherRe.lastIndex=this.lastIndex;let u=this.matcherRe.exec(r);if(!u)return null;let O=u.findIndex((P,I)=>I>0&&P!==void 0),M=this.matchIndexes[O];return u.splice(0,O),Object.assign(u,M)}}class l{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(r){if(this.multiRegexes[r])return this.multiRegexes[r];let u=new n;return this.rules.slice(r).forEach(([O,M])=>u.addRule(O,M)),u.compile(),this.multiRegexes[r]=u,u}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(r,u){this.rules.push([r,u]),u.type==="begin"&&this.count++}exec(r){let u=this.getMatcher(this.regexIndex);u.lastIndex=this.lastIndex;let O=u.exec(r);if(this.resumingScanAtSamePosition()&&!(O&&O.index===this.lastIndex)){let M=this.getMatcher(0);M.lastIndex=this.lastIndex+1,O=M.exec(r)}return O&&(this.regexIndex+=O.position+1,this.regexIndex===this.count&&this.considerAll()),O}}function d(c){let r=new l;return c.contains.forEach(u=>r.addRule(u.begin,{rule:u,type:"begin"})),c.terminatorEnd&&r.addRule(c.terminatorEnd,{type:"end"}),c.illegal&&r.addRule(c.illegal,{type:"illegal"}),r}function _(c,r){let u=c;if(c.isCompiled)return u;[mt,zt,nn,Xt].forEach(M=>M(c,r)),e.compilerExtensions.forEach(M=>M(c,r)),c.__beforeBegin=null,[Wt,Ft,Yt].forEach(M=>M(c,r)),c.isCompiled=!0;let O=null;return typeof c.keywords=="object"&&c.keywords.$pattern&&(c.keywords=Object.assign({},c.keywords),O=c.keywords.$pattern,delete c.keywords.$pattern),O=O||/\w+/,c.keywords&&(c.keywords=$e(c.keywords,e.case_insensitive)),u.keywordPatternRe=t(O,!0),r&&(c.begin||(c.begin=/\B|\b/),u.beginRe=t(u.begin),!c.end&&!c.endsWithParent&&(c.end=/\B|\b/),c.end&&(u.endRe=t(u.end)),u.terminatorEnd=G(u.end)||"",c.endsWithParent&&r.terminatorEnd&&(u.terminatorEnd+=(c.end?"|":"")+r.terminatorEnd)),c.illegal&&(u.illegalRe=t(c.illegal)),c.contains||(c.contains=[]),c.contains=[].concat(...c.contains.map(function(M){return rn(M==="self"?c:M)})),c.contains.forEach(function(M){_(M,u)}),c.starts&&_(c.starts,r),u.matcher=d(u),u}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=k(e.classNameAliases||{}),_(e)}function Ue(e){return e?e.endsWithParent||Ue(e.starts):!1}function rn(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(t){return k(e,{variants:null},t)})),e.cachedVariants?e.cachedVariants:Ue(e)?k(e,{starts:e.starts?k(e.starts):null}):Object.isFrozen(e)?k(e):e}var cn="11.12.0",ue=class extends Error{constructor(t,n){super(t),this.name="HTMLInjectionError",this.html=n}},ce=Ce,Ae=k,Te=Symbol("nomatch"),on=7,je=function(e){let t=Object.create(null),n=Object.create(null),l=[],d=!0,_="Could not find the language '{}', did you forget to load/include a language module?",c={disableAutodetect:!0,name:"Plain text",contains:[]},r={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:le};function u(i){return r.noHighlightRe.test(i)}function O(i){let a=i.className+" ";a+=i.parentNode?i.parentNode.className:"";let h=r.languageDetectRe.exec(a);if(h){let E=C(h[1]);return E||(Se(_.replace("{}",h[1])),Se("Falling back to no-highlight mode for this block.",i)),E?h[1]:"no-highlight"}return a.split(/\s+/).find(E=>u(E)||C(E))}function M(i,a,h){let E="",w="";typeof a=="object"?(E=i,h=a.ignoreIllegals,w=a.language):(H("10.7.0","highlight(lang, code, ...args) has been deprecated."),H("10.7.0",`Please use highlight(code, options) instead.
+(see the highlight.js issue tracker)`),w=i,E=a),h===void 0&&(h=!0);let y={code:E,language:w};W("before:highlight",y);let D=y.result?y.result:P(y.language,y.code,h);return D.code=y.code,W("after:highlight",D),D}function P(i,a,h,E){let w=Object.create(null);function y(s,o){return s.keywords[o]}function D(){if(!f.keywords){x.addText(b);return}let s=0;f.keywordPatternRe.lastIndex=0;let o=f.keywordPatternRe.exec(b),g="";for(;o;){g+=b.substring(s,o.index);let p=A.case_insensitive?o[0].toLowerCase():o[0],N=y(f,p);if(N){let[T,at]=N;if(x.addText(g),g="",w[p]=(w[p]||0)+1,w[p]<=on&&(Y+=at),T.startsWith("_"))g+=o[0];else{let lt=A.classNameAliases[T]||T;S(o[0],lt)}}else g+=o[0];s=f.keywordPatternRe.lastIndex,o=f.keywordPatternRe.exec(b)}g+=b.substring(s),x.addText(g)}function F(){if(b==="")return;let s=null;if(typeof f.subLanguage=="string"){if(!t[f.subLanguage]){x.addText(b);return}s=P(f.subLanguage,b,!0,we[f.subLanguage]),we[f.subLanguage]=s._top}else s=$(b,f.subLanguage.length?f.subLanguage:null);f.relevance>0&&(Y+=s.relevance),x.__addSublanguage(s._emitter,s.language)}function R(){f.subLanguage!=null?F():D(),b=""}function S(s,o){s!==""&&(x.startScope(o),x.addText(s),x.endScope())}function be(s,o){let g=1,p=o.length-1;for(;g<=p;){if(!s._emit[g]){g++;continue}let N=A.classNameAliases[s[g]]||s[g],T=o[g];N?S(T,N):(b=T,D(),b=""),g++}}function _e(s,o){return s.scope&&typeof s.scope=="string"&&x.openNode(A.classNameAliases[s.scope]||s.scope),s.beginScope&&(s.beginScope._wrap?(S(b,A.classNameAliases[s.beginScope._wrap]||s.beginScope._wrap),b=""):s.beginScope._multi&&(be(s.beginScope,o),b="")),f=Object.create(s,{parent:{value:f}}),f}function Me(s,o,g){let p=Nt(s.endRe,g);if(p){if(s["on:end"]){let N=new Z(s);s["on:end"](o,N),N.isMatchIgnored&&(p=!1)}if(p){for(;s.endsParent&&s.parent;)s=s.parent;return s}}if(s.endsWithParent)return Me(s.parent,o,g)}function it(s){return f.matcher.regexIndex===0?(b+=s[0],1):(re=!0,0)}function st(s){let o=s[0],g=s.rule,p=new Z(g),N=[g.__beforeBegin,g["on:begin"]];for(let T of N)if(T&&(T(s,p),p.isMatchIgnored))return it(o);return g.skip?b+=o:(g.excludeBegin&&(b+=o),R(),!g.returnBegin&&!g.excludeBegin&&(b=o)),_e(g,s),g.returnBegin?0:o.length}function rt(s){let o=s[0],g=a.substring(s.index),p=Me(f,s,g);if(!p)return Te;let N=f;f.endScope&&f.endScope._wrap?(R(),S(o,f.endScope._wrap)):f.endScope&&f.endScope._multi?(R(),be(f.endScope,s)):N.skip?b+=o:(N.returnEnd||N.excludeEnd||(b+=o),R(),N.excludeEnd&&(b=o));do f.scope&&x.closeNode(),!f.skip&&!f.subLanguage&&(Y+=f.relevance),f=f.parent;while(f!==p.parent);return p.starts&&_e(p.starts,s),N.returnEnd?0:o.length}function ct(){let s=[];for(let o=f;o!==A;o=o.parent)o.scope&&s.unshift(o.scope);s.forEach(o=>x.openNode(o))}let z={};function Oe(s,o){let g=o&&o[0];if(b+=s,g==null)return R(),0;if(z.type==="begin"&&o.type==="end"&&z.index===o.index&&g===""){if(b+=a.slice(o.index,o.index+1),!d){let p=new Error(`0 width match regex (${i})`);throw p.languageName=i,p.badRule=z.rule,p}return 1}if(z=o,o.type==="begin")return st(o);if(o.type==="illegal"&&!h){let p=new Error('Illegal lexeme "'+g+'" for mode "'+(f.scope||"<unnamed>")+'"');throw p.mode=f,p}else if(o.type==="end"){let p=rt(o);if(p!==Te)return p}if(o.type==="illegal"&&g==="")return o.index===a.length||(b+=`
+`),1;if(se>1e5&&se>o.index*3)throw new Error("potential infinite loop, way more iterations than matches");return b+=g,g.length}let A=C(i);if(!A)throw L(_.replace("{}",i)),new Error('Unknown language: "'+i+'"');let ot=sn(A),ie="",f=E||ot,we={},x=new r.__emitter(r);ct();let b="",Y=0,v=0,se=0,re=!1;try{if(A.__emitTokens)A.__emitTokens(a,x);else{for(f.matcher.considerAll();;){se++,re?re=!1:f.matcher.considerAll(),f.matcher.lastIndex=v;let s=f.matcher.exec(a);if(!s)break;let o=a.substring(v,s.index),g=Oe(o,s);v=s.index+g}Oe(a.substring(v))}return x.finalize(),ie=x.toHTML(),{language:i,value:ie,relevance:Y,illegal:!1,_emitter:x,_top:f}}catch(s){if(s.message&&s.message.includes("Illegal"))return{language:i,value:ce(a),illegal:!0,relevance:0,_illegalBy:{message:s.message,index:v,context:a.slice(v-100,v+100),mode:s.mode,resultSoFar:ie},_emitter:x};if(d)return{language:i,value:ce(a),illegal:!1,relevance:0,errorRaised:s,_emitter:x,_top:f};throw s}}function I(i){let a={value:ce(i),illegal:!1,relevance:0,_top:c,_emitter:new r.__emitter(r)};return a._emitter.addText(i),a}function $(i,a){a=a||r.languages||Object.keys(t);let h=I(i),E=a.filter(C).filter(Ee).map(R=>P(R,i,!1));E.unshift(h);let w=E.sort((R,S)=>{if(R.relevance!==S.relevance)return S.relevance-R.relevance;if(R.language&&S.language){if(C(R.language).supersetOf===S.language)return 1;if(C(S.language).supersetOf===R.language)return-1}return 0}),[y,D]=w,F=y;return F.secondBest=D,F}function te(i,a,h){let E=a&&n[a]||h;i.classList.add("hljs"),i.classList.add(`language-${E}`)}function ne(i){let a=null,h=O(i);if(u(h))return;if(W("before:highlightElement",{el:i,language:h}),i.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",i);return}if(i.children.length>0&&(r.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("(see the highlight.js security wiki)"),console.warn("The element with unescaped HTML:"),console.warn(i)),r.throwUnescapedHTML))throw new ue("One of your code blocks includes unescaped HTML.",i.innerHTML);a=i;let E=a.textContent,w=h?M(E,{language:h,ignoreIllegals:!0}):$(E);i.innerHTML=w.value,i.dataset.highlighted="yes",te(i,h,w.language),i.result={language:w.language,re:w.relevance,relevance:w.relevance},w.secondBest&&(i.secondBest={language:w.secondBest.language,relevance:w.secondBest.relevance}),W("after:highlightElement",{el:i,result:w,text:E})}function Ye(i){r=Ae(r,i)}let Xe=()=>{m(),H("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function Ze(){m(),H("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let de=!1;function m(){function i(){m()}if(document.readyState==="loading"){de||window.addEventListener("DOMContentLoaded",i,!1),de=!0;return}document.querySelectorAll(r.cssSelector).forEach(ne)}function Je(i,a){let h=null;try{h=a(e)}catch(E){if(L("Language definition for '{}' could not be registered.".replace("{}",i)),d)L(E);else throw E;h=c}h.name||(h.name=i),t[i]=h,h.rawDefinition=a.bind(null,e),h.aliases&&pe(h.aliases,{languageName:i})}function Ve(i){delete t[i];for(let a of Object.keys(n))n[a]===i&&delete n[a]}function Qe(){return Object.keys(t)}function C(i){return i=(i||"").toLowerCase(),t[i]||t[n[i]]}function pe(i,{languageName:a}){typeof i=="string"&&(i=[i]),i.forEach(h=>{n[h.toLowerCase()]=a})}function Ee(i){let a=C(i);return a&&!a.disableAutodetect}function qe(i){i["before:highlightBlock"]&&!i["before:highlightElement"]&&(i["before:highlightElement"]=a=>{i["before:highlightBlock"](Object.assign({block:a.el},a))}),i["after:highlightBlock"]&&!i["after:highlightElement"]&&(i["after:highlightElement"]=a=>{i["after:highlightBlock"](Object.assign({block:a.el},a))})}function et(i){qe(i),l.push(i)}function tt(i){let a=l.indexOf(i);a!==-1&&l.splice(a,1)}function W(i,a){let h=i;l.forEach(function(E){E[h]&&E[h](a)})}function nt(i){return H("10.7.0","highlightBlock will be removed entirely in v12.0"),H("10.7.0","Please use highlightElement now."),ne(i)}Object.assign(e,{highlight:M,highlightAuto:$,highlightAll:m,highlightElement:ne,highlightBlock:nt,configure:Ye,initHighlighting:Xe,initHighlightingOnLoad:Ze,registerLanguage:Je,unregisterLanguage:Ve,listLanguages:Qe,getLanguage:C,registerAliases:pe,autoDetection:Ee,inherit:Ae,addPlugin:et,removePlugin:tt}),e.debugMode=function(){d=!1},e.safeMode=function(){d=!0},e.versionString=cn,e.regex={concat:B,lookahead:De,either:V,optional:wt,anyNumberOfTimes:Ot};for(let i in X)typeof X[i]=="object"&&Ie(X[i]);return Object.assign(e,X),e},U=je({});U.newInstance=()=>je({});Ge.exports=U;U.HighlightJS=U;U.default=U});var me=bt(Ke(),1);var he=me.default;var j="[0-9](_*[0-9])*",q=`\\.(${j})`,ee="[0-9a-fA-F](_*[0-9a-fA-F])*",We={className:"number",variants:[{begin:`(\\b(${j})((${q})|\\.)?|(${q}))[eE][+-]?(${j})[fFdD]?\\b`},{begin:`\\b(${j})((${q})[fFdD]?\\b|\\.([fFdD]\\b)?)`},{begin:`(${q})[fFdD]?\\b`},{begin:`\\b(${j})[fFdD]\\b`},{begin:`\\b0[xX]((${ee})\\.?|(${ee})?\\.(${ee}))[pP][+-]?(${j})[fFdD]?\\b`},{begin:"\\b(0|[1-9](_*[0-9])*)[lL]?\\b"},{begin:`\\b0[xX](${ee})[lL]?\\b`},{begin:"\\b0(_*[0-7])*[lL]?\\b"},{begin:"\\b0[bB][01](_*[01])*[lL]?\\b"}],relevance:0};function Fe(e,t,n){return n===-1?"":e.replace(t,l=>Fe(e,t,n-1))}function ze(e){let t=e.regex,n="[\xC0-\u02B8a-zA-Z_$][\xC0-\u02B8a-zA-Z_$0-9]*",l="(?:(?:\\s*\\[\\s*])+)?",d=n+"<@@@>"+l,c="(?:"+("\\?(?:\\s+(?:extends|super)\\s+"+d+")?")+"|"+d+")",r=Fe("(?:\\s*<\\s*"+c+"(?:\\s*,\\s*"+c+")*\\s*>)?",/<@@@>/g,2),I={keyword:["synchronized","abstract","private","var","static","if","const ","for","while","strictfp","finally","protected","import","native","final","void","enum","else","break","transient","catch","instanceof","volatile","case","assert","package","default","public","try","switch","continue","throws","protected","public","private","module","requires","exports","do","sealed","yield","permits","goto","when"],literal:["false","true","null"],type:["char","boolean","long","float","int","byte","short","double"],built_in:["super","this"]},$={className:"meta",begin:"@"+n,contains:[{begin:/\(/,end:/\)/,contains:["self"]}]},te={className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[e.C_BLOCK_COMMENT_MODE],endsParent:!0};return{name:"Java",aliases:["jsp"],keywords:I,illegal:/<\/|#/,contains:[e.COMMENT("/\\*\\*","\\*/",{relevance:0,contains:[{begin:/\w+@/,relevance:0},{className:"doctag",begin:"@[A-Za-z]+"}]}),{begin:/import java\.[a-z]+\./,keywords:"import",relevance:2},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE,{begin:/"""/,end:/"""/,className:"string",contains:[e.BACKSLASH_ESCAPE]},e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,{match:[/\b(?:class|interface|enum|extends|implements|new)/,/\s+/,n],className:{1:"keyword",3:"title.class"}},{match:/non-sealed/,scope:"keyword"},{beginKeywords:"new throw return else yield assert",relevance:0},{begin:[n,t.concat(r,l,/\s+/),n,l,/\s*/,/=(?!=)/],className:{1:"type",3:"variable",6:"operator"}},{begin:[/record/,/\s+/,n],className:{1:"keyword",3:"title.class"},contains:[te,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},{begin:[n,t.concat(r,l,/\s+/),n,/\s*(?=\()/],className:{1:"type",3:"title.function"},keywords:I,contains:[{className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[$,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,We,e.C_BLOCK_COMMENT_MODE]},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},We,$]}}he.registerLanguage("java",ze);window.hljs=he;})();
+</script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---- 1. syntax highlighting -------------------------------------- */
+  function highlight() {
+    if (!window.hljs) return;
+    var blocks = document.querySelectorAll('pre code.language-java');
+    for (var i = 0; i < blocks.length; i++) {
+      try { window.hljs.highlightElement(blocks[i]); } catch (e) {}
+    }
+  }
+
+  /* ---- 2. every solution / reveal starts closed --------------------- */
+  function closeAll() {
+    var d = document.querySelectorAll('details.soln');
+    for (var i = 0; i < d.length; i++) { d[i].open = false; }
+  }
+
+  /* ---- 3. show all / hide all -------------------------------------- */
+  function wireToolbar() {
+    var show = document.getElementById('showAll');
+    var hide = document.getElementById('hideAll');
+    function setAll(v) {
+      var d = document.querySelectorAll('details.soln');
+      for (var i = 0; i < d.length; i++) { d[i].open = v; }
+    }
+    if (show) show.addEventListener('click', function () { setAll(true); });
+    if (hide) hide.addEventListener('click', function () { setAll(false); });
+  }
+
+  /* ---- 4. live-coding editors -------------------------------------- */
+  var INDENT = '    ';
+
+  function wireEditors() {
+    var eds = document.querySelectorAll('.editor');
+    for (var i = 0; i < eds.length; i++) { wireOne(eds[i]); }
+  }
+
+  function wireOne(box) {
+    var ta = box.querySelector('textarea');
+    if (!ta) return;
+    var starter = ta.value;
+
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Tab' || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+      ev.preventDefault();
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+
+      if (s === e && !ev.shiftKey) {
+        ta.value = v.slice(0, s) + INDENT + v.slice(e);
+        ta.selectionStart = ta.selectionEnd = s + INDENT.length;
+        return;
+      }
+      /* block indent / outdent over the selected lines */
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var le = v.indexOf('\n', e);
+      if (le === -1) le = v.length;
+      var seg = v.slice(ls, le);
+      var lines = seg.split('\n');
+      var delta0 = 0, total = 0;
+
+      for (var i = 0; i < lines.length; i++) {
+        if (ev.shiftKey) {
+          var m = lines[i].match(/^(\t| {1,4})/);
+          if (m) {
+            lines[i] = lines[i].slice(m[0].length);
+            if (i === 0) delta0 = -m[0].length;
+            total -= m[0].length;
+          }
+        } else {
+          lines[i] = INDENT + lines[i];
+          if (i === 0) delta0 = INDENT.length;
+          total += INDENT.length;
+        }
+      }
+      ta.value = v.slice(0, ls) + lines.join('\n') + v.slice(le);
+      ta.selectionStart = Math.max(ls, s + delta0);
+      ta.selectionEnd = Math.max(ta.selectionStart, e + total);
+    });
+
+    /* keep the indent of the current line when Enter is pressed */
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Enter' || ev.shiftKey || ev.ctrlKey || ev.metaKey) return;
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+      if (s !== e) return;
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var lead = (v.slice(ls, s).match(/^[ \t]*/) || [''])[0];
+      var extra = /[{(\[]\s*$/.test(v.slice(ls, s)) ? INDENT : '';
+      if (!lead && !extra) return;
+      ev.preventDefault();
+      var ins = '\n' + lead + extra;
+      ta.value = v.slice(0, s) + ins + v.slice(e);
+      ta.selectionStart = ta.selectionEnd = s + ins.length;
+    });
+
+    var rst = box.querySelector('[data-act="reset"]');
+    if (rst) rst.addEventListener('click', function () {
+      ta.value = starter;
+      ta.focus();
+      flash(box, 'Reset to starter code');
+    });
+
+    var cpy = box.querySelector('[data-act="copy"]');
+    if (cpy) cpy.addEventListener('click', function () {
+      var done = function () { flash(box, 'Copied — paste it into your IDE'); };
+      var fail = function () { flash(box, 'Copy failed — select the text and press Ctrl/Cmd+C'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value).then(done, function () { legacy(ta, done, fail); });
+      } else {
+        legacy(ta, done, fail);
+      }
+    });
+  }
+
+  function legacy(ta, done, fail) {
+    try {
+      var st = ta.selectionStart, en = ta.selectionEnd;
+      ta.select();
+      var ok = document.execCommand('copy');
+      ta.selectionStart = st; ta.selectionEnd = en;
+      ok ? done() : fail();
+    } catch (e) { fail(); }
+  }
+
+  function flash(box, msg) {
+    var f = box.querySelector('.foot');
+    if (!f) return;
+    if (f.getAttribute('data-base') === null || f.getAttribute('data-base') === undefined) {
+      f.setAttribute('data-base', f.textContent);
+    }
+    f.textContent = msg;
+    window.setTimeout(function () { f.textContent = f.getAttribute('data-base'); }, 2200);
+  }
+
+  /* ---- go ----------------------------------------------------------- */
+  function init() {
+    highlight();
+    closeAll();
+    wireToolbar();
+    wireEditors();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  /* belt and braces: some browsers restore <details> state on soft reload */
+  window.addEventListener('pageshow', closeAll);
+})();
+</script>
+</body>
+</html>

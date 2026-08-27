@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class 21 — Graphics and Painting | CSCI 212</title>
+<style>
+:root{
+  --ink:#0f172a; --ink2:#334155; --muted:#64748b; --line:#e2e8f0;
+  --bg:#ffffff; --bg2:#f8fafc;
+  --obj:#4f46e5; --def:#2563eb; --ex:#059669; --alg:#7c3aed;
+  --key:#b45309; --warn:#dc2626; --qc:#0891b2; --prac:#be185d; --sum:#475569;
+  --edit:#ea580c; --edit-bg:#fff7ed;
+  --code-bg:#0d1117; --code-bd:#000000;   /* read-only listings: black */
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px 80px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:#0f172a;color:#e2e8f0;font-size:13.5px;
+  border-bottom:3px solid var(--obj);
+}
+.topbar .inner{max-width:900px;margin:0 auto;padding:10px 22px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.topbar a{color:#e2e8f0;text-decoration:none;border-bottom:1px solid transparent}
+.topbar a:hover{border-bottom-color:#94a3b8}
+.topbar .course{font-weight:700;letter-spacing:.02em}
+.topbar .sep{color:#475569}
+.topbar .spacer{flex:1}
+
+/* ---------- title block ---------- */
+.titleblock{padding:34px 0 10px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.eyebrow{
+  font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--obj);margin-bottom:8px;
+}
+.titleblock h1{font-size:33px;line-height:1.2;margin:0 0 10px;letter-spacing:-.015em}
+.titleblock .sub{margin:0;color:var(--muted);font-size:17px;line-height:1.5}
+
+h2{
+  font-size:24px;margin:46px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line);letter-spacing:-.01em;scroll-margin-top:14px;
+}
+h2 .num{color:var(--obj);font-weight:800;margin-right:11px}
+h3{font-size:18.5px;margin:30px 0 10px;color:var(--ink)}
+h4{font-size:16px;margin:20px 0 8px;color:var(--ink2)}
+p{margin:12px 0}
+ul,ol{margin:12px 0;padding-left:26px}
+li{margin:6px 0}
+a{color:var(--def)}
+hr{border:0;border-top:1px solid var(--line);margin:30px 0}
+strong{color:var(--ink)}
+.muted{color:var(--muted)}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--bg2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 20px 16px;margin:22px 0;
+}
+.toc .th{
+  font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;
+}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:30px}
+.toc li{margin:3px 0;font-size:14.5px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- show all / hide all ---------- */
+.tools{
+  display:flex;gap:9px;align-items:center;flex-wrap:wrap;
+  padding:11px 15px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:9px;margin:22px 0;font-size:13.5px;
+}
+.tools .lab{font-weight:700;color:var(--ink2)}
+.tools button{
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  background:#fff;color:var(--ink2);border:1px solid #cbd5e1;
+  border-radius:6px;padding:4px 12px;
+}
+.tools button:hover{background:var(--obj);border-color:var(--obj);color:#fff}
+.tools .muted{font-size:12.5px}
+
+/* ---------- boxes ---------- */
+.box{border:1px solid var(--line);border-left:5px solid var(--muted);border-radius:8px;margin:22px 0;overflow:hidden;background:#fff}
+.box>.hd{
+  padding:9px 16px;font-size:12.5px;font-weight:700;
+  letter-spacing:.075em;text-transform:uppercase;color:#fff;background:var(--muted);
+}
+.box>.hd .tag{margin-left:5px;font-weight:500;text-transform:none;letter-spacing:0;opacity:.92;font-size:13px}
+.box>.bd{padding:4px 18px 14px}
+.box>.bd>:first-child{margin-top:12px}
+.box>.bd>:last-child{margin-bottom:2px}
+
+.box.obj{border-left-color:var(--obj)}  .box.obj>.hd{background:var(--obj)}
+.box.def{border-left-color:var(--def)}  .box.def>.hd{background:var(--def)}
+.box.ex{border-left-color:var(--ex)}    .box.ex>.hd{background:var(--ex)}
+.box.alg{border-left-color:var(--alg)}  .box.alg>.hd{background:var(--alg)}
+.box.key{border-left-color:var(--key)}  .box.key>.hd{background:var(--key)}
+.box.warn{border-left-color:var(--warn)}.box.warn>.hd{background:var(--warn)}
+.box.qc{border-left-color:var(--qc)}    .box.qc>.hd{background:var(--qc)}
+.box.prac{border-left-color:var(--prac)}.box.prac>.hd{background:var(--prac)}
+.box.sum{border-left-color:var(--sum)}  .box.sum>.hd{background:var(--sum)}
+
+.box.obj{background:#f5f5ff}
+.box.qc{background:#f0fbfe}
+.box.warn{background:#fff7f7}
+.box.key{background:#fffbf2}
+.box.sum{background:#f8fafc}
+
+/* ---------- code ---------- */
+/* Read-only listings sit on black, matching CSCI 211, so a code block is never
+   mistaken for the editable live-coding box. */
+pre{
+  margin:14px 0;padding:13px 15px;overflow-x:auto;
+  background:var(--code-bg);border:1px solid var(--code-bd);border-radius:8px;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;color:#c9d1d9;
+}
+pre code{font-family:inherit;font-size:inherit;background:none;padding:0;border:0;color:inherit;display:block}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef2f7;
+  border:1px solid #e2e8f0;border-radius:4px;padding:1px 5px;color:#0b3a5b;
+}
+.filename{
+  font-family:var(--mono);font-size:12px;color:#475569;
+  margin:16px 0 -9px;font-weight:600;
+}
+
+/* comparison block: another language, never syntax-highlighted. Dark like the
+   Java listings, but desaturated and dashed so it reads as "not this course". */
+pre.cmp{background:#161b22;border-style:dashed;border-color:#3f4650;color:#9aa4b2}
+pre.cmp code{color:#9aa4b2}
+
+/* shell commands you type */
+pre.sh{background:#1e293b;border-color:#1e293b;color:#e2e8f0;position:relative;padding-top:26px}
+pre.sh code{color:#e2e8f0}
+pre.sh::before{
+  content:"Terminal";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#86efac;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* output / terminal blocks */
+pre.out{background:#111d33;border-color:#111d33;color:#e2e8f0;position:relative;padding-top:26px}
+pre.out code{color:#e2e8f0}
+pre.out::before{
+  content:"Output";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#7dd3fc;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+pre.err{background:#1f1416;border-color:#7f1d1d;color:#fecdd3;padding-top:26px;position:relative}
+pre.err code{color:#fecdd3}
+pre.err::before{
+  content:"Compiler message";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#fda4af;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* ---- highlight.js, GitHub-dark palette (hand-written, no external file) ---- */
+.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-template-tag,
+.hljs-template-variable,.hljs-type,.hljs-variable.language_{color:#ff7b72}
+.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#d2a8ff}
+.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,
+.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable{color:#79c0ff}
+.hljs-meta .hljs-string,.hljs-regexp,.hljs-string{color:#a5d6ff}
+.hljs-built_in,.hljs-symbol{color:#ffa657}
+.hljs-code,.hljs-comment,.hljs-formula{color:#8b949e;font-style:italic}
+.hljs-name,.hljs-quote,.hljs-selector-pseudo,.hljs-selector-tag{color:#7ee787}
+.hljs-subst{color:#c9d1d9}
+.hljs-section{color:#1f6feb;font-weight:700}
+.hljs-bullet{color:#f2cc60}
+.hljs-emphasis{color:#c9d1d9;font-style:italic}
+.hljs-strong{color:#c9d1d9;font-weight:700}
+
+/* ---------- trace tables ---------- */
+table{border-collapse:collapse;margin:16px 0;font-size:14px;width:100%}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg2);font-weight:700;font-size:13px}
+table.trace td:first-child,table.trace th:first-child{white-space:nowrap}
+table code{font-size:.88em}
+
+/* ---------- multi-part questions ---------- */
+.part{margin:16px 0;padding-left:14px;border-left:2px solid #cbd5e1}
+.part .q{margin:0 0 8px}
+.part .pl{font-weight:700;color:var(--qc);margin-right:6px}
+
+/* ---------- collapsible solutions ---------- */
+details.soln{margin:10px 0 4px}
+details.soln>summary{
+  list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  font-size:12.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:#fff;background:var(--sum);border-radius:6px;padding:5px 13px;
+  user-select:none;
+}
+details.soln>summary::-webkit-details-marker{display:none}
+details.soln>summary::before{content:"\25B6";font-size:9px;transition:transform .15s}
+details.soln[open]>summary::before{transform:rotate(90deg)}
+details.soln>summary::after{content:"Show Answer"}
+details.soln[open]>summary::after{content:"Hide Answer"}
+details.soln>summary:hover{filter:brightness(1.18)}
+
+details.soln.reveal>summary{background:var(--ex)}
+details.soln.reveal>summary::after{content:"Show Output & Explanation"}
+details.soln.reveal[open]>summary::after{content:"Hide Output & Explanation"}
+details.soln.reveal.noout>summary::after{content:"Show Explanation"}
+details.soln.reveal.noout[open]>summary::after{content:"Hide Explanation"}
+
+.ans{
+  margin-top:11px;padding:2px 16px 10px;background:#fff;
+  border:1px solid var(--line);border-left:3px solid var(--sum);border-radius:7px;
+}
+details.soln.reveal .ans{border-left-color:var(--ex)}
+.ans>:first-child{margin-top:12px}
+.ans>:last-child{margin-bottom:6px}
+
+/* ---------- live coding editor ---------- */
+.editor{
+  margin:18px 0;border:2px dashed var(--edit);border-radius:9px;
+  background:var(--edit-bg);overflow:hidden;
+}
+.editor .ehd{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:7px 13px;background:var(--edit);color:#fff;
+  font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+}
+.editor .ehd .etitle{flex:1}
+.editor .ehd button{
+  font:inherit;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  cursor:pointer;background:rgba(255,255,255,.16);color:#fff;
+  border:1px solid rgba(255,255,255,.5);border-radius:5px;padding:3px 10px;
+}
+.editor .ehd button:hover{background:#fff;color:var(--edit)}
+.editor textarea{
+  display:block;width:100%;border:0;outline:0;resize:vertical;
+  padding:12px 15px;background:var(--edit-bg);color:#431407;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;
+  tab-size:4;-moz-tab-size:4;min-height:150px;
+}
+.editor textarea:focus{background:#fff}
+.editor .foot{
+  padding:5px 13px 7px;font-size:11.5px;color:#9a3412;background:#ffedd5;
+  border-top:1px solid #fed7aa;
+}
+
+/* ---------- prev/next nav ---------- */
+.pagenav{display:flex;gap:14px;margin:52px 0 0;flex-wrap:wrap}
+.pagenav a,.pagenav span.disabled{
+  flex:1 1 260px;display:block;text-decoration:none;
+  border:1px solid var(--line);border-radius:9px;padding:12px 16px;background:#fff;
+}
+.pagenav a:hover{border-color:var(--obj);background:var(--bg2)}
+.pagenav .dir{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.pagenav .ttl{font-size:15px;font-weight:600;color:var(--ink);margin-top:3px}
+.pagenav .next{text-align:right}
+.pagenav span.disabled{opacity:.4}
+.pagenav span.disabled .ttl{color:var(--muted)}
+
+footer.pf{
+  margin-top:40px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--muted);text-align:center;
+}
+
+/* ---------- index page ---------- */
+table.sched{font-size:14.5px}
+table.sched th{background:#0f172a;color:#fff;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+table.sched td:first-child{white-space:nowrap;font-weight:700;color:var(--muted);width:60px}
+table.sched tr.examrow td{background:#fff1f2}
+table.sched tr.revrow td{background:#fffbeb}
+table.sched a{font-weight:600;text-decoration:none}
+table.sched a:hover{text-decoration:underline}
+
+
+/* ---------- release gating ---------- */
+.pending{
+  margin-top:4px;font-size:11.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:#b45309;
+}
+.pagenav span.disabled .pending{color:#b45309}
+table.sched tr.pendingrow td{background:#fcfcfd}
+table.sched .unrel{color:var(--muted)}
+table.sched .pending{display:block;margin-top:2px}
+table.sched td.cn{white-space:nowrap;width:52px;font-weight:700;color:var(--muted)}
+table.sched td.dt{white-space:nowrap;width:104px;color:var(--muted);font-size:13.5px}
+table.sched tr.offrow td{background:#f1f5f9;color:var(--muted);font-style:italic}
+.refcard{
+  display:block;text-decoration:none;border:1px solid var(--line);
+  border-left:5px solid var(--alg);border-radius:9px;padding:13px 17px;
+  margin:22px 0;background:#faf9ff;
+}
+.refcard:hover{background:#f5f3ff;border-color:var(--alg)}
+.refcard .rl{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--alg)}
+.refcard .rt{font-size:16px;font-weight:600;color:var(--ink);margin-top:3px}
+.refcard .rd{font-size:14px;color:var(--muted);margin-top:4px}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,.tools,.pagenav,.pending{display:none !important}
+  html,body{width:100%;font-size:10pt}
+  .wrap{max-width:100%;width:100%;padding:0}
+  /* a wide <pre> must wrap rather than widen the page and clip every other
+     element at the paper edge */
+  /* Screen shows code on black; paper does not. Restore a dark-on-light palette
+     for print only, or the dark theme's light tokens vanish on white. */
+  pre{white-space:pre-wrap;overflow:visible;overflow-wrap:anywhere;font-size:8.6pt;
+      background:#f8fafc !important;color:#24292e !important;border-color:#cbd5e1 !important;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  pre code{color:#24292e !important}
+  pre.cmp{background:#fff !important;color:#475569 !important;border-color:#94a3b8 !important}
+  pre.cmp code{color:#475569 !important}
+  pre .hljs-doctag,pre .hljs-keyword,pre .hljs-meta .hljs-keyword,pre .hljs-template-tag,
+  pre .hljs-template-variable,pre .hljs-type,pre .hljs-variable.language_{color:#d73a49 !important}
+  pre .hljs-title,pre .hljs-title.class_,pre .hljs-title.class_.inherited__,
+  pre .hljs-title.function_{color:#6f42c1 !important}
+  pre .hljs-attr,pre .hljs-attribute,pre .hljs-literal,pre .hljs-meta,pre .hljs-number,
+  pre .hljs-operator,pre .hljs-selector-attr,pre .hljs-selector-class,pre .hljs-selector-id,
+  pre .hljs-variable{color:#005cc5 !important}
+  pre .hljs-meta .hljs-string,pre .hljs-regexp,pre .hljs-string{color:#032f62 !important}
+  pre .hljs-built_in,pre .hljs-symbol{color:#e36209 !important}
+  pre .hljs-code,pre .hljs-comment,pre .hljs-formula{color:#6a737d !important}
+  pre .hljs-name,pre .hljs-quote,pre .hljs-selector-pseudo,
+  pre .hljs-selector-tag{color:#22863a !important}
+  pre .hljs-subst,pre .hljs-emphasis,pre .hljs-strong{color:#24292e !important}
+  .filename{color:#475569 !important}
+  table{table-layout:fixed;width:100%;word-wrap:break-word;overflow-wrap:anywhere}
+  .box,.toc{max-width:100%}
+  a{color:var(--ink);text-decoration:none}
+  .box,.part,pre,table,.editor{break-inside:avoid;page-break-inside:avoid}
+  h2{break-after:avoid;page-break-after:avoid}
+  details.soln>summary{display:none !important}
+  details.soln:not([open])>.ans{display:none !important}
+  details.soln::before{
+    content:"Answer withheld — see the online notes.";
+    display:block;font-size:9pt;font-style:italic;color:#64748b;margin:6px 0;
+  }
+  details.soln[open]::before{content:""}
+  .editor textarea{display:none !important}
+  .editor{border:1.5px solid #fdba74 !important;background:#fff;border-style:solid}
+  .editor .ehd{background:#fff !important;color:#9a3412 !important;border-bottom:1px solid #fdba74}
+  .editor .ehd button{display:none}
+  .editor .foot{display:none}
+  .editor::after{content:"";display:block;height:2.1in;background:#fff}
+  pre.out,pre.sh{background:#f1f5f9 !important;color:#0f172a !important;border-color:#94a3b8 !important}
+  pre.err{background:#fef2f2 !important;color:#7f1d1d !important;border-color:#fca5a5 !important}
+  pre.out code,pre.sh code{color:#0f172a !important}
+  pre.err code{color:#7f1d1d !important}
+  pre.out::before,pre.sh::before{color:#475569}
+  pre.err::before{color:#b91c1c}
+  .box>.hd{color:#000;background:#fff !important;border-bottom:1px solid #cbd5e1}
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="inner">
+<span class="course">CSCI 212</span>
+<span class="sep">|</span>
+<a href="index.html">Course index</a>
+<span class="sep">|</span>
+<span>Class 21 of 28</span>
+<span class="sep">|</span>
+<span>Thursday, November 12</span>
+<span class="spacer"></span>
+<span>Queens College, CUNY</span>
+</div></div>
+<div class="wrap">
+<div class="titleblock">
+  <div class="eyebrow">Session 21 &middot; Lecture 19</div>
+  <h1>Graphics and Painting</h1>
+  <p class="sub">You stop assembling ready-made components and start drawing pixels yourself &mdash; and the <code>Shape</code> hierarchy from Lectures 12&ndash;14 finally gets the job it was built for.</p> </div> <div class="box obj"> <div class="hd">Learning Objectives</div> <div class="bd"> <p>By the end of today's session you should be able to:</p> <ol> <li>State where the origin of the Java graphics coordinate system is, which way <code>y</code> increases, and convert a "50 pixels up from the middle" instruction into an actual <code>y</code> value.</li> <li>Override <code>paintComponent(Graphics g)</code> on a <code>JPanel</code>, and explain why you never call it yourself and why <code>super.paintComponent(g)</code> must be its first line.</li> <li>Call <code>repaint()</code> when the picture needs to change, and say what would go wrong if you called <code>paintComponent</code> instead.</li> <li>Use <code>drawLine</code>, <code>drawRect</code>, <code>fillRect</code>, <code>drawOval</code>, <code>fillOval</code>, <code>drawRoundRect</code>, <code>drawArc</code>, <code>drawPolygon</code>, <code>fillPolygon</code> and <code>drawString</code>, and give the meaning of every argument.</li> <li>Explain that <code>drawOval(x, y, w, h)</code> takes a <em>bounding box</em>, not a center and a radius, and write the arithmetic that centers a circle in a panel.</li> <li>Set a color with a <code>Color</code> constant or with <code>new Color(r, g, b)</code>, and change the drawing font with <code>setFont</code>.</li> <li>Contrast <em>direct drawing</em> through <code>getGraphics()</code> with <em>painting</em> through <code>paintComponent</code>, and say why the first one loses your picture.</li> <li>Store a drawing as a collection of <code>Shape</code> objects that redraw themselves, and explain why an abstract <code>draw(Graphics g)</code> method replaces a chain of <code>if</code> statements.</li> </ol> </div> </div> <div class="toc"> <div class="th">On this page</div> <ol> <li><a href="#s1">Where (0, 0) is</a></li> <li><a href="#s2">paintComponent: the method you write and never call</a></li> <li><a href="#s3">The drawing methods, and the bounding box</a></li> <li><a href="#s4">Color, and a word about Font</a></li> <li><a href="#s5">repaint(): how you ask for a redraw</a></li> <li><a href="#s6">Direct drawing versus painting</a></li> <li><a href="#s7">A panel that remembers what to draw</a></li> <li><a href="#s8">Letting each shape draw itself</a></li> <li><a href="#prac">Practice Problems</a></li> <li><a href="#summary">Lecture Summary</a></li> </ol> </div> <div class="tools"> <span class="lab">Answers</span> <button id="showAll" type="button">Show all</button> <button id="hideAll" type="button">Hide all</button> <span class="muted">&mdash; every worked-example output and every solution is hidden when the page loads. Work it out first, then reveal.</span> </div> <hr> <h2 id="s1"><span class="num">1.</span>Where (0, 0) is</h2> <p>For the last four lectures you have been an assembler of parts. You created a <code>JFrame</code>, you put components into it, you handed the arrangement over to a layout manager, and you registered listeners so that clicks ran your code. At no point did you decide what any pixel looked like. A <code>JButton</code> drew itself; a <code>JLabel</code> drew itself; you never asked how.</p> <p>Today you take that job. Everything from here on is about one object &mdash; a <code>Graphics</code> &mdash; and about roughly a dozen methods you call on it. The concepts are small. The place people lose marks is the very first one, so we start there and we are going to be pedantic about it.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the graphics coordinate system</span></div> <div class="bd"> <p>Every drawing method takes positions measured in <strong>pixels</strong> from the <strong>top-left corner of the component you are drawing on</strong>. That corner is (0, 0), and it is called the <strong>origin</strong>.</p> <ul> <li><strong><code>x</code> increases to the right</strong> &mdash; the same as in mathematics.</li> <li><strong><code>y</code> increases <em>downward</em></strong> &mdash; the opposite of mathematics.</li> </ul> <p>The coordinates are relative to the <em>component</em>, not the screen and not the frame. In a <code>JPanel</code> that sits inside a frame, the panel's own top-left corner is (0, 0) no matter where the window is dragged to.</p> </div> </div> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; bigger y means lower down</span></div> <div class="bd"> <p>In your maths classes, a point with a larger <code>y</code> is <em>higher</em> on the page. In computer graphics, a point with a larger <code>y</code> is <em>further down the screen</em>. The point (100, 300) sits <strong>below</strong> the point (100, 50).</p> <p>This is not Java being awkward. It is the way essentially every screen and every printer has worked since the 1960s: an image is drawn as a series of horizontal lines starting at the top, so counting rows downward from zero is the natural thing to do. Java, C#, HTML canvases, iOS and Android all do it.</p> </div> </div> <p>Here are the two conventions side by side. Read the arrow directions, not the labels.</p> <p class="filename">Two coordinate systems &mdash; the only difference is the y arrow</p>
+<pre class="cmp"><code> MATHEMATICS                          JAVA GRAPHICS
+
+       y                        (0,0) +--------------&gt; x
+       ^                              |
+       |                              |
+       |     . (100, 300)             |
+       |                              |     . (100, 50)
+       |     . (100, 50)              |
+       |                              |
+(0,0)  +--------------&gt; x             |     . (100, 300)
+                                      v
+                                      y
+
+ (100,300) is ABOVE (100,50)     (100,300) is BELOW (100,50)</code></pre> <p>You do not have to take this on trust. A <code>Graphics</code> object does not need a window at all &mdash; it will happily draw onto an image held in memory, and then you can ask that image what color each pixel came out. Here is the diagonal line from (0, 0) to (200, 200), interrogated pixel by pixel.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; which way does the diagonal go?</span></div> <div class="bd"> <p>A <code>BufferedImage</code> is a rectangle of pixels in memory. Calling <code>createGraphics()</code> on one gives you a <code>Graphics</code> that draws into it, and <code>getRGB(x, y)</code> afterwards tells you exactly what landed where. Predict all four answers before you reveal: the line runs from (0, 0) to (200, 200), so which corners of the image does it pass through?</p> <p class="filename">WhichWayIsUp.java</p>
+<pre><code class="language-java">import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+
+// Draws the line from (0,0) to (200,200) and asks the image where the ink is.
+public class WhichWayIsUp {
+
+   public static void main(String args[]) {
+      BufferedImage sheet = new BufferedImage(201, 201, BufferedImage.TYPE_INT_RGB);
+      Graphics g = sheet.createGraphics();
+
+      g.setColor(Color.WHITE);
+      g.fillRect(0, 0, 201, 201);
+
+      g.setColor(Color.BLACK);
+      g.drawLine(0, 0, 200, 200);
+
+      System.out.println("drawLine(0, 0, 200, 200)");
+      System.out.println("   ink at (10, 10),  near the TOP-left corner:    " + inked(sheet, 10, 10));
+      System.out.println("   ink at (10, 190), near the BOTTOM-left corner: " + inked(sheet, 10, 190));
+      System.out.println("   ink at (190, 190), near the BOTTOM-right:      " + inked(sheet, 190, 190));
+      System.out.println("   ink at (190, 10),  near the TOP-right:         " + inked(sheet, 190, 10));
+   }
+
+   static boolean inked(BufferedImage sheet, int x, int y) {
+      return (sheet.getRGB(x, y) &amp; 0xFFFFFF) != 0xFFFFFF;
+   }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>drawLine(0, 0, 200, 200)
+   ink at (10, 10),  near the TOP-left corner:    true
+   ink at (10, 190), near the BOTTOM-left corner: false
+   ink at (190, 190), near the BOTTOM-right:      true
+   ink at (190, 10),  near the TOP-right:         false</code></pre> <p>The line goes from the <strong>top-left</strong> corner down to the <strong>bottom-right</strong> corner. In a maths class the line <code>y = x</code> climbs from bottom-left to top-right; on a screen the identical pair of numbers descends. If you remember one image from this lecture, make it this one.</p> <p>Two smaller things worth banking now, because both come back later:</p> <ul> <li><strong>You can draw without a window.</strong> Nothing in this program mentions <code>JFrame</code>, <code>JPanel</code> or <code>setVisible</code>. <code>Graphics</code> is not tied to the screen &mdash; the same methods draw into a window, into an image, or onto a printer. That is why we can check our arithmetic exactly rather than squinting at a picture.</li> <li><strong><code>0xFFFFFF</code> is white.</strong> <code>getRGB</code> hands back one <code>int</code> holding all three color channels packed together; masking off the top byte leaves red, green and blue, and all three at maximum is white. &sect;4 unpacks that number properly.</li> </ul> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 19.1</div> <div class="bd"> <p>A <code>JPanel</code> is 400 pixels wide and 300 pixels tall.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> What are the coordinates of its four corners?</p> <details class="soln"><summary></summary><div class="ans"> <p>Top-left (0, 0), top-right (399, 0), bottom-left (0, 299), bottom-right (399, 299).</p> <p>The largest legal <code>x</code> is <code>width - 1</code>, not <code>width</code>, for exactly the same reason the last index of a 400-element array is 399. It is worth saying out loud because the drawing methods themselves are happy to accept 400, or 4000, or &minus;20 &mdash; nothing is checked, and anything off the edge is simply not shown.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What is the coordinate of the exact center?</p> <details class="soln"><summary></summary><div class="ans"> <p>(200, 150) &mdash; that is <code>getWidth() / 2</code> and <code>getHeight() / 2</code>. Writing it with those two methods rather than with the literals 200 and 150 is what makes a drawing stay centered when the user resizes the window.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> You want a dot 60 pixels <em>above</em> the center. What <code>y</code> do you use?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>y = 150 - 60</code>, which is 90. <strong>Above means subtract.</strong> This is the part that catches people: "up" is the direction of <em>decreasing</em> <code>y</code>, so moving up the screen means taking numbers away.</p> <p><strong>Things to notice across all three parts.</strong> Whenever a question says <em>above</em>, <em>higher</em>, <em>up</em> or <em>the top of</em>, translate it into "smaller <code>y</code>" before you write any arithmetic. Doing that translation on paper, once, prevents the single most common sign error in graphics code.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 19.2</div> <div class="bd"> <p>Two windows are on the screen. Window A is at the top-left of the display; window B has been dragged to the bottom-right. Each contains a <code>JPanel</code> that draws a dot at (10, 10). Where does each dot appear, and are the two <code>Graphics</code> calls different?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Ask what (0, 0) means for the object being drawn on.</p> <p>Each dot appears 10 pixels right and 10 pixels down from the top-left corner <em>of its own panel</em>. On the screen as a whole the two dots are far apart, but the code is identical and neither panel knows or cares where its window has been dragged to.</p> <p><strong>Things to notice.</strong> Coordinates are always <em>component-local</em>. This is why a panel's drawing code never mentions the window position and never breaks when the window moves. It is also why, when you nest a panel inside another panel, the inner one starts counting from its own corner again &mdash; Swing translates the <code>Graphics</code> for you before it calls your code.</p> </div></details> </div> </div> <h2 id="s2"><span class="num">2.</span>paintComponent: the method you write and never call</h2> <p>So you want to draw. Where does the code go? Not in <code>main</code>, and not in a button's <code>actionPerformed</code> &mdash; we will see in &sect;6 exactly why that fails. It goes in one specific method, on a class of your own that extends <code>JPanel</code>.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the Graphics object</span></div> <div class="bd"> <p><code>Graphics</code>, from <code>java.awt</code>, is Java's <strong>drawing context</strong>: an object that knows <em>what surface</em> is being drawn on, and remembers a current color and a current font. Every drawing operation is a method call on a <code>Graphics</code>.</p> <p>You never construct one with <code>new</code>. Java hands you a <code>Graphics</code> when it is ready for you to draw &mdash; and the standard way it does that is by calling your <code>paintComponent</code> method and passing one in.</p> <p><code>Graphics2D</code> extends <code>Graphics</code> with extra abilities: line thickness (<code>setStroke</code>), transparency, gradients, rotation. The object Swing hands you is <em>always</em> really a <code>Graphics2D</code>, so <code>Graphics2D g2 = (Graphics2D) g;</code> is a cast that always succeeds &mdash; an ordinary downcast of exactly the kind you met in Lecture 13.</p> </div> </div> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; paintComponent</span></div> <div class="bd"> <p><code>protected void paintComponent(Graphics g)</code> is the method every Swing component uses to draw its own content. To draw your own picture you write a class that extends <code>JPanel</code> and <strong>overrides</strong> it:</p> <pre><code class="language-java">public class MyPanel extends JPanel {
+   public void paintComponent(Graphics g) {
+      super.paintComponent(g);
+      // your drawing goes here
+   }
+}</code></pre> <p>Three rules govern it, and all three are exam material:</p> <ol> <li><strong>You override it; you never call it.</strong> Swing calls it, whenever the component needs to be on the screen.</li> <li><strong><code>super.paintComponent(g);</code> is the first line</strong> &mdash; it fills the component with its background color, wiping out whatever was drawn last time.</li> <li><strong>It must be prepared to run at any moment, any number of times.</strong> You do not control when it happens, so it has to redraw the whole picture from scratch every time.</li> </ol> </div> </div> <p>Rule 3 is the one that reshapes how you think. <code>paintComponent</code> is not a command that puts something on the screen once. It is your answer to a question Swing asks over and over: <em>what does this component look like right now?</em></p> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; when Swing calls paintComponent</span></div> <div class="bd"> <p>You never call it. Swing does, when any of these happens:</p> <ol> <li>The component is displayed for the first time.</li> <li>The window is resized, minimised and restored, or moved partly off the screen and back.</li> <li>Another window that was covering it is moved away.</li> <li>Your program calls <code>repaint()</code> &mdash; the subject of &sect;5.</li> </ol> <p>The first three are outside your control entirely. That is why the method must be able to reproduce the entire picture using only what the object currently knows.</p> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; leaving out super.paintComponent(g)</span></div> <div class="bd"> <p><code>super.paintComponent(g)</code> is what erases the previous frame. Leave it out and the old ink stays on the component, and every new drawing is painted on top of the last one. On a static picture you may never notice. The moment anything moves, you get a smear.</p> <p>The next worked example proves it, pixel by pixel.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; what the super call is actually for</span></div> <div class="bd"> <p>Two panels, identical except for one line. Each draws a single blue circle at a position held in a field. The driver paints each panel <em>twice</em> onto the same image &mdash; once with the circle at the left, then again with it moved to the right &mdash; which is exactly what Swing does to a component whose contents have changed.</p> <p>Before you reveal: for each panel, is there blue ink left at the old position?</p> <p class="filename">SuperTest.java</p>
+<pre><code class="language-java">import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+
+import javax.swing.JPanel;
+
+// A panel that draws one filled circle. Where it goes is decided by a field,
+// so we can move the circle and paint the panel a second time.
+abstract class CirclePanel extends JPanel {
+   int x = 50;
+}
+
+class GoodPanel extends CirclePanel {
+   protected void paintComponent(Graphics g) {
+      super.paintComponent(g);        // clears the panel to its background color
+      g.setColor(Color.BLUE);
+      g.fillOval(x, 50, 100, 100);
+   }
+}
+
+class BadPanel extends CirclePanel {
+   protected void paintComponent(Graphics g) {
+      g.setColor(Color.BLUE);         // the super call has been left out
+      g.fillOval(x, 50, 100, 100);
+   }
+}
+
+public class SuperTest {
+
+   // Is there blue ink at this point of the image?
+   static boolean blueAt(BufferedImage img, int x, int y) {
+      return (img.getRGB(x, y) &amp; 0xFFFFFF) == 0x0000FF;
+   }
+
+   static void paintTwice(String name, CirclePanel p) {
+      p.setSize(400, 200);
+      p.setBackground(Color.WHITE);
+
+      BufferedImage img = new BufferedImage(400, 200, BufferedImage.TYPE_INT_RGB);
+      Graphics2D g = img.createGraphics();
+
+      p.x = 50;
+      p.paint(g);          // first paint:  circle centered at (100, 100)
+      p.x = 250;
+      p.paint(g);          // second paint: circle centered at (300, 100)
+
+      g.dispose();
+
+      System.out.println(name);
+      System.out.println("   ink at the OLD position (100,100): " + blueAt(img, 100, 100));
+      System.out.println("   ink at the NEW position (300,100): " + blueAt(img, 300, 100));
+   }
+
+   public static void main(String args[]) {
+      paintTwice("GoodPanel -- calls super.paintComponent(g)", new GoodPanel());
+      paintTwice("BadPanel  -- leaves it out", new BadPanel());
+   }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>GoodPanel -- calls super.paintComponent(g)
+   ink at the OLD position (100,100): false
+   ink at the NEW position (300,100): true
+BadPanel  -- leaves it out
+   ink at the OLD position (100,100): true
+   ink at the NEW position (300,100): true</code></pre> <p>There it is, with no room for argument. <code>GoodPanel</code> shows one circle: the super call filled the whole panel with white before redrawing, so the old circle is gone. <code>BadPanel</code> shows <strong>two</strong> circles &mdash; the object only ever wanted to draw one, but the first one was never erased.</p> <p>In a real animation, dragging a shape across a <code>BadPanel</code> leaves a solid trail behind it. Students usually describe this as "my program is drawing too much"; it is not. It is drawing exactly the right thing and failing to remove the previous frame.</p> <p><strong>Two details in the harness are worth naming.</strong></p> <ul> <li><code>p.paint(g)</code> rather than <code>p.paintComponent(g)</code>. <code>paint</code> is the public entry point Swing itself uses; it runs <code>paintComponent</code>, then the border, then any child components. <code>paintComponent</code> is <code>protected</code>, which is a deliberate signal: it is not part of the public interface, because <em>you are not supposed to call it</em>.</li> <li><code>CirclePanel</code> is an abstract class holding the shared field <code>x</code>, so one helper method can take either panel. Straight out of Lecture 14 &mdash; and it will be the shape of the whole design by &sect;8.</li> </ul> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 19.3</div> <div class="bd"> <p>A student's panel draws a clock face. It looks perfect when the program starts. They then drag another window across it, and afterwards half the clock is missing.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Something wiped part of the component and it was not redrawn. Ask who was supposed to redraw it.</p> <p>Almost certainly the drawing is not in <code>paintComponent</code> at all &mdash; it was done once, somewhere else, straight after the window appeared. Covering a component destroys its pixels; Swing recovers them by calling <code>paintComponent</code> again, and if the drawing code is not in there, there is nothing to recover.</p> <p><strong>Things to notice.</strong> "It looked right until something covered it" is the signature symptom of drawing outside <code>paintComponent</code>, and &sect;6 shows the exact code that produces it. The cure is always the same: move the drawing into <code>paintComponent</code>, and keep whatever data it needs in fields of the panel.</p> <p>A second, rarer cause fits the same symptom: <code>paintComponent</code> that draws different things on different calls &mdash; for instance one that reads from a <code>Scanner</code>, or that uses <code>Math.random()</code> without storing the result. A repaint must be able to reproduce the same picture, so anything random has to be generated once and remembered.</p> </div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 19.4</div> <div class="bd"> <p>Answer briefly.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Why is <code>paintComponent</code> declared <code>protected</code> rather than <code>public</code>?</p> <details class="soln"><summary></summary><div class="ans"> <p>Because it is meant to be <em>overridden</em>, not <em>called</em>. <code>protected</code> lets a subclass &mdash; yours &mdash; supply a new body, while keeping the method out of the public interface so that other code cannot invoke it directly. The access modifier is documentation: it says "this is a hook, not a service".</p> <p>You may legally widen it to <code>public</code> in your override, and plenty of code does, including your instructor's <code>PaintingPanel</code> in &sect;7. That is allowed &mdash; an override may widen access, never narrow it &mdash; but it does not make calling it a good idea.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What is the type of the parameter <code>g</code>, and where did the object come from?</p> <details class="soln"><summary></summary><div class="ans"> <p>Its declared type is <code>Graphics</code>. The object Swing actually passes is a <code>Graphics2D</code> &mdash; a subclass &mdash; which is why the downcast <code>(Graphics2D) g</code> never fails. Swing created it, aimed at the right piece of the screen, and it is only valid for the duration of this one call, which is another reason not to save it in a field and use it later.</p> <p><strong>Things to notice across both parts.</strong> Static type <code>Graphics</code>, dynamic type <code>Graphics2D</code>: the exact situation from Lecture 13. The declared type limits what you can call without a cast; the real object decides what actually happens.</p> </div></details> </div> </div> </div> <h2 id="s3"><span class="num">3.</span>The drawing methods, and the bounding box</h2> <p>Now the methods themselves. There are more than this in the library, but these are the ones your instructor's programs use and the ones worth knowing by heart.</p> <table> <tr><th>Method</th><th>What it draws</th><th>Arguments</th></tr> <tr><td><code>drawLine(x1, y1, x2, y2)</code></td><td>a straight line</td><td>the two <em>endpoints</em></td></tr> <tr><td><code>drawRect(x, y, w, h)</code></td><td>a rectangle outline</td><td>top-left corner, then width and height</td></tr> <tr><td><code>fillRect(x, y, w, h)</code></td><td>a solid rectangle</td><td>the same four</td></tr> <tr><td><code>drawOval(x, y, w, h)</code></td><td>an ellipse outline</td><td>the <em>bounding box</em>: its top-left corner, width, height</td></tr> <tr><td><code>fillOval(x, y, w, h)</code></td><td>a solid ellipse</td><td>the same four</td></tr> <tr><td><code>drawRoundRect(x, y, w, h, aw, ah)</code></td><td>a rectangle with rounded corners</td><td>the four, plus the width and height of the corner arc</td></tr> <tr><td><code>drawArc(x, y, w, h, start, sweep)</code></td><td>part of an ellipse outline</td><td>the bounding box, plus two angles in degrees</td></tr> <tr><td><code>drawPolygon(xs, ys, n)</code></td><td>a closed outline through <code>n</code> points</td><td>two <code>int</code> arrays and how many points to use</td></tr> <tr><td><code>fillPolygon(xs, ys, n)</code></td><td>the same shape, solid</td><td>the same three</td></tr> <tr><td><code>drawString(s, x, y)</code></td><td>text</td><td>the <code>String</code> first, then the left end of its <em>baseline</em></td></tr> </table> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; an oval is described by the box around it</span></div> <div class="bd"> <p><code>drawOval(x, y, w, h)</code> does <strong>not</strong> take a center and a radius. It takes the <strong>bounding box</strong>: the invisible rectangle the ellipse is inscribed in, given exactly the way <code>drawRect</code> gives one &mdash; top-left corner, then width, then height.</p> <p>So <code>drawOval(50, 220, 150, 100)</code> produces an ellipse 150 wide and 100 tall whose <em>leftmost</em> point is at <code>x</code> = 50 and whose <em>topmost</em> point is at <code>y</code> = 220. Its center is at (50 + 75, 220 + 50) = (125, 270), and nothing in the call says so.</p> <p>To draw a circle of diameter <code>d</code> centered at (<code>cx</code>, <code>cy</code>) you must do the arithmetic yourself:</p> <pre><code class="language-java">g.fillOval(cx - d / 2, cy - d / 2, d, d);</code></pre> <p>Forgetting this is, by a wide margin, the second most common error in beginner graphics code &mdash; after getting <code>y</code> upside down.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; measuring exactly where the ink goes</span></div> <div class="bd"> <p>The table above says "top-left corner, width, height", but there is a subtlety it hides. Does <code>drawRect(50, 60, 150, 100)</code> ink 150 columns, or 151? Rather than argue about it, draw each shape on a blank image and find the smallest rectangle containing every colored pixel.</p> <p>Predict the five answers before you reveal. In particular: for <code>drawString("Line", 125, 70)</code>, is the text above the line <code>y</code> = 70, below it, or centered on it?</p> <p class="filename">WhereIsTheInk.java</p>
+<pre><code class="language-java">import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+
+// Draws one shape on a blank white image and reports exactly which pixels
+// ended up colored. Nothing is displayed; there is no window and no JFrame.
+public class WhereIsTheInk {
+
+   static BufferedImage sheet;
+   static Graphics pen;
+
+   // A fresh 400 x 400 white image, with the pen already set to black.
+   static void blankSheet() {
+      sheet = new BufferedImage(400, 400, BufferedImage.TYPE_INT_RGB);
+      pen = sheet.createGraphics();       // a Graphics, exactly like paintComponent's
+      pen.setColor(Color.WHITE);
+      pen.fillRect(0, 0, 400, 400);
+      pen.setColor(Color.BLACK);
+   }
+
+   // The smallest rectangle that contains every non-white pixel.
+   static void report(String call) {
+      int minX = 400, minY = 400, maxX = -1, maxY = -1;
+      for (int y = 0; y &lt; 400; y++) {
+         for (int x = 0; x &lt; 400; x++) {
+            if ((sheet.getRGB(x, y) &amp; 0xFFFFFF) != 0xFFFFFF) {
+               if (x &lt; minX) minX = x;
+               if (x &gt; maxX) maxX = x;
+               if (y &lt; minY) minY = y;
+               if (y &gt; maxY) maxY = y;
+            }
+         }
+      }
+      System.out.println(call);
+      System.out.println("      x from " + minX + " to " + maxX + "  (" + (maxX - minX + 1) + " pixels wide)");
+      System.out.println("      y from " + minY + " to " + maxY + "  (" + (maxY - minY + 1) + " pixels tall)");
+   }
+
+   public static void main(String args[]) {
+      blankSheet();
+      pen.drawRect(50, 60, 150, 100);
+      report("drawRect(50, 60, 150, 100)");
+
+      blankSheet();
+      pen.fillRect(50, 60, 150, 100);
+      report("fillRect(50, 60, 150, 100)");
+
+      blankSheet();
+      pen.drawOval(50, 60, 150, 100);
+      report("drawOval(50, 60, 150, 100)");
+
+      blankSheet();
+      pen.fillOval(50, 60, 150, 100);
+      report("fillOval(50, 60, 150, 100)");
+
+      blankSheet();
+      pen.drawString("Line", 125, 70);
+      report("drawString(\"Line\", 125, 70)");
+   }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>drawRect(50, 60, 150, 100)
+      x from 50 to 200  (151 pixels wide)
+      y from 60 to 160  (101 pixels tall)
+fillRect(50, 60, 150, 100)
+      x from 50 to 199  (150 pixels wide)
+      y from 60 to 159  (100 pixels tall)
+drawOval(50, 60, 150, 100)
+      x from 50 to 200  (151 pixels wide)
+      y from 60 to 160  (101 pixels tall)
+fillOval(50, 60, 150, 100)
+      x from 50 to 199  (150 pixels wide)
+      y from 61 to 159  (99 pixels tall)
+drawString("Line", 125, 70)
+      x from 126 to 148  (23 pixels wide)
+      y from 61 to 69  (9 pixels tall)</code></pre> <p>Four facts fall straight out of those numbers.</p> <ul> <li><strong>The bounding box is real.</strong> <code>drawOval(50, 60, 150, 100)</code> inks exactly the same rectangle of the image as <code>drawRect(50, 60, 150, 100)</code>: <code>x</code> from 50, <code>y</code> from 60. The oval touches all four sides of that box from the inside and goes nowhere near the corners.</li> <li><strong>An outline is one pixel wider than a fill.</strong> <code>drawRect</code> spans 151 columns, <code>fillRect</code> spans 150. The outline is drawn <em>on</em> the boundary, so it includes both <code>x</code> = 50 and <code>x</code> = 50 + 150; the fill covers the interior, from <code>x</code> = 50 up to but not including <code>x</code> = 200. In practice you can ignore the difference; on a "what exactly is at pixel (200, 60)?" exam question you cannot.</li> <li><strong>The <code>y</code> in <code>drawString</code> is the baseline, not the top.</strong> The text was drawn at <code>y</code> = 70 and its ink lies at <code>y</code> 61 to 69 &mdash; entirely <em>above</em> the number you gave. That is the line the letters sit on, the same baseline you write on with lined paper; descenders on letters like <code>g</code> and <code>p</code> drop below it. Ask for text at <code>y</code> = 5 in a large font and it disappears off the top of the panel, which mystifies everybody the first time.</li> <li><strong>Text size depends on the font.</strong> The 23-by-9 figure is for whatever default font this machine has installed; a different machine or a different look and feel will give a slightly different number. The <em>baseline</em> rule does not vary.</li> </ul> 
+</div></details> </div> </div> <p>Two of the methods have arguments that are not obvious even once you know about bounding boxes. Both appear in your instructor's demo program, so pin them down now.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; drawRoundRect and drawArc</span></div> <div class="bd"> <p><code>drawRoundRect(x, y, w, h, arcWidth, arcHeight)</code> draws the same rectangle as <code>drawRect</code>, but each corner is replaced by a quarter-ellipse. <code>arcWidth</code> and <code>arcHeight</code> are the full width and height of the ellipse the corner is cut from, so <code>drawRoundRect(50, 60, 150, 100, 40, 40)</code> rounds each corner with a quarter-circle of radius 20. Passing 0 for both gives you an ordinary rectangle.</p> <p><code>drawArc(x, y, w, h, startAngle, arcAngle)</code> draws part of the ellipse inscribed in that bounding box. Both angles are in <strong>degrees</strong>:</p> <ul> <li><code>startAngle</code> = 0 is the <strong>3 o'clock</strong> position &mdash; the rightmost point of the ellipse.</li> <li><code>arcAngle</code> sweeps <strong>counterclockwise</strong> when positive, clockwise when negative. Counterclockwise means <em>upward</em> on the screen &mdash; this is the one place where the angles behave the way your maths classes trained you, in spite of <code>y</code> pointing down.</li> </ul> <p>So <code>drawArc(50, 50, 200, 200, 0, 90)</code> draws the top-right quarter of a circle, and <code>drawArc(50, 50, 200, 200, 0, -90)</code> draws the bottom-right quarter. <code>fillArc</code> closes the arc back to the center and fills it, giving you a pie slice.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 19.5</div> <div class="bd"> <p>Give the exact call for each. Assume you have a <code>Graphics g</code> and a panel 400 wide by 300 tall.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> A solid circle of diameter 80 centered in the panel.</p> <details class="soln"><summary></summary><div class="ans"> <p>The center is at (200, 150), and a circle of diameter 80 needs its bounding box to start 40 to the left and 40 above:</p> <pre><code class="language-java">g.fillOval(200 - 40, 150 - 40, 80, 80);
+// g.fillOval(160, 110, 80, 80);</code></pre> <p>Written so that it survives a resize:</p> <pre><code class="language-java">int d = 80;
+g.fillOval(getWidth() / 2 - d / 2, getHeight() / 2 - d / 2, d, d);</code></pre> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> A rectangle outline occupying the whole left half of the panel.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>g.drawRect(0, 0, 200, 300);</code> &mdash; or, resize-proof, <code>g.drawRect(0, 0, getWidth() / 2, getHeight());</code></p> <p>Note that the right-hand edge and the bottom edge of the outline land on <code>x</code> = 200 and <code>y</code> = 300, and <code>y</code> = 300 is one past the last row of a 300-tall panel, so the bottom edge is not visible. <code>drawRect(0, 0, getWidth() - 1, getHeight() - 1)</code> is the call that puts a visible border all the way round a component.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> A horizontal line right across the middle.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>g.drawLine(0, 150, 399, 150);</code> &mdash; the two endpoints, not a start and a length. <code>drawLine</code> is the only one of these methods whose last two arguments are a <em>position</em> rather than a size, and mixing that up is worth a mark on an exam.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> The word <code>Total</code> starting 10 pixels in from the left edge and 20 pixels down from the top.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>g.drawString("Total", 10, 20);</code> &mdash; and be aware that because 20 is the <em>baseline</em>, the letters occupy roughly <code>y</code> 8 to 20 rather than 20 to 32. If you want text comfortably clear of the top edge, give it a <code>y</code> of at least the font size, not a <code>y</code> of 2.</p> <p><strong>Things to notice across all four parts.</strong> Three of the four methods take a position and a <em>size</em>; <code>drawLine</code> takes two positions; <code>drawString</code> takes the text first and then a position that means something different again. When you are unsure, the reliable question is "does the last pair of numbers describe how big it is, or where it ends?"</p> </div></details> </div> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; BasicDrawingDemo, every method at once</span></div> <div class="bd"> <p>This is your instructor's tour of the drawing methods. It is split into two files: a <code>JPanel</code> subclass that does nothing but draw, and a <code>JFrame</code> that puts one on the screen. That split is worth copying &mdash; the panel is now a class you can reuse, test, or drop into any window.</p> <p class="filename">DrawingPanel.java</p>
+<pre><code class="language-java">import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+
+import javax.swing.JPanel;
+
+public class DrawingPanel extends JPanel {
+
+   protected void paintComponent(Graphics g) {
+      super.paintComponent(g);
+
+      // Cast to Graphics2D for advanced features
+      Graphics2D g2d = (Graphics2D) g;
+
+      // Draw a line
+      g.setColor(Color.BLACK);
+      g.drawLine(50, 50, 200, 50);
+      g.drawString("Line", 125, 70);
+
+      // Draw a rectangle outline
+      g.setColor(Color.RED);
+      g.drawRect(50, 100, 150, 70);
+      g.drawString("Rectangle Outline", 75, 190);
+
+      // Draw a filled rectangle
+      g.setColor(Color.BLUE);
+      g.fillRect(250, 100, 150, 70);
+      g.setColor(Color.WHITE);
+      g.drawString("Filled Rectangle", 275, 135);
+
+      // Draw an oval outline
+      g.setColor(Color.GREEN);
+      g.drawOval(50, 220, 150, 100);
+      g.setColor(Color.BLACK);
+      g.drawString("Oval Outline", 85, 340);
+
+      // Draw a filled oval
+      g.setColor(Color.ORANGE);
+      g.fillOval(250, 220, 150, 100);
+      g.setColor(Color.BLACK);
+      g.drawString("Filled Oval", 285, 340);
+
+      // Draw an arc (part of an oval)
+      g.setColor(Color.PINK);
+      g.drawArc(450, 100, 150, 150, 0, 135);
+      g.drawString("Arc", 510, 170);
+
+      // Draw a polygon
+      g.setColor(Color.DARK_GRAY);
+      int[] xPoints = {450, 550, 600, 550};
+      int[] yPoints = {270, 220, 270, 350};
+      g.fillPolygon(xPoints, yPoints, 4);
+      g.drawString("Polygon", 500, 370);
+
+      // Draw text with a different font
+      g.setColor(Color.RED);
+      Font currentFont = g.getFont();
+      Font newFont = currentFont.deriveFont(Font.BOLD, 20f);
+      g.setFont(newFont);
+      g.drawString("Java Graphics Demo", 230, 450);
+
+      // Draw with a different stroke (line thickness)
+      g.setColor(Color.BLACK);
+      g2d.setStroke(new BasicStroke(5));
+      g2d.drawLine(230, 460, 440, 460);
+   }
+}</code></pre> <p class="filename">BasicDrawingDemo.java</p>
+<pre><code class="language-java">import java.awt.Color;
+
+import javax.swing.JFrame;
+
+public class BasicDrawingDemo extends JFrame {
+
+   public static final int WIDTH = 700;
+   public static final int HEIGHT = 550;
+
+   public BasicDrawingDemo() {
+      super("Basic Drawing Demo");
+      setSize(WIDTH, HEIGHT);
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+      DrawingPanel panel = new DrawingPanel();
+      panel.setBackground(Color.WHITE);
+      add(panel);
+   }
+
+   public static void main(String args[]) {
+      BasicDrawingDemo demo = new BasicDrawingDemo();
+      demo.setVisible(true);
+   }
+}</code></pre> <p>This program opens a window and prints nothing, so there is no output to show. Before you reveal, work out on paper roughly where each of the nine shapes lands, and answer one question: the label <em>Rectangle Outline</em> is drawn at <code>y</code> = 190, and the rectangle itself ends at <code>y</code> = 170. Is the label inside the rectangle or below it?</p> <details class="soln reveal noout"><summary></summary><div class="ans">
+ <p>Below it. The rectangle occupies <code>y</code> 100 to 170; the label's baseline is at 190, twenty pixels further down, so it sits clear underneath. Every label in this program is placed the same way except <em>Filled Rectangle</em>, which is deliberately drawn in white at <code>y</code> = 135 so that it lands <em>on top of</em> the blue rectangle and is legible against it.</p> <p>Here is the layout, drawn as a coarse character grid: one character stands for a block of about 10 by 14 pixels, and the letter says which color came out. It is a sketch of the arrangement, not a screenshot.</p> <p class="filename">Layout of the 700 &times; 550 panel &mdash; a sketch, not a screenshot</p>
+<pre class="cmp"><code>      x=0         100       200       300       400       500       600       700
+        |         |         |         |         |         |         |         |
+y= 50        KKKKKKKKKKKKKKKK
+                    KKK
+
+y=100        RRRRRRRRRRRRRRRR    BBBBBBBBBBBBBBB        PPPPPPPPP
+             R              R    BBBBBBBBBBBBBBB       PP       PPP
+             R              R    BBBBBBBBBBBBBBB                  PP
+             R              R    BBBBBBBBBBBBBBB                   P
+             R              R    BBBBBBBBBBBBBBB           PP      P
+             RRRRRRRRRRRRRRRR    BBBBBBBBBBBBBBB           PP      PP
+y=170          RRRRRRRRRRRR
+
+                 GGGGGGG              OOOOO                   DD
+y=220         GGGG     GGGG        OOOOOOOOOOOO            DDDDDD
+             GG           GG     OOOOOOOOOOOOOOO        DDDDDDDDDDD
+             G             G     OOOOOOOOOOOOOOO      DDDDDDDDDDDDDD
+             G             GG    OOOOOOOOOOOOOOO     DDDDDDDDDDDDDDD
+             G             G     OOOOOOOOOOOOOOO      DDDDDDDDDDDDDD
+             GGG         GGG      OOOOOOOOOOOOOO        DDDDDDDDDDD
+               GGGGGGGGGGG         OOOOOOOOOOO           DDDDDDDDD
+y=320           KKKKKKKK            KKKKKKK                DDDDDD
+                KKKKKKKK            KKKKKKK                  DDD
+                                                          DDDDD
+                                                          DDDDD
+
+
+
+                               RRRRRRRRRRRRRRRRRRRRRRR
+y=450                         KKKKKKKKKKKKKKKKKKKKKKKR
+                              KKKKKKKKKKKKKKKKKKKKKKK
+
+   K = black    R = red    B = blue    G = green
+   O = orange   P = pink   D = dark gray    blank = white background</code></pre> <p>Read the sketch against the code and every argument makes sense.</p> <ul> <li>The black line starts at <code>x</code> = 50 and stops at <code>x</code> = 200, and the word <em>Line</em> hangs below its middle.</li> <li>The red rectangle is an <strong>outline</strong> &mdash; hollow, four sides, white inside. The blue one beside it is <strong>filled</strong>, and its label is the white text you can see punched into it.</li> <li>The green oval touches the sides of the box <code>x</code> 50&ndash;200, <code>y</code> 220&ndash;320 and leaves the corners empty. The orange one occupies the same shape 200 pixels to the right, solid.</li> <li>The pink arc starts at 3 o'clock and sweeps 135 degrees counterclockwise, so it runs from the right-hand side up and over to the upper left &mdash; a bit more than a quarter-circle.</li> <li>The dark gray polygon is the four points (450, 270), (550, 220), (600, 270), (550, 350) joined in order and filled: a kite, wide at the top and pointed at the bottom.</li> <li>The two rows at <code>y</code> = 450 and 460 are the 20-point bold red heading and, immediately below it, a line drawn with <code>new BasicStroke(5)</code> &mdash; five pixels thick instead of one.</li> </ul> <p><strong>One thing to change if you copy this code.</strong> Notice that the background color is set by <code>BasicDrawingDemo</code>, on the panel, in the constructor. Your instructor's original had <code>setBackground(Color.WHITE);</code> inside <code>paintComponent</code> instead. The next box explains why that does not work properly.</p> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; setBackground inside paintComponent is too late</span></div> <div class="bd"> <p><code>setBackground</code> does not paint anything. It stores a color on the component, and the component's background is filled by <code>super.paintComponent(g)</code> &mdash; which has <em>already run</em> by the time you get to the next line. So the very first painting uses whatever color the panel had before, and only a later painting uses the new one.</p> <p>This small program paints the same panel twice and looks at the corner pixel each time:</p> <p class="filename">BgTest.java</p>
+<pre><code class="language-java">import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+
+import javax.swing.JPanel;
+
+class HerPanel extends JPanel {
+   protected void paintComponent(Graphics g) {
+      super.paintComponent(g);
+      setBackground(Color.WHITE);      // set AFTER the background was already filled
+      g.setColor(Color.BLACK);
+      g.drawLine(50, 50, 200, 50);
+   }
+}
+
+public class BgTest {
+   static String px(BufferedImage im, int x, int y) {
+      Color c = new Color(im.getRGB(x, y));
+      return "rgb(" + c.getRed() + "," + c.getGreen() + "," + c.getBlue() + ")";
+   }
+
+   public static void main(String args[]) {
+      HerPanel p = new HerPanel();
+      p.setSize(300, 200);
+      System.out.println("panel background before any painting: " + p.getBackground());
+
+      BufferedImage im = new BufferedImage(300, 200, BufferedImage.TYPE_INT_RGB);
+      Graphics2D g = im.createGraphics();
+
+      p.paint(g);
+      System.out.println("after 1st paint, corner pixel   = " + px(im, 5, 5));
+      System.out.println("panel background is now:          " + p.getBackground());
+
+      p.paint(g);
+      System.out.println("after 2nd paint, corner pixel   = " + px(im, 5, 5));
+      g.dispose();
+   }
+}</code></pre> <pre class="out"><code>panel background before any painting: javax.swing.plaf.ColorUIResource[r=238,g=238,b=238]
+after 1st paint, corner pixel   = rgb(238,238,238)
+panel background is now:          java.awt.Color[r=255,g=255,b=255]
+after 2nd paint, corner pixel   = rgb(255,255,255)</code></pre> <p>The first painting comes out gray, not white. (238, 238, 238 is the default panel color of this machine's look and feel; yours may be a slightly different gray.) In a real window you usually get away with it, because changing a component's background asks Swing for another repaint, and the second painting is white &mdash; but you have paid for two paintings and a visible flash to achieve what one line in the constructor does properly.</p> <p>The rule is general and worth carrying beyond this example: <strong><code>paintComponent</code> should only draw.</strong> Setting properties, creating objects, reading files or changing fields inside it means doing that work again every time a window is uncovered.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 19.6</div> <div class="bd"> <p>Write a complete class <code>SmileyPanel</code> that extends <code>JPanel</code> and draws a face in the middle of the panel: a yellow filled circle 200 pixels across, two black filled eyes 20 pixels across, and a straight black mouth. Use <code>getWidth()</code> and <code>getHeight()</code> so that the face stays centered when the window is resized. Add a <code>main</code> in a separate class that puts it in a 400 by 400 frame.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Compute the center once, into two local variables, and express everything else as an offset from it. Then each shape is a bounding box you can write without thinking: a circle of diameter <code>d</code> centered at (<code>cx</code>, <code>cy</code>) is <code>fillOval(cx - d/2, cy - d/2, d, d)</code>. Remember that the eyes are <em>above</em> the center, which means <em>subtracting</em> from <code>cy</code>.</p> <p class="filename">SmileyPanel.java</p>
+<pre><code class="language-java">import java.awt.Color;
+import java.awt.Graphics;
+
+import javax.swing.JPanel;
+
+public class SmileyPanel extends JPanel {
+
+   public void paintComponent(Graphics g) {
+      super.paintComponent(g);
+
+      int cx = getWidth() / 2;
+      int cy = getHeight() / 2;
+
+      // The face: a circle 200 across, centered on the panel.
+      g.setColor(Color.YELLOW);
+      g.fillOval(cx - 100, cy - 100, 200, 200);
+      g.setColor(Color.BLACK);
+      g.drawOval(cx - 100, cy - 100, 200, 200);
+
+      // Two eyes, 20 across, 40 above the center and 35 either side of it.
+      g.fillOval(cx - 35 - 10, cy - 40 - 10, 20, 20);
+      g.fillOval(cx + 35 - 10, cy - 40 - 10, 20, 20);
+
+      // The mouth: a straight line 80 wide, 45 below the center.
+      g.drawLine(cx - 40, cy + 45, cx + 40, cy + 45);
+   }
+}</code></pre> <p class="filename">SmileyDemo.java</p>
+<pre><code class="language-java">import java.awt.Color;
+
+import javax.swing.JFrame;
+
+public class SmileyDemo extends JFrame {
+
+   public SmileyDemo() {
+      super("Smiley");
+      setSize(400, 400);
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+      SmileyPanel panel = new SmileyPanel();
+      panel.setBackground(Color.WHITE);
+      add(panel);
+   }
+
+   public static void main(String args[]) {
+      SmileyDemo gui = new SmileyDemo();
+      gui.setVisible(true);
+   }
+}</code></pre> <p><strong>Things to notice.</strong> Every eye coordinate is written as <code>center ± offset − radius</code>, which looks fussy but is exactly the arithmetic the bounding box forces on you. Writing <code>cx - 35 - 10</code> rather than the already-simplified <code>cx - 45</code> keeps the two ideas visible: 35 is where the eye's <em>center</em> goes, 10 is half its diameter.</p> <p><code>fillOval</code> then <code>drawOval</code> with the same four arguments is the standard idiom for a filled shape with an outline round it &mdash; fill first, outline second, or the outline gets painted over.</p> <p>The mouth could be an arc instead of a line: <code>g.drawArc(cx - 40, cy + 10, 80, 60, 180, 180);</code> draws the bottom half of an ellipse, which curves the right way for a smile. Try it.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 19.6</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="22" aria-label="Live coding - Quick Check 19.6">import java.awt.Color;
+import java.awt.Graphics;
+
+import javax.swing.JPanel;
+
+public class SmileyPanel extends JPanel {
+
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        // 1. Find the center of the panel with getWidth() and getHeight().
+
+        // 2. A yellow filled circle 200 across, centered there.
+
+        // 3. Two black eyes, 20 across, above the center.
+
+        // 4. A straight black mouth below the center.
+
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 19.7</div> <div class="bd"> <p>A student wants a circle of radius 50 centered at (200, 200). They write <code>g.drawOval(200, 200, 50, 50);</code>. Describe precisely what appears instead, and give the correct call.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Read their four numbers as what <code>drawOval</code> actually means: bounding-box corner, width, height.</p> <p>What appears is a circle 50 pixels <em>across</em> &mdash; radius 25, not 50 &mdash; whose bounding box starts at (200, 200), so its center is at (200 + 25, 200 + 25) = (225, 225). It is both half the intended size and displaced down and to the right by 25 pixels in each direction.</p> <p>The correct call converts center and radius into corner and diameter:</p> <pre><code class="language-java">g.drawOval(200 - 50, 200 - 50, 100, 100);
+// g.drawOval(150, 150, 100, 100);</code></pre> <p><strong>Things to notice.</strong> Two independent mistakes are hiding in one line, and they partly cancel: the shape is smaller <em>and</em> shifted, so the top-left of the wrong circle is not far from the top-left of the right one, and on screen it can look "nearly right". That is exactly why this bug survives to the exam.</p> <p>A habit that kills it for good: never pass a radius to a drawing method. Convert to diameter the moment you have it &mdash; <code>int d = 2 * r;</code> &mdash; and then the only arithmetic left is <code>center - d / 2</code>.</p> </div></details> </div> </div> <h2 id="s4"><span class="num">4.</span>Color, and a word about Font</h2> <p>A <code>Graphics</code> has a <em>current color</em>. Every drawing method uses it, and it stays set until you change it. There is no color argument on any of the methods in &sect;3, which is why your instructor's code is a strict alternation of <code>setColor</code> and a drawing call.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; Color</span></div> <div class="bd"> <p><code>java.awt.Color</code> represents a color as three numbers &mdash; the amounts of <strong>red</strong>, <strong>green</strong> and <strong>blue</strong> light mixed together &mdash; each from 0 to 255. There are three ways to get one:</p> <ul> <li>A named constant: <code>Color.RED</code>, <code>Color.BLUE</code>, <code>Color.GREEN</code>, <code>Color.BLACK</code>, <code>Color.WHITE</code>, <code>Color.YELLOW</code>, <code>Color.ORANGE</code>, <code>Color.PINK</code>, <code>Color.CYAN</code>, <code>Color.MAGENTA</code>, <code>Color.GRAY</code>, <code>Color.LIGHT_GRAY</code>, <code>Color.DARK_GRAY</code>.</li> <li><code>new Color(r, g, b)</code> with three numbers of your own.</li> <li><code>new Color(rgb)</code> with a single <code>int</code> holding all three packed together &mdash; red in the top byte, then green, then blue. This is the form your instructor uses to make random colors.</li> </ul> <p><code>g.setColor(c)</code> makes <code>c</code> the current color. A <code>Color</code> object never changes once created; to change color you set a different one.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; what the constants actually are</span></div> <div class="bd"> <p>The constants are ordinary <code>Color</code> objects and you can ask them their components. Two of the answers below are not what people guess. Predict <code>Color.ORANGE</code> and <code>Color.PINK</code> before you reveal.</p> <p class="filename">ColorFacts.java</p>
+<pre><code class="language-java">import java.awt.Color;
+
+public class ColorFacts {
+   static void show(String label, Color c) {
+      System.out.printf("%-22s red=%-4d green=%-4d blue=%d%n",
+                        label, c.getRed(), c.getGreen(), c.getBlue());
+   }
+
+   public static void main(String args[]) {
+      show("Color.BLACK",   Color.BLACK);
+      show("Color.WHITE",   Color.WHITE);
+      show("Color.RED",     Color.RED);
+      show("Color.GREEN",   Color.GREEN);
+      show("Color.BLUE",    Color.BLUE);
+      show("Color.ORANGE",  Color.ORANGE);
+      show("Color.PINK",    Color.PINK);
+      show("Color.GRAY",    Color.GRAY);
+      show("Color.DARK_GRAY", Color.DARK_GRAY);
+
+      System.out.println();
+      show("new Color(255,0,0)",   new Color(255, 0, 0));
+      show("new Color(0,128,128)", new Color(0, 128, 128));
+      show("new Color(153,0,51)",  new Color(153, 0, 51));
+
+      System.out.println();
+      System.out.println("Color.RED.equals(new Color(255,0,0)) is " + Color.RED.equals(new Color(255, 0, 0)));
+
+      System.out.println();
+      int rgb = 10027263;                 // one number instead of three
+      show("new Color(10027263)", new Color(rgb));
+      System.out.println("   because 10027263 = 153*65536 + 0*256 + 255");
+   }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Color.BLACK            red=0    green=0    blue=0
+Color.WHITE            red=255  green=255  blue=255
+Color.RED              red=255  green=0    blue=0
+Color.GREEN            red=0    green=255  blue=0
+Color.BLUE             red=0    green=0    blue=255
+Color.ORANGE           red=255  green=200  blue=0
+Color.PINK             red=255  green=175  blue=175
+Color.GRAY             red=128  green=128  blue=128
+Color.DARK_GRAY        red=64   green=64   blue=64
+
+new Color(255,0,0)     red=255  green=0    blue=0
+new Color(0,128,128)   red=0    green=128  blue=128
+new Color(153,0,51)    red=153  green=0    blue=51
+
+Color.RED.equals(new Color(255,0,0)) is true
+
+new Color(10027263)    red=153  green=0    blue=255
+   because 10027263 = 153*65536 + 0*256 + 255</code></pre> <p>Three things to take away.</p> <ul> <li><strong>The constants are nothing special.</strong> <code>Color.RED</code> <em>is</em> <code>new Color(255, 0, 0)</code>, and <code>equals</code> says so. They are <code>public static final Color</code> fields &mdash; exactly the pattern from Lecture 9 &mdash; provided so you do not have to remember the numbers.</li> <li><strong>Mixing light is not mixing paint.</strong> Red plus green light gives yellow, not brown; all three at full gives white; all three at zero gives black; equal amounts of all three give a gray whose brightness is that amount. That is why <code>Color.GRAY</code> is (128, 128, 128).</li> <li><strong>The one-argument constructor packs the three bytes into one <code>int</code>.</strong> 10027263 in binary is 153 in the red byte, 0 in the green, 255 in the blue. That is what makes the line <code>int rgb = (int) (Math.random() * 256 * 256 * 256);</code> in &sect;6 work: 256 &times; 256 &times; 256 is 16,777,216, the number of distinct colors, so the expression picks one of them uniformly.</li> </ul> 
+</div></details> </div> </div> <p>Fonts work the same way: the <code>Graphics</code> has a current font, and <code>setFont</code> changes it. You rarely need more than the one idiom that appears in <code>DrawingPanel</code>.</p> <pre><code class="language-java">Font currentFont = g.getFont();                          // whatever font is in use
+Font newFont = currentFont.deriveFont(Font.BOLD, 20f);   // same face, bold, 20 point
+g.setFont(newFont);
+g.drawString("Java Graphics Demo", 230, 450);</code></pre> <p><code>deriveFont</code> makes a copy of a font with something changed, which is safer than naming a font family that may not exist on the machine. If you want to build one from scratch the constructor is <code>new Font("SansSerif", Font.BOLD, 20)</code> &mdash; family name, style (<code>Font.PLAIN</code>, <code>Font.BOLD</code>, <code>Font.ITALIC</code>, or <code>Font.BOLD + Font.ITALIC</code>), and size in points. Note the <code>20f</code> in <code>deriveFont</code>: that overload takes a <code>float</code>, and plain <code>20</code> would call a different method.</p> <div class="box qc"> <div class="hd">Quick Check 19.8</div> <div class="bd"> <p>Consider this fragment inside a <code>paintComponent</code>.</p> <pre><code class="language-java">g.setColor(Color.RED);
+g.fillRect(10, 10, 50, 50);
+g.fillRect(70, 10, 50, 50);
+g.setColor(Color.BLUE);
+g.fillRect(130, 10, 50, 50);</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> What color is the second square?</p> <details class="soln"><summary></summary><div class="ans"> <p>Red. The current color persists until it is changed, so one <code>setColor</code> serves as many drawing calls as you like. Only the third square is blue.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Suppose the first line were deleted. What color would the first two squares be?</p> <details class="soln"><summary></summary><div class="ans"> <p>Whatever the current color happened to be when <code>paintComponent</code> was entered &mdash; in practice the component's foreground color, usually black, but you should treat it as unspecified. This is why well-written drawing code sets a color before its first drawing call rather than relying on the initial one.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Write the line that would make the third square a medium teal instead of pure blue.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>g.setColor(new Color(0, 128, 128));</code> &mdash; no red, half green, half blue. There is no <code>Color.TEAL</code> constant, so this is the case the three-argument constructor exists for.</p> <p><strong>Things to notice across all three parts.</strong> The current color is <em>state</em> held by the <code>Graphics</code> object, exactly like the current font. Reading a <code>paintComponent</code> means tracking that state down the page, which is precisely the skill an exam "what color is the shape at line 7?" question is testing.</p> </div></details> </div> </div> </div> <h2 id="s5"><span class="num">5.</span>repaint(): how you ask for a redraw</h2> <p>You know where the drawing code goes and you know you must not call it. So how does a picture ever change in response to a button click?</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; repaint</span></div> <div class="bd"> <p><code>repaint()</code> is a method on every component. It does not draw anything. It <strong>puts a request on a queue</strong>: "this component is out of date, please paint it when convenient". Swing collects those requests, works out what actually needs redrawing, and later calls <code>paintComponent</code> on the event dispatch thread.</p> <p>The pattern is always the same two steps:</p> <ol> <li>Change the <em>data</em> the panel draws from &mdash; a field, a list, a coordinate.</li> <li>Call <code>repaint()</code> on the panel.</li> </ol> <p><code>paintComponent</code> then reads the new data and produces the new picture.</p> </div> </div> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; why not just call paintComponent yourself?</span></div> <div class="bd"> <p>Three reasons, in increasing order of importance.</p> <ol> <li><strong>You do not have a <code>Graphics</code> to give it.</strong> The only valid one is the one Swing hands to <code>paintComponent</code>. Getting one another way is the mistake &sect;6 is about.</li> <li><strong>You would skip half the work.</strong> <code>paintComponent</code> draws the content; the border and any child components are painted by <code>paintBorder</code> and <code>paintChildren</code> afterwards, and calling the middle one on its own gets you a component drawn without its border.</li> <li><strong>Ten changes should cost one repaint.</strong> If a loop moves twenty shapes and calls <code>repaint()</code> twenty times, Swing collapses those requests and repaints once. Twenty direct calls to <code>paintComponent</code> would be twenty full redraws, and the user would see every intermediate state flicker past.</li> </ol> <p>Say it as a rule: <strong><code>repaint()</code> is a request; <code>paintComponent</code> is the response. You only ever write the request.</strong></p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 19.9</div> <div class="bd"> <p>A panel has a field <code>private int circleX = 50;</code> and a <code>paintComponent</code> that draws a circle at <code>circleX</code>. A button's <code>actionPerformed</code> contains this:</p> <pre><code class="language-java">public void actionPerformed(ActionEvent e) {
+   circleX = circleX + 20;
+}</code></pre> <p>The button clicks, but the circle never moves. What is missing, and where does it go?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The data changed. Ask who was told.</p> <p>Nobody. <code>circleX</code> really is 70 after the first click, and 90 after the second &mdash; but no repaint was requested, so <code>paintComponent</code> is never called again and the screen still shows the picture from the last time Swing happened to paint. The fix is one line:</p> <pre><code class="language-java">public void actionPerformed(ActionEvent e) {
+   circleX = circleX + 20;
+   panel.repaint();              // ask for the new picture
+}</code></pre> <p><strong>Things to notice.</strong> The listener changes data and asks for a repaint; it never draws. That division is the whole architecture of a Swing graphics program, and it is what &sect;7 formalises.</p> <p>An interesting confirmation: without the <code>repaint()</code> line, minimising the window and restoring it makes the circle jump to its correct new position. The uncover forced a paint, and <code>paintComponent</code> read the field that had been changing all along. If a student ever reports that behavior, the diagnosis is certain.</p> </div></details> </div> </div> <h2 id="s6"><span class="num">6.</span>Direct drawing versus painting</h2> <p>There is another way to get a <code>Graphics</code>, and your instructor's notes show it deliberately so that you can watch it fail. It is called <em>direct drawing</em>.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; direct drawing</span></div> <div class="bd"> <p><strong>Direct drawing</strong> means asking a component for a <code>Graphics</code> yourself, with <code>Graphics g = component.getGraphics();</code>, and drawing on it from ordinary code &mdash; a listener, a loop, anywhere.</p> <p>It has an immediate visual effect, and it is <strong>not persistent</strong>. The pixels you set are the ones on the screen right now; nothing remembers them. The next time Swing repaints that component, for any reason, it calls <code>paintComponent</code>, which knows nothing about your drawing, and your picture is gone.</p> <p><strong>Painting</strong> means putting the drawing in <code>paintComponent</code> and calling <code>repaint()</code>. It is persistent, because the picture is rebuilt from data every time it is needed. For everything you write in this course, painting is the right answer.</p> </div> </div> <p>Here is the program built the wrong way. It is worth reading closely, because every line of it is reasonable-looking and the design is still broken.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; GraphicsDemo, and why its picture evaporates</span></div> <div class="bd"> <p>A window with a <em>Shapes</em> menu. Choosing <em>Circle</em>, <em>Rectangle</em> or <em>Line</em> draws one at a random position in a random color; <em>Change Repeats</em> toggles between one shape per click and ten; <em>Clear</em> paints the whole panel white again.</p> <p class="filename">GraphicsDemo.java</p>
+<pre><code class="language-java">import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+
+public class GraphicsDemo extends JFrame implements ActionListener {
+   public static final int WIDTH = 1200;
+   public static final int HEIGHT = 800;
+
+   private JPanel picturePanel;
+   private int repeat = 1;
+
+   public GraphicsDemo() {
+      super("Graphics Demo");
+      setSize(WIDTH, HEIGHT);
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+      Container contentPane = getContentPane();
+      contentPane.setLayout(new BorderLayout());
+
+      JMenuBar mBar = new JMenuBar();
+      setJMenuBar(mBar);
+      JMenu shapeMenu = new JMenu("Shapes");
+      mBar.add(shapeMenu);
+
+      String[] names = {"Circle", "Rectangle", "Line", "Change Repeats", "Clear"};
+      for (int i = 0; i &lt; names.length; i++) {
+         JMenuItem item = new JMenuItem(names[i]);
+         item.addActionListener(this);
+         shapeMenu.add(item);
+      }
+
+      picturePanel = new JPanel();
+      picturePanel.setBackground(Color.WHITE);
+      contentPane.add(picturePanel, BorderLayout.CENTER);
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      String command = e.getActionCommand();
+      Graphics g = picturePanel.getGraphics();      // direct drawing
+      if (command.equals("Clear")) {
+         g.setColor(Color.WHITE);
+         g.fillRect(0, 0, WIDTH, HEIGHT);
+      }
+      else if (command.equals("Change Repeats")) {
+         if (repeat == 1) repeat = 10;
+         else repeat = 1;
+      }
+      else for (int x = 0; x &lt; repeat; x++) {
+         draw(g, command);
+      }
+      picturePanel.validate();
+   }
+
+   private void draw(Graphics g, String command) {
+      int rgb = (int) (Math.random() * 256 * 256 * 256);
+      int xCenter = (int) (Math.random() * 1200);
+      int yCenter = (int) (Math.random() * 800);
+      int size = (int) (Math.random() * 150) + 30;
+      g.setColor(new Color(rgb));
+      if (command.equals("Circle"))    g.fillOval(xCenter, yCenter, size, size);
+      if (command.equals("Rectangle")) g.fillRect(xCenter, yCenter, size, size);
+      if (command.equals("Line")) {
+         Graphics2D g2 = (Graphics2D) g;
+         g2.setStroke(new BasicStroke(5));
+         g2.drawLine(xCenter, yCenter, xCenter + size, yCenter + size);
+      }
+   }
+
+   public static void main(String args[]) {
+      GraphicsDemo gui = new GraphicsDemo();
+      gui.setVisible(true);
+   }
+}</code></pre> <p>It works, in the sense that shapes appear when you choose a menu item. Before you reveal, answer two questions. First: what happens to the shapes if you drag another window across this one? Second: this class has no <code>paintComponent</code> anywhere &mdash; where is the drawing code, and who calls it?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <p><strong>The shapes vanish.</strong> Every one of them. Covering the panel destroys those pixels; uncovering it makes Swing repaint the panel, and a plain <code>JPanel</code>'s <code>paintComponent</code> fills itself with its background color and stops, because that is all a plain <code>JPanel</code> has ever drawn. Nothing anywhere remembers that there were forty circles. Resizing the window does the same thing. So does minimising and restoring it.</p> <p><strong>The drawing code is in <code>draw</code>, and <code>actionPerformed</code> calls it directly.</strong> That is the whole problem in one sentence. The picture exists only as pixels that were poked onto the screen at the moment of a click; it has no representation in the program at all.</p> <p>There is a second, sharper failure hiding in <code>getGraphics()</code>. It returns <code>null</code> for a component that is not currently on the screen:</p> <p class="filename">GetGraphicsTest.java</p>
+<pre><code class="language-java">import java.awt.Graphics;
+
+import javax.swing.JPanel;
+
+public class GetGraphicsTest {
+   public static void main(String args[]) {
+      JPanel panel = new JPanel();
+      panel.setSize(400, 300);
+
+      Graphics g = panel.getGraphics();
+      System.out.println("panel.isShowing() = " + panel.isShowing());
+      System.out.println("panel.getGraphics() returned " + g);
+
+      g.drawLine(0, 0, 100, 100);      // what happens here?
+   }
+}</code></pre> <pre class="out"><code>panel.isShowing() = false
+panel.getGraphics() returned null
+Exception in thread "main" java.lang.NullPointerException: Cannot invoke "java.awt.Graphics.drawLine(int, int, int, int)" because "g" is null</code></pre> <p>So direct drawing only works at all after the window is visible, which is why you cannot use it to set up a picture in a constructor. Inside <code>paintComponent</code> the question never arises: Swing only calls you when there is a real surface to draw on, and it hands you the <code>Graphics</code> for it.</p> <p>Two smaller remarks on this code, both worth noticing because they are symptoms of the same design problem rather than separate bugs:</p> <ul> <li><code>Clear</code> erases by painting a white rectangle 1200 by 800 &mdash; the size of the <em>frame</em>, not of the panel. It happens to be big enough. In a properly painted version, clearing means emptying a list, and the size never comes into it.</li> <li><code>picturePanel.validate()</code> at the end does nothing useful here; <code>validate</code> re-runs the layout, and no components have moved. It is where <code>repaint()</code> would go if the program had anything to repaint.</li> </ul> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 19.10</div> <div class="bd"> <p>Two ways to make an area of a window red: <code>panel.setBackground(Color.RED);</code> and, inside <code>paintComponent</code>, <code>g.setColor(Color.RED); g.fillRect(0, 0, getWidth(), getHeight());</code></p> <div class="part"> <p class="q"><span class="pl">(a)</span> Which one survives the window being covered and uncovered?</p> <details class="soln"><summary></summary><div class="ans"> <p>Both do &mdash; and that is the point of the question. <code>setBackground</code> stores a property on the component, and <code>super.paintComponent(g)</code> re-fills with it on every repaint. The <code>fillRect</code> version is inside <code>paintComponent</code>, so it runs on every repaint too. Neither is direct drawing.</p> <p>The version that would <em>not</em> survive is <code>panel.getGraphics().fillRect(...)</code> from a listener.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Your GUI exam questions ask you to make a panel red. Which one do they expect?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>setBackground</code>. Every GUI question on the CSCI 212 exams that involves color &mdash; the red error window, the panels that swap colors when a button is clicked, the center panel that turns red, orange or green &mdash; is solved with <code>setBackground(Color.RED)</code> on a component, not with a drawing method.</p> <p>That is worth knowing about the exam: colored <em>areas</em> are components with a background; <code>fillRect</code> is for shapes you are drawing yourself.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Give one thing the <code>fillRect</code> version can do that <code>setBackground</code> cannot.</p> <details class="soln"><summary></summary><div class="ans"> <p>Anything that is not the whole rectangle: half the panel, a stripe, a circle, a gradient of a hundred rectangles, a shape whose size depends on data. <code>setBackground</code> colors the entire component and nothing else.</p> <p><strong>Things to notice across all three parts.</strong> The choice is not "drawing versus components" as a matter of taste. If the thing you want is a rectangle that fills a region and reacts to clicks, make it a component and set its background; Swing will manage it. If it is a picture, draw it in <code>paintComponent</code>. Reaching for graphics when a component would do is how people end up reimplementing buttons.</p> </div></details> </div> </div> </div> <h2 id="s7"><span class="num">7.</span>A panel that remembers what to draw</h2> <p>The fix for <code>GraphicsDemo</code> is not a better drawing routine. It is a change of mind about what the program <em>is</em>. Right now the picture lives on the screen. It has to live in the program instead, as data, and the screen has to become a report of that data.</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; the picture is data, not pixels</span></div> <div class="bd"> <p>Keep a list of the things that should be on the screen. <code>paintComponent</code> draws every item in the list, from scratch, every time it is called. A user action adds to the list, removes from it, or edits it &mdash; and then calls <code>repaint()</code>.</p> <p>Now every one of the events that used to destroy the picture &mdash; a resize, an uncover, a minimise &mdash; simply causes the list to be drawn again. The picture is indestructible because it was never really on the screen in the first place.</p> </div> </div> <p>Your instructor's version of this is three small classes. <code>Shape</code> is one item in the list. <code>PaintingPanel</code> holds the list and draws it. <code>PaintingDemo</code> is the window and the menus.</p> <p class="filename">Shape.java</p>
+<pre><code class="language-java">public class Shape {
+   String shapeType;
+   int rgbValue;
+   int x;
+   int y;
+   int size;
+
+   public Shape(String s, int rgb, int xCenter, int yCenter, int sz) {
+      shapeType = s;
+      rgbValue = rgb;
+      x = xCenter;
+      y = yCenter;
+      size = sz;
+   }
+}</code></pre> <p class="filename">PaintingPanel.java</p>
+<pre><code class="language-java">import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.util.ArrayList;
+
+import javax.swing.JPanel;
+
+public class PaintingPanel extends JPanel {
+
+   private ArrayList&lt;Shape&gt; data;
+
+   public PaintingPanel() {
+      super();
+      data = new ArrayList&lt;Shape&gt;();
+   }
+
+   public void add(int repeat, String s) {
+      for (int i = 0; i &lt; repeat; i++) {
+         int rgb = (int) (Math.random() * 256 * 256 * 256);
+         int xCenter = (int) (Math.random() * 1200);
+         int yCenter = (int) (Math.random() * 800);
+         int size = (int) (Math.random() * 150) + 30;
+         data.add(new Shape(s, rgb, xCenter, yCenter, size));
+      }
+   }
+
+   public void paintComponent(Graphics g) {
+      super.paintComponent(g);
+      for (int i = 0; i &lt; data.size(); i++) {
+         Shape s = data.get(i);
+         g.setColor(new Color(s.rgbValue));
+         String command = s.shapeType;
+         if (command.equals("Circle")) g.fillOval(s.x, s.y, s.size, s.size);
+         if (command.equals("Rectangle")) g.fillRect(s.x, s.y, s.size, s.size);
+         if (command.equals("Line")) {
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setStroke(new BasicStroke(5));
+            g2.drawLine(s.x, s.y, s.x + s.size, s.y + s.size);
+         }
+      }
+   }
+
+   public void clear() {
+      data = new ArrayList&lt;Shape&gt;();
+   }
+}</code></pre> <p>Put the two versions of <code>actionPerformed</code> side by side and the whole lecture is visible in the difference.</p> <table> <tr><th></th><th><code>GraphicsDemo</code> &mdash; direct drawing</th><th><code>PaintingDemo</code> &mdash; painting</th></tr> <tr><td>What a click does</td><td>gets a <code>Graphics</code> and draws on it</td><td>adds objects to a list, then calls <code>repaint()</code></td></tr> <tr><td>Where the drawing code lives</td><td>in a private <code>draw</code> method the listener calls</td><td>in <code>paintComponent</code>, which the listener never calls</td></tr> <tr><td>Where the picture lives</td><td>on the screen only</td><td>in the <code>ArrayList</code> inside the panel</td></tr> <tr><td>Cover the window and uncover it</td><td>everything is lost</td><td>redrawn exactly</td></tr> <tr><td>Clearing</td><td>paint a big white rectangle</td><td><code>data.clear()</code>, then repaint</td></tr> <tr><td>Could you save the picture to a file?</td><td>no &mdash; there is nothing to save</td><td>yes &mdash; write out the list</td></tr> </table> <p class="filename">PaintingDemo.java</p>
+<pre><code class="language-java">import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+
+public class PaintingDemo extends JFrame implements ActionListener {
+   public static final int WIDTH = 1200;
+   public static final int HEIGHT = 800;
+
+   private PaintingPanel picturePanel;
+   private int repeat = 1;
+
+   public PaintingDemo() {
+      super("Graphics Demo");
+      setSize(WIDTH, HEIGHT);
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+      Container contentPane = getContentPane();
+      contentPane.setLayout(new BorderLayout());
+
+      JMenuBar mBar = new JMenuBar();
+      setJMenuBar(mBar);
+      JMenu shapeMenu = new JMenu("Shapes");
+      mBar.add(shapeMenu);
+
+      String[] names = {"Circle", "Rectangle", "Line", "Change Repeats", "Clear"};
+      for (int i = 0; i &lt; names.length; i++) {
+         JMenuItem item = new JMenuItem(names[i]);
+         item.addActionListener(this);
+         shapeMenu.add(item);
+      }
+
+      picturePanel = new PaintingPanel();
+      picturePanel.setBackground(Color.WHITE);
+      contentPane.add(picturePanel, BorderLayout.CENTER);
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      String command = e.getActionCommand();
+      if (command.equals("Change Repeats")) {
+         if (repeat == 1) repeat = 10;
+         else repeat = 1;
+      }
+      else if (command.equals("Clear")) {
+         picturePanel.clear();
+      }
+      else picturePanel.add(repeat, command);
+      picturePanel.repaint();
+   }
+
+   public static void main(String args[]) {
+      PaintingDemo gui = new PaintingDemo();
+      gui.setVisible(true);
+   }
+}</code></pre> <p>Notice the last line of <code>actionPerformed</code>: one <code>repaint()</code>, outside the <code>if</code>, covering every case. Adding ten shapes still costs one repaint request. And notice what is <em>not</em> in that method: no <code>Graphics</code>, no <code>setColor</code>, no <code>fillOval</code>. The listener changes data; the panel draws.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; Model, View, Controller</span></div> <div class="bd"> <p>This three-way split has a name. <strong>MVC</strong> divides a program into:</p> <ul> <li>the <strong>model</strong> &mdash; the data: the <code>Shape</code> class and the <code>ArrayList</code>;</li> <li>the <strong>view</strong> &mdash; the code that displays it: <code>paintComponent</code>;</li> <li>the <strong>controller</strong> &mdash; the code that handles user input: <code>actionPerformed</code>.</li> </ul> <p>The point is that each part can be changed without disturbing the others. Add a new shape type and only the model and the view change. Replace the menus with buttons and only the controller changes. Add a "save to file" feature and only the model is involved, because the model is the only place the picture actually exists.</p> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; a class called Shape collides with java.awt.Shape</span></div> <div class="bd"> <p><code>java.awt</code> already contains an interface named <code>Shape</code>. <code>PaintingPanel</code> gets away with <code>import java.awt.*;</code> because a class in your own directory beats a wildcard import. Add an explicit <code>import java.awt.Shape;</code> &mdash; which an IDE will cheerfully offer to do for you &mdash; and everything falls apart at once:</p> <pre class="err"><code>PaintingPanel.java:22: error: Shape is abstract; cannot be instantiated
+         data.add(new Shape(s, rgb, xCenter, yCenter, size));
+                  ^
+PaintingPanel.java:30: error: cannot find symbol
+         g.setColor(new Color(s.rgbValue));
+                               ^
+  symbol:   variable rgbValue
+  location: variable s of type Shape</code></pre> <p>The messages are bewildering until you realise the compiler is talking about a completely different <code>Shape</code> &mdash; one that has no <code>rgbValue</code> and cannot be instantiated because it is an interface. If a <code>cannot find symbol</code> message names a field you are certain you wrote, check whether the type in the message is the class you meant.</p> <p>The safest fixes are to import only what you use &mdash; <code>import java.awt.Color;</code> rather than <code>import java.awt.*;</code> &mdash; or to give the class a name of its own, such as <code>DrawnShape</code>.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 19.11</div> <div class="bd"> <p>You want to add a <em>Triangle</em> item to <code>PaintingDemo</code> as it currently stands. List every place in the three classes that has to change.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Follow the string <code>"Triangle"</code> from the menu to the pixels and write down every point it has to be recognised at.</p> <ol> <li><strong><code>PaintingDemo</code></strong>: add <code>"Triangle"</code> to the array of menu item names, so there is something to click.</li> <li><strong><code>PaintingPanel.paintComponent</code></strong>: add another <code>if (command.equals("Triangle")) ...</code> with the <code>fillPolygon</code> call in it.</li> </ol> <p>Two places. <code>Shape</code> itself needs no change, because it stores a <code>String</code> and does not care what it says, and <code>add</code> needs no change for the same reason.</p> <p><strong>Things to notice.</strong> Two places is not terrible &mdash; but look at <em>which</em> two. The drawing knowledge for triangles has to be inserted into the middle of a method that already knows how to draw circles, rectangles and lines, and that method grows every time a shape is added. A <code>Shape</code> object in this design is a passive bag of numbers with a string label; it does not know what it is, so something else has to keep asking.</p> <p>If that chain of <code>if (command.equals(...))</code> is ringing a bell from Lecture 13, it should. That is exactly the pattern polymorphism exists to delete, and &sect;8 deletes it.</p> </div></details> </div> </div> <h2 id="s8"><span class="num">8.</span>Letting each shape draw itself</h2> <p>Look again at the loop in <code>paintComponent</code>:</p> <pre><code class="language-java">for (int i = 0; i &lt; data.size(); i++) {
+   Shape s = data.get(i);
+   g.setColor(new Color(s.rgbValue));
+   String command = s.shapeType;
+   if (command.equals("Circle")) g.fillOval(s.x, s.y, s.size, s.size);
+   if (command.equals("Rectangle")) g.fillRect(s.x, s.y, s.size, s.size);
+   if (command.equals("Line")) { ... }
+}</code></pre> <p>A heterogeneous collection, walked in a loop, with a chain of tests asking each element "what kind of thing are you?" so that the right code can be chosen. Lecture 13 had a name for that shape of code, and a replacement for it.</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; the payoff for Lectures 12, 13 and 14</span></div> <div class="bd"> <p>Instead of a <code>String</code> saying what kind of shape it is, make each kind a <strong>subclass</strong>. Give the superclass one <strong>abstract method</strong>, <code>draw(Graphics g)</code>, and let every subclass implement it its own way. Then the loop becomes one line:</p> <pre><code class="language-java">for (int i = 0; i &lt; data.size(); i++) {
+   data.get(i).draw(g);
+}</code></pre> <p>and <strong>dynamic binding</strong> picks the right <code>draw</code> for each element at run time. The panel no longer knows that circles exist. Adding a triangle means writing one new class and touching nothing that already works.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the same program, drawn by the shapes</span></div> <div class="bd"> <p>Four small files replace the tangle. <code>Shape</code> is abstract &mdash; there is no such thing as a plain shape, and Java will now refuse to let anyone create one. Each subclass knows exactly one drawing call.</p> <p class="filename">Shape.java</p>
+<pre><code class="language-java">import java.awt.Color;
+import java.awt.Graphics;
+
+public abstract class Shape {
+   private Color color;
+   private int x, y, size;
+
+   public Shape(Color color, int x, int y, int size) {
+      this.color = color;
+      this.x = x;
+      this.y = y;
+      this.size = size;
+   }
+
+   public Color getColor() { return color; }
+   public int getX()       { return x; }
+   public int getY()       { return y; }
+   public int getSize()    { return size; }
+
+   // Every shape must know how to draw itself.
+   public abstract void draw(Graphics g);
+}</code></pre> <p class="filename">Circle.java</p>
+<pre><code class="language-java">import java.awt.Color;
+import java.awt.Graphics;
+
+public class Circle extends Shape {
+   public Circle(Color color, int x, int y, int size) {
+      super(color, x, y, size);
+   }
+
+   public void draw(Graphics g) {
+      g.setColor(getColor());
+      g.fillOval(getX(), getY(), getSize(), getSize());
+   }
+}</code></pre> <p class="filename">Square.java</p>
+<pre><code class="language-java">import java.awt.Color;
+import java.awt.Graphics;
+
+public class Square extends Shape {
+   public Square(Color color, int x, int y, int size) {
+      super(color, x, y, size);
+   }
+
+   public void draw(Graphics g) {
+      g.setColor(getColor());
+      g.fillRect(getX(), getY(), getSize(), getSize());
+   }
+}</code></pre> <p class="filename">Diagonal.java</p>
+<pre><code class="language-java">import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+
+public class Diagonal extends Shape {
+   public Diagonal(Color color, int x, int y, int size) {
+      super(color, x, y, size);
+   }
+
+   public void draw(Graphics g) {
+      Graphics2D g2 = (Graphics2D) g;
+      g2.setColor(getColor());
+      g2.setStroke(new BasicStroke(5));
+      g2.drawLine(getX(), getY(), getX() + getSize(), getY() + getSize());
+   }
+}</code></pre> <p>And the panel, which is now almost embarrassingly short:</p> <p class="filename">PaintingPanel.java</p>
+<pre><code class="language-java">import java.awt.Graphics;
+import java.util.ArrayList;
+
+import javax.swing.JPanel;
+
+public class PaintingPanel extends JPanel {
+
+   private ArrayList&lt;Shape&gt; data = new ArrayList&lt;Shape&gt;();
+
+   public void add(Shape s) {
+      data.add(s);
+   }
+
+   public void clear() {
+      data.clear();
+   }
+
+   public void paintComponent(Graphics g) {
+      super.paintComponent(g);
+      for (int i = 0; i &lt; data.size(); i++) {
+         data.get(i).draw(g);       // dynamic binding picks the right draw
+      }
+   }
+}</code></pre> <p>Does it really work? Put one of each into a panel at known positions, paint it into an image, and ask the image what color specific pixels came out. Predict all six lines before you reveal &mdash; in particular the two "corner" probes, which are the real test of whether you have the bounding box straight.</p> <p class="filename">ShapeProof.java</p>
+<pre><code class="language-java">import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+
+public class ShapeProof {
+
+   static String colorAt(BufferedImage img, int x, int y) {
+      Color c = new Color(img.getRGB(x, y));
+      if (c.equals(Color.WHITE)) return "background";
+      if (c.equals(Color.RED))   return "RED";
+      if (c.equals(Color.BLUE))  return "BLUE";
+      if (c.equals(Color.BLACK)) return "BLACK";
+      return c.getRed() + "," + c.getGreen() + "," + c.getBlue();
+   }
+
+   public static void main(String args[]) {
+      PaintingPanel panel = new PaintingPanel();
+      panel.setSize(400, 300);
+      panel.setBackground(Color.WHITE);
+
+      panel.add(new Circle(Color.RED,   50,  50, 100));
+      panel.add(new Square(Color.BLUE, 200,  50, 100));
+      panel.add(new Diagonal(Color.BLACK, 50, 200, 100));
+
+      BufferedImage img = new BufferedImage(400, 300, BufferedImage.TYPE_INT_RGB);
+      Graphics2D g = img.createGraphics();
+      panel.paint(g);
+      g.dispose();
+
+      System.out.println("center of the circle  (100,100): " + colorAt(img, 100, 100));
+      System.out.println("corner of the circle   (52, 52): " + colorAt(img,  52,  52));
+      System.out.println("center of the square  (250,100): " + colorAt(img, 250, 100));
+      System.out.println("corner of the square  (202, 52): " + colorAt(img, 202,  52));
+      System.out.println("middle of the line    (100,250): " + colorAt(img, 100, 250));
+      System.out.println("beside the line       (140,250): " + colorAt(img, 140, 250));
+   }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>center of the circle  (100,100): RED
+corner of the circle   (52, 52): background
+center of the square  (250,100): BLUE
+corner of the square  (202, 52): BLUE
+middle of the line    (100,250): BLACK
+beside the line       (140,250): background</code></pre> <p>Every shape drew itself, in the right color, in the right place &mdash; and <code>PaintingPanel</code> contains no <code>if</code>, no <code>equals</code>, and no mention of circles, squares or lines at all.</p> <p>The two corner probes are the bounding-box lesson made concrete. The circle and the square were given the <em>same</em> shaped box &mdash; 100 by 100 &mdash; and asked for the point 2 pixels in from its top-left corner. The square fills its box, so that point is blue. The circle only touches the box at four points, so its corner is empty background. Same four numbers, different shape, different pixels.</p> <p><strong>What each earlier lecture contributed.</strong></p> <table class="trace"> <tr><th>From</th><th>Idea</th><th>Where it appears here</th></tr> <tr><td>Lecture 7</td><td>a class bundles data with the operations on it</td><td>a <code>Shape</code> carries its color and position <em>and</em> knows how to draw</td></tr> <tr><td>Lecture 12</td><td>inheritance and <code>super(...)</code></td><td><code>Circle extends Shape</code>, and its constructor's first line</td></tr> <tr><td>Lecture 13</td><td>a heterogeneous collection and dynamic binding</td><td><code>ArrayList&lt;Shape&gt;</code> holding three different classes; <code>draw</code> resolves at run time</td></tr> <tr><td>Lecture 14</td><td>an abstract method forces every subclass to supply a body</td><td><code>public abstract void draw(Graphics g);</code></td></tr> <tr><td>Lecture 15</td><td>a listener is an interface you implement</td><td><code>PaintingDemo implements ActionListener</code></td></tr> </table> <p>This is the design your course has been building toward since Lecture 7. It is worth sitting with for a moment: <em>the panel draws a picture it cannot describe</em>, because every object in it is responsible for itself.</p> 
+</div></details> </div> </div> <p>The controller changes shape too. Instead of passing a <code>String</code> down and letting the panel decode it, <code>PaintingDemo</code> creates the right object and hands it over.</p> <p class="filename">PaintingDemo.java</p>
+<pre><code class="language-java">import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+
+public class PaintingDemo extends JFrame implements ActionListener {
+   public static final int WIDTH = 1200;
+   public static final int HEIGHT = 800;
+
+   private PaintingPanel picturePanel;
+   private int repeat = 1;
+
+   public PaintingDemo() {
+      super("Graphics Demo");
+      setSize(WIDTH, HEIGHT);
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+      Container contentPane = getContentPane();
+      contentPane.setLayout(new BorderLayout());
+
+      JMenuBar mBar = new JMenuBar();
+      setJMenuBar(mBar);
+      JMenu shapeMenu = new JMenu("Shapes");
+      mBar.add(shapeMenu);
+
+      String[] names = {"Circle", "Rectangle", "Line", "Change Repeats", "Clear"};
+      for (int i = 0; i &lt; names.length; i++) {
+         JMenuItem item = new JMenuItem(names[i]);
+         item.addActionListener(this);
+         shapeMenu.add(item);
+      }
+
+      picturePanel = new PaintingPanel();
+      picturePanel.setBackground(Color.WHITE);
+      contentPane.add(picturePanel, BorderLayout.CENTER);
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      String command = e.getActionCommand();
+      if (command.equals("Change Repeats")) {
+         if (repeat == 1) repeat = 10;
+         else repeat = 1;
+      }
+      else if (command.equals("Clear")) {
+         picturePanel.clear();
+      }
+      else {
+         for (int i = 0; i &lt; repeat; i++) {
+            picturePanel.add(randomShape(command));
+         }
+      }
+      picturePanel.repaint();      // ask for a redraw; never call paintComponent
+   }
+
+   private Shape randomShape(String command) {
+      Color color = new Color((int) (Math.random() * 256 * 256 * 256));
+      int x    = (int) (Math.random() * WIDTH);
+      int y    = (int) (Math.random() * HEIGHT);
+      int size = (int) (Math.random() * 150) + 30;
+
+      if (command.equals("Circle"))    return new Circle(color, x, y, size);
+      if (command.equals("Rectangle")) return new Square(color, x, y, size);
+      return new Diagonal(color, x, y, size);
+   }
+
+   public static void main(String args[]) {
+      PaintingDemo gui = new PaintingDemo();
+      gui.setVisible(true);
+   }
+}</code></pre> <p>There is still one <code>if</code> chain, in <code>randomShape</code>, and it is worth being honest about it. Somewhere a menu label has to be turned into an object, and that decision has to be written down once. The difference is that it now happens in <em>one</em> place, at the moment of creation, instead of every time the picture is drawn &mdash; and it produces an object that knows what it is from then on.</p> <div class="box qc"> <div class="hd">Quick Check 19.12</div> <div class="bd"> <p>Questions about the polymorphic design.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>Shape</code> is declared <code>abstract</code>. What exactly does the compiler refuse to let you write, and why is that a good thing here?</p> <details class="soln"><summary></summary><div class="ans"> <p>It refuses <code>new Shape(Color.RED, 10, 10, 50)</code> &mdash; <code>error: Shape is abstract; cannot be instantiated</code>. That is right, because a plain shape has no meaning: there would be no answer to the question of what <code>draw</code> should do. Declaring the class abstract turns a design decision into a rule the compiler enforces.</p> <p>You can still write <code>Shape s = new Circle(...);</code> and hold shapes in an <code>ArrayList&lt;Shape&gt;</code>, which is the whole point &mdash; abstract classes cannot be instantiated but they can absolutely be used as types.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>PaintingPanel.paintComponent</code> calls <code>data.get(i).draw(g)</code>. The static type of <code>data.get(i)</code> is <code>Shape</code>, and <code>Shape.draw</code> has no body. What runs?</p> <details class="soln"><summary></summary><div class="ans"> <p>The <code>draw</code> of whatever class the object actually is &mdash; <code>Circle.draw</code>, <code>Square.draw</code> or <code>Diagonal.draw</code>. The declared type decides what you are <em>allowed</em> to call; the object decides what actually <em>runs</em>. That is dynamic binding, unchanged from Lecture 13.</p> <p>The abstract declaration is what makes the call legal in the first place: the compiler needs to see a <code>draw</code> on <code>Shape</code> to accept the line, and the abstract method is that promise.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Compare this to Quick Check 19.11: how many files change when you add a <code>Triangle</code>?</p> <details class="soln"><summary></summary><div class="ans"> <p>One new file, <code>Triangle.java</code>, plus two small edits in <code>PaintingDemo</code> &mdash; the menu name and one line in <code>randomShape</code>. <code>Shape</code> does not change. <code>PaintingPanel</code> does not change <em>at all</em>, and neither does <code>Circle</code>, <code>Square</code> or <code>Diagonal</code>.</p> <p>In the string-tag version you had to reach into a method that already worked, in the class that draws everything, and add a case to it. Here you add a class. Nothing that was working can break, because nothing that was working was edited.</p> <p><strong>Things to notice across all three parts.</strong> This is the argument for polymorphism in its most concrete form, and it is worth being able to make it in a sentence on an exam: <em>a chain of <code>if</code> statements asking what type an object is can almost always be replaced by an abstract method, and the version with the abstract method grows by addition instead of by editing.</em></p> </div></details> </div> </div> </div> <h2 id="prac"><span class="num">&#9733;</span>Practice Problems</h2> <div class="box prac"> <div class="hd">Practice Problems<span class="tag">&mdash; exam-style, Lecture 19 material only</span></div> <div class="bd"> <p>A note on what to expect. The GUI questions on the CSCI 212 exams are about <em>components</em> &mdash; build this window, add these buttons, write the listener, set this panel's background. Drawing questions are much rarer than the amount of lecture time graphics gets would suggest. What the exams do reward is exactly the material of &sect;8: an abstract superclass, a collection of subclasses, and one method that dispatches polymorphically.</p> <p>So work Problem 1 for the design, Problem 2 for the coordinate arithmetic, and treat Problems 3, 4 and 5 as drill on the three things that cost marks: the bounding box, the baseline, and <code>super.paintComponent(g)</code>.</p> </div> </div> <h3>Problem 1 &mdash; Add a new shape type <span class="muted">(from the "Things you can try and explore" list at the end of the Lecture 18 notes)</span></h3> <p>The suggestion is: <em>"Modify the PaintingDemo to add a new shape type (e.g. Triangle or Star)."</em> Do it for the polymorphic design of &sect;8. Write a class <code>Triangle</code> that extends <code>Shape</code> and draws a solid triangle: apex at the top-center of its bounding box, base along the bottom. Then say what else has to change.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Keep the same contract as every other shape: the object is given a color, a top-left corner and a size, and it fills the box <code>x</code>, <code>y</code>, <code>size</code>, <code>size</code>. So the three corners are</p> <ul> <li>the apex, halfway across the top: (<code>x + size/2</code>, <code>y</code>);</li> <li>the bottom-left: (<code>x</code>, <code>y + size</code>);</li> <li>the bottom-right: (<code>x + size</code>, <code>y + size</code>).</li> </ul> <p><code>fillPolygon</code> wants those as two parallel <code>int</code> arrays and a count. Watch the <code>y</code> values: the apex has the <em>smallest</em> <code>y</code> because it is at the top.</p> <p class="filename">Triangle.java</p>
+<pre><code class="language-java">import java.awt.Color;
+import java.awt.Graphics;
+
+public class Triangle extends Shape {
+   public Triangle(Color color, int x, int y, int size) {
+      super(color, x, y, size);
+   }
+
+   public void draw(Graphics g) {
+      int x = getX(), y = getY(), size = getSize();
+      int[] xPoints = {x + size / 2, x, x + size};
+      int[] yPoints = {y, y + size, y + size};
+
+      g.setColor(getColor());
+      g.fillPolygon(xPoints, yPoints, 3);
+   }
+}</code></pre> <p>Checking it the same way &sect;8 did &mdash; one red triangle in a 200-pixel box at (50, 50), so the apex is (150, 50) and the base runs along <code>y</code> = 250:</p> <p class="filename">TriangleProof.java</p>
+<pre><code class="language-java">import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+
+public class TriangleProof {
+   static String at(BufferedImage im, int x, int y) {
+      Color c = new Color(im.getRGB(x, y));
+      if (c.equals(Color.WHITE)) return "background";
+      if (c.equals(Color.RED)) return "RED";
+      return c.getRed() + "," + c.getGreen() + "," + c.getBlue();
+   }
+
+   public static void main(String args[]) {
+      PaintingPanel panel = new PaintingPanel();
+      panel.setSize(300, 300);
+      panel.setBackground(Color.WHITE);
+      panel.add(new Triangle(Color.RED, 50, 50, 200));   // apex (150,50), base y = 250
+
+      BufferedImage im = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
+      Graphics2D g = im.createGraphics();
+      panel.paint(g);
+      g.dispose();
+
+      System.out.println("just under the apex   (150, 55): " + at(im, 150, 55));
+      System.out.println("bottom-left corner     (55, 245): " + at(im,  55, 245));
+      System.out.println("bottom-right corner   (245, 245): " + at(im, 245, 245));
+      System.out.println("top-left of the box    (55,  55): " + at(im,  55,  55));
+      System.out.println("centre of the box     (150, 150): " + at(im, 150, 150));
+   }
+}</code></pre> <pre class="out"><code>just under the apex   (150, 55): RED
+bottom-left corner     (55, 245): RED
+bottom-right corner   (245, 245): RED
+top-left of the box    (55,  55): background
+centre of the box     (150, 150): RED</code></pre> <p>The apex, both base corners and the middle are red; the top-left of the bounding box is empty, which is right &mdash; the triangle's sloping left edge has not reached that far across yet at <code>y</code> = 55.</p> <p><strong>What else changes.</strong> Two lines, both in <code>PaintingDemo</code>:</p> <pre><code class="language-java">String[] names = {
+    "Circle", "Rectangle", "Triangle", "Line", "Change Repeats", "Clear"}
+;</code></pre> <pre><code class="language-java">if (command.equals("Triangle"))  return new Triangle(color, x, y, size);</code></pre> <p><strong>Things to notice.</strong> <code>PaintingPanel</code> was not touched. Neither was <code>Shape</code>, nor any existing subclass. The new shape was added by <em>writing</em> code, not by <em>editing</em> code &mdash; and that is the practical difference the abstract method buys you.</p> <p>For a <code>Star</code>, the method is the same: work out the points on paper, put them in the two arrays in order around the outline, and pass the count. <code>fillPolygon</code> closes the shape for you, so you do not repeat the first point at the end.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 1</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="20" aria-label="Live coding - Practice Problem 1">import java.awt.Color;
+import java.awt.Graphics;
+
+public class Triangle extends Shape {
+
+    public Triangle(Color color, int x, int y, int size) {
+        // 1. Pass everything up to the Shape constructor.
+
+    }
+
+    public void draw(Graphics g) {
+        // 2. Three points: apex at the top-center, then the two bottom corners.
+        //    Remember the apex has the SMALLEST y.
+
+        // 3. Set the color, then fillPolygon(xPoints, yPoints, 3).
+
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 2 &mdash; What color is each pixel? <span class="muted">(added for these notes)</span></h3> <p>A <code>JPanel</code> 400 pixels wide and 250 tall has a white background and this <code>paintComponent</code>. For each of the six points below, say what color that pixel comes out.</p> <p class="filename">StackPanel.java</p>
+<pre><code class="language-java">import java.awt.Color;
+import java.awt.Graphics;
+
+import javax.swing.JPanel;
+
+public class StackPanel extends JPanel {
+   public void paintComponent(Graphics g) {
+      super.paintComponent(g);
+
+      g.setColor(Color.RED);
+      g.fillRect(50, 50, 200, 100);
+
+      g.setColor(Color.BLUE);
+      g.fillRect(100, 80, 200, 100);
+
+      g.setColor(Color.BLACK);
+      g.drawRect(50, 50, 200, 100);
+   }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> (60, 60)</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Red.</strong> The red rectangle covers <code>x</code> 50 to 249 and <code>y</code> 50 to 149, so (60, 60) is inside it. The blue one starts at <code>x</code> = 100 and <code>y</code> = 80, so it does not reach this point.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> (150, 100)</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Blue.</strong> Both rectangles cover this point, and blue was drawn second. Later drawing wins: a <code>Graphics</code> has no notion of layers or transparency here, it simply replaces pixels in the order the calls are made.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> (280, 170)</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Blue.</strong> The blue rectangle runs from (100, 80) for 200 across and 100 down, so <code>x</code> 100 to 299 and <code>y</code> 80 to 179. (280, 170) is inside it; the red one ended at <code>x</code> = 249 and <code>y</code> = 149.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> (250, 50)</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Black.</strong> This is the one to think about. <code>fillRect(50, 50, 200, 100)</code> fills up to but <em>not including</em> <code>x</code> = 250, so the red does not reach here. But <code>drawRect(50, 50, 200, 100)</code> puts its outline <em>on</em> <code>x</code> = 50 + 200 = 250, and it was drawn last. The outline of a <code>drawRect</code> is one pixel wider than the fill of the corresponding <code>fillRect</code>, which is the fact &sect;3 measured.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> (250, 150)</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Black.</strong> The bottom-right corner of the same outline: <code>x</code> = 50 + 200 and <code>y</code> = 50 + 100. The blue rectangle covers this point too, but the outline was drawn after it.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(f)</span> (30, 30)</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>White</strong> &mdash; the panel's background, put there by <code>super.paintComponent(g)</code>. Nothing was drawn above <code>y</code> = 50 or left of <code>x</code> = 50.</p> <p>Verified by painting the panel into an image and reading the pixels back:</p> <pre class="out"><code>(a)  ( 60,  60): RED
+(b)  (150, 100): BLUE
+(c)  (280, 170): BLUE
+(d)  (250,  50): BLACK
+(e)  (250, 150): BLACK
+(f)  ( 30,  30): background</code></pre> <p><strong>Things to notice across all six parts.</strong> Two rules answer every question of this kind, and they are worth writing at the top of your exam paper. <em>A fill covers <code>x</code> to <code>x + w - 1</code>; an outline is drawn on <code>x</code> and on <code>x + w</code>.</em> And <em>the last thing drawn is the thing you see.</em></p> <p>The reliable technique is to sketch the rectangles on paper with their real ranges written beside them &mdash; "red: 50&ndash;249 by 50&ndash;149" &mdash; and then read off each point. Trying to hold three overlapping rectangles in your head is how this question gets missed.</p> </div></details> </div> <h3>Problem 3 &mdash; Find the errors <span class="muted">(added for these notes)</span></h3> <p>This panel is meant to draw a blue circle 60 pixels across whose top-left bounding-box corner is at (150, 100), and the word <code>Hello</code> in red near the top-left of the panel. Exactly 3 of the numbered lines have errors, and there is one further error that is not on a numbered line at all. Identify each error and give a corrected version.</p> <p class="filename">BrokenPainter.java</p>
+<pre><code class="language-java">import java.awt.Color;
+import java.awt.Graphics;
+
+import javax.swing.JPanel;
+
+public class BrokenPainter extends JPanel {
+
+    public void paintComponent(Graphics g) {
+        g.setColor(Color.BLUE);                       // line 1
+        g.fillOval(150, 100, 60);                     // line 2
+        g.setColor("red");                            // line 3
+        g.drawString(20, 40, "Hello");                // line 4
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Compile it in your head the way <code>javac</code> does &mdash; are the method names right, do the argument counts match, do the types match? Then, separately, ask the question the compiler cannot: <em>does this method do everything a <code>paintComponent</code> has to do?</em></p> <p><strong>Error 1 &mdash; the unnumbered one: <code>super.paintComponent(g);</code> is missing.</strong> It must be the first statement in the method. Without it the panel is never cleared, so anything drawn on a previous repaint stays underneath. This produces no compiler message at all; it is a silent behavior bug, and it is the one this whole lecture is about.</p> <p><strong>Error 2 &mdash; line 2.</strong> <code>fillOval</code> takes four arguments, not three. The author has written the two coordinates and then what they think is a radius or a size.</p> <pre class="err"><code>BrokenPainter.java:10: error: method fillOval in class Graphics cannot be applied to given types;
+        g.fillOval(150, 100, 60);                     // line 2
+         ^
+  required: int,int,int,int
+  found:    int,int,int
+  reason: actual and formal argument lists differ in length</code></pre> <p>Corrected: <code>g.fillOval(150, 100, 60, 60);</code> &mdash; a bounding box 60 wide and 60 tall, which for an oval means a circle.</p> <p><strong>Error 3 &mdash; line 3.</strong> <code>setColor</code> takes a <code>Color</code> object, not the name of a color as text.</p> <pre class="err"><code>BrokenPainter.java:11: error: incompatible types: String cannot be converted to Color
+        g.setColor("red");                            // line 3
+                   ^</code></pre> <p>Corrected: <code>g.setColor(Color.RED);</code></p> <p><strong>Error 4 &mdash; line 4.</strong> <code>drawString</code> takes the text <em>first</em>, then the position. The arguments are in the wrong order.</p> <pre class="err"><code>BrokenPainter.java:12: error: no suitable method found for drawString(int,int,String)
+        g.drawString(20, 40, "Hello");                // line 4
+         ^
+    method Graphics.drawString(String,int,int) is not applicable
+      (argument mismatch; int cannot be converted to String)</code></pre> <p>Corrected: <code>g.drawString("Hello", 20, 40);</code></p> <p>All four fixed:</p> <p class="filename">FixedPainter.java</p>
+<pre><code class="language-java">import java.awt.Color;
+import java.awt.Graphics;
+
+import javax.swing.JPanel;
+
+public class FixedPainter extends JPanel {
+
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);                      // the missing line
+        g.setColor(Color.BLUE);                       // line 1
+        g.fillOval(150, 100, 60, 60);                 // line 2
+        g.setColor(Color.RED);                        // line 3
+        g.drawString("Hello", 20, 40);                // line 4
+    }
+}</code></pre> <p>And checked against the pixels, on a white panel:</p> <pre class="out"><code>center of the circle (180, 130): BLUE
+left edge of it      (150, 130): BLUE
+just left of that    (149, 130): background
+the point (150, 100) itself    : background</code></pre> <p><strong>Things to notice.</strong> Look at that last line. The call was <code>fillOval(150, 100, 60, 60)</code> and the pixel <em>at</em> (150, 100) is background &mdash; because (150, 100) is the corner of the bounding box, and a circle does not reach into the corners of its box. The leftmost blue pixel is at (150, 130), halfway down the box. If you predicted blue at (150, 100), that is the bounding box catching you out, and it is exactly what Problem 2 part (d) was drilling.</p> <p>Three of these four errors were caught by the compiler. The fourth &mdash; the missing <code>super</code> call &mdash; compiles, runs, and produces a program that looks fine until something moves. That ratio is realistic: the errors that cost you an afternoon are never the ones <code>javac</code> finds.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 3</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="16" aria-label="Live coding - Practice Problem 3">import java.awt.Color;
+import java.awt.Graphics;
+
+import javax.swing.JPanel;
+
+public class BrokenPainter extends JPanel {
+
+    public void paintComponent(Graphics g) {
+        g.setColor(Color.BLUE);                       // line 1
+        g.fillOval(150, 100, 60);                     // line 2
+        g.setColor("red");                            // line 3
+        g.drawString(20, 40, "Hello");                // line 4
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 4 &mdash; A target <span class="muted">(added for these notes)</span></h3> <p>Write a complete class <code>TargetPanel</code> that extends <code>JPanel</code> and draws an archery target: five concentric filled circles centered in the panel, alternating red and white, with the outermost 150 pixels across and each one inside it 30 pixels smaller. The target must stay centered when the window is resized. Use two named constants for the number of rings and the step.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Concentric circles are a fill-order problem: draw the <strong>largest first</strong> and let each smaller one cover the middle of the last. Drawing smallest first would hide everything under the biggest circle.</p> <p>Ring <code>i</code> (counting from 0) has diameter <code>(RINGS - i) * STEP</code>, so ring 0 is 5 &times; 30 = 150 across and ring 4 is 30. Each is centered, so its bounding box starts at <code>cx - diameter/2</code>. Alternate the color with <code>i % 2</code>.</p> <p class="filename">TargetPanel.java</p>
+<pre><code class="language-java">import java.awt.Color;
+import java.awt.Graphics;
+
+import javax.swing.JPanel;
+
+public class TargetPanel extends JPanel {
+   public static final int RINGS = 5;      // number of colored bands
+   public static final int STEP  = 30;     // each ring is 30 pixels wider than the next
+
+   public void paintComponent(Graphics g) {
+      super.paintComponent(g);
+
+      int cx = getWidth() / 2;             // center of the panel
+      int cy = getHeight() / 2;
+
+      for (int i = 0; i &lt; RINGS; i++) {
+         int diameter = (RINGS - i) * STEP;
+         if (i % 2 == 0) g.setColor(Color.RED);
+         else            g.setColor(Color.WHITE);
+         g.fillOval(cx - diameter / 2, cy - diameter / 2, diameter, diameter);
+      }
+   }
+}</code></pre> <p>Checked on a 300 by 240 panel with a light gray background, so that "outside the target" is distinguishable from a white ring. The center is at (150, 120), and the ring radii are 75, 60, 45, 30 and 15:</p> <pre class="out"><code>panel is 300 x 240, so the center is (150, 120)
+   dead center       (150, 120): red
+   20 px right       (170, 120): white
+   35 px right       (185, 120): red
+   50 px right       (200, 120): white
+   70 px right       (220, 120): red
+   90 px right       (240, 120): panel background
+   40 px straight up (150,  80): red</code></pre> <p>Red, white, red, white, red as you walk outward, and beyond 75 pixels you are off the target. The last probe checks the other axis: 40 pixels straight up is the same distance from the center as 40 to the right, so it must be the same color, and it is.</p> <p><strong>Things to notice.</strong> <code>RINGS</code> is odd on purpose. With an even number the innermost circle would be white and the bullseye would vanish into the background &mdash; which is exactly the kind of off-by-one you can only find by drawing it.</p> <p><code>getWidth()</code> and <code>getHeight()</code> are read inside <code>paintComponent</code>, not stored in fields. That is what makes it survive a resize: the panel's size at the moment of painting is the size that gets used, and Swing repaints after every resize.</p> <p>An alternative with no alternating colors at all: draw the biggest circle red, then use <code>drawOval</code> in white for the ring boundaries. It is fewer pixels of work, but it gives you thin white lines rather than thick bands. Which one is right depends on the picture you want; both are correct programs.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 4</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="22" aria-label="Live coding - Practice Problem 4">import java.awt.Color;
+import java.awt.Graphics;
+
+import javax.swing.JPanel;
+
+public class TargetPanel extends JPanel {
+    public static final int RINGS = 5;
+    public static final int STEP  = 30;
+
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        // 1. The center of the panel, from getWidth() and getHeight().
+
+        // 2. Loop i from 0 to RINGS - 1.
+        //    Largest circle FIRST, so diameter = (RINGS - i) * STEP.
+        //    Alternate red and white, and center each bounding box.
+
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 5 &mdash; Short answer <span class="muted">(added for these notes)</span></h3> <p>Six one-or-two-sentence questions of the kind that open a graphics problem.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Where is the origin of a component's coordinate system, and which way does <code>y</code> increase?</p> <details class="soln"><summary></summary><div class="ans"> <p>At the top-left corner of the component; <code>x</code> increases to the right and <code>y</code> increases downward. So a larger <code>y</code> means further down the screen, the opposite of the mathematical convention.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Name the two rules about <code>paintComponent</code> that are most often broken.</p> <details class="soln"><summary></summary><div class="ans"> <p>Never call it yourself &mdash; call <code>repaint()</code> and let Swing call it. And make <code>super.paintComponent(g);</code> its first statement, so the component is cleared before you redraw.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> What do the four arguments of <code>drawOval(x, y, w, h)</code> mean?</p> <details class="soln"><summary></summary><div class="ans"> <p>They are the bounding box: (<code>x</code>, <code>y</code>) is the top-left corner of the rectangle the ellipse is inscribed in, and <code>w</code> and <code>h</code> are that rectangle's width and height. They are <em>not</em> a center and a radius. For a circle of diameter <code>d</code> centered at (<code>cx</code>, <code>cy</code>) the call is <code>drawOval(cx - d/2, cy - d/2, d, d)</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> What does the <code>y</code> in <code>drawString(s, x, y)</code> refer to?</p> <details class="soln"><summary></summary><div class="ans"> <p>The <em>baseline</em> of the text &mdash; the line the letters sit on. The characters are drawn above that <code>y</code>, with descenders dipping below it, so <code>drawString("Hi", 0, 0)</code> puts the text off the top of the component and you see nothing.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> Give one advantage of painting over direct drawing, in one sentence.</p> <details class="soln"><summary></summary><div class="ans"> <p>A painted picture is rebuilt from data every time the component is redrawn, so it survives resizing, minimising, and being covered by another window &mdash; a directly drawn one does not.</p> <p>Half a mark for "and it can be saved, printed or undone, because the picture exists as objects rather than as pixels".</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(f)</span> A <code>Graphics</code> reference <code>g</code> needs <code>setStroke</code>, which <code>Graphics</code> does not have. Write the line that fixes it and say why it is safe.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Graphics2D g2 = (Graphics2D) g;</code> &mdash; a downcast. It is safe because the object Swing passes to <code>paintComponent</code> is always really a <code>Graphics2D</code>; the parameter is only <em>declared</em> as <code>Graphics</code> for historical reasons, so the cast is checking something that is already true.</p> <p><strong>Things to notice across all six parts.</strong> Every one of these is a single sentence from &sect;1 to &sect;6 turned into a question, and each is the sort of thing that decides whether the rest of your answer can score. If you can write (a), (b) and (c) from memory, you have the three facts that the other errors in this lecture are all downstream of.</p> </div></details> </div> <div class="box sum" id="summary"> <div class="hd">Lecture Summary</div> <div class="bd"> <ul> <li>The origin (0, 0) is the <strong>top-left corner of the component</strong>, <code>x</code> increases to the right, and <code>y</code> increases <strong>downward</strong>. "Higher up the screen" means a <em>smaller</em> <code>y</code>.</li> <li>Drawing happens in <code>paintComponent(Graphics g)</code>, which you <strong>override on a <code>JPanel</code> subclass and never call</strong>. Its first line must be <code>super.paintComponent(g);</code>, which clears the component &mdash; leave it out and old drawings stay underneath.</li> <li>Swing calls <code>paintComponent</code> on first display, on resize, when the component is uncovered, and when you call <code>repaint()</code>. It must be able to rebuild the whole picture every time.</li> <li><strong><code>repaint()</code> is a request</strong>; <code>paintComponent</code> is the response. Change the data, then call <code>repaint()</code> on the panel.</li> <li><code>drawRect</code>, <code>drawOval</code>, <code>drawRoundRect</code> and <code>drawArc</code> all take a <strong>bounding box</strong>: top-left corner, width, height &mdash; never a center and a radius. <code>drawLine</code> is the exception; its last two numbers are a second point. <code>drawString(s, x, y)</code> puts the text's <strong>baseline</strong> at <code>y</code>, so the letters sit above it.</li> <li>A <code>Graphics</code> carries a <strong>current color and font</strong>, set with <code>setColor</code> and <code>setFont</code> and used by every drawing call until changed. Colors come from constants such as <code>Color.RED</code> or from <code>new Color(r, g, b)</code>.</li> <li><strong>Direct drawing</strong> through <code>getGraphics()</code> puts pixels on the screen and nothing remembers them; the picture is lost on the next repaint. <strong>Painting</strong> keeps the picture as data and redraws it on demand. Always paint.</li> <li>The design that makes it work is <strong>MVC</strong>: a list of <code>Shape</code> objects (the model), a <code>paintComponent</code> that draws them (the view), and an <code>actionPerformed</code> that edits the list and calls <code>repaint()</code> (the controller).</li> <li>Give <code>Shape</code> an <strong>abstract <code>draw(Graphics g)</code></strong> and let every subclass implement it, and the panel's chain of <code>if (type.equals(...))</code> collapses into <code>data.get(i).draw(g)</code>. Adding a shape becomes writing a new class instead of editing a
+      working one &mdash; the whole argument for Lectures 12 to 14, in twenty lines.</li>
+    </ul>
+    <p><strong>Coming up in Session 22: the Exam 2 Review.</strong> That closes the material
+    Exam 2 covers &mdash; Lectures 10 through 19, from the parking-ticket case study through
+    inheritance, polymorphism, abstract classes and interfaces, and the five GUI lectures
+    ending here. Next session we put the whole of it back together and work through the exam
+    questions themselves; the session after that is Exam 2.</p>
+  </div>
+</div>
+
+<nav class="pagenav">
+<span class="disabled"><div class="dir">&larr; Previous</div><div class="ttl">Lecture 18 &mdash; GUI IV: Borders, Icons and Scroll Panes</div><div class="pending">posts Tue Nov 10</div></span>
+<span class="disabled next"><div class="dir">Next &rarr;</div><div class="ttl">Review 2 &mdash; Exam 2 Review</div><div class="pending">posts Tue Nov 17</div></span>
+</nav>
+<footer class="pf">CSCI 212 &middot; Object-Oriented Programming in Java &middot; Queens College, CUNY</footer>
+</div>
+<script>
+(()=>{var ut=Object.create;var xe=Object.defineProperty;var ft=Object.getOwnPropertyDescriptor;var gt=Object.getOwnPropertyNames;var ht=Object.getPrototypeOf,dt=Object.prototype.hasOwnProperty;var pt=(e,t)=>()=>{try{return t||e((t={exports:{}}).exports,t),t.exports}catch(n){throw t=0,n}};var Et=(e,t,n,l)=>{if(t&&typeof t=="object"||typeof t=="function")for(let d of gt(t))!dt.call(e,d)&&d!==n&&xe(e,d,{get:()=>t[d],enumerable:!(l=ft(t,d))||l.enumerable});return e};var bt=(e,t,n)=>(n=e!=null?ut(ht(e)):{},Et(t||!e||!e.__esModule?xe(n,"default",{value:e,enumerable:!0}):n,e));var Ke=pt((ln,Ge)=>{function Ie(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(t=>{let n=e[t],l=typeof n;(l==="object"||l==="function")&&!Object.isFrozen(n)&&Ie(n)}),e}var Z=class{constructor(t){t.data===void 0&&(t.data={}),this.data=t.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function Ce(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function k(e,...t){let n=Object.create(null);for(let l in e)n[l]=e[l];return t.forEach(function(l){for(let d in l)n[d]=l[d]}),n}var _t="</span>",Ne=e=>!!e.scope,Mt=(e,{prefix:t})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let n=e.split(".");return[`${t}${n.shift()}`,...n.map((l,d)=>`${l}${"_".repeat(d+1)}`)].join(" ")}return`${t}${e}`},oe=class{constructor(t,n){this.buffer="",this.classPrefix=n.classPrefix,t.walk(this)}addText(t){this.buffer+=Ce(t)}openNode(t){if(!Ne(t))return;let n=Mt(t.scope,{prefix:this.classPrefix});this.span(n)}closeNode(t){Ne(t)&&(this.buffer+=_t)}value(){return this.buffer}span(t){this.buffer+=`<span class="${t}">`}},Re=(e={})=>{let t={children:[]};return Object.assign(t,e),t},ae=class e{constructor(){this.rootNode=Re(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(t){this.top.children.push(t)}openNode(t){let n=Re({scope:t});this.add(n),this.stack.push(n)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(t){return this.constructor._walk(t,this.rootNode)}static _walk(t,n){return typeof n=="string"?t.addText(n):n.children&&(t.openNode(n),n.children.forEach(l=>this._walk(t,l)),t.closeNode(n)),t}static _collapse(t){typeof t!="string"&&t.children&&(t.children.every(n=>typeof n=="string")?t.children=[t.children.join("")]:t.children.forEach(n=>{e._collapse(n)}))}},le=class extends ae{constructor(t){super(),this.options=t}addText(t){t!==""&&this.add(t)}startScope(t){this.openNode(t)}endScope(){this.closeNode()}__addSublanguage(t,n){let l=t.root;n&&(l.scope=`language:${n}`),this.add(l)}toHTML(){return new oe(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function G(e){return e?typeof e=="string"?e:e.source:null}function De(e){return B("(?=",e,")")}function Ot(e){return B("(?:",e,")*")}function wt(e){return B("(?:",e,")?")}function B(...e){return e.map(n=>G(n)).join("")}function xt(e){let t=e[e.length-1];return typeof t=="object"&&t.constructor===Object?(e.splice(e.length-1,1),t):{}}function V(...e){return"("+(xt(e).capture?"":"?:")+e.map(l=>G(l)).join("|")+")"}function ke(e){return new RegExp(e.toString()+"|").exec("").length-1}function Nt(e,t){let n=e&&e.exec(t);return n&&n.index===0}var Rt=new RegExp(V(/\[(?:[^\\\]]|\\.)*\]/,/\(\?<(?![=!])[^>]+>/,/\(\?'[^']+'/,/\(\??/,/\\([1-9][0-9]*)/,/\\./));function fe(e,{joinWith:t}){let n=0;return e.map(l=>{n+=1;let d=n,_=G(l),c="";for(;_.length>0;){let r=Rt.exec(_);if(!r){c+=_;break}c+=_.substring(0,r.index),_=_.substring(r.index+r[0].length),r[0][0]==="\\"&&r[1]?c+="\\"+String(Number(r[1])+d):(c+=r[0],(r[0]==="("||/^\(\?[<']/.test(r[0]))&&n++)}return c}).map(l=>`(${l})`).join(t)}var yt=/\b\B/,ve="[a-zA-Z]\\w*",ge="[a-zA-Z_]\\w*",Le="\\b\\d+(\\.\\d+)?",Be="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Pe="\\b(0b[01]+)",St="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",At=(e={})=>{let t=/^#![ ]*\//;return e.binary&&(e.begin=B(t,/.*\b/,e.binary,/\b.*/)),k({scope:"meta",begin:t,end:/$/,relevance:0,"on:begin":(n,l)=>{n.index!==0&&l.ignoreMatch()}},e)},K={begin:"\\\\[\\s\\S]",relevance:0},Tt={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[K]},It={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[K]},Ct={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},Q=function(e,t,n={}){let l=k({scope:"comment",begin:e,end:t,contains:[]},n);l.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let d=V("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return l.contains.push({begin:B(/[ ]+/,"(",d,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),l},Dt=Q("//","$"),kt=Q("/\\*","\\*/"),vt=Q("#","$"),Lt={scope:"number",begin:Le,relevance:0},Bt={scope:"number",begin:Be,relevance:0},Pt={scope:"number",begin:Pe,relevance:0},$t={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[K,{begin:/\[/,end:/\]/,relevance:0,contains:[K]}]},Ht={scope:"title",begin:ve,relevance:0},Ut={scope:"title",begin:ge,relevance:0},jt={begin:"\\.\\s*"+ge,relevance:0},Gt=function(e){return Object.assign(e,{"on:begin":(t,n)=>{n.data._beginMatch=t[1]},"on:end":(t,n)=>{n.data._beginMatch!==t[1]&&n.ignoreMatch()}})},X=Object.freeze({__proto__:null,APOS_STRING_MODE:Tt,BACKSLASH_ESCAPE:K,BINARY_NUMBER_MODE:Pt,BINARY_NUMBER_RE:Pe,COMMENT:Q,C_BLOCK_COMMENT_MODE:kt,C_LINE_COMMENT_MODE:Dt,C_NUMBER_MODE:Bt,C_NUMBER_RE:Be,END_SAME_AS_BEGIN:Gt,HASH_COMMENT_MODE:vt,IDENT_RE:ve,MATCH_NOTHING_RE:yt,METHOD_GUARD:jt,NUMBER_MODE:Lt,NUMBER_RE:Le,PHRASAL_WORDS_MODE:Ct,QUOTE_STRING_MODE:It,REGEXP_MODE:$t,RE_STARTERS_RE:St,SHEBANG:At,TITLE_MODE:Ht,UNDERSCORE_IDENT_RE:ge,UNDERSCORE_TITLE_MODE:Ut});function Kt(e,t){e.input[e.index-1]==="."&&t.ignoreMatch()}function mt(e,t){e.className!==void 0&&(e.scope=e.className,delete e.className)}function Wt(e,t){t&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=Kt,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function Ft(e,t){Array.isArray(e.illegal)&&(e.illegal=V(...e.illegal))}function zt(e,t){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function Yt(e,t){e.relevance===void 0&&(e.relevance=1)}var Xt=(e,t)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let n=Object.assign({},e);Object.keys(e).forEach(l=>{delete e[l]}),e.keywords=n.keywords,e.begin=B(n.beforeMatch,De(n.begin)),e.starts={relevance:0,contains:[Object.assign(n,{endsParent:!0})]},e.relevance=0,delete n.beforeMatch},Zt=["of","and","for","in","not","or","if","then","parent","list","value"],Jt="keyword";function $e(e,t,n=Jt){let l=Object.create(null);return typeof e=="string"?d(n,e.split(" ")):Array.isArray(e)?d(n,e):Object.keys(e).forEach(function(_){Object.assign(l,$e(e[_],t,_))}),l;function d(_,c){t&&(c=c.map(r=>r.toLowerCase())),c.forEach(function(r){let u=r.split("|");l[u[0]]=[_,Vt(u[0],u[1])]})}}function Vt(e,t){return t?Number(t):Qt(e)?0:1}function Qt(e){return Zt.includes(e.toLowerCase())}var ye={},L=e=>{console.error(e)},Se=(e,...t)=>{console.log(`WARN: ${e}`,...t)},H=(e,t)=>{ye[`${e}/${t}`]||(console.log(`Deprecated as of ${e}. ${t}`),ye[`${e}/${t}`]=!0)},J=new Error;function He(e,t,{key:n}){let l=0,d=e[n],_={},c={};for(let r=1;r<=t.length;r++)c[r+l]=d[r],_[r+l]=!0,l+=ke(t[r-1]);e[n]=c,e[n]._emit=_,e[n]._multi=!0}function qt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw L("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),J;if(typeof e.beginScope!="object"||e.beginScope===null)throw L("beginScope must be object"),J;He(e,e.begin,{key:"beginScope"}),e.begin=fe(e.begin,{joinWith:""})}}function en(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw L("skip, excludeEnd, returnEnd not compatible with endScope: {}"),J;if(typeof e.endScope!="object"||e.endScope===null)throw L("endScope must be object"),J;He(e,e.end,{key:"endScope"}),e.end=fe(e.end,{joinWith:""})}}function tn(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function nn(e){tn(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),qt(e),en(e)}function sn(e){function t(c,r){return new RegExp(G(c),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(r?"g":""))}class n{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(r,u){u.position=this.position++,this.matchIndexes[this.matchAt]=u,this.regexes.push([u,r]),this.matchAt+=ke(r)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let r=this.regexes.map(u=>u[1]);this.matcherRe=t(fe(r,{joinWith:"|"}),!0),this.lastIndex=0}exec(r){this.matcherRe.lastIndex=this.lastIndex;let u=this.matcherRe.exec(r);if(!u)return null;let O=u.findIndex((P,I)=>I>0&&P!==void 0),M=this.matchIndexes[O];return u.splice(0,O),Object.assign(u,M)}}class l{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(r){if(this.multiRegexes[r])return this.multiRegexes[r];let u=new n;return this.rules.slice(r).forEach(([O,M])=>u.addRule(O,M)),u.compile(),this.multiRegexes[r]=u,u}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(r,u){this.rules.push([r,u]),u.type==="begin"&&this.count++}exec(r){let u=this.getMatcher(this.regexIndex);u.lastIndex=this.lastIndex;let O=u.exec(r);if(this.resumingScanAtSamePosition()&&!(O&&O.index===this.lastIndex)){let M=this.getMatcher(0);M.lastIndex=this.lastIndex+1,O=M.exec(r)}return O&&(this.regexIndex+=O.position+1,this.regexIndex===this.count&&this.considerAll()),O}}function d(c){let r=new l;return c.contains.forEach(u=>r.addRule(u.begin,{rule:u,type:"begin"})),c.terminatorEnd&&r.addRule(c.terminatorEnd,{type:"end"}),c.illegal&&r.addRule(c.illegal,{type:"illegal"}),r}function _(c,r){let u=c;if(c.isCompiled)return u;[mt,zt,nn,Xt].forEach(M=>M(c,r)),e.compilerExtensions.forEach(M=>M(c,r)),c.__beforeBegin=null,[Wt,Ft,Yt].forEach(M=>M(c,r)),c.isCompiled=!0;let O=null;return typeof c.keywords=="object"&&c.keywords.$pattern&&(c.keywords=Object.assign({},c.keywords),O=c.keywords.$pattern,delete c.keywords.$pattern),O=O||/\w+/,c.keywords&&(c.keywords=$e(c.keywords,e.case_insensitive)),u.keywordPatternRe=t(O,!0),r&&(c.begin||(c.begin=/\B|\b/),u.beginRe=t(u.begin),!c.end&&!c.endsWithParent&&(c.end=/\B|\b/),c.end&&(u.endRe=t(u.end)),u.terminatorEnd=G(u.end)||"",c.endsWithParent&&r.terminatorEnd&&(u.terminatorEnd+=(c.end?"|":"")+r.terminatorEnd)),c.illegal&&(u.illegalRe=t(c.illegal)),c.contains||(c.contains=[]),c.contains=[].concat(...c.contains.map(function(M){return rn(M==="self"?c:M)})),c.contains.forEach(function(M){_(M,u)}),c.starts&&_(c.starts,r),u.matcher=d(u),u}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=k(e.classNameAliases||{}),_(e)}function Ue(e){return e?e.endsWithParent||Ue(e.starts):!1}function rn(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(t){return k(e,{variants:null},t)})),e.cachedVariants?e.cachedVariants:Ue(e)?k(e,{starts:e.starts?k(e.starts):null}):Object.isFrozen(e)?k(e):e}var cn="11.12.0",ue=class extends Error{constructor(t,n){super(t),this.name="HTMLInjectionError",this.html=n}},ce=Ce,Ae=k,Te=Symbol("nomatch"),on=7,je=function(e){let t=Object.create(null),n=Object.create(null),l=[],d=!0,_="Could not find the language '{}', did you forget to load/include a language module?",c={disableAutodetect:!0,name:"Plain text",contains:[]},r={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:le};function u(i){return r.noHighlightRe.test(i)}function O(i){let a=i.className+" ";a+=i.parentNode?i.parentNode.className:"";let h=r.languageDetectRe.exec(a);if(h){let E=C(h[1]);return E||(Se(_.replace("{}",h[1])),Se("Falling back to no-highlight mode for this block.",i)),E?h[1]:"no-highlight"}return a.split(/\s+/).find(E=>u(E)||C(E))}function M(i,a,h){let E="",w="";typeof a=="object"?(E=i,h=a.ignoreIllegals,w=a.language):(H("10.7.0","highlight(lang, code, ...args) has been deprecated."),H("10.7.0",`Please use highlight(code, options) instead.
+(see the highlight.js issue tracker)`),w=i,E=a),h===void 0&&(h=!0);let y={code:E,language:w};W("before:highlight",y);let D=y.result?y.result:P(y.language,y.code,h);return D.code=y.code,W("after:highlight",D),D}function P(i,a,h,E){let w=Object.create(null);function y(s,o){return s.keywords[o]}function D(){if(!f.keywords){x.addText(b);return}let s=0;f.keywordPatternRe.lastIndex=0;let o=f.keywordPatternRe.exec(b),g="";for(;o;){g+=b.substring(s,o.index);let p=A.case_insensitive?o[0].toLowerCase():o[0],N=y(f,p);if(N){let[T,at]=N;if(x.addText(g),g="",w[p]=(w[p]||0)+1,w[p]<=on&&(Y+=at),T.startsWith("_"))g+=o[0];else{let lt=A.classNameAliases[T]||T;S(o[0],lt)}}else g+=o[0];s=f.keywordPatternRe.lastIndex,o=f.keywordPatternRe.exec(b)}g+=b.substring(s),x.addText(g)}function F(){if(b==="")return;let s=null;if(typeof f.subLanguage=="string"){if(!t[f.subLanguage]){x.addText(b);return}s=P(f.subLanguage,b,!0,we[f.subLanguage]),we[f.subLanguage]=s._top}else s=$(b,f.subLanguage.length?f.subLanguage:null);f.relevance>0&&(Y+=s.relevance),x.__addSublanguage(s._emitter,s.language)}function R(){f.subLanguage!=null?F():D(),b=""}function S(s,o){s!==""&&(x.startScope(o),x.addText(s),x.endScope())}function be(s,o){let g=1,p=o.length-1;for(;g<=p;){if(!s._emit[g]){g++;continue}let N=A.classNameAliases[s[g]]||s[g],T=o[g];N?S(T,N):(b=T,D(),b=""),g++}}function _e(s,o){return s.scope&&typeof s.scope=="string"&&x.openNode(A.classNameAliases[s.scope]||s.scope),s.beginScope&&(s.beginScope._wrap?(S(b,A.classNameAliases[s.beginScope._wrap]||s.beginScope._wrap),b=""):s.beginScope._multi&&(be(s.beginScope,o),b="")),f=Object.create(s,{parent:{value:f}}),f}function Me(s,o,g){let p=Nt(s.endRe,g);if(p){if(s["on:end"]){let N=new Z(s);s["on:end"](o,N),N.isMatchIgnored&&(p=!1)}if(p){for(;s.endsParent&&s.parent;)s=s.parent;return s}}if(s.endsWithParent)return Me(s.parent,o,g)}function it(s){return f.matcher.regexIndex===0?(b+=s[0],1):(re=!0,0)}function st(s){let o=s[0],g=s.rule,p=new Z(g),N=[g.__beforeBegin,g["on:begin"]];for(let T of N)if(T&&(T(s,p),p.isMatchIgnored))return it(o);return g.skip?b+=o:(g.excludeBegin&&(b+=o),R(),!g.returnBegin&&!g.excludeBegin&&(b=o)),_e(g,s),g.returnBegin?0:o.length}function rt(s){let o=s[0],g=a.substring(s.index),p=Me(f,s,g);if(!p)return Te;let N=f;f.endScope&&f.endScope._wrap?(R(),S(o,f.endScope._wrap)):f.endScope&&f.endScope._multi?(R(),be(f.endScope,s)):N.skip?b+=o:(N.returnEnd||N.excludeEnd||(b+=o),R(),N.excludeEnd&&(b=o));do f.scope&&x.closeNode(),!f.skip&&!f.subLanguage&&(Y+=f.relevance),f=f.parent;while(f!==p.parent);return p.starts&&_e(p.starts,s),N.returnEnd?0:o.length}function ct(){let s=[];for(let o=f;o!==A;o=o.parent)o.scope&&s.unshift(o.scope);s.forEach(o=>x.openNode(o))}let z={};function Oe(s,o){let g=o&&o[0];if(b+=s,g==null)return R(),0;if(z.type==="begin"&&o.type==="end"&&z.index===o.index&&g===""){if(b+=a.slice(o.index,o.index+1),!d){let p=new Error(`0 width match regex (${i})`);throw p.languageName=i,p.badRule=z.rule,p}return 1}if(z=o,o.type==="begin")return st(o);if(o.type==="illegal"&&!h){let p=new Error('Illegal lexeme "'+g+'" for mode "'+(f.scope||"<unnamed>")+'"');throw p.mode=f,p}else if(o.type==="end"){let p=rt(o);if(p!==Te)return p}if(o.type==="illegal"&&g==="")return o.index===a.length||(b+=`
+`),1;if(se>1e5&&se>o.index*3)throw new Error("potential infinite loop, way more iterations than matches");return b+=g,g.length}let A=C(i);if(!A)throw L(_.replace("{}",i)),new Error('Unknown language: "'+i+'"');let ot=sn(A),ie="",f=E||ot,we={},x=new r.__emitter(r);ct();let b="",Y=0,v=0,se=0,re=!1;try{if(A.__emitTokens)A.__emitTokens(a,x);else{for(f.matcher.considerAll();;){se++,re?re=!1:f.matcher.considerAll(),f.matcher.lastIndex=v;let s=f.matcher.exec(a);if(!s)break;let o=a.substring(v,s.index),g=Oe(o,s);v=s.index+g}Oe(a.substring(v))}return x.finalize(),ie=x.toHTML(),{language:i,value:ie,relevance:Y,illegal:!1,_emitter:x,_top:f}}catch(s){if(s.message&&s.message.includes("Illegal"))return{language:i,value:ce(a),illegal:!0,relevance:0,_illegalBy:{message:s.message,index:v,context:a.slice(v-100,v+100),mode:s.mode,resultSoFar:ie},_emitter:x};if(d)return{language:i,value:ce(a),illegal:!1,relevance:0,errorRaised:s,_emitter:x,_top:f};throw s}}function I(i){let a={value:ce(i),illegal:!1,relevance:0,_top:c,_emitter:new r.__emitter(r)};return a._emitter.addText(i),a}function $(i,a){a=a||r.languages||Object.keys(t);let h=I(i),E=a.filter(C).filter(Ee).map(R=>P(R,i,!1));E.unshift(h);let w=E.sort((R,S)=>{if(R.relevance!==S.relevance)return S.relevance-R.relevance;if(R.language&&S.language){if(C(R.language).supersetOf===S.language)return 1;if(C(S.language).supersetOf===R.language)return-1}return 0}),[y,D]=w,F=y;return F.secondBest=D,F}function te(i,a,h){let E=a&&n[a]||h;i.classList.add("hljs"),i.classList.add(`language-${E}`)}function ne(i){let a=null,h=O(i);if(u(h))return;if(W("before:highlightElement",{el:i,language:h}),i.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",i);return}if(i.children.length>0&&(r.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("(see the highlight.js security wiki)"),console.warn("The element with unescaped HTML:"),console.warn(i)),r.throwUnescapedHTML))throw new ue("One of your code blocks includes unescaped HTML.",i.innerHTML);a=i;let E=a.textContent,w=h?M(E,{language:h,ignoreIllegals:!0}):$(E);i.innerHTML=w.value,i.dataset.highlighted="yes",te(i,h,w.language),i.result={language:w.language,re:w.relevance,relevance:w.relevance},w.secondBest&&(i.secondBest={language:w.secondBest.language,relevance:w.secondBest.relevance}),W("after:highlightElement",{el:i,result:w,text:E})}function Ye(i){r=Ae(r,i)}let Xe=()=>{m(),H("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function Ze(){m(),H("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let de=!1;function m(){function i(){m()}if(document.readyState==="loading"){de||window.addEventListener("DOMContentLoaded",i,!1),de=!0;return}document.querySelectorAll(r.cssSelector).forEach(ne)}function Je(i,a){let h=null;try{h=a(e)}catch(E){if(L("Language definition for '{}' could not be registered.".replace("{}",i)),d)L(E);else throw E;h=c}h.name||(h.name=i),t[i]=h,h.rawDefinition=a.bind(null,e),h.aliases&&pe(h.aliases,{languageName:i})}function Ve(i){delete t[i];for(let a of Object.keys(n))n[a]===i&&delete n[a]}function Qe(){return Object.keys(t)}function C(i){return i=(i||"").toLowerCase(),t[i]||t[n[i]]}function pe(i,{languageName:a}){typeof i=="string"&&(i=[i]),i.forEach(h=>{n[h.toLowerCase()]=a})}function Ee(i){let a=C(i);return a&&!a.disableAutodetect}function qe(i){i["before:highlightBlock"]&&!i["before:highlightElement"]&&(i["before:highlightElement"]=a=>{i["before:highlightBlock"](Object.assign({block:a.el},a))}),i["after:highlightBlock"]&&!i["after:highlightElement"]&&(i["after:highlightElement"]=a=>{i["after:highlightBlock"](Object.assign({block:a.el},a))})}function et(i){qe(i),l.push(i)}function tt(i){let a=l.indexOf(i);a!==-1&&l.splice(a,1)}function W(i,a){let h=i;l.forEach(function(E){E[h]&&E[h](a)})}function nt(i){return H("10.7.0","highlightBlock will be removed entirely in v12.0"),H("10.7.0","Please use highlightElement now."),ne(i)}Object.assign(e,{highlight:M,highlightAuto:$,highlightAll:m,highlightElement:ne,highlightBlock:nt,configure:Ye,initHighlighting:Xe,initHighlightingOnLoad:Ze,registerLanguage:Je,unregisterLanguage:Ve,listLanguages:Qe,getLanguage:C,registerAliases:pe,autoDetection:Ee,inherit:Ae,addPlugin:et,removePlugin:tt}),e.debugMode=function(){d=!1},e.safeMode=function(){d=!0},e.versionString=cn,e.regex={concat:B,lookahead:De,either:V,optional:wt,anyNumberOfTimes:Ot};for(let i in X)typeof X[i]=="object"&&Ie(X[i]);return Object.assign(e,X),e},U=je({});U.newInstance=()=>je({});Ge.exports=U;U.HighlightJS=U;U.default=U});var me=bt(Ke(),1);var he=me.default;var j="[0-9](_*[0-9])*",q=`\\.(${j})`,ee="[0-9a-fA-F](_*[0-9a-fA-F])*",We={className:"number",variants:[{begin:`(\\b(${j})((${q})|\\.)?|(${q}))[eE][+-]?(${j})[fFdD]?\\b`},{begin:`\\b(${j})((${q})[fFdD]?\\b|\\.([fFdD]\\b)?)`},{begin:`(${q})[fFdD]?\\b`},{begin:`\\b(${j})[fFdD]\\b`},{begin:`\\b0[xX]((${ee})\\.?|(${ee})?\\.(${ee}))[pP][+-]?(${j})[fFdD]?\\b`},{begin:"\\b(0|[1-9](_*[0-9])*)[lL]?\\b"},{begin:`\\b0[xX](${ee})[lL]?\\b`},{begin:"\\b0(_*[0-7])*[lL]?\\b"},{begin:"\\b0[bB][01](_*[01])*[lL]?\\b"}],relevance:0};function Fe(e,t,n){return n===-1?"":e.replace(t,l=>Fe(e,t,n-1))}function ze(e){let t=e.regex,n="[\xC0-\u02B8a-zA-Z_$][\xC0-\u02B8a-zA-Z_$0-9]*",l="(?:(?:\\s*\\[\\s*])+)?",d=n+"<@@@>"+l,c="(?:"+("\\?(?:\\s+(?:extends|super)\\s+"+d+")?")+"|"+d+")",r=Fe("(?:\\s*<\\s*"+c+"(?:\\s*,\\s*"+c+")*\\s*>)?",/<@@@>/g,2),I={keyword:["synchronized","abstract","private","var","static","if","const ","for","while","strictfp","finally","protected","import","native","final","void","enum","else","break","transient","catch","instanceof","volatile","case","assert","package","default","public","try","switch","continue","throws","protected","public","private","module","requires","exports","do","sealed","yield","permits","goto","when"],literal:["false","true","null"],type:["char","boolean","long","float","int","byte","short","double"],built_in:["super","this"]},$={className:"meta",begin:"@"+n,contains:[{begin:/\(/,end:/\)/,contains:["self"]}]},te={className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[e.C_BLOCK_COMMENT_MODE],endsParent:!0};return{name:"Java",aliases:["jsp"],keywords:I,illegal:/<\/|#/,contains:[e.COMMENT("/\\*\\*","\\*/",{relevance:0,contains:[{begin:/\w+@/,relevance:0},{className:"doctag",begin:"@[A-Za-z]+"}]}),{begin:/import java\.[a-z]+\./,keywords:"import",relevance:2},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE,{begin:/"""/,end:/"""/,className:"string",contains:[e.BACKSLASH_ESCAPE]},e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,{match:[/\b(?:class|interface|enum|extends|implements|new)/,/\s+/,n],className:{1:"keyword",3:"title.class"}},{match:/non-sealed/,scope:"keyword"},{beginKeywords:"new throw return else yield assert",relevance:0},{begin:[n,t.concat(r,l,/\s+/),n,l,/\s*/,/=(?!=)/],className:{1:"type",3:"variable",6:"operator"}},{begin:[/record/,/\s+/,n],className:{1:"keyword",3:"title.class"},contains:[te,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},{begin:[n,t.concat(r,l,/\s+/),n,/\s*(?=\()/],className:{1:"type",3:"title.function"},keywords:I,contains:[{className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[$,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,We,e.C_BLOCK_COMMENT_MODE]},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},We,$]}}he.registerLanguage("java",ze);window.hljs=he;})();
+</script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---- 1. syntax highlighting -------------------------------------- */
+  function highlight() {
+    if (!window.hljs) return;
+    var blocks = document.querySelectorAll('pre code.language-java');
+    for (var i = 0; i < blocks.length; i++) {
+      try { window.hljs.highlightElement(blocks[i]); } catch (e) {}
+    }
+  }
+
+  /* ---- 2. every solution / reveal starts closed --------------------- */
+  function closeAll() {
+    var d = document.querySelectorAll('details.soln');
+    for (var i = 0; i < d.length; i++) { d[i].open = false; }
+  }
+
+  /* ---- 3. show all / hide all -------------------------------------- */
+  function wireToolbar() {
+    var show = document.getElementById('showAll');
+    var hide = document.getElementById('hideAll');
+    function setAll(v) {
+      var d = document.querySelectorAll('details.soln');
+      for (var i = 0; i < d.length; i++) { d[i].open = v; }
+    }
+    if (show) show.addEventListener('click', function () { setAll(true); });
+    if (hide) hide.addEventListener('click', function () { setAll(false); });
+  }
+
+  /* ---- 4. live-coding editors -------------------------------------- */
+  var INDENT = '    ';
+
+  function wireEditors() {
+    var eds = document.querySelectorAll('.editor');
+    for (var i = 0; i < eds.length; i++) { wireOne(eds[i]); }
+  }
+
+  function wireOne(box) {
+    var ta = box.querySelector('textarea');
+    if (!ta) return;
+    var starter = ta.value;
+
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Tab' || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+      ev.preventDefault();
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+
+      if (s === e && !ev.shiftKey) {
+        ta.value = v.slice(0, s) + INDENT + v.slice(e);
+        ta.selectionStart = ta.selectionEnd = s + INDENT.length;
+        return;
+      }
+      /* block indent / outdent over the selected lines */
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var le = v.indexOf('\n', e);
+      if (le === -1) le = v.length;
+      var seg = v.slice(ls, le);
+      var lines = seg.split('\n');
+      var delta0 = 0, total = 0;
+
+      for (var i = 0; i < lines.length; i++) {
+        if (ev.shiftKey) {
+          var m = lines[i].match(/^(\t| {1,4})/);
+          if (m) {
+            lines[i] = lines[i].slice(m[0].length);
+            if (i === 0) delta0 = -m[0].length;
+            total -= m[0].length;
+          }
+        } else {
+          lines[i] = INDENT + lines[i];
+          if (i === 0) delta0 = INDENT.length;
+          total += INDENT.length;
+        }
+      }
+      ta.value = v.slice(0, ls) + lines.join('\n') + v.slice(le);
+      ta.selectionStart = Math.max(ls, s + delta0);
+      ta.selectionEnd = Math.max(ta.selectionStart, e + total);
+    });
+
+    /* keep the indent of the current line when Enter is pressed */
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Enter' || ev.shiftKey || ev.ctrlKey || ev.metaKey) return;
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+      if (s !== e) return;
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var lead = (v.slice(ls, s).match(/^[ \t]*/) || [''])[0];
+      var extra = /[{(\[]\s*$/.test(v.slice(ls, s)) ? INDENT : '';
+      if (!lead && !extra) return;
+      ev.preventDefault();
+      var ins = '\n' + lead + extra;
+      ta.value = v.slice(0, s) + ins + v.slice(e);
+      ta.selectionStart = ta.selectionEnd = s + ins.length;
+    });
+
+    var rst = box.querySelector('[data-act="reset"]');
+    if (rst) rst.addEventListener('click', function () {
+      ta.value = starter;
+      ta.focus();
+      flash(box, 'Reset to starter code');
+    });
+
+    var cpy = box.querySelector('[data-act="copy"]');
+    if (cpy) cpy.addEventListener('click', function () {
+      var done = function () { flash(box, 'Copied — paste it into your IDE'); };
+      var fail = function () { flash(box, 'Copy failed — select the text and press Ctrl/Cmd+C'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value).then(done, function () { legacy(ta, done, fail); });
+      } else {
+        legacy(ta, done, fail);
+      }
+    });
+  }
+
+  function legacy(ta, done, fail) {
+    try {
+      var st = ta.selectionStart, en = ta.selectionEnd;
+      ta.select();
+      var ok = document.execCommand('copy');
+      ta.selectionStart = st; ta.selectionEnd = en;
+      ok ? done() : fail();
+    } catch (e) { fail(); }
+  }
+
+  function flash(box, msg) {
+    var f = box.querySelector('.foot');
+    if (!f) return;
+    if (f.getAttribute('data-base') === null || f.getAttribute('data-base') === undefined) {
+      f.setAttribute('data-base', f.textContent);
+    }
+    f.textContent = msg;
+    window.setTimeout(function () { f.textContent = f.getAttribute('data-base'); }, 2200);
+  }
+
+  /* ---- go ----------------------------------------------------------- */
+  function init() {
+    highlight();
+    closeAll();
+    wireToolbar();
+    wireEditors();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  /* belt and braces: some browsers restore <details> state on soft reload */
+  window.addEventListener('pageshow', closeAll);
+})();
+</script>
+</body>
+</html>

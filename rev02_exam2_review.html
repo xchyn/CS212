@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class 22 — Exam 2 Review | CSCI 212</title>
+<style>
+:root{
+  --ink:#0f172a; --ink2:#334155; --muted:#64748b; --line:#e2e8f0;
+  --bg:#ffffff; --bg2:#f8fafc;
+  --obj:#4f46e5; --def:#2563eb; --ex:#059669; --alg:#7c3aed;
+  --key:#b45309; --warn:#dc2626; --qc:#0891b2; --prac:#be185d; --sum:#475569;
+  --edit:#ea580c; --edit-bg:#fff7ed;
+  --code-bg:#0d1117; --code-bd:#000000;   /* read-only listings: black */
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px 80px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:#0f172a;color:#e2e8f0;font-size:13.5px;
+  border-bottom:3px solid var(--obj);
+}
+.topbar .inner{max-width:900px;margin:0 auto;padding:10px 22px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.topbar a{color:#e2e8f0;text-decoration:none;border-bottom:1px solid transparent}
+.topbar a:hover{border-bottom-color:#94a3b8}
+.topbar .course{font-weight:700;letter-spacing:.02em}
+.topbar .sep{color:#475569}
+.topbar .spacer{flex:1}
+
+/* ---------- title block ---------- */
+.titleblock{padding:34px 0 10px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.eyebrow{
+  font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--obj);margin-bottom:8px;
+}
+.titleblock h1{font-size:33px;line-height:1.2;margin:0 0 10px;letter-spacing:-.015em}
+.titleblock .sub{margin:0;color:var(--muted);font-size:17px;line-height:1.5}
+
+h2{
+  font-size:24px;margin:46px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line);letter-spacing:-.01em;scroll-margin-top:14px;
+}
+h2 .num{color:var(--obj);font-weight:800;margin-right:11px}
+h3{font-size:18.5px;margin:30px 0 10px;color:var(--ink)}
+h4{font-size:16px;margin:20px 0 8px;color:var(--ink2)}
+p{margin:12px 0}
+ul,ol{margin:12px 0;padding-left:26px}
+li{margin:6px 0}
+a{color:var(--def)}
+hr{border:0;border-top:1px solid var(--line);margin:30px 0}
+strong{color:var(--ink)}
+.muted{color:var(--muted)}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--bg2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 20px 16px;margin:22px 0;
+}
+.toc .th{
+  font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;
+}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:30px}
+.toc li{margin:3px 0;font-size:14.5px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- show all / hide all ---------- */
+.tools{
+  display:flex;gap:9px;align-items:center;flex-wrap:wrap;
+  padding:11px 15px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:9px;margin:22px 0;font-size:13.5px;
+}
+.tools .lab{font-weight:700;color:var(--ink2)}
+.tools button{
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  background:#fff;color:var(--ink2);border:1px solid #cbd5e1;
+  border-radius:6px;padding:4px 12px;
+}
+.tools button:hover{background:var(--obj);border-color:var(--obj);color:#fff}
+.tools .muted{font-size:12.5px}
+
+/* ---------- boxes ---------- */
+.box{border:1px solid var(--line);border-left:5px solid var(--muted);border-radius:8px;margin:22px 0;overflow:hidden;background:#fff}
+.box>.hd{
+  padding:9px 16px;font-size:12.5px;font-weight:700;
+  letter-spacing:.075em;text-transform:uppercase;color:#fff;background:var(--muted);
+}
+.box>.hd .tag{margin-left:5px;font-weight:500;text-transform:none;letter-spacing:0;opacity:.92;font-size:13px}
+.box>.bd{padding:4px 18px 14px}
+.box>.bd>:first-child{margin-top:12px}
+.box>.bd>:last-child{margin-bottom:2px}
+
+.box.obj{border-left-color:var(--obj)}  .box.obj>.hd{background:var(--obj)}
+.box.def{border-left-color:var(--def)}  .box.def>.hd{background:var(--def)}
+.box.ex{border-left-color:var(--ex)}    .box.ex>.hd{background:var(--ex)}
+.box.alg{border-left-color:var(--alg)}  .box.alg>.hd{background:var(--alg)}
+.box.key{border-left-color:var(--key)}  .box.key>.hd{background:var(--key)}
+.box.warn{border-left-color:var(--warn)}.box.warn>.hd{background:var(--warn)}
+.box.qc{border-left-color:var(--qc)}    .box.qc>.hd{background:var(--qc)}
+.box.prac{border-left-color:var(--prac)}.box.prac>.hd{background:var(--prac)}
+.box.sum{border-left-color:var(--sum)}  .box.sum>.hd{background:var(--sum)}
+
+.box.obj{background:#f5f5ff}
+.box.qc{background:#f0fbfe}
+.box.warn{background:#fff7f7}
+.box.key{background:#fffbf2}
+.box.sum{background:#f8fafc}
+
+/* ---------- code ---------- */
+/* Read-only listings sit on black, matching CSCI 211, so a code block is never
+   mistaken for the editable live-coding box. */
+pre{
+  margin:14px 0;padding:13px 15px;overflow-x:auto;
+  background:var(--code-bg);border:1px solid var(--code-bd);border-radius:8px;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;color:#c9d1d9;
+}
+pre code{font-family:inherit;font-size:inherit;background:none;padding:0;border:0;color:inherit;display:block}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef2f7;
+  border:1px solid #e2e8f0;border-radius:4px;padding:1px 5px;color:#0b3a5b;
+}
+.filename{
+  font-family:var(--mono);font-size:12px;color:#475569;
+  margin:16px 0 -9px;font-weight:600;
+}
+
+/* comparison block: another language, never syntax-highlighted. Dark like the
+   Java listings, but desaturated and dashed so it reads as "not this course". */
+pre.cmp{background:#161b22;border-style:dashed;border-color:#3f4650;color:#9aa4b2}
+pre.cmp code{color:#9aa4b2}
+
+/* shell commands you type */
+pre.sh{background:#1e293b;border-color:#1e293b;color:#e2e8f0;position:relative;padding-top:26px}
+pre.sh code{color:#e2e8f0}
+pre.sh::before{
+  content:"Terminal";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#86efac;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* output / terminal blocks */
+pre.out{background:#111d33;border-color:#111d33;color:#e2e8f0;position:relative;padding-top:26px}
+pre.out code{color:#e2e8f0}
+pre.out::before{
+  content:"Output";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#7dd3fc;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+pre.err{background:#1f1416;border-color:#7f1d1d;color:#fecdd3;padding-top:26px;position:relative}
+pre.err code{color:#fecdd3}
+pre.err::before{
+  content:"Compiler message";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#fda4af;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* ---- highlight.js, GitHub-dark palette (hand-written, no external file) ---- */
+.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-template-tag,
+.hljs-template-variable,.hljs-type,.hljs-variable.language_{color:#ff7b72}
+.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#d2a8ff}
+.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,
+.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable{color:#79c0ff}
+.hljs-meta .hljs-string,.hljs-regexp,.hljs-string{color:#a5d6ff}
+.hljs-built_in,.hljs-symbol{color:#ffa657}
+.hljs-code,.hljs-comment,.hljs-formula{color:#8b949e;font-style:italic}
+.hljs-name,.hljs-quote,.hljs-selector-pseudo,.hljs-selector-tag{color:#7ee787}
+.hljs-subst{color:#c9d1d9}
+.hljs-section{color:#1f6feb;font-weight:700}
+.hljs-bullet{color:#f2cc60}
+.hljs-emphasis{color:#c9d1d9;font-style:italic}
+.hljs-strong{color:#c9d1d9;font-weight:700}
+
+/* ---------- trace tables ---------- */
+table{border-collapse:collapse;margin:16px 0;font-size:14px;width:100%}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg2);font-weight:700;font-size:13px}
+table.trace td:first-child,table.trace th:first-child{white-space:nowrap}
+table code{font-size:.88em}
+
+/* ---------- multi-part questions ---------- */
+.part{margin:16px 0;padding-left:14px;border-left:2px solid #cbd5e1}
+.part .q{margin:0 0 8px}
+.part .pl{font-weight:700;color:var(--qc);margin-right:6px}
+
+/* ---------- collapsible solutions ---------- */
+details.soln{margin:10px 0 4px}
+details.soln>summary{
+  list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  font-size:12.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:#fff;background:var(--sum);border-radius:6px;padding:5px 13px;
+  user-select:none;
+}
+details.soln>summary::-webkit-details-marker{display:none}
+details.soln>summary::before{content:"\25B6";font-size:9px;transition:transform .15s}
+details.soln[open]>summary::before{transform:rotate(90deg)}
+details.soln>summary::after{content:"Show Answer"}
+details.soln[open]>summary::after{content:"Hide Answer"}
+details.soln>summary:hover{filter:brightness(1.18)}
+
+details.soln.reveal>summary{background:var(--ex)}
+details.soln.reveal>summary::after{content:"Show Output & Explanation"}
+details.soln.reveal[open]>summary::after{content:"Hide Output & Explanation"}
+details.soln.reveal.noout>summary::after{content:"Show Explanation"}
+details.soln.reveal.noout[open]>summary::after{content:"Hide Explanation"}
+
+.ans{
+  margin-top:11px;padding:2px 16px 10px;background:#fff;
+  border:1px solid var(--line);border-left:3px solid var(--sum);border-radius:7px;
+}
+details.soln.reveal .ans{border-left-color:var(--ex)}
+.ans>:first-child{margin-top:12px}
+.ans>:last-child{margin-bottom:6px}
+
+/* ---------- live coding editor ---------- */
+.editor{
+  margin:18px 0;border:2px dashed var(--edit);border-radius:9px;
+  background:var(--edit-bg);overflow:hidden;
+}
+.editor .ehd{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:7px 13px;background:var(--edit);color:#fff;
+  font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+}
+.editor .ehd .etitle{flex:1}
+.editor .ehd button{
+  font:inherit;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  cursor:pointer;background:rgba(255,255,255,.16);color:#fff;
+  border:1px solid rgba(255,255,255,.5);border-radius:5px;padding:3px 10px;
+}
+.editor .ehd button:hover{background:#fff;color:var(--edit)}
+.editor textarea{
+  display:block;width:100%;border:0;outline:0;resize:vertical;
+  padding:12px 15px;background:var(--edit-bg);color:#431407;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;
+  tab-size:4;-moz-tab-size:4;min-height:150px;
+}
+.editor textarea:focus{background:#fff}
+.editor .foot{
+  padding:5px 13px 7px;font-size:11.5px;color:#9a3412;background:#ffedd5;
+  border-top:1px solid #fed7aa;
+}
+
+/* ---------- prev/next nav ---------- */
+.pagenav{display:flex;gap:14px;margin:52px 0 0;flex-wrap:wrap}
+.pagenav a,.pagenav span.disabled{
+  flex:1 1 260px;display:block;text-decoration:none;
+  border:1px solid var(--line);border-radius:9px;padding:12px 16px;background:#fff;
+}
+.pagenav a:hover{border-color:var(--obj);background:var(--bg2)}
+.pagenav .dir{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.pagenav .ttl{font-size:15px;font-weight:600;color:var(--ink);margin-top:3px}
+.pagenav .next{text-align:right}
+.pagenav span.disabled{opacity:.4}
+.pagenav span.disabled .ttl{color:var(--muted)}
+
+footer.pf{
+  margin-top:40px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--muted);text-align:center;
+}
+
+/* ---------- index page ---------- */
+table.sched{font-size:14.5px}
+table.sched th{background:#0f172a;color:#fff;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+table.sched td:first-child{white-space:nowrap;font-weight:700;color:var(--muted);width:60px}
+table.sched tr.examrow td{background:#fff1f2}
+table.sched tr.revrow td{background:#fffbeb}
+table.sched a{font-weight:600;text-decoration:none}
+table.sched a:hover{text-decoration:underline}
+
+
+/* ---------- release gating ---------- */
+.pending{
+  margin-top:4px;font-size:11.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:#b45309;
+}
+.pagenav span.disabled .pending{color:#b45309}
+table.sched tr.pendingrow td{background:#fcfcfd}
+table.sched .unrel{color:var(--muted)}
+table.sched .pending{display:block;margin-top:2px}
+table.sched td.cn{white-space:nowrap;width:52px;font-weight:700;color:var(--muted)}
+table.sched td.dt{white-space:nowrap;width:104px;color:var(--muted);font-size:13.5px}
+table.sched tr.offrow td{background:#f1f5f9;color:var(--muted);font-style:italic}
+.refcard{
+  display:block;text-decoration:none;border:1px solid var(--line);
+  border-left:5px solid var(--alg);border-radius:9px;padding:13px 17px;
+  margin:22px 0;background:#faf9ff;
+}
+.refcard:hover{background:#f5f3ff;border-color:var(--alg)}
+.refcard .rl{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--alg)}
+.refcard .rt{font-size:16px;font-weight:600;color:var(--ink);margin-top:3px}
+.refcard .rd{font-size:14px;color:var(--muted);margin-top:4px}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,.tools,.pagenav,.pending{display:none !important}
+  html,body{width:100%;font-size:10pt}
+  .wrap{max-width:100%;width:100%;padding:0}
+  /* a wide <pre> must wrap rather than widen the page and clip every other
+     element at the paper edge */
+  /* Screen shows code on black; paper does not. Restore a dark-on-light palette
+     for print only, or the dark theme's light tokens vanish on white. */
+  pre{white-space:pre-wrap;overflow:visible;overflow-wrap:anywhere;font-size:8.6pt;
+      background:#f8fafc !important;color:#24292e !important;border-color:#cbd5e1 !important;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  pre code{color:#24292e !important}
+  pre.cmp{background:#fff !important;color:#475569 !important;border-color:#94a3b8 !important}
+  pre.cmp code{color:#475569 !important}
+  pre .hljs-doctag,pre .hljs-keyword,pre .hljs-meta .hljs-keyword,pre .hljs-template-tag,
+  pre .hljs-template-variable,pre .hljs-type,pre .hljs-variable.language_{color:#d73a49 !important}
+  pre .hljs-title,pre .hljs-title.class_,pre .hljs-title.class_.inherited__,
+  pre .hljs-title.function_{color:#6f42c1 !important}
+  pre .hljs-attr,pre .hljs-attribute,pre .hljs-literal,pre .hljs-meta,pre .hljs-number,
+  pre .hljs-operator,pre .hljs-selector-attr,pre .hljs-selector-class,pre .hljs-selector-id,
+  pre .hljs-variable{color:#005cc5 !important}
+  pre .hljs-meta .hljs-string,pre .hljs-regexp,pre .hljs-string{color:#032f62 !important}
+  pre .hljs-built_in,pre .hljs-symbol{color:#e36209 !important}
+  pre .hljs-code,pre .hljs-comment,pre .hljs-formula{color:#6a737d !important}
+  pre .hljs-name,pre .hljs-quote,pre .hljs-selector-pseudo,
+  pre .hljs-selector-tag{color:#22863a !important}
+  pre .hljs-subst,pre .hljs-emphasis,pre .hljs-strong{color:#24292e !important}
+  .filename{color:#475569 !important}
+  table{table-layout:fixed;width:100%;word-wrap:break-word;overflow-wrap:anywhere}
+  .box,.toc{max-width:100%}
+  a{color:var(--ink);text-decoration:none}
+  .box,.part,pre,table,.editor{break-inside:avoid;page-break-inside:avoid}
+  h2{break-after:avoid;page-break-after:avoid}
+  details.soln>summary{display:none !important}
+  details.soln:not([open])>.ans{display:none !important}
+  details.soln::before{
+    content:"Answer withheld — see the online notes.";
+    display:block;font-size:9pt;font-style:italic;color:#64748b;margin:6px 0;
+  }
+  details.soln[open]::before{content:""}
+  .editor textarea{display:none !important}
+  .editor{border:1.5px solid #fdba74 !important;background:#fff;border-style:solid}
+  .editor .ehd{background:#fff !important;color:#9a3412 !important;border-bottom:1px solid #fdba74}
+  .editor .ehd button{display:none}
+  .editor .foot{display:none}
+  .editor::after{content:"";display:block;height:2.1in;background:#fff}
+  pre.out,pre.sh{background:#f1f5f9 !important;color:#0f172a !important;border-color:#94a3b8 !important}
+  pre.err{background:#fef2f2 !important;color:#7f1d1d !important;border-color:#fca5a5 !important}
+  pre.out code,pre.sh code{color:#0f172a !important}
+  pre.err code{color:#7f1d1d !important}
+  pre.out::before,pre.sh::before{color:#475569}
+  pre.err::before{color:#b91c1c}
+  .box>.hd{color:#000;background:#fff !important;border-bottom:1px solid #cbd5e1}
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="inner">
+<span class="course">CSCI 212</span>
+<span class="sep">|</span>
+<a href="index.html">Course index</a>
+<span class="sep">|</span>
+<span>Class 22 of 28</span>
+<span class="sep">|</span>
+<span>Tuesday, November 17</span>
+<span class="spacer"></span>
+<span>Queens College, CUNY</span>
+</div></div>
+<div class="wrap">
+<div class="titleblock">
+  <div class="eyebrow">Session 22 &middot; Review</div>
+  <h1>Exam 2 Review</h1>
+  <p class="sub">Lectures 10 to 19 on one page &mdash; the ideas in one paragraph each, the mistakes that actually cost marks, and a set of exam-shaped problems to work under a clock. Exam 2 is cumulative, so the Exam 1 material is still in scope.</p>
+</div>
+
+<div class="box obj">
+  <div class="hd">What Exam 2 Covers</div>
+  <div class="bd">
+    <p>Exam 2 is in class next session, and it is <strong>cumulative</strong> &mdash; the
+    syllabus is explicit that each exam covers all the material up to the point it is
+    given. In practice the weight sits on Lectures 10 through 19, which is what this page
+    drills, but anything from Lecture 1 onward can appear: a <code>String</code> comparison, an
+    integer division, an <code>ArrayList</code> method. If you are shaky on any of that, work the
+    Exam 1 Review page again first.</p>
+    <p>Here is the Lecture 10&ndash;19 list, with the lecture each item came from:</p>
+    <ol>
+      <li><strong>Reading a problem description and deciding what the classes are</strong> &mdash;
+      responsibilities, "has-a" versus "is-a", encapsulation with <code>private</code> fields <span class="muted">(Lecture 10)</span>.</li> <li><strong>Building a system out of several cooperating classes</strong> &mdash; one class holding a reference to another, arrays of objects, the <code>null</code> you have to guard <span class="muted">(Lecture 11)</span>.</li> <li><strong>Inheritance</strong> &mdash; <code>extends</code>, what is and is not inherited, <code>super(...)</code> and the constructor chain, overriding versus overloading <span class="muted">(Lecture 12)</span>.</li> <li><strong>Polymorphism and dynamic binding</strong> &mdash; static type versus dynamic type, which version of a method actually runs, arrays of a superclass type, casting down and <code>instanceof</code> <span class="muted">(Lecture 13)</span>.</li> <li><strong>Abstract classes and interfaces</strong> &mdash; <code>abstract</code>, <code>implements</code>, writing an interface from a description, implementing one, and extending the implementation <span class="muted">(Lecture 14)</span>.</li> <li><strong>Windows and events</strong> &mdash; <code>JFrame</code>, the content pane, <code>setVisible</code>, the source&ndash;event&ndash;listener model, <code>WindowListener</code> and <code>WindowAdapter</code> <span class="muted">(Lecture 15)</span>.</li> <li><strong>Layout managers and buttons</strong> &mdash; <code>FlowLayout</code>, <code>BorderLayout</code>, <code>GridLayout</code>, nested <code>JPanel</code>s, <code>implements ActionListener</code>, <code>addActionListener(this)</code> and <code>actionPerformed</code> <span class="muted">(Lecture 16)</span>.</li> <li><strong>Text components and menus</strong> &mdash; <code>JLabel</code>, <code>JTextField</code>, <code>getText</code>, <code>setText</code>, <code>Integer.parseInt</code>, <code>JMenuBar</code>/<code>JMenu</code>/<code>JMenuItem</code> <span class="muted">(Lecture 17)</span>.</li> <li><strong>Borders, icons and scroll panes</strong> &mdash; <code>BorderFactory</code>, <code>ImageIcon</code>, <code>JScrollPane</code> <span class="muted">(Lecture 18)</span>.</li> <li><strong>Graphics</strong> &mdash; <code>paintComponent</code>, the <code>Graphics</code> drawing methods, the bounding box, <code>Color</code>, and <code>repaint()</code> <span class="muted">(Lecture 19)</span>.</li> </ol> <p>Nothing on this page is new. If a line surprises you, that is a signal to go back to the lecture named beside it rather than to learn it from the summary.</p> </div> </div> <div class="toc"> <div class="th">On this page</div> <ol> <li><a href="#s1">The shape of the exam</a></li> <li><a href="#s2">The case study, in one page</a></li> <li><a href="#s3">Inheritance</a></li> <li><a href="#s4">Polymorphism and dynamic binding</a></li> <li><a href="#s5">Abstract classes and interfaces</a></li> <li><a href="#s6">Windows, events and listeners</a></li> <li><a href="#s7">Layouts, buttons and actionPerformed</a></li> <li><a href="#s8">Text, menus and the finishing layer</a></li> <li><a href="#s9">Graphics and painting</a></li> <li><a href="#prac">Practice Problems</a></li> <li><a href="#summary">Before the Exam</a></li> </ol> </div> <div class="tools"> <span class="lab">Answers</span> <button id="showAll" type="button">Show all</button> <button id="hideAll" type="button">Hide all</button> <span class="muted">&mdash; every worked-example output and every solution is hidden when the page loads. Work it out first, then reveal.</span> </div> <hr> <h2 id="s1"><span class="num">1.</span>The shape of the exam</h2> <p>Ten lectures is a lot of material, and they are not weighted equally. Last year's Exam 2 was four problems worth 40 points in 50 minutes, and the marks fell like this:</p> <table> <tr><th>Problem</th><th>What it asked</th><th>Marks</th><th>Lecture</th></tr> <tr><td>1</td><td>Write a class that implements a given interface, then a subclass that overrides one method</td><td>10</td><td>12 and 14</td></tr> <tr><td>2</td><td>Predict five lines of output from a hierarchy of four classes</td><td>10</td><td>13</td></tr> <tr><td>3</td><td>Write the <code>main</code> and the constructor of a <code>JFrame</code> subclass, from a picture of the window</td><td>10</td><td>15 and 16</td></tr> <tr><td>4</td><td>Modify that class so a button does something: the class header, <code>actionPerformed</code>, and the registration line</td><td>10</td><td>16</td></tr> </table> <p>Read that table again, because it is the single most useful thing on this page. <strong>Half the exam was one GUI window, written twice</strong> &mdash; once to put it on the screen and once to make it respond. A quarter was output prediction from a class hierarchy. A quarter was writing an interface implementation. The parking-ticket case study did not appear at all, and no question asked you to recite a definition.</p> <p>That does not make the case study or the definitions worthless &mdash; they are how you know what the other questions mean, and a different year's paper may ask about them directly. It does tell you where to spend the last evening. If you can build a two-panel window with a working button from a blank sheet of paper, and you can read a hierarchy and say which <code>method()</code> runs, you have most of the paper.</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; the exam is closed book</span></div> <div class="bd"> <p>There is no compiler in the room and no notes on the desk. Every piece of code you write is written from memory, in pen, on paper. That changes what "knowing it" means: reading a <code>JFrame</code> constructor and nodding is not the same skill as producing one, and only the second one is on the paper.</p> <p>So work every problem on this page with a pen before you open the toggle. The gap between "I understood that" and "I could have written that" is exactly where the marks go.</p> </div> </div> <h2 id="s2"><span class="num">2.</span>The case study, in one page</h2> <p>Lectures 10 and 11 took one English paragraph about parking enforcement and turned it into five classes: <code>ParkingMeter</code> (how many minutes are paid for), <code>ParkedCar</code> (a car, which <em>has</em> a meter), <code>ParkingTicket</code> (a car plus an officer plus a fine), <code>PoliceOfficer</code> (who patrols and writes tickets) and a driver class that runs the simulation. The point was never the parking. The point was the method for getting from prose to classes, and the two design rules that came out of it.</p> <ul> <li><strong>Nouns suggest classes; verbs suggest methods.</strong> Read the description, list the things, then ask of each one: does it have state that has to be remembered? If yes, it is a class. If it is just a value, it is a field.</li> <li><strong>"has-a" means a field, "is-a" means inheritance.</strong> A <code>ParkedCar</code> is not a <code>ParkingMeter</code>, so <code>ParkedCar</code> holds one in a <code>private ParkingMeter meter;</code> field. Say the sentence out loud; if it sounds absurd in English it is absurd in Java.</li> <li><strong>Encapsulation is about what you hand back, not just what you declare.</strong> Making <code>meter</code> <code>private</code> protects the field, not the object it points at. A getter that returns the meter itself hands a caller the power to reset it, which is why the design exposes <code>expiredMeter()</code>, <code>adjustMeter(int)</code> and <code>getFine()</code> instead.</li> <li><strong>Build in dependency order.</strong> <code>ParkingMeter</code> depends on nothing, so it is written and compiled first; <code>ParkedCar</code> uses it; <code>ParkingTicket</code> uses both. Compiling as you go means every error you see belongs to the file you just typed.</li> <li><strong>An array of objects is an array of <code>null</code>s until you fill it.</strong> <code>ParkedCar street[] = new ParkedCar[20];</code> makes twenty empty slots, not twenty cars. Every use of <code>street[i]</code> needs a <code>null</code> guard.</li> </ul> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; if you can only do one thing</span></div> <div class="bd"> <p>Be able to look at any two class names on the paper and say, in one sentence, whether they are related by <em>has-a</em> (a field) or by <em>is-a</em> (<code>extends</code>). Every design question on this material, and half the inheritance questions, reduces to that one call.</p> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; the case-study traps, collected</span></div> <div class="bd"> <ul> <li><strong>Declaring the field but never creating the object.</strong> Delete <code>meter = new ParkingMeter();</code> from the constructor and the class still compiles perfectly &mdash; <code>meter</code> is simply <code>null</code>. The car prints its make and color quite happily and then throws a <code>NullPointerException</code> the first time anything touches the meter. An object can be half-built and look completely healthy until you reach the missing part.</li> <li><strong>Forgetting that most of an object array is <code>null</code>.</strong> The first empty parking space you touch without a guard throws. The whole shape of the patrol loop &mdash; <code>if (street[i] == null) ... else ...</code> &mdash; exists for that reason.</li> <li><strong>A getter that hands out the object itself.</strong> <code>return meter;</code> compiles and looks like every other getter, and it quietly undoes the <code>private</code>.</li> <li><strong>Boundary arithmetic in the fine.</strong> The fine rule changes at every whole hour, so the test cases that matter are 59, 60 and 61 minutes overdue &mdash; not 30 and 90. Whenever a rule changes at a boundary, test <em>on</em> the boundary.</li> <li><strong><code>this(...)</code> anywhere but first.</strong> A call to another constructor must be the first statement in the constructor. Put a <code>println</code> above it and the file stops compiling. The identical rule applies to <code>super(...)</code>.</li> </ul> </div> </div> <div class="box qc"> <div class="hd">Practice Problem 22.1</div> <div class="bd"> <p>A campus wants to model its printers. The description reads: <em>"A printer belongs to a building. It has a model name and a page counter. A print job has an owner, a number of pages and the printer it was sent to. A print job costs 10 cents a page, doubled if the job is over 50 pages."</em></p> <div class="part"> <p class="q"><span class="pl">(a)</span> What classes would you create, and what fields would each hold?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> List the nouns, then ask of each whether it has state worth remembering. <em>Printer</em>, <em>building</em>, <em>model name</em>, <em>page counter</em>, <em>print job</em>, <em>owner</em>, <em>number of pages</em>, <em>cost</em>.</p> <p>Two of those are classes: <code>Printer</code> and <code>PrintJob</code>. The rest are fields.</p> <ul> <li><code>Printer</code> &mdash; <code>private String building; private String model; private int pagesPrinted;</code></li> <li><code>PrintJob</code> &mdash; <code>private String owner; private int pages; private Printer printer;</code></li> </ul> <p><code>building</code> and <code>model</code> are <code>String</code>s, not classes, because nothing in the description asks a building to do anything or to remember anything. If a later requirement said "a building has a street address and a list of printers", <code>Building</code> would become a class &mdash; that is the test.</p> <p>The cost is not a field. It is computed from <code>pages</code>, so it is a method: storing it as well would give you two copies of the same fact that can drift apart.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Is <code>PrintJob</code> a <code>Printer</code>, or does it have one? What does your answer make the Java look like?</p> <details class="soln"><summary></summary><div class="ans"> <p>Say it in English. "A print job is a printer" &mdash; false, obviously. "A print job has a printer" &mdash; true. So it is a field, not <code>extends</code>:</p> <pre><code class="language-java">public class PrintJob {
+    private String owner;
+    private int pages;
+    private Printer printer;          // has-a
+
+    public PrintJob(String owner, int pages, Printer printer) {
+        this.owner = owner;
+        this.pages = pages;
+        this.printer = printer;
+    }
+}</code></pre> <p>This is exactly the <code>ParkedCar</code>/<code>ParkingMeter</code> relationship from Lecture 10 with the names changed, and it is the relationship almost every "design these classes" question is really testing.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Write the method that returns the cost of the job in cents. Why must you be careful about 50 pages exactly?</p> <details class="soln"><summary></summary><div class="ans"> <p>The rule says <em>over</em> 50 pages, so 50 pages is charged at the ordinary rate and 51 is charged double:</p> <pre><code class="language-java">public int getCost() {
+    int cost = 10 * pages;
+    if (pages &gt; 50) {
+        cost = cost * 2;
+    }
+    return cost;
+}</code></pre> <p><strong>Things to notice across all three parts.</strong> The boundary is where the marks are, and it is decided by one character: <code>pages &gt; 50</code> charges 50 pages at the single rate, <code>pages &gt;= 50</code> charges them double. The English word was "over", so it is <code>&gt;</code>. This is the same lesson the parking fine taught &mdash; when a rule changes at a boundary, the value <em>on</em> the boundary is the test case you have to think about, and it is the one an exam will pick.</p> </div></details> </div> </div> </div> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 22.1</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="10" aria-label="Live coding - Practice Problem 22.1">public class PrintJob {
+    // 1. private fields: owner, pages, and the Printer this job was sent to
+
+    // 2. a constructor that takes all three
+
+    // 3. getCost() -- 10 cents a page, doubled if the job is OVER 50 pages
+
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h2 id="s3"><span class="num">3.</span>Inheritance</h2> <p>Inheritance is the third pillar, and the one that finally lets you stop copying code. Writing <code>class Car extends Vehicle</code> says two things at once: a <code>Car</code> <em>is a</em> <code>Vehicle</code>, and a <code>Car</code> gets everything <code>Vehicle</code> has without your typing it again. Everything else in Lecture 12 is a consequence of those two sentences.</p> <ul> <li><strong>What is inherited.</strong> Every <code>public</code> and <code>protected</code> field and method, and package-private members if the subclass is in the same package.</li> <li><strong>What is not.</strong> Constructors &mdash; ever. A constructor builds one specific class, so handing it down would make no sense.</li> <li><strong>The <code>private</code> case, which trips everyone.</strong> A <code>private</code> field of the superclass <em>is</em> part of the subclass object &mdash; the memory is there, the data is real &mdash; but the subclass's code cannot name it. Reach it through a <code>public</code> or <code>protected</code> getter, or make the field <code>protected</code> in the first place.</li> <li><strong><code>super(...)</code> must be the first statement in a constructor</strong>, and if you do not write it Java inserts a silent <code>super()</code> for you. If the superclass has no no-argument constructor, that silent insertion fails and you get an error pointing at your own constructor.</li> <li><strong>Construction runs top-down.</strong> <code>new Taxi()</code> builds the <code>Vehicle</code> part, then the <code>Car</code> part, then the <code>Taxi</code> part. Every constructor's body runs <em>after</em> the chain above it has finished.</li> <li><strong>Overriding</strong> is redeclaring a method with the <em>same</em> name and <em>same</em> parameter list in a subclass. <code>@Override</code> is optional but free insurance: it makes the compiler check that you really did override something.</li> <li><strong><code>super.method()</code></strong> calls the superclass version from inside the override. It is how you extend behaviour instead of replacing it.</li> </ul> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; if you can only do one thing</span></div> <div class="bd"> <p>Be able to write a three-line subclass from memory: the header <code>public class Sub extends Super</code>, a constructor whose first statement is <code>super(...)</code>, and one <code>@Override</code> method. That skeleton is worth 10 points on its own, and Problem 1 of last year's paper was almost exactly it.</p> </div> </div> <div class="box qc"> <div class="hd">Practice Problem 22.2</div> <div class="bd"> <p>What does this print? Work out the order before you look &mdash; there are six lines.</p> <p class="filename">Chain.java</p>
+<pre><code class="language-java">class Vehicle {
+    Vehicle() { System.out.println("Vehicle()"); }
+    Vehicle(String s) { System.out.println("Vehicle(" + s + ")"); }
+}
+
+class Car extends Vehicle {
+    Car() { System.out.println("Car()"); }
+    Car(String s) { super(s); System.out.println("Car(" + s + ")"); }
+}
+
+class Taxi extends Car {
+    Taxi() { super("taxi"); System.out.println("Taxi()"); }
+}
+
+public class Chain {
+    public static void main(String args[]) {
+        new Car();
+        System.out.println("--");
+        new Taxi();
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> For each <code>new</code>, walk <em>up</em> the chain first collecting the constructors that will run, then walk back <em>down</em> printing their bodies. A constructor's own <code>println</code> cannot happen until everything above it has finished.</p> <pre class="out"><code>Vehicle()
+Car()
+--
+Vehicle(taxi)
+Car(taxi)
+Taxi()</code></pre> <table class="trace"> <tr><th>Call</th><th>Chain that is set up</th><th>Bodies, in the order they run</th></tr> <tr><td><code>new Car()</code></td><td><code>Car()</code> has no <code>super(...)</code>, so Java inserts <code>super()</code> &rarr; <code>Vehicle()</code></td><td><code>Vehicle()</code>, then <code>Car()</code></td></tr> <tr><td><code>new Taxi()</code></td><td><code>Taxi()</code> calls <code>super("taxi")</code> &rarr; <code>Car(String)</code>, which calls <code>super(s)</code> &rarr; <code>Vehicle(String)</code></td><td><code>Vehicle(taxi)</code>, <code>Car(taxi)</code>, then <code>Taxi()</code></td></tr> </table> <p><strong>Things to notice.</strong> <code>new Taxi()</code> never runs <code>Car()</code> or <code>Vehicle()</code>, the no-argument versions &mdash; <code>Taxi</code> chose <code>Car(String)</code> explicitly and <code>Car(String)</code> chose <code>Vehicle(String)</code>. A class having several constructors does not mean several of them run; exactly one runs per class per object.</p> <p>Notice also that <code>Taxi</code> has no <code>Taxi(String)</code> and cannot inherit <code>Car(String)</code>. If you want <code>new Taxi("yellow")</code> to work you have to write that constructor yourself, even if its whole body is <code>super(s);</code>. That is the "constructors are not inherited" rule showing up in the place it actually bites.</p> </div></details> </div> </div> <div class="box qc"> <div class="hd">Practice Problem 22.3</div> <div class="bd"> <p><code>Employee</code> is given. Write a subclass <code>Manager</code> that adds a <code>bonus</code> and overrides <code>pay()</code> so that it returns the salary plus the bonus &mdash; without repeating the salary calculation.</p> <p class="filename">Employee.java</p>
+<pre><code class="language-java">public class Employee {
+    private String name;
+    private double salary;
+
+    public Employee(String name, double salary) {
+        this.name = name;
+        this.salary = salary;
+    }
+
+    public String getName() { return name; }
+
+    public double pay() { return salary / 26.0; }
+
+    public String toString() { return name + " is paid " + pay(); }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Three moves, in order. Header with <code>extends</code>. A constructor whose first statement is <code>super(name, salary)</code>, because <code>Employee</code> has no no-argument constructor. An <code>@Override</code> of <code>pay()</code> that calls <code>super.pay()</code> rather than re-deriving the fortnightly figure &mdash; <code>salary</code> is <code>private</code>, so you could not re-derive it even if you wanted to.</p> <p class="filename">Manager.java</p>
+<pre><code class="language-java">public class Manager extends Employee {
+    private double bonus;
+
+    public Manager(String name, double salary, double bonus) {
+        super(name, salary);
+        this.bonus = bonus;
+    }
+
+    @Override
+    public double pay() {
+        return super.pay() + bonus / 26.0;
+    }
+}</code></pre> <p class="filename">PayDemo.java</p>
+<pre><code class="language-java">public class PayDemo {
+    public static void main(String args[]) {
+        Employee e = new Employee("Ana", 52000);
+        Employee m = new Manager("Bo", 52000, 13000);
+
+        System.out.println(e);
+        System.out.println(m);
+    }
+}</code></pre> <pre class="out"><code>Ana is paid 2000.0
+Bo is paid 2500.0</code></pre> <p><strong>Things to notice.</strong> <code>toString()</code> was written once, in <code>Employee</code>, and it calls <code>pay()</code>. When it runs on the <code>Manager</code> object that call goes to <code>Manager.pay()</code> &mdash; a method <code>Employee</code> had never heard of. That is dynamic binding doing your work for you, and it is why the manager's line reads 2500 without <code>toString</code> being touched.</p> <p><code>super.pay()</code> is not the same as <code>pay()</code>. Writing <code>return pay() + bonus / 26.0;</code> inside the override calls the override again, forever, and the program dies with a <code>StackOverflowError</code>. When an override wants the old behaviour, <code>super.</code> is the only way to ask for it.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 22.3</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="11" aria-label="Live coding - Practice Problem 22.3">public class Manager extends Employee {
+    // 1. a private double field, bonus
+
+    // 2. a constructor (name, salary, bonus) -- super(...) must come FIRST
+
+    // 3. @Override pay() to add the fortnightly share of the bonus,
+    //    reusing super.pay() rather than recomputing the salary
+
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; the inheritance traps, collected</span></div> <div class="bd"> <ul> <li><strong><code>super(...)</code> not first.</strong> Storing your own fields before calling up is natural and illegal. Java will not let your code run on a half-built object.</li> <li><strong>Forgetting <code>super(...)</code> when the parent has no no-argument constructor.</strong> The message misdirects you badly &mdash; it complains about a constructor you never wrote, with the caret on <em>your</em> constructor's closing parenthesis: <pre class="err"><code>T.java:8: error: constructor Shape in class Shape cannot be applied to given types;
+    public Circle(double r) {
+                            ^
+  required: double
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+1 error</code></pre> Translate it as: <em>you did not call <code>super(...)</code>, so I tried <code>super()</code>, and <code>Shape</code> has not got one.</em></li> <li><strong>Reaching a <code>private</code> field from a subclass.</strong> In Lecture 14's <code>FormattedDocument</code>, writing <code>System.out.println(super.content.toUpperCase());</code> gives <code>error: content has private access in Document</code>. <code>private</code> means private to the class, not to the family, and <code>super.</code> does not change that. Use a getter, or declare the field <code>protected</code>. Problem 3 below hits the same wall.</li> <li><strong>Making every field <code>protected</code> to avoid that.</strong> A <code>protected</code> field is a promise to every future subclass that it exists with that name and type, forever. Keep fields <code>private</code> and hand subclasses methods.</li> <li><strong>An "override" that is really an overload.</strong> Change the parameter type by accident and you have added a second method rather than replacing the first, and the program silently runs the old one. <code>@Override</code> turns that into a compile error:</li> </ul> <pre class="err"><code>T.java:6: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+1 error</code></pre> <p>Without the annotation the same file compiles and prints <code>Animal says woof</code> &mdash; the subclass method you carefully wrote is never called. Two seconds of typing buys you that error; write <code>@Override</code> on every override.</p> </div> </div> <h2 id="s4"><span class="num">4.</span>Polymorphism and dynamic binding</h2> <p>This is a quarter of the paper and it is entirely mechanical once you separate two questions that feel like one. Every reference variable has <strong>two</strong> types at the same time: the <em>static type</em> it was declared with, and the <em>dynamic type</em> of the object it currently points at. <code>Shape s = new Circle(3);</code> has static type <code>Shape</code> and dynamic type <code>Circle</code>. Every question in this section is answered by asking which of the two applies.</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; the two rules, and nothing else</span></div> <div class="bd"> <p><strong>The static type decides what you are allowed to write.</strong> The compiler looks only at the declared type and asks: does that class, or something it inherits from, declare a method with this name and these argument types? If not, the program does not compile, regardless of what the object really is.</p> <p><strong>The dynamic type decides which version runs.</strong> Once the compiler has settled <em>which method</em>, the JVM looks at the actual object to decide <em>whose body</em>.</p> <p>Or, in the form to write at the top of your exam paper: <em>overriding is resolved at run time by the dynamic type; overloading is resolved at compile time by the static type.</em></p> </div> </div> <p>The rest follows:</p> <ul> <li><strong>Assignment goes one way only.</strong> <code>Shape s = new Circle(3);</code> compiles because a <code>Circle</code> is a <code>Shape</code>. <code>Circle c = new Shape();</code> does not, because a <code>Shape</code> is not a <code>Circle</code>. Read the assignment as "the thing on the right is-a thing on the left" and it is decided.</li> <li><strong>An array of a superclass type holds any mixture of subclasses.</strong> Each element has static type <code>Shape</code>, so you may call whatever <code>Shape</code> declares; each element has its own dynamic type, so the right override runs. One loop, no <code>if</code> statements about types.</li> <li><strong>Casting down is how you get the subclass methods back</strong>, and the cast is checked at run time. Guard it with <code>instanceof</code> unless you can point at the line that guarantees the type. <code>((D) a2).change();</code> and <code>((Mid) all[2]).extra();</code> are the shape the exam uses.</li> <li><strong>Fields are not polymorphic.</strong> If a subclass declares a field with the same name as the superclass's, both exist in the object, and which one you read is decided by the static type &mdash; at compile time, like an overload. This is the single nastiest question in the topic.</li> <li><strong><code>println(obj)</code> calls <code>toString()</code> polymorphically.</strong> That is why <code>System.out.println(a);</code> where <code>a</code> is declared <code>A</code> but holds a <code>B</code> prints <code>B</code>'s version.</li> </ul> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; answering any "what is printed at line (x)?"</span></div> <div class="bd"> <ol> <li>Write down the <strong>declared type</strong> of the reference on the left of the dot.</li> <li>Write down the <strong>actual object</strong> it holds. If the line before said <code>A a1 = new E();</code>, the object is an <code>E</code>, whatever <code>a1</code> is declared as.</li> <li>Ask the compiler's question: does the <em>declared</em> type have a method with that name and those argument types? If no &mdash; the answer is "does not compile", and that is a legitimate answer on this exam. If there is a cast in front, use the cast's type instead.</li> <li>Ask the JVM's question: starting at the <em>actual</em> class and walking up, whose version of that method do you meet first? That body is what runs.</li> <li>If the thing being read is a field rather than a method, stop at step 3 &mdash; fields use the declared type.</li> </ol> </div> </div> <div class="box qc"> <div class="hd">Practice Problem 22.4</div> <div class="bd"> <p>Using the four-step procedure above, answer each part. The classes are:</p> <pre><code class="language-java">class Animal {
+    void speak() { System.out.println("Animal speaks"); }
+    void eat() { System.out.println("Animal eats"); }
+}
+
+class Dog extends Animal {
+    void speak() { System.out.println("Woof"); }
+    void fetch() { System.out.println("Fetching"); }
+}
+
+class Puppy extends Dog {
+    void speak() { System.out.println("Yip"); }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>Animal a = new Puppy(); a.speak();</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>Yip</code>. Declared type <code>Animal</code> declares <code>speak()</code>, so it compiles. The actual object is a <code>Puppy</code>, and <code>Puppy</code> overrides <code>speak()</code>, so <code>Puppy</code>'s body runs.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>Animal a = new Puppy(); a.fetch();</code></p> <details class="soln"><summary></summary><div class="ans"> <p>It does not compile. The declared type is <code>Animal</code>, and <code>Animal</code> has no <code>fetch()</code>. That the object happens to be a <code>Puppy</code> is irrelevant &mdash; the compiler is following a rule that ignores the previous line on purpose, because in real code the previous line is a loop or a method call with nothing to look at.</p> <pre class="err"><code>T.java:18: error: cannot find symbol
+        a.fetch();
+         ^
+  symbol:   method fetch()
+  location: variable a of type Animal
+1 error</code></pre> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>Animal a = new Puppy(); ((Dog) a).fetch();</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>Fetching</code>. The cast changes the type the compiler consults, and <code>Dog</code> does declare <code>fetch()</code>, so it compiles. At run time the object really is a <code>Puppy</code>, a <code>Puppy</code> is a <code>Dog</code>, so the cast succeeds and <code>Dog</code>'s <code>fetch()</code> runs.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>Animal a = new Dog(); ((Puppy) a).speak();</code></p> <details class="soln"><summary></summary><div class="ans"> <p>It compiles, and then it throws a <code>ClassCastException</code> at run time. The compiler allows the cast because a variable declared <code>Animal</code> <em>could</em> be holding a <code>Puppy</code>. It isn't &mdash; it holds a plain <code>Dog</code>, and a <code>Dog</code> is not a <code>Puppy</code>.</p> <p><strong>Things to notice across all four parts.</strong> Parts (b) and (d) fail at different <em>times</em>, and knowing which is which is worth marks. A cast the compiler can prove impossible (casting a declared <code>Rectangle</code> to <code>Circle</code>) is a compile error; a cast that is merely possible is deferred to run time. If a question asks "what happens", say which of the two it is.</p> <p>The safe form is always <code>if (a instanceof Puppy) { ((Puppy) a).speak(); }</code> &mdash; and note that <code>instanceof</code> answers <code>false</code> rather than throwing, so it is exactly the guard you want.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Practice Problem 22.5</div> <div class="bd"> <p>This one separates people who have understood the two rules from people who have memorised "the object decides". Two lines of output.</p> <p class="filename">OverDemo.java</p>
+<pre><code class="language-java">class P {
+    void f(Object o) { System.out.println("P.f(Object)"); }
+    void f(String s) { System.out.println("P.f(String)"); }
+}
+
+class Q extends P {
+    void f(Object o) { System.out.println("Q.f(Object)"); }
+}
+
+public class OverDemo {
+    public static void main(String args[]) {
+        P p = new Q();
+        Object o = "hello";
+
+        p.f(o);            // line (a)
+        p.f("hello");      // line (b)
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Two stages, never one. First, using only the <em>declared</em> types, decide which signature is being called. Then, using the actual object, decide whose body runs for that signature. The argument types are settled first and never revisited.</p> <pre class="out"><code>Q.f(Object)
+P.f(String)</code></pre> <table class="trace"> <tr><th>Line</th><th>Stage 1: which signature? (compile time, declared types)</th><th>Stage 2: whose body? (run time, actual object)</th></tr> <tr><td>(a) <code>p.f(o)</code></td><td><code>o</code> is <em>declared</em> <code>Object</code>, so the only fit is <code>f(Object)</code></td><td>The object is a <code>Q</code>, and <code>Q</code> overrides <code>f(Object)</code> &rarr; <code>Q.f(Object)</code></td></tr> <tr><td>(b) <code>p.f("hello")</code></td><td>The argument is a <code>String</code> literal, so the more specific <code>f(String)</code> wins</td><td><code>Q</code> does not override <code>f(String)</code>, so the inherited <code>P.f(String)</code> runs</td></tr> </table> <p><strong>Things to notice.</strong> Line (a) is holding a <code>String</code> at run time, and Java still calls <code>f(Object)</code>. Overload selection happened at compile time, from the word <code>Object</code> in the declaration of <code>o</code>, and nothing at run time can revisit it. Java does not have "double dispatch": the receiver is chosen dynamically, the arguments never are.</p> <p>The practical version of this rule: if two methods differ in <em>name</em> or in <em>parameter list</em>, they are unrelated methods that happen to sit near each other. Only an identical name-plus-parameter-list makes an override.</p> </div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; the polymorphism traps, collected</span></div> <div class="bd"> <ul> <li><strong>"But I can see that it is a <code>Circle</code>."</strong> The compiler does not look at the previous line. <code>Shape s = new Circle(3); s.getRadius();</code> is a compile error and it is supposed to be.</li> <li><strong>The arrow only points one way.</strong> <code>Circle c = new Shape();</code> is <code>incompatible types: Shape cannot be converted to Circle</code>. Read the assignment aloud as "is-a" and you will never get this backwards.</li> <li><strong>Answering an override question with the declared type.</strong> <code>A a = new C();</code> then <code>a.what()</code> prints <code>C</code>'s answer, not <code>A</code>'s. Circle the <code>new</code> on the previous line before you answer &mdash; that is the word that decides.</li> <li><strong>Answering a field question with the dynamic type.</strong> The <em>opposite</em> mistake, and the reason a question mixes methods and fields in one program. Fields use the declared type.</li> <li><strong>Forgetting that a missing override means "look upward".</strong> When class <code>F</code> extends <code>B</code> and does not declare <code>what()</code>, <code>b1.what()</code> runs <code>B</code>'s version. Walk up from the actual class until you find one; you always find one eventually, because <code>Object</code> is at the top.</li> <li><strong>Casting without a guard.</strong> A downcast that is merely <em>possible</em> compiles and throws <code>ClassCastException</code> at run time. Guard with <code>instanceof</code>.</li> </ul> </div> </div> <h2 id="s5"><span class="num">5.</span>Abstract classes and interfaces</h2> <p>Lecture 14 was about declaring a method and refusing to write it. A <code>Shape</code> has an area, but there is no formula for the area of a generic shape &mdash; both halves of that sentence are true, and ordinary classes cannot express it. Java gives you two tools that can, and the exam has asked about both.</p> <ul> <li><strong>An abstract method</strong> is a signature followed by a semicolon: <code>public abstract double getArea();</code>. A class containing one must itself be declared <code>abstract</code>. The reverse is not true &mdash; a class may be <code>abstract</code> with no abstract methods, if you simply want to forbid <code>new</code>.</li> <li><strong>An abstract class is still a class.</strong> It may have fields, constructors, and fully written methods. Its constructor is never called by you; it is called by the subclass's <code>super(...)</code>.</li> <li><strong>An interface is a list of obligations.</strong> Every method in it is implicitly <code>public</code> and implicitly <code>abstract</code>, whether you write those words or not. Every field in it is implicitly <code>public static final</code>.</li> <li><strong><code>extends</code> is scarce; <code>implements</code> is not.</strong> A class extends exactly one class and implements as many interfaces as it likes. Spend the <code>extends</code> slot on what the class fundamentally <em>is</em>; use interfaces for what it <em>can do</em>.</li> <li><strong>Both give you a type you can declare a variable with.</strong> <code>Printable p = new Document("hi");</code> is legal, and <code>p</code> may then be used for anything <code>Printable</code> declares &mdash; and nothing else. That is the Lecture 13 static-type rule again, with an interface in the driving seat.</li> <li><strong>You may declare a variable of an abstract type; you may not construct one.</strong> <code>AbstractShape s = circle;</code> is fine. <code>new AbstractShape()</code> is not.</li> </ul> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; if you can only do one thing</span></div> <div class="bd"> <p>Be able to turn a bullet-pointed English description into a class that implements a given interface: the header, the <code>private</code> field, the constructor, and one <code>@Override public</code> method per interface method. Last year that was Problem 1 and it was 10 of the 40 marks, and the rubric gave 2 marks for the header alone.</p> </div> </div> <div class="box qc"> <div class="hd">Practice Problem 22.6</div> <div class="bd"> <p>Given this interface and class:</p> <pre><code class="language-java">interface Drawable {
+    void draw();
+}
+
+class Dot implements Drawable {
+    public void draw() { System.out.println("."); }
+    public void enlarge() { System.out.println("bigger"); }
+}</code></pre> <p>For each line, say whether it compiles, and if not, what the compiler says.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>Drawable d = new Dot();</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compiles. A <code>Dot</code> implements <code>Drawable</code>, so "a <code>Dot</code> is a <code>Drawable</code>" is true and the assignment is legal in that direction. This is the ordinary way you use an interface: the variable's type says what you need, the object supplies it.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>Drawable d = new Drawable();</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Does not compile. An interface has no bodies and no constructor, so there is nothing to construct. The message is <code>Drawable is abstract; cannot be instantiated</code> &mdash; the same message an abstract class gives, because an interface is the extreme case of an abstract class.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>Drawable d = new Dot(); d.enlarge();</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Does not compile. The declared type is <code>Drawable</code>, and <code>Drawable</code> declares one method. The <code>Dot</code> obviously has <code>enlarge()</code>, and it makes no difference:</p> <pre class="err"><code>T.java:13: error: cannot find symbol
+        d.enlarge();
+         ^
+  symbol:   method enlarge()
+  location: variable d of type Drawable
+1 error</code></pre> <p>Note <code>location: variable d of type Drawable</code> &mdash; the same message shape you saw in Lecture 13 with a superclass reference, for the same reason. The fix is the same too: <code>((Dot) d).enlarge();</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>Dot</code> is rewritten with <code>void draw()</code> instead of <code>public void draw()</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p>Does not compile, and this is the one that catches people every single time, because the omission looks like nothing:</p> <pre class="err"><code>T.java:6: error: draw() in Dot cannot implement draw() in Drawable
+    void draw() { System.out.println("."); }
+         ^
+  attempting to assign weaker access privileges; was public
+1 error</code></pre> <p><strong>Things to notice across all four parts.</strong> Read the second line of that message: <em>was public</em>. Interface methods are implicitly <code>public</code>, so leaving the word off is not "matching the interface" &mdash; it is package-private, which is narrower, and Java never lets an override reduce visibility.</p> <p>Write <code>public</code> on every method that implements an interface, always. On last year's rubric each implemented method was worth one mark, and a class that does not compile is hard to defend.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Practice Problem 22.7</div> <div class="bd"> <p>Write an interface <code>Payable</code> that requires two methods: <code>getPay()</code> returning a <code>double</code>, and <code>printPayslip()</code> returning nothing. Then write a class <code>Contractor</code> that implements it, with a private <code>String</code> name, a private <code>double</code> hourlyRate, a private <code>int</code> hours, and a constructor taking all three.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The interface is signatures plus semicolons &mdash; no bodies, no fields, no constructor. The class then owes one <code>public</code> method per interface method, plus whatever state it needs of its own. <code>printPayslip()</code> should call <code>getPay()</code> rather than recompute the product; that keeps one copy of the formula and, as Lecture 14 showed, it means a subclass overriding <code>getPay()</code> fixes the payslip for free.</p> <p class="filename">Payable.java</p>
+<pre><code class="language-java">public interface Payable {
+    double getPay();
+    void printPayslip();
+}</code></pre> <p class="filename">Contractor.java</p>
+<pre><code class="language-java">public class Contractor implements Payable {
+    private String name;
+    private double hourlyRate;
+    private int hours;
+
+    public Contractor(String name, double hourlyRate, int hours) {
+        this.name = name;
+        this.hourlyRate = hourlyRate;
+        this.hours = hours;
+    }
+
+    @Override
+    public double getPay() {
+        return hourlyRate * hours;
+    }
+
+    @Override
+    public void printPayslip() {
+        System.out.println(name + ": " + hours + " hours, pay " + getPay());
+    }
+}</code></pre> <p class="filename">PayableDemo.java</p>
+<pre><code class="language-java">public class PayableDemo {
+    public static void main(String args[]) {
+        Payable p = new Contractor("Sam", 32.5, 18);
+        p.printPayslip();
+        System.out.println("total owed: " + p.getPay());
+    }
+}</code></pre> <pre class="out"><code>Sam: 18 hours, pay 585.0
+total owed: 585.0</code></pre> <p><strong>Things to notice.</strong> The interface declares <code>double getPay();</code> with no <code>public</code> and no <code>abstract</code>, because both are automatic there. The class writes <code>public</code> on both methods, because there it is not automatic. Those two facts look contradictory and are the reason part (d) above exists.</p> <p><code>Payable p = ...</code> rather than <code>Contractor p = ...</code> is deliberate: the variable now says "something I can pay", so the same line would work for an <code>Employee</code>, a <code>Contractor</code> or an <code>Intern</code>. That is the whole reason interfaces exist, and it is the sentence to write if a question asks "why use an interface here?"</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 22.7</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="20" aria-label="Live coding - Practice Problem 22.7">public interface Payable {
+    // 1. double getPay();
+    // 2. void printPayslip();
+
+}
+
+// -------- second file --------
+
+public class Contractor implements Payable {
+    // 3. private fields: name, hourlyRate, hours
+
+    // 4. constructor taking all three
+
+    // 5. public double getPay()
+
+    // 6. public void printPayslip() -- reuse getPay(), do not recompute
+
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; the abstract-and-interface traps, collected</span></div> <div class="bd"> <ul> <li><strong>Leaving <code>public</code> off an implementing method.</strong> Covered above. It is the single most common way a correct-looking answer fails to compile.</li> <li><strong><code>implements</code> with no method body written.</strong> <code>class T extends JFrame implements ActionListener</code> and nothing else gives <code>T is not abstract and does not override abstract method actionPerformed(ActionEvent) in ActionListener</code>. This message is a gift &mdash; it tells you the exact signature it wants, parameter type included.</li> <li><strong>Trying to instantiate an abstract type.</strong> The caret points at <code>new</code>, not at the variable. Declaring a variable of an abstract type is fine.</li> <li><strong>Expecting more from an interface reference.</strong> An interface reference sees the interface's methods and nothing else, however obvious the object is.</li> <li><strong>Putting a constructor, an instance field, or a method body in an interface.</strong> All three are compile errors. A field written as <code>int count;</code> gives <code>= expected</code>, because every interface field is <code>final</code> and so the only legal continuation is <code>= something</code>.</li> <li><strong>Writing <code>implements</code> where <code>extends</code> belongs.</strong> <code>WindowAdapter</code> is a class, so you <code>extends</code> it; <code>WindowListener</code> is an interface, so you <code>implements</code> it. Getting it the wrong way round gives <code>interface expected here</code> in one direction and <code>no interface expected here</code> in the other.</li> <li><strong>Order in the header.</strong> It is always <code>class Foo extends Bar implements Baz</code> &mdash; <code>extends</code> first, one of them; <code>implements</code> second, as many as you like.</li> </ul> </div> </div> <h2 id="s6"><span class="num">6.</span>Windows, events and listeners</h2> <p>Lecture 15 was the first program in the course with no <code>println</code> in it. Three imports, one class, and a window on the screen &mdash; and then the reason interfaces stopped being theory: a button works because you implement one.</p> <ul> <li><strong>Three packages.</strong> <code>javax.swing</code> (with the <code>x</code>) for the components, <code>java.awt</code> for <code>Color</code>, <code>Container</code>, and the layout managers, <code>java.awt.event</code> (singular) for the listener interfaces and the event classes.</li> <li><strong>The pattern every exam question uses.</strong> <code>public class Foo extends JFrame</code>, with a constructor that calls <code>super()</code>, <code>setTitle</code>, <code>setSize</code> and builds the contents, and a <code>main</code> that does nothing but <code>Foo gui = new Foo(); gui.setVisible(true);</code>.</li> <li><strong>Nothing appears until <code>setVisible(true)</code>.</strong> Constructing a frame builds it in memory; showing it is a separate step, and it belongs in <code>main</code>.</li> <li><strong>Components go in the content pane, not in the frame.</strong> <code>Container contentPane = getContentPane();</code> and then <code>contentPane.add(...)</code>.</li> <li><strong>Closing.</strong> <code>setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)</code> ends the whole JVM; <code>DISPOSE_ON_CLOSE</code> closes just that window; <code>DO_NOTHING_ON_CLOSE</code> is what you use when a <code>WindowListener</code> needs to decide.</li> <li><strong>The event model, in one sentence.</strong> A <em>source</em> (a button, a window) fires an <em>event object</em> at a <em>listener</em>, and a listener is an object whose class implements the matching interface. Nothing happens until you <em>register</em> the listener with the source.</li> <li><strong><code>WindowListener</code> has seven methods</strong> and you must write all seven if you implement it. <code>WindowAdapter</code> is a class that supplies seven empty ones, so extending it lets you override only <code>windowClosing</code>. But it is a class, so it uses up your one <code>extends</code>.</li> </ul> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; if you can only do one thing</span></div> <div class="bd"> <p>Be able to write the six-line skeleton from a blank page, in this order, without thinking:</p> <pre><code class="language-java">public class Foo extends JFrame {
+    public Foo() {
+        super();
+        setTitle("Foo");
+        setSize(400, 300);
+        Container contentPane = getContentPane();
+        contentPane.setLayout(new BorderLayout());
+        // ... components ...
+    }
+
+    public static void main(String args[]) {
+        Foo gui = new Foo();
+        gui.setVisible(true);
+    }
+}</code></pre> <p>Half of last year's paper started from exactly this. The marks for <code>main</code> alone were 2 out of 10, for four lines you can write before you have read the rest of the question.</p> </div> </div> <h2 id="s7"><span class="num">7.</span>Layouts, buttons and actionPerformed</h2> <p>Lecture 16 is the densest lecture on the exam and it is worth the most. Two separate skills live here: putting components where you want them, and making one of them do something.</p> <p><strong>Where things go.</strong> A container never places components itself; it asks its <em>layout manager</em>.</p> <table> <tr><th>Layout</th><th>Behaviour</th><th>Default for</th></tr> <tr><td><code>FlowLayout</code></td><td>Left to right, centred, wrapping to a new row when it runs out of width. Every component gets its preferred size and is never stretched.</td><td><code>JPanel</code></td></tr> <tr><td><code>BorderLayout</code></td><td>Five regions: <code>NORTH</code>, <code>SOUTH</code>, <code>EAST</code>, <code>WEST</code>, <code>CENTER</code>. Each holds <strong>one</strong> component. <code>CENTER</code> takes all the space the others do not want.</td><td>a <code>JFrame</code>'s content pane</td></tr> <tr><td><code>GridLayout(r, c)</code></td><td>Equal cells, filled left to right then top to bottom. Every cell is the same size and every component is stretched to fill its cell. A count of <code>0</code> means "as many as needed".</td><td>&mdash;</td></tr> </table> <p>Anything more complicated than those three is built by <strong>nesting</strong>: put a <code>JPanel</code> with its own layout manager into a region of another container. Every non-trivial window on the exam is one <code>BorderLayout</code> with a <code>JPanel</code> in <code>CENTER</code> and a <code>JPanel</code> in <code>SOUTH</code>, and the <code>SOUTH</code> one has a <code>GridLayout</code> or a <code>FlowLayout</code> full of buttons.</p> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; from a picture of a window to code</span></div> <div class="bd"> <ol> <li><strong>Draw the tree first, on the exam paper.</strong> Frame, content pane, then one line per container with its layout manager and one line per component. Two minutes here saves ten later and it is visible working that earns partial credit.</li> <li>Write the frame setup: <code>super(); setTitle(...); setSize(...);</code></li> <li>Get the content pane and set its layout.</li> <li>For each panel in the tree, in order: create it, set its layout, <em>add it to its parent</em>, then add its children. Creating and adding in that order means you never lose track of which container you are filling.</li> <li>Assign to <em>fields</em>, not local variables, anything <code>actionPerformed</code> will need later. Everything else can stay local.</li> </ol> </div> </div> <p><strong>Making it do something</strong> is always the same six moves, and they are the ones the exam takes apart and asks for one at a time:</p> <ol> <li><code>import java.awt.event.*;</code></li> <li>Add <code>implements ActionListener</code> to the class header.</li> <li>Create the button: <code>JButton b = new JButton("SWAP");</code></li> <li>Add it to a container.</li> <li><strong>Register it: <code>b.addActionListener(this);</code></strong></li> <li>Write <code>public void actionPerformed(ActionEvent e) { ... }</code>.</li> </ol> <p>Inside <code>actionPerformed</code>, tell several buttons apart with <code>e.getActionCommand()</code>, which returns the button's label as a <code>String</code>, and compare it with <code>.equals(...)</code> &mdash; never with <code>==</code>. <code>e.getSource()</code> compares against the button object itself and is the alternative when the labels might change.</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; if you can only do one thing</span></div> <div class="bd"> <p>Memorise the three answers that Problem 4 asks for, because they are three separate marks and none of them depends on the rest of the question:</p> <ul> <li>the header: <code>public class Foo extends JFrame implements ActionListener</code></li> <li>the registration line: <code>b.addActionListener(this);</code></li> <li>the method signature: <code>public void actionPerformed(ActionEvent e)</code></li> </ul> <p>Last year those were worth 2, 2 and part of 6. If you write nothing else on a GUI question, write those three lines.</p> </div> </div> <div class="box qc"> <div class="hd">Practice Problem 22.8</div> <div class="bd"> <p>A content pane 300 by 200 has a <code>BorderLayout</code>. A <code>JLabel</code> goes in <code>NORTH</code>, an empty <code>JPanel</code> in <code>CENTER</code>, and a <code>JPanel</code> with <code>GridLayout(1, 3)</code> holding three buttons goes in <code>SOUTH</code>.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Which of the three regions gets the leftover vertical space, and roughly what size is each component?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>CENTER</code> gets the leftover. <code>NORTH</code> and <code>SOUTH</code> are given exactly the height they ask for and the full width; <code>CENTER</code> gets everything in between. Laying it out for real and printing the bounds:</p> <pre class="out"><code>title    at (  0,  0)  size 300 x  15
+middle   at (  0, 15)  size 300 x 160
+row      at (  0,175)  size 300 x  25
+One      at (  0,  0)  size 100 x  25
+Two      at (100,  0)  size 100 x  25
+Three    at (200,  0)  size 100 x  25</code></pre> <p>The label wanted 15 pixels of height and got exactly that. The button row wanted 25 and got exactly that. The middle panel got 200 &minus; 15 &minus; 25 = 160. All three are the full 300 wide, because <code>NORTH</code> and <code>SOUTH</code> stretch horizontally.</p> <p>Inside the row, <code>GridLayout(1, 3)</code> divided 300 pixels into three equal 100-pixel cells and stretched each button to fill its cell &mdash; the buttons' own preferred widths were ignored completely. The x-coordinates 0, 100, 200 are relative to the row panel, not to the window.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> A student writes <code>contentPane.add(buttonOne); contentPane.add(buttonTwo); contentPane.add(buttonThree);</code> directly on a <code>BorderLayout</code> content pane and sees one enormous button. Why?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>add</code> has a one-argument form, so all three lines compile. In a <code>BorderLayout</code> the no-region form means <code>CENTER</code>. Each region holds one component, so each <code>add</code> overwrote the previous one, and the third button is the only one the layout manager still remembers. <code>CENTER</code> stretches to fill the window, which is why it is enormous.</p> <p>Nothing was thrown away and no exception was raised: all three buttons are still children of the content pane. The first two were simply given a size of zero by zero, so they occupy no pixels. The last one added wins.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> The three buttons need to sit side by side and share the width equally. Write the code.</p> <details class="soln"><summary></summary><div class="ans"> <p>They cannot all go in one region, so they go into a panel of their own and the panel goes in the region:</p> <pre><code class="language-java">JPanel buttonPanel = new JPanel();
+buttonPanel.setLayout(new GridLayout(1, 3));
+contentPane.add(buttonPanel, BorderLayout.SOUTH);
+
+buttonPanel.add(buttonOne);
+buttonPanel.add(buttonTwo);
+buttonPanel.add(buttonThree);</code></pre> <p><strong>Things to notice across all three parts.</strong> <code>GridLayout(1, 3)</code> rather than the default <code>FlowLayout</code> is what makes them <em>equal</em> width. With <code>FlowLayout</code> they would sit side by side too, but each at its own preferred size and centred with gaps &mdash; which is fine if the picture shows that, and wrong if the picture shows three buttons filling the bar. Look at the picture.</p> <p>The order of the four lines is worth copying: create the panel, set its layout, add it to its parent, then fill it. Adding the panel before filling it is not required by Java, but doing it consistently is how you avoid the commonest layout bug of all &mdash; an <code>add</code> aimed at the wrong container.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Practice Problem 22.9</div> <div class="bd"> <p>A frame has two buttons labelled <code>UP</code> and <code>DOWN</code> and a <code>JLabel</code> field called <code>count</code> that starts at <code>"0"</code>. Write the <code>actionPerformed</code> method that makes them add one and subtract one, and the one line that has to appear where each button is created.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The number has to survive from one click to the next, so it is a field, not a local. <code>getActionCommand()</code> returns the label as a <code>String</code>, so two <code>if</code>s on <code>.equals</code> are enough. Then push the new number into the label with <code>setText</code> &mdash; a <code>JLabel</code> holds text, so the <code>int</code> has to be converted, and <code>"" + n</code> is the shortest way.</p> <pre><code class="language-java">private int n = 0;                          // a field, beside the JLabel field
+
+public void actionPerformed(ActionEvent e) {
+    if (e.getActionCommand().equals("UP")) {
+        n = n + 1;
+    }
+    if (e.getActionCommand().equals("DOWN")) {
+        n = n - 1;
+    }
+    count.setText("" + n);
+}</code></pre> <p>And at each button:</p> <pre><code class="language-java">up.addActionListener(this);</code></pre> <p><strong>Things to notice.</strong> <code>count</code> must be a field of the class. If the constructor said <code>JLabel count = new JLabel("0");</code> then <code>count</code> is a local variable that disappears when the constructor returns, and <code>actionPerformed</code> will not compile &mdash; <code>cannot find symbol: variable count</code>. The rule is easy to apply: <em>anything <code>actionPerformed</code> reads or changes must be a field.</em></p> <p>The strings <code>"UP"</code> and <code>"DOWN"</code> are written twice each &mdash; once in <code>new JButton("UP")</code> and once here. They must agree character for character, capitals and spaces included. <code>"Up"</code> does not match <code>"UP"</code>, and no error is produced; the button simply does nothing. When one button in a program is dead and its neighbours work, put the two strings side by side and read them a character at a time.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 22.9</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="13" aria-label="Live coding - Practice Problem 22.9">// Assume the class already has:
+//     JLabel count;          (a field, showing "0")
+//     JButton up, down;      (labelled "UP" and "DOWN")
+
+// 1. add the field that remembers the number between clicks
+
+
+// 2. write actionPerformed
+
+
+// 3. write the one line that must appear where each button is created</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; the GUI traps, collected</span></div> <div class="bd"> <p>These are the ones that actually appear in submitted code, in rough order of how often.</p> <ul> <li><strong>The button that does nothing.</strong> Leave out <code>b.addActionListener(this);</code> and everything compiles, the window opens, the button draws itself and even presses in when you click it &mdash; and nothing happens. <code>actionPerformed</code> is a perfectly good method that nobody ever calls. Last year this one line was a question in its own right.</li> <li><strong><code>implements ActionListener</code> with no <code>actionPerformed</code>.</strong> A compile error, and a helpful one: it prints the signature it wants.</li> <li><strong><code>ActionPerformed</code> with a capital A.</strong> Same error, and much harder to see, because the method you wrote is sitting right there.</li> <li><strong>The component the listener cannot reach.</strong> Declared as a local variable in the constructor instead of a field. <code>cannot find symbol: variable display</code>.</li> <li><strong>Re-declaring a field inside the constructor.</strong> <code>JPanel color1 = new JPanel();</code> where the class already has a <code>color1</code> field creates a local that shadows it, leaving the real field <code>null</code> &mdash; and <code>actionPerformed</code> then throws a <code>NullPointerException</code>. Assign, do not re-declare. That one word <code>JPanel</code> in the wrong place is the most expensive typo on the paper.</li> <li><strong><code>java.swing</code> instead of <code>javax.swing</code>.</strong> The message is <code>package java.swing does not exist</code>, followed by a cascade of <code>cannot find symbol</code> for every Swing class in the file. It is <code>java.awt</code> without an <code>x</code> and <code>javax.swing</code> with one.</li> <li><strong>Two components into one <code>BorderLayout</code> region.</strong> Compiles, runs, and silently loses one of them.</li> <li><strong><code>add</code> aimed at the wrong container.</strong> When you are reading GUI code back, read only the receivers &mdash; the thing before the dot on each <code>add</code> &mdash; and check each against your tree.</li> <li><strong><code>setBackground</code> on the frame.</strong> Compiles, changes nothing visible: the frame's background is completely covered by its content pane. Color the thing that is actually on screen.</li> <li><strong>Comparing labels with <code>==</code>.</strong> <code>e.getActionCommand() == "UP"</code> compares references, not characters. Use <code>.equals</code>.</li> </ul> </div> </div> <h2 id="s8"><span class="num">8.</span>Text, menus and the finishing layer</h2> <p>Lectures 17 and 18 added the components a program needs in order to have a conversation with the user, and then the layer that makes a window look finished. Neither appeared on last year's Exam 2, but both appear on the later papers in this course, and one of the GUI questions in the Exam 2 practice set is a text-and-menu window, so treat them as fair game and learn the four or five lines of each that matter.</p> <p><strong>Text components.</strong> Four of them, distinguished by who writes the text:</p> <table> <tr><th>Component</th><th>Who writes it</th><th>The two methods that matter</th></tr> <tr><td><code>JLabel</code></td><td>the program</td><td><code>setText(String)</code>, <code>getText()</code></td></tr> <tr><td><code>JTextField</code></td><td>the user, one line</td><td><code>getText()</code>, <code>setText(String)</code></td></tr> <tr><td><code>JTextArea</code></td><td>the user, many lines</td><td><code>getText()</code>, <code>append(String)</code></td></tr> <tr><td><code>JButton</code></td><td>the program (it is a label you can press)</td><td><code>getText()</code>, <code>setText(String)</code></td></tr> </table> <ul> <li><strong><code>new JTextField(15)</code> is a width, not a limit.</strong> The number is a column count &mdash; a request to the layout manager for roughly fifteen characters' worth of width. The user can type as much as they like and <code>getText()</code> hands you every character. The same is true of <code>new JTextArea(10, 30)</code>.</li> <li><strong>Text in, number out.</strong> <code>getText()</code> returns a <code>String</code>. To do arithmetic with it you need <code>Integer.parseInt(s)</code> or <code>Double.parseDouble(s)</code>, and those throw <code>NumberFormatException</code> when the user types something that is not a number. A blank field throws too. That is Lecture 20's material arriving early, and the exam answers wrap the call in <code>try</code>/<code>catch</code>.</li> <li><strong>Number out, text in.</strong> <code>setText</code> takes a <code>String</code>, so an <code>int</code> has to be converted: <code>label.setText("" + n)</code> is the shortest way and <code>label.setText(String.valueOf(n))</code> is the explicit one.</li> <li><strong>Menus are three nested things.</strong> A <code>JMenuBar</code> holds <code>JMenu</code>s, a <code>JMenu</code> holds <code>JMenuItem</code>s, and the bar is attached with <code>setJMenuBar(bar)</code> &mdash; not with <code>add</code>. The listener goes on the <em>item</em>: <code>item.addActionListener(this);</code>. A <code>JMenuItem</code> fires an <code>ActionEvent</code> exactly as a button does, and its action command is its label.</li> <li><strong>Borders.</strong> <code>panel.setBorder(BorderFactory.createTitledBorder("Options"));</code> and the <code>createEtchedBorder</code>, <code>createLineBorder</code> and <code>createEmptyBorder</code> variants. Only a <code>JComponent</code> has <code>setBorder</code>.</li> <li><strong>Icons.</strong> <code>new ImageIcon("duke.gif")</code> resolves the file name against the program's working directory, so the image must sit next to the <code>.class</code> file. Pass it to <code>new JButton("Save", icon)</code> or <code>label.setIcon(icon)</code>.</li> <li><strong>Scroll panes.</strong> <code>contentPane.add(new JScrollPane(area), BorderLayout.CENTER);</code> &mdash; you add the <em>scroll pane</em>, never the component, and you add it to a region that stretches.</li> </ul> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; if you can only do one thing</span></div> <div class="bd"> <p>Be able to write the three lines that turn typing into an answer:</p> <pre><code class="language-java">int n = Integer.parseInt(input.getText());
+int doubled = 2 * n;
+answer.setText("" + doubled);</code></pre> <p>Read from a <code>JTextField</code>, convert, write to a <code>JLabel</code>. Almost every "make it respond" question on these papers that is not about color is this, with different arithmetic in the middle.</p> </div> </div> <div class="box qc"> <div class="hd">Practice Problem 22.10</div> <div class="bd"> <p>A window has a <code>JTextField</code> field <code>input</code> and a <code>JLabel</code> field <code>answer</code>. Write an <code>actionPerformed</code> that reads a number of miles from <code>input</code> and puts the equivalent number of kilometers into <code>answer</code>, and does something sensible if the user typed nonsense. One mile is 1.609 kilometers.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Three steps and a guard. Read the text; convert it; compute; write it back. <code>Double.parseDouble</code> rather than <code>Integer.parseInt</code>, because miles can have a fractional part. The conversion is the only line that can fail, so it and the arithmetic go inside the <code>try</code>, and the message for a bad entry goes in the <code>catch</code>.</p> <pre><code class="language-java">public void actionPerformed(ActionEvent e) {
+    try {
+        double miles = Double.parseDouble(input.getText().trim());
+        double km = miles * 1.609;
+        answer.setText(miles + " miles = " + km + " km");
+    } catch (NumberFormatException ex) {
+        answer.setText("Please type a number.");
+    }
+}</code></pre> <p>Running the same logic outside the GUI, with <code>getText()</code> replaced by a fixed <code>String</code> so the interesting cases can actually be exercised:</p> <pre class="out"><code>typed [10]  -&gt;  10.0 miles = 16.09 km
+typed [ 3.5 ]  -&gt;  3.5 miles = 5.6315 km
+typed []  -&gt;  Please type a number.
+typed [ten]  -&gt;  Please type a number.
+typed [-2]  -&gt;  -2.0 miles = -3.218 km</code></pre> <p><strong>Things to notice.</strong> <code>.trim()</code> matters more than it looks. Without it, a user who types a space after the number gets a <code>NumberFormatException</code>; the empty field throws as well, and so does anything the user typed that is not a number. Those are the three cases a tester will find in ten seconds, and the <code>catch</code> handles all three with one message.</p> <p>Notice also that there is no <code>throws NumberFormatException</code> on the method, and there cannot be: <code>ActionListener</code> declares <code>actionPerformed</code> with no <code>throws</code> clause, and an implementing method may not add one. Inside a listener there is no escape hatch, so the handling has to happen right there.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 22.10</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="12" aria-label="Live coding - Practice Problem 22.10">// Fields already declared:  JTextField input;   JLabel answer;
+
+public void actionPerformed(ActionEvent e) {
+    // 1. read the text out of input
+    // 2. convert it to a double  (this is the line that can fail)
+    // 3. multiply by 1.609
+    // 4. write the result into answer
+    // 5. catch NumberFormatException and say something useful
+
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; the text, menu and polish traps, collected</span></div> <div class="bd"> <ul> <li><strong>The listener on the <code>JMenu</code> instead of the <code>JMenuItem</code>.</strong> <code>JMenu</code> inherits <code>addActionListener</code> from <code>AbstractButton</code>, so <code>fileMenu.addActionListener(this);</code> compiles perfectly &mdash; and then every item in the menu does nothing. No error, no warning: a menu that opens, an item that highlights, and silence when you choose it.</li> <li><strong>Attaching the menu bar with <code>add</code>.</strong> It is <code>setJMenuBar(bar)</code> on the frame.</li> <li><strong>Treating the text-field column count as a maximum length.</strong> It is a width request. If you genuinely need a limit, check <code>getText().length()</code> yourself.</li> <li><strong>Forgetting that <code>getText()</code> returns a <code>String</code>.</strong> <code>int n = input.getText();</code> is <code>incompatible types: String cannot be converted to int</code>. It needs <code>Integer.parseInt</code>.</li> <li><strong>Putting <code>throws</code> on <code>actionPerformed</code>.</strong> Not allowed &mdash; <code>overridden method does not throw FileNotFoundException</code>. Handle it inside.</li> <li><strong><code>setBorder</code> on the content pane.</strong> <code>getContentPane()</code> is declared to return <code>java.awt.Container</code>, which has no <code>setBorder</code>. Put your own <code>JPanel</code> inside the content pane and border that.</li> <li><strong>Adding the component instead of the scroll pane.</strong> A component has at most one parent, so <code>contentPane.add(textArea)</code> after wrapping it rips the area back out of the scroll pane, leaving a text area that does not scroll and an empty scroll pane that is not in the window.</li> <li><strong>An absolute path in an <code>ImageIcon</code>.</strong> It works on exactly one computer. Use a plain file name and hand in the image with the source.</li> </ul> </div> </div> <h2 id="s9"><span class="num">9.</span>Graphics and painting</h2> <p>Lecture 19 stopped assembling ready-made components and started drawing pixels. It is the last topic on the exam and the smallest, but it is also where the <code>Shape</code> hierarchy from Lectures 12 to 14 finally gets a job, so a question can combine the two.</p> <ul> <li><strong>The origin is the top-left corner and <code>y</code> increases downward.</strong> Every coordinate is relative to the component being painted, not to the screen or the window.</li> <li><strong>You override <code>paintComponent(Graphics g)</code> and you never call it.</strong> Swing calls it &mdash; when the window first appears, when it is uncovered, when it is resized, and when you ask. The first line is always <code>super.paintComponent(g);</code>, which erases the previous frame by filling the background.</li> <li><strong>To ask for a redraw, call <code>repaint()</code></strong>, not <code>paintComponent</code>. <code>repaint()</code> schedules a repaint; Swing decides when, and hands you a <code>Graphics</code> you could not have produced yourself.</li> <li><strong><code>draw</code> outlines, <code>fill</code> fills.</strong> <code>drawRect</code>, <code>fillRect</code>, <code>drawOval</code>, <code>fillOval</code>, <code>drawLine</code>, <code>drawString</code>, <code>drawArc</code>.</li> <li><strong>Ovals and arcs are given their bounding box, not a centre and radius.</strong> <code>g.fillOval(50, 50, 100, 100)</code> is a circle 100 across whose bounding box starts at (50, 50), so its centre is (100, 100).</li> <li><strong>A fill covers <code>x</code> through <code>x + w - 1</code>; an outline is drawn on <code>x</code> and on <code>x + w</code>.</strong> An outline is one pixel wider than the corresponding fill.</li> <li><strong>The last thing drawn is the thing you see.</strong> There are no layers. Calls replace pixels in the order you make them.</li> <li><strong><code>g.setColor(Color.RED)</code> applies to everything drawn after it</strong> until the next <code>setColor</code>.</li> </ul> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; if you can only do one thing</span></div> <div class="bd"> <p>Be able to write a painting panel from memory:</p> <pre><code class="language-java">public class MyPanel extends JPanel {
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.setColor(Color.RED);
+        g.fillOval(50, 50, 100, 100);
+    }
+}</code></pre> <p><code>extends JPanel</code>, override <code>paintComponent</code>, <code>super</code> first, <code>setColor</code> then draw. Then read every drawing question by sketching the bounding boxes on paper with their real ranges beside them &mdash; "red: 50 to 149 across, 50 to 149 down" &mdash; and reading the answer off.</p> </div> </div> <div class="box qc"> <div class="hd">Practice Problem 22.11</div> <div class="bd"> <p>A panel is 300 by 200 with a white background and this <code>paintComponent</code>. What is drawn, and where is its centre?</p> <pre><code class="language-java">public void paintComponent(Graphics g) {
+    super.paintComponent(g);
+
+    g.setColor(Color.BLACK);
+    g.drawRect(20, 20, 260, 160);
+
+    g.setColor(Color.GREEN);
+    g.fillOval(120, 70, 60, 60);
+
+    g.drawLine(0, 0, 300, 200);
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Take the calls in order and, for each, write down the range it covers rather than trying to picture it.</p> <table class="trace"> <tr><th>Call</th><th>Color</th><th>What it covers</th></tr> <tr><td><code>drawRect(20, 20, 260, 160)</code></td><td>black</td><td>an outline from (20, 20) to (280, 180) &mdash; a border 20 pixels inside the panel on every side</td></tr> <tr><td><code>fillOval(120, 70, 60, 60)</code></td><td>green</td><td>a filled circle 60 across, bounding box <code>x</code> 120&ndash;179, <code>y</code> 70&ndash;129, so its centre is (150, 100)</td></tr> <tr><td><code>drawLine(0, 0, 300, 200)</code></td><td>green</td><td>a diagonal from the top-left corner to the bottom-right</td></tr> </table> <p>The centre of the circle is (150, 100), which is also the centre of the panel &mdash; because the bounding box starts at half the panel's width minus half the circle's width, 150 &minus; 30 = 120, and likewise 100 &minus; 30 = 70. That is the arithmetic to remember for "centre this circle".</p> <p><strong>Things to notice.</strong> The diagonal line is <em>green</em>. There is no <code>setColor</code> between the <code>fillOval</code> and the <code>drawLine</code>, and a <code>Graphics</code> remembers its color until you change it. Reading a question like this, put your finger on the most recent <code>setColor</code> above every drawing call. Painting the panel into an image and reading four pixels back confirms it:</p> <pre class="out"><code>centre of the circle  (150, 100): GREEN
+top edge of the box    (20,  20): BLACK
+on the diagonal        (60,  40): GREEN
+empty corner          (250, 160): background (white)</code></pre> <p>The line also runs to (300, 200), which is one pixel outside the panel in each direction &mdash; a 300-wide panel has columns 0 to 299. Java clips it silently; nothing is thrown.</p> </div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; the graphics traps, collected</span></div> <div class="bd"> <ul> <li><strong>Leaving out <code>super.paintComponent(g)</code>.</strong> It is what erases the previous frame. Without it the old ink stays and every new drawing is painted on top of the last one. On a static picture you may never notice; the moment anything moves you get a smear.</li> <li><strong>Calling <code>paintComponent</code> yourself.</strong> You have no <code>Graphics</code> to pass it and no business deciding when. Call <code>repaint()</code>.</li> <li><strong><code>setBackground</code> inside <code>paintComponent</code>.</strong> Too late &mdash; <code>super.paintComponent(g)</code> has already filled the background with the old color on that same pass. Set the background in the constructor.</li> <li><strong>Confusing a bounding box with a centre and radius.</strong> <code>fillOval(cx, cy, r, r)</code> does not put a circle at (cx, cy); it puts the box's top-left corner there.</li> <li><strong>Naming your own class <code>Shape</code>.</strong> <code>java.awt</code> already has an interface called <code>Shape</code>. Your own class wins against <code>import java.awt.*;</code>, but the moment an IDE adds an explicit <code>import java.awt.Shape;</code> the file falls apart with <code>cannot find symbol</code> messages about fields you are certain you wrote. If a <code>cannot find symbol</code> names something you know exists, check that the type in the message is the class you meant.</li> <li><strong>Drawing in the wrong order.</strong> Outline first, then fill the same rectangle, and the fill erases the outline everywhere except the one-pixel right and bottom edges. Fill first, then outline.</li> </ul> </div> </div> <h2 id="prac"><span class="num">&#9733;</span>Practice Problems</h2> <div class="box prac"> <div class="hd">Practice Problems<span class="tag">&mdash; eight, weighted like the real paper</span></div> <div class="bd"> <p>These eight are in exam format and in exam proportion: two on polymorphic dispatch, one on writing an interface implementation, four on GUIs, one on graphics. Together they are about twice the length of a real Exam 2, so a sensible way to use them is to take Problems 1, 3, 4 and 5 as a 50-minute mock paper, then work the rest at leisure.</p> <p>Last year's paper itself is worked in full elsewhere rather than repeated here. <strong>Problem 1</strong> (the <code>Printable</code> interface, <code>Document</code> and <code>FormattedDocument</code>) is Problem 1 in Lecture 14. <strong>Problem 2</strong> (the <code>MethodTest</code> output prediction) is Problem 2 in Lecture 13. <strong>Problems 3 and 4</strong> &mdash; the <code>swapColors</code> window, half the marks on the paper &mdash; are Problem 1 in Lecture 16. Go and do them under a clock when you have finished here; they are the closest thing to seeing the actual paper.</p> <p>Every output shown below is real: each program was compiled and run. The GUI programs compile but open a window rather than printing, so what you get instead is a sketch of the window and, where there is logic worth checking, the same logic pulled out into a program that can be run.</p> </div> </div> <h3>Problem 1 &mdash; What is printed at each line? <span class="muted">(from Exam 2 Practice Problems)</span></h3> <p>Read the following code. Six classes, one <code>main</code>, five questions.</p> <p class="filename">Q1.java</p>
+<pre><code class="language-java">class A {
+    void method(char ch) { System.out.println("A.method() " + ch); }
+    String what() { return "Returning A"; }
+    void adjust() { System.out.println("Adjusting A"); }
+}
+
+class B extends A {
+    void method(char ch) { System.out.println("B.method() " + ch); }
+    String what() { return "Returning B"; }
+    void adjust() { System.out.println("Adjusting B"); }
+}
+
+class C extends A {
+    void method(char ch) { System.out.println("C.method() " + ch); }
+    String what() { return "Returning C"; }
+    void adjust() { System.out.println("Adjusting C"); }
+}
+
+class D extends A {
+    void method(char ch) { System.out.println("D.method() " + ch); }
+    String what() { return "returning D"; }
+    void change() { System.out.println("Changed String"); }
+    void adjust() { System.out.println("Adjusting D"); }
+}
+
+class E extends B {
+    void method(char ch) { System.out.println("E.method() " + ch); }
+    String what() { return "Returning F"; }
+}
+
+class F extends B {
+    void method(char ch) { System.out.println("F.method() " + ch); }
+    void adjust() { System.out.println("Adjusting F"); }
+}
+
+public class Q1 {
+    public static void main(String[] args) {
+        A a = new C();
+        System.out.println(a.what());   //-----(a)
+        A a1 = new E();
+        a1.method('X');                 //-----(b)
+        B b = new B();
+        b.adjust();                     //-----(c)
+        B b1 = new F();
+        System.out.println(b1.what());  //-----(d)
+        A a2 = new D();
+        ((D) a2).change();              //-----(e)
+    }
+}</code></pre> <p>Before you start, draw the family tree in the margin. <code>A</code> is the root; <code>B</code>, <code>C</code> and <code>D</code> extend <code>A</code>; <code>E</code> and <code>F</code> extend <code>B</code>. Everything below is read off that tree.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> What is printed at line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Declared type <code>A</code>; actual object <code>C</code>. Does <code>A</code> declare <code>what()</code>? Yes, so it compiles. Does <code>C</code> override it? Yes.</p> <pre class="out"><code>Returning C</code></pre> <p>The declaration <code>A a</code> never enters into the answer except to prove the call is legal.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What is printed at line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p>Declared type <code>A</code>, which declares <code>method(char)</code>, so it compiles. The actual object is an <code>E</code>, and <code>E</code> overrides <code>method(char)</code>.</p> <pre class="out"><code>E.method() X</code></pre> <p>Notice that <code>E</code> sits two levels down: <code>E extends B extends A</code>. Dynamic binding does not stop at the first subclass, it starts at the actual class and works upward, so <code>E</code>'s version is found immediately and <code>B</code>'s is never reached.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> What is printed at line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <p>The easy one, and it is on the paper to give you a mark and to make you slow down. <code>b</code> is declared <code>B</code> and holds a <code>B</code>. No polymorphism is involved at all.</p> <pre class="out"><code>Adjusting B</code></pre> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> What is printed at line (d)?</p> <details class="soln"><summary></summary><div class="ans"> <p>This is the trap. The object is an <code>F</code>, so the instinct is to look for <code>F</code>'s <code>what()</code> &mdash; and <code>F</code> does not have one. It declares <code>method(char)</code> and <code>adjust()</code> and nothing else. So you walk up: <code>F</code> extends <code>B</code>, and <code>B</code> declares <code>what()</code>.</p> <pre class="out"><code>Returning B</code></pre> <p>The near-miss is <code>E</code>, which <em>does</em> override <code>what()</code> &mdash; and returns the string <code>"Returning F"</code>. That string is bait: it belongs to class <code>E</code>, not class <code>F</code>, and nothing on line (d) touches <code>E</code> at all. When a question puts a string in a class that names a different class, assume it is deliberate.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> What is printed at line (e)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>change()</code> is declared only in <code>D</code>. <code>a2</code> is declared <code>A</code>, so <code>a2.change()</code> on its own would not compile &mdash; which is exactly why the cast is there. <code>((D) a2)</code> tells the compiler to consult <code>D</code> instead, and at run time the object really is a <code>D</code>, so the cast succeeds.</p> <pre class="out"><code>Changed String</code></pre> <p>Running the whole program prints all five lines together:</p> <pre class="out"><code>Returning C
+E.method() X
+Adjusting B
+Returning B
+Changed String</code></pre> <p><strong>Things to notice across all five parts.</strong> Every one of the five was answered by the same two-column note: <em>declared type</em> on the left, <em>actual object</em> on the right. Write those two columns down the margin of the exam paper before you answer anything, and the question stops being about cleverness.</p> <p>Three things this question is testing that are easy to miss. First, a subclass that <em>omits</em> a method inherits it &mdash; part (d). Second, a cast is how you reach a method the declared type has never heard of &mdash; part (e). Third, <code>D</code> returns <code>"returning D"</code> with a small <code>r</code> and <code>E</code> returns <code>"Returning F"</code>; neither is asked about, and both are there to see whether you are reading or pattern-matching. Copy the strings exactly as written when you answer, capitals included.</p> </div></details> </div> <h3>Problem 2 &mdash; Static type, dynamic type and a cast <span class="muted">(added for these notes)</span></h3> <p>The same skill as Problem 1, with the two extra cases the exams like: a field with the same name in two classes, and an overload that looks like an override. Seven lines, and one of them does not survive.</p> <p class="filename">Dispatch.java</p>
+<pre><code class="language-java">class Base {
+    String tag = "base";
+    void show() { System.out.println("Base.show, tag = " + tag); }
+    void show(int n) { System.out.println("Base.show(int) " + n); }
+}
+
+class Mid extends Base {
+    String tag = "mid";
+    void show() { System.out.println("Mid.show, tag = " + tag); }
+    void extra() { System.out.println("Mid.extra"); }
+}
+
+class Leaf extends Mid {
+    void show() { System.out.println("Leaf.show, tag = " + tag); }
+    void show(double d) { System.out.println("Leaf.show(double) " + d); }
+}
+
+public class Dispatch {
+    public static void main(String[] args) {
+        Base p = new Leaf();
+        p.show();                              // line (a)
+        System.out.println(p.tag);             // line (b)
+        p.show(2);                             // line (c)
+
+        Base[] all = { new Base(), new Mid(), new Leaf() };
+        all[1].show();                         // line (d)
+        ((Mid) all[2]).extra();                // line (e)
+
+        Base q = new Mid();
+        System.out.println(q instanceof Leaf); // line (f)
+        ((Leaf) q).show();                     // line (g)
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> What is printed at line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p>The object is a <code>Leaf</code> and <code>Leaf</code> overrides <code>show()</code>, so <code>Leaf.show</code> runs. The interesting half is the <code>tag</code> it prints. <code>Leaf</code> does not declare a <code>tag</code>; the nearest one its code can see is <code>Mid</code>'s.</p> <pre class="out"><code>Leaf.show, tag = mid</code></pre> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What is printed at line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>base</code>. This is the field rule, and it is the opposite of the method rule. <code>p</code> is <em>declared</em> <code>Base</code>, so <code>p.tag</code> reads <code>Base</code>'s <code>tag</code>, even though the object is a <code>Leaf</code> whose <code>Mid</code> part holds <code>"mid"</code>.</p> <pre class="out"><code>base</code></pre> <p>Both fields exist in the object at once. The subclass field <em>hides</em> the superclass field rather than replacing it, and which one you get is decided at compile time from the declared type. Compare (a) and (b): the same object, one line apart, reporting two different values for "tag".</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> What is printed at line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <p>Two stages. Stage 1, compile time: <code>p</code> is declared <code>Base</code>, the argument is an <code>int</code>, and <code>Base</code> declares <code>show(int)</code>. That is the signature. Stage 2, run time: does <code>Leaf</code> override <code>show(int)</code>? No &mdash; <code>Leaf</code> declares <code>show()</code> and <code>show(double)</code>, and <code>show(double)</code> is a <em>different signature</em>, so it is an overload, not an override.</p> <pre class="out"><code>Base.show(int) 2</code></pre> <p><code>Leaf.show(double)</code> is never called, and could not be: nothing chose that signature.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> What is printed at line (d)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>all</code> is a <code>Base[]</code>, so every element's declared type is <code>Base</code> and <code>show()</code> is legal on any of them. Element 1 holds a <code>Mid</code>.</p> <pre class="out"><code>Mid.show, tag = mid</code></pre> <p>Here <code>Mid.show</code> prints <code>"mid"</code> for the honest reason: <code>Mid</code> really does declare that field and its own code sees its own copy.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> What is printed at line (e)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>extra()</code> is declared in <code>Mid</code>, and <code>all[2]</code> is declared <code>Base</code>, so the bare call would not compile. The cast to <code>Mid</code> fixes that, and at run time <code>all[2]</code> holds a <code>Leaf</code>, which is a <code>Mid</code>, so the cast succeeds.</p> <pre class="out"><code>Mid.extra</code></pre> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(f)</span> What is printed at line (f)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>false</code>. <code>q</code> holds a plain <code>Mid</code>. <code>instanceof</code> asks "is the actual object of this type, or of a type below it?" &mdash; and a <code>Mid</code> is not a <code>Leaf</code>; the relationship only runs the other way.</p> <pre class="out"><code>false</code></pre> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(g)</span> What happens at line (g)?</p> <details class="soln"><summary></summary><div class="ans"> <p>It compiles, and then it throws. The compiler permits the cast because a variable declared <code>Base</code> <em>could</em> be holding a <code>Leaf</code>. Line (f) has just told you it is not.</p> <pre class="out"><code>Leaf.show, tag = mid
+base
+Base.show(int) 2
+Mid.show, tag = mid
+Mid.extra
+false
+Exception in thread "main" java.lang.ClassCastException: class Mid cannot be cast to class Leaf (Mid and Leaf are in unnamed module of loader 'app')
+	at Dispatch.main(Dispatch.java:31)</code></pre> <p>The parenthetical about modules and class loaders is Java 21 being thorough; the part that matters is the first eight words.</p> <p><strong>Things to notice across all seven parts.</strong> Lines (a) and (b) are the pair to take away: <em>methods use the object, fields use the declaration.</em> If you can explain why the same variable reports <code>Leaf.show</code> and <code>base</code> on consecutive lines, you have understood Lecture 13.</p> <p>Line (c) is the second pair, with <code>show(int)</code> and <code>show(double)</code>. Two methods are the same method only if the name <em>and</em> the parameter list match. Change one parameter type and you have not overridden anything &mdash; you have added a second method that the compiler may never choose.</p> <p>Line (g) is why <code>instanceof</code> exists. Written as <code>if (q instanceof Leaf) { ((Leaf) q).show(); }</code> the program prints nothing there and runs to completion. On an exam, "compiles, then throws <code>ClassCastException</code> at run time" is a complete answer and is worth full marks; "error" is not.</p> </div></details> </div> <h3>Problem 3 &mdash; An interface, a class and a subclass <span class="muted">(added for these notes, in the format of Problem 1 of CSCI 212 Exam 2, Spring 2025)</span></h3> <p>Consider the following interface:</p> <p class="filename">Sendable.java</p>
+<pre><code class="language-java">public interface Sendable {
+    void send();
+    void send(int times);
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> Write a class <code>Message</code> that implements <code>Sendable</code>. It should have a private <code>String</code> field <code>body</code>, a constructor that takes the body as a parameter, a <code>send()</code> that prints <code>Sending: </code> followed by the body, and a <code>send(int times)</code> that sends the message that many times. <span class="muted">[6 marks: 2 for the class header, 1 each for the field, the constructor and the two methods]</span></p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The interface names two obligations, so the class owes two <code>public</code> methods with exactly those signatures. Write <code>send(int)</code> as a loop over <code>send()</code> rather than repeating the <code>println</code> &mdash; it is shorter, and part (b) will show that it also does something useful for free.</p> <p>Add a <code>protected</code> getter while you are here. <code>body</code> is <code>private</code> as the question demands, and the subclass in part (b) will need to read it; <code>protected</code> means "the family may see this", which is exactly the relationship you want.</p> <p class="filename">Message.java</p>
+<pre><code class="language-java">public class Message implements Sendable {
+    private String body;
+
+    public Message(String body) {
+        this.body = body;
+    }
+
+    protected String getBody() {
+        return body;
+    }
+
+    @Override
+    public void send() {
+        System.out.println("Sending: " + body);
+    }
+
+    @Override
+    public void send(int times) {
+        for (int i = 0; i &lt; times; i++) {
+            send();
+        }
+    }
+}</code></pre> <p>Every mark in this part is for a single line, and they are independent. Write the header first, then the field, then the constructor, then the two methods &mdash; in that order &mdash; and even a half-finished answer collects most of them.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Write a subclass <code>UrgentMessage</code> that extends <code>Message</code> and has only one method besides its constructor. That method should override <code>send()</code> so the body is printed in capitals, surrounded by three asterisks on each side. <span class="muted">[4 marks: 2 for the class header, 1 for the constructor, 1 for the override]</span></p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Two things are compulsory and one is the trap. Compulsory: the <code>extends</code> header, and a constructor that calls <code>super(body)</code> &mdash; <code>Message</code> has no no-argument constructor, so leaving it out will not compile. The trap: <code>body</code> is <code>private</code>, so <code>super.body</code> is not available. Use the getter.</p> <p class="filename">UrgentMessage.java</p>
+<pre><code class="language-java">public class UrgentMessage extends Message {
+
+    public UrgentMessage(String body) {
+        super(body);
+    }
+
+    @Override
+    public void send() {
+        System.out.println("Sending: *** " + getBody().toUpperCase() + " ***");
+    }
+}</code></pre> <p class="filename">MessageDemo.java</p>
+<pre><code class="language-java">public class MessageDemo {
+    public static void main(String[] args) {
+        Sendable m = new Message("server is up");
+        m.send();
+        m.send(2);
+
+        System.out.println("---");
+
+        Sendable u = new UrgentMessage("server is down");
+        u.send();
+        u.send(3);
+    }
+}</code></pre> <pre class="out"><code>Sending: server is up
+Sending: server is up
+Sending: server is up
+---
+Sending: *** SERVER IS DOWN ***
+Sending: *** SERVER IS DOWN ***
+Sending: *** SERVER IS DOWN ***
+Sending: *** SERVER IS DOWN ***</code></pre> <p><strong>Things to notice across both parts.</strong> <code>UrgentMessage</code> overrides <em>one</em> method, exactly as the question demands &mdash; and <code>u.send(3)</code> still prints three capitalised lines. The inherited <code>send(int)</code> calls <code>send()</code>, and that call goes to the object's own version. One override changed the behaviour of a method that was not overridden. Writing <code>send(int)</code> as a loop over <code>send()</code> in part (a) is what bought that; a version that repeated the <code>println</code> would have printed the shouty line once and three quiet ones.</p> <p><strong>The <code>private</code> trap.</strong> The obvious thing to write in the subclass is <code>System.out.println(super.body.toUpperCase());</code> and it does not compile:</p> <pre class="err"><code>UrgentMessage.java:9: error: body has private access in Message
+        System.out.println(super.body.toUpperCase());
+                                ^
+1 error</code></pre> <p><code>private</code> means private to the class, not to the family, and <code>super.</code> does not change that. The two repairs are the getter above, or declaring <code>protected String body;</code> in <code>Message</code>, after which plain <code>body.toUpperCase()</code> works. Both are accepted; the getter keeps the field private as the question asked.</p> <p>Finally, note that <code>Sendable</code> declares two methods with the <em>same name</em> and different parameter lists. That is ordinary overloading and an interface may do it. It obliges you to write two separate methods, not one with a default argument &mdash; Java has no default arguments.</p> </div></details> </div> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Problem 3</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="23" aria-label="Live coding - Problem 3">public class Message implements Sendable {
+    // 1. private String field body
+
+    // 2. constructor taking the body
+
+    // 3. protected getter, so the subclass can read it
+
+    // 4. public void send()            -- "Sending: " + body
+
+    // 5. public void send(int times)   -- call send() in a loop
+
+}
+
+// -------- second file --------
+
+public class UrgentMessage extends Message {
+    // 6. constructor -- super(body) must come first
+
+    // 7. override send() to shout: "Sending: *** BODY ***"
+
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 4 &mdash; Build the window <span class="muted">(added for these notes, in the format of Problem 3 of CSCI 212 Exam 2, Spring 2025)</span></h3> <p>Consider the following Java class, used to create and display a GUI. The class has exactly two methods, which you will write.</p> <p class="filename">Thermostat.java</p>
+<pre><code class="language-java">public class Thermostat extends JFrame {
+   JLabel reading;      // shows the current setting; starts at 70
+   JPanel dial;         // the large panel in the middle; starts gray
+
+   // There is a constructor method whose code has been omitted
+
+   // There is a main method whose code has been omitted
+}</code></pre> <p>The window has title <code>Thermostat</code>, is 400 by 300, and displays as follows.</p> <p class="filename">The Thermostat window &mdash; a sketch, not a screenshot</p>
+<pre class="cmp"><code>+-------------------------------------------------+
+| Thermostat                       _   []   X     |
++-------------------------------------------------+
+|                      70                         |   &lt;- JLabel, centered
++-------------------------------------------------+
+|                                                 |
+|                                                 |
+|                 dial  (gray)                    |   &lt;- JPanel
+|                                                 |
+|                                                 |
++-------------------------------------------------+
+|      [   COOLER   ][   WARMER   ]               |
++-------------------------------------------------+
+   400 x 300 pixels.  The two buttons share the
+   width of the bar equally.</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> Write the <code>main</code> method. <span class="muted">[2 marks]</span></p> <details class="soln"><summary></summary><div class="ans"> <p>Two lines, and they are the same two lines in every question of this kind. Construct the frame, then show it.</p> <pre><code class="language-java">public static void main(String args[]) {
+   Thermostat gui = new Thermostat();
+   gui.setVisible(true);
+}</code></pre> <p><code>setVisible(true)</code> is what puts it on the screen; a constructed frame that is never shown exists only in memory. Write this part first on the exam, before you have read the rest of the question &mdash; it is two marks you cannot get wrong.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Write the constructor. The buttons do not need to respond when clicked. <span class="muted">[8 marks: 3 for the window setup, 3 for the label and the dial, 2 for the button bar]</span></p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Draw the tree before you write a line of code.</p> <p class="filename">The container tree for Thermostat</p>
+<pre class="cmp"><code>Thermostat (a JFrame)
+  +-- content pane                     BorderLayout
+        +-- NORTH:  reading            a JLabel, text "70", centered
+        +-- CENTER: dial               a JPanel with a gray background
+        +-- SOUTH:  buttonPanel        GridLayout(1, 2)
+               +-- COOLER              a JButton
+               +-- WARMER              a JButton</code></pre> <p>Three things go into the content pane, so the content pane needs a <code>BorderLayout</code> and each of them needs a region. The label and the dial are single components, so they go straight into <code>NORTH</code> and <code>CENTER</code> with no panel around them. The two buttons cannot both go in <code>SOUTH</code> &mdash; one region, one component &mdash; so they go into a panel of their own, and because the sketch shows them the same width that panel gets a <code>GridLayout(1, 2)</code>.</p> <p><code>reading</code> and <code>dial</code> are <em>assigned</em>, not declared, inside the constructor. They are already fields; writing <code>JPanel dial = new JPanel();</code> here would create a local variable that shadows the field, leaving the real field <code>null</code> and making part (d) of the next problem throw a <code>NullPointerException</code>.</p> <pre><code class="language-java">public Thermostat() {
+   super();
+   setTitle("Thermostat");
+   setSize(400, 300);
+   setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+   Container contentPane = getContentPane();
+   contentPane.setLayout(new BorderLayout());
+
+   reading = new JLabel("70", JLabel.CENTER);
+   contentPane.add(reading, BorderLayout.NORTH);
+
+   dial = new JPanel();
+   dial.setBackground(Color.GRAY);
+   contentPane.add(dial, BorderLayout.CENTER);
+
+   JPanel buttonPanel = new JPanel();
+   buttonPanel.setLayout(new GridLayout(1, 2));
+   contentPane.add(buttonPanel, BorderLayout.SOUTH);
+
+   JButton cooler = new JButton("COOLER");
+   buttonPanel.add(cooler);
+
+   JButton warmer = new JButton("WARMER");
+   buttonPanel.add(warmer);
+}</code></pre> <p>The imports the file needs, since a full answer usually wants them:</p> <pre><code class="language-java">import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.GridLayout;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;</code></pre> <p><strong>Things to notice.</strong> This is a Swing program, so it opens a window and prints nothing &mdash; there is no output block to check it against. What can be checked is that it compiles, and it does: <code>javac Thermostat.java</code> on the complete file finishes silently.</p> <p><code>buttonPanel</code> is a local variable and <code>dial</code> is a field, and that difference is not stylistic. The next problem's <code>actionPerformed</code> needs to recolor the dial and rewrite the label, so those two must be fields; nothing ever looks at <code>buttonPanel</code> again, so it can stay local. Deciding which is which <em>before</em> you write the constructor is the single habit that makes these questions easy.</p> <p><code>JLabel.CENTER</code> as the second constructor argument is what centers the text inside the label's own width. Without it the <code>70</code> sits hard against the left edge, which does not match the picture. If you cannot remember the constant, <code>reading.setHorizontalAlignment(JLabel.CENTER);</code> on the next line does the same job.</p> </div></details> </div> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Problem 4</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="24" aria-label="Live coding - Problem 4">public class Thermostat extends JFrame {
+   JLabel reading;
+   JPanel dial;
+
+   public Thermostat() {
+      // 1. super(), setTitle, setSize
+
+      // 2. get the content pane, give it a BorderLayout
+
+      // 3. the label in NORTH  (assign the field, do not re-declare it)
+
+      // 4. the gray dial in CENTER
+
+      // 5. a panel in SOUTH with GridLayout(1, 2) and the two buttons
+
+   }
+
+   public static void main(String args[]) {
+      // 6. two lines
+
+   }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 5 &mdash; Make it respond <span class="muted">(added for these notes, in the format of Problem 4 of CSCI 212 Exam 2, Spring 2025)</span></h3> <p>Modify the class from Problem 4 so that clicking <code>COOLER</code> lowers the setting by one and clicking <code>WARMER</code> raises it by one. The label must always show the current setting, and the dial must be blue below 68, red above 72, and gray in between. Your modifications should add <em>one</em> standard method to the class to program all responses to user actions.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> The title line of the class must be modified. Write the new title line. <span class="muted">[2 marks]</span></p> <details class="soln"><summary></summary><div class="ans"> <pre><code class="language-java">public class Thermostat extends JFrame implements ActionListener</code></pre> <p>Both halves, in that order. <code>extends</code> comes before <code>implements</code> in a class header, always; there is exactly one thing you can extend and any number you can implement.</p> <p>Two marks for one line, and it does not depend on any other part of the question. If you write nothing else, write this.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What else does the class need, besides the new method? <span class="muted">[1 mark]</span></p> <details class="soln"><summary></summary><div class="ans"> <p>A field to remember the temperature between clicks:</p> <pre><code class="language-java">private int temperature = 70;</code></pre> <p>A local variable inside <code>actionPerformed</code> would be reset to 70 on every click, so the display would flick between 69 and 71 forever. Anything that has to survive from one event to the next is a field. That is the same rule that made <code>reading</code> and <code>dial</code> fields, applied to a number instead of a component.</p> <p>And the import: <code>import java.awt.event.*;</code> &mdash; note the singular <code>event</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Write the full code for the one new method that should be added to the class to allow it to respond to button clicks. <span class="muted">[6 marks]</span></p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Two buttons, so there is something to tell apart: <code>e.getActionCommand()</code> returns the label as a <code>String</code> and <code>.equals</code> compares it. Then update the number, push it into the label, and choose the color. Doing the update and the display in that order means the label and the dial always agree.</p> <p>Watch the boundaries. "Blue below 68" is <code>temperature &lt; 68</code>, so 68 itself is gray. "Red above 72" is <code>temperature &gt; 72</code>, so 72 itself is gray. An <code>else if</code> chain gets both right and also guarantees exactly one branch runs.</p> <pre><code class="language-java">public void actionPerformed(ActionEvent e) {
+   if (e.getActionCommand().equals("COOLER")) {
+      temperature = temperature - 1;
+   }
+   if (e.getActionCommand().equals("WARMER")) {
+      temperature = temperature + 1;
+   }
+
+   reading.setText("" + temperature);
+
+   if (temperature &lt; 68) {
+      dial.setBackground(Color.BLUE);
+   } else if (temperature &gt; 72) {
+      dial.setBackground(Color.RED);
+   } else {
+      dial.setBackground(Color.GRAY);
+   }
+}</code></pre> <p>The window cannot be run here, but the arithmetic and the color rule can: pulled out into a plain program that "clicks" the buttons in sequence, it behaves like this.</p> <pre class="out"><code>start   -&gt; label reads 70, dial is GRAY
+COOLER  -&gt; label reads 69, dial is GRAY
+COOLER  -&gt; label reads 68, dial is GRAY
+COOLER  -&gt; label reads 67, dial is BLUE
+WARMER  -&gt; label reads 68, dial is GRAY
+WARMER  -&gt; label reads 69, dial is GRAY
+WARMER  -&gt; label reads 70, dial is GRAY
+WARMER  -&gt; label reads 71, dial is GRAY
+WARMER  -&gt; label reads 72, dial is GRAY
+WARMER  -&gt; label reads 73, dial is RED</code></pre> <p>Three clicks down turns it blue at 67 and one click back up returns it to gray at 68 &mdash; which is what "blue below 68" means. Getting <code>&lt;</code> and <code>&lt;=</code> the right way round here is worth as much as the rest of the method.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> A change is also needed to make each button object listen for user interactions. Write the one line of code, and say where it goes. <span class="muted">[1 mark]</span></p> <details class="soln"><summary></summary><div class="ans"> <pre><code class="language-java">cooler.addActionListener(this);</code></pre> <p>It goes immediately after the button is created, once for each button &mdash; so <code>warmer.addActionListener(this);</code> as well. <code>this</code> is the frame, and the frame is the listener, because the frame is what implements <code>ActionListener</code>.</p> <p><strong>Things to notice across all four parts.</strong> Leave this line out and everything still compiles. The window opens, the buttons draw themselves, they press in and spring back when clicked &mdash; and nothing happens, because nothing ever told the buttons that this object wanted to hear from them. When a button "does not work", check the registration before you look at the handler.</p> <p>Notice how the four parts divide the work: a header, a field, a method, and a registration. Those are four independent marks, and three of them can be written without solving the fourth. On a paper where a GUI question is worth 20 points, that is the difference between running out of time with nothing on the page and running out of time with 14 marks on it.</p> <p>The whole modified class compiles: <code>javac Thermostat.java</code> on the finished file &mdash; header, field, constructor with the two registration lines, <code>actionPerformed</code> and <code>main</code> &mdash; finishes silently.</p> </div></details> </div> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Problem 5</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="14" aria-label="Live coding - Problem 5">// 1. the new title line
+
+
+// 2. the field that survives between clicks
+
+
+// 3. the method
+public void actionPerformed(ActionEvent e) {
+
+}
+
+// 4. the registration line, once per button</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 6 &mdash; Find the four errors <span class="muted">(added for these notes)</span></h3> <p>This class is meant to display a window with a big <code>0</code> in the middle and a <code>COUNT</code> button at the bottom; each click should raise the number by one. Exactly four of the numbered lines, or the lines around them, are wrong. Identify all four, say what the compiler does about each, and give a corrected version.</p> <p class="filename">Counter.java</p>
+<pre><code class="language-java">import java.awt.BorderLayout;
+import java.awt.Container;
+import java.swing.*;                                   // line 1
+import java.awt.event.*;
+
+public class Counter extends JFrame implements ActionListener {
+   private int clicks = 0;
+
+   public Counter() {
+      super();
+      setTitle("Counter");
+      setSize(300, 150);
+
+      Container contentPane = getContentPane();
+      contentPane.setLayout(new BorderLayout());
+
+      JLabel display = new JLabel("0", JLabel.CENTER);   // line 2
+      contentPane.add(display, BorderLayout.CENTER);
+
+      JButton count = new JButton("COUNT");
+      contentPane.add(count, BorderLayout.SOUTH);        // line 3
+   }
+
+   public void ActionPerformed(ActionEvent e) {          // line 4
+      clicks = clicks + 1;
+      display.setText("" + clicks);                      // line 5
+   }
+
+   public static void main(String args[]) {
+      Counter gui = new Counter();
+      gui.setVisible(true);
+   }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Compile it and read the first message; fix that; compile again. A broken import poisons every line that uses the package, so the first compile produces a wall of <code>cannot find symbol</code> that says almost nothing. Work from the top down and recompile after each fix rather than trying to read all of it at once.</p> <p><strong>Error 1 &mdash; line 1.</strong> It is <code>javax.swing</code>, with an <code>x</code>. The first compile reports thirteen errors, twelve of which are consequences of this one:</p> <pre class="err"><code>Counter.java:3: error: package java.swing does not exist
+import java.swing.*;                                   // line 1
+^</code></pre> <p>Corrected: <code>import javax.swing.*;</code> &mdash; and note that the other three imports are right as they stand: <code>java.awt</code> has no <code>x</code>, and <code>java.awt.event</code> is singular.</p> <p><strong>Error 2 &mdash; line 4.</strong> With the import fixed, two real errors are left. The method is called <code>ActionPerformed</code> with a capital <code>A</code>, so as far as Java is concerned the class promised to implement <code>ActionListener</code> and then did not:</p> <pre class="err"><code>Counter.java:6: error: Counter is not abstract and does not override abstract method actionPerformed(ActionEvent) in ActionListener
+public class Counter extends JFrame implements ActionListener {
+       ^</code></pre> <p>Corrected: <code>public void actionPerformed(ActionEvent e) {</code>. The caret points at the class header, not at line 4, which is the confusing part &mdash; the compiler is complaining about a promise the header made, not about the method you wrote.</p> <p><strong>Error 3 &mdash; line 2 (and line 5).</strong> <code>display</code> is a local variable of the constructor. It stops existing the moment the constructor returns, and <code>actionPerformed</code> has never heard of it:</p> <pre class="err"><code>Counter.java:26: error: cannot find symbol
+      display.setText("" + clicks);                      // line 5
+      ^
+  symbol:   variable display
+  location: class Counter</code></pre> <p>Corrected: declare it as a field beside <code>clicks</code> and only <em>assign</em> it in the constructor:</p> <pre><code class="language-java">private JLabel display;                    // beside the clicks field
+
+// ... and inside the constructor:
+display = new JLabel("0", JLabel.CENTER);  // no type in front</code></pre> <p><strong>Error 4 &mdash; after line 3.</strong> The fourth one the compiler will never tell you about. The button is created and added, and it is never registered, so <code>actionPerformed</code> is a method nobody calls. Add one line at the end of the constructor, next to the button:</p> <pre><code class="language-java">count.addActionListener(this);</code></pre> <p>With all four fixed, the file compiles silently:</p> <p class="filename">Counter.java</p>
+<pre><code class="language-java">import java.awt.BorderLayout;
+import java.awt.Container;
+import javax.swing.*;
+import java.awt.event.*;
+
+public class Counter extends JFrame implements ActionListener {
+   private int clicks = 0;
+   private JLabel display;
+
+   public Counter() {
+      super();
+      setTitle("Counter");
+      setSize(300, 150);
+
+      Container contentPane = getContentPane();
+      contentPane.setLayout(new BorderLayout());
+
+      display = new JLabel("0", JLabel.CENTER);
+      contentPane.add(display, BorderLayout.CENTER);
+
+      JButton count = new JButton("COUNT");
+      contentPane.add(count, BorderLayout.SOUTH);
+      count.addActionListener(this);
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      clicks = clicks + 1;
+      display.setText("" + clicks);
+   }
+
+   public static void main(String args[]) {
+      Counter gui = new Counter();
+      gui.setVisible(true);
+   }
+}</code></pre> <p><strong>Things to notice.</strong> Three of the four errors are compile errors and the fourth is silent. That ratio is realistic: the compiler catches the typing mistakes and is completely blind to the wiring. A GUI that compiles is not a GUI that works, and the missing <code>addActionListener</code> is by far the most common reason a submitted program "does nothing".</p> <p>Notice also how the messages moved as the errors were fixed. The first compile reported thirteen errors, twelve of them consequences of the bad import; with the import fixed the second reported two; with the method name fixed the third reported one. Fixing one error and being handed a brand-new one is completely normal and does not mean your fix was wrong.</p> <p>Line 3 is correct as written, incidentally. Adding a single button straight into <code>BorderLayout.SOUTH</code> is legal and matches the description &mdash; it will be stretched to the full width of the window, which is what a one-button bar usually wants.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Problem 6</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="28" aria-label="Live coding - Problem 6">import java.awt.BorderLayout;
+import java.awt.Container;
+import java.swing.*;                                   // line 1
+import java.awt.event.*;
+
+public class Counter extends JFrame implements ActionListener {
+   private int clicks = 0;
+
+   public Counter() {
+      super();
+      setTitle("Counter");
+      setSize(300, 150);
+
+      Container contentPane = getContentPane();
+      contentPane.setLayout(new BorderLayout());
+
+      JLabel display = new JLabel("0", JLabel.CENTER);   // line 2
+      contentPane.add(display, BorderLayout.CENTER);
+
+      JButton count = new JButton("COUNT");
+      contentPane.add(count, BorderLayout.SOUTH);        // line 3
+   }
+
+   public void ActionPerformed(ActionEvent e) {          // line 4
+      clicks = clicks + 1;
+      display.setText("" + clicks);                      // line 5
+   }
+
+   public static void main(String args[]) {
+      Counter gui = new Counter();
+      gui.setVisible(true);
+   }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 7 &mdash; Reading what the user typed <span class="muted">(added for these notes)</span></h3> <p>Write a complete Java class <code>Doubler</code> that displays this window. Typing a number into the field and pressing <code>DOUBLE</code> must put twice that number beside <code>Doubled:</code>. If what the user typed is not a number, the label should say so rather than crashing.</p> <p class="filename">The Doubler window &mdash; a sketch, not a screenshot</p>
+<pre class="cmp"><code>+---------------------------------------------+
+| Doubler                       _   []   X    |
++---------------------------------------------+
+|  Number:        [ 21              ]         |
+|                                             |
+|  Doubled:       42                          |
++---------------------------------------------+
+|             [    DOUBLE    ]                |
++---------------------------------------------+
+   360 x 160 pixels.  The four items above the
+   button sit in a 2 x 2 grid: two JLabels on
+   the left, a JTextField and a JLabel on the
+   right.</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Start from the tree. Four things in a two-by-two arrangement is <code>GridLayout(2, 2)</code> in a panel; the panel goes in <code>CENTER</code> and the button goes in <code>SOUTH</code>.</p> <p class="filename">The container tree for Doubler</p>
+<pre class="cmp"><code>Doubler (a JFrame)
+  +-- content pane                  BorderLayout
+        +-- CENTER: top             GridLayout(2, 2)
+        |      +-- JLabel "Number:"
+        |      +-- input            a JTextField(10)      &lt;- field
+        |      +-- JLabel "Doubled:"
+        |      +-- answer           a JLabel ""           &lt;- field
+        +-- SOUTH:  the DOUBLE button</code></pre> <p>Then decide what must be a field. <code>actionPerformed</code> has to <em>read</em> the text field and <em>write</em> the answer label, so both of those are fields; the two fixed captions and the panel are never looked at again, so they can be built inline.</p> <p>The conversion is the only line that can fail, so it and everything that depends on it go inside a <code>try</code>, with the apology in the <code>catch</code>.</p> <p class="filename">Doubler.java</p>
+<pre><code class="language-java">import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+public class Doubler extends JFrame implements ActionListener {
+   private JTextField input;
+   private JLabel answer;
+
+   public Doubler() {
+      super();
+      setTitle("Doubler");
+      setSize(360, 160);
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+      Container contentPane = getContentPane();
+      contentPane.setLayout(new BorderLayout());
+
+      JPanel top = new JPanel();
+      top.setLayout(new GridLayout(2, 2));
+      contentPane.add(top, BorderLayout.CENTER);
+
+      top.add(new JLabel("Number:"));
+      input = new JTextField(10);
+      top.add(input);
+
+      top.add(new JLabel("Doubled:"));
+      answer = new JLabel("");
+      top.add(answer);
+
+      JButton go = new JButton("DOUBLE");
+      contentPane.add(go, BorderLayout.SOUTH);
+      go.addActionListener(this);
+   }
+
+   public void actionPerformed(ActionEvent e) {
+      try {
+         int n = Integer.parseInt(input.getText().trim());
+         answer.setText("" + (2 * n));
+      } catch (NumberFormatException ex) {
+         answer.setText("not a number");
+      }
+   }
+
+   public static void main(String args[]) {
+      Doubler gui = new Doubler();
+      gui.setVisible(true);
+   }
+}</code></pre> <p>The class compiles. It opens a window and prints nothing, so there is no console output to show &mdash; but the body of <code>actionPerformed</code> is ordinary Java, and with <code>getText()</code> replaced by a fixed <code>String</code> it can be run against the cases a user will actually produce:</p> <pre class="out"><code>typed [21]  -&gt;  42
+typed [  7 ]  -&gt;  14
+typed []  -&gt;  not a number
+typed [3.5]  -&gt;  not a number
+typed [-4]  -&gt;  -8</code></pre> <p><strong>Things to notice.</strong> The order of the four <code>add</code> calls into <code>top</code> is the order the grid fills: left to right along the first row, then left to right along the second. Swap the third and fourth and the labels end up in the wrong column. <code>GridLayout</code> has no notion of "row 2, column 1" &mdash; you get the cells in the order you add.</p> <p><code>top.add(new JLabel("Number:"));</code> creates the label and adds it without ever naming it. That is fine here precisely because nothing will ever want it again, and it is a useful habit: the variables you bother to name become a short list of the things that matter.</p> <p>Three cases go through the <code>catch</code>, not one: an empty field, a word, and &mdash; less obviously &mdash; <code>3.5</code>, because <code>Integer.parseInt</code> rejects a decimal point. If the specification had said "a number" rather than "a whole number", <code>Double.parseDouble</code> would be the right call. Read what the question asks for.</p> <p><code>.trim()</code> earns its place. Without it, a user who types a space after the digits gets an exception and an unhelpful "not a number", which is the sort of thing that looks like a mysterious bug and is a one-word fix.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Problem 7</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="22" aria-label="Live coding - Problem 7">public class Doubler extends JFrame implements ActionListener {
+   // 1. fields: the JTextField and the JLabel that actionPerformed needs
+
+   public Doubler() {
+      // 2. super(), setTitle("Doubler"), setSize(360, 160)
+
+      // 3. content pane, BorderLayout
+
+      // 4. a JPanel with GridLayout(2, 2) in CENTER, filled in this order:
+      //       "Number:"  input   "Doubled:"  answer
+
+      // 5. the DOUBLE button in SOUTH -- and register it
+
+   }
+
+   // 6. actionPerformed: getText, parseInt, setText -- and catch the bad input
+
+   // 7. main
+
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 8 &mdash; What color is each pixel? <span class="muted">(added for these notes)</span></h3> <p>A <code>JPanel</code> 300 pixels wide and 200 tall has a white background and this <code>paintComponent</code>. For each of the five points, say what color that pixel comes out.</p> <p class="filename">FacePanel.java</p>
+<pre><code class="language-java">import java.awt.Color;
+import java.awt.Graphics;
+
+import javax.swing.JPanel;
+
+public class FacePanel extends JPanel {
+   public void paintComponent(Graphics g) {
+      super.paintComponent(g);
+
+      g.setColor(Color.BLACK);
+      g.drawOval(50, 50, 100, 100);
+
+      g.setColor(Color.YELLOW);
+      g.fillOval(50, 50, 100, 100);
+
+      g.setColor(Color.BLUE);
+      g.fillRect(120, 20, 60, 60);
+   }
+}</code></pre> <p>Write down what each call covers before you answer anything. The oval was given the bounding box from (50, 50) to (150, 150); the rectangle the box from (120, 20) to (180, 80). Whether the pixels <em>on</em> 150 and 180 are painted is exactly what parts (c) and (d) turn on.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> (100, 100)</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Yellow.</strong> That is the centre of the oval &mdash; the bounding box runs from (50, 50) for 100 in each direction, so the centre is (100, 100). The blue rectangle starts at <code>y</code> = 20 and is 60 tall, so it stops at <code>y</code> = 79 and never reaches here.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> (50, 100)</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Yellow.</strong> This is the leftmost point of the circle, and both calls touch it: <code>drawOval</code> put a black outline pixel there, and <code>fillOval</code> painted over it a moment later. The later call wins.</p> <p>That is the whole reason the two calls are in this order in the question. Outline first, fill second, and the outline is erased almost everywhere &mdash; which is exactly the bug you get when you write <code>drawRect</code> before <code>fillRect</code> on the same rectangle.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> (150, 100)</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Black.</strong> The one pixel where the outline survives. <code>fillOval(50, 50, 100, 100)</code> fills up to but not including <code>x</code> = 150, so the yellow stops at 149. <code>drawOval</code> with the same arguments puts its outline <em>on</em> <code>x</code> = 50 + 100 = 150. An outline is one pixel wider than the corresponding fill, and this is the point that proves it.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> (130, 60)</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Blue.</strong> The rectangle covers <code>x</code> 120 to 179 and <code>y</code> 20 to 79, so this point is inside it, and it was drawn last. The circle covers it too &mdash; (130, 60) is well inside the oval &mdash; and it makes no difference.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> (100, 30)</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>White</strong> &mdash; the panel's background, put there by <code>super.paintComponent(g)</code> before anything else was drawn. <code>y</code> = 30 is above the circle's box, and <code>x</code> = 100 is left of the rectangle's.</p> <p>Painting the panel into an image and reading the five pixels back:</p> <pre class="out"><code>(a) (100, 100): YELLOW
+(b) ( 50, 100): YELLOW
+(c) (150, 100): BLACK
+(d) (130,  60): BLUE
+(e) (100,  30): background (white)</code></pre> <p><strong>Things to notice across all five parts.</strong> Two rules answer every question of this kind, and they are worth writing at the top of your paper before you start: <em>a fill covers <code>x</code> through <code>x + w - 1</code>, while an outline is drawn on <code>x</code> and on <code>x + w</code></em>, and <em>the last thing drawn is the thing you see.</em></p> <p>The reliable technique is to sketch the shapes with their real ranges written beside them &mdash; "yellow circle: 50 to 149 across, 50 to 149 down" &mdash; and then read off each point. Holding two overlapping shapes and an off-by-one rule in your head at once is how this question gets missed.</p> <p>Note that part (e) depends on <code>super.paintComponent(g)</code> being there. Delete that line and the answer to (e) becomes "whatever happened to be on the component last time" &mdash; which on a first painting is unpredictable and on a repaint is the previous picture. It is the first line of the method for a reason.</p> </div></details> </div> <div class="box sum" id="summary"> <div class="hd">Before the Exam</div> <div class="bd"> <p>A checklist for the last evening. Work down it with a pen; anything you cannot do without looking is where the remaining hours belong.</p> <p><strong>Things to be able to write from a blank page, in under a minute each:</strong></p> <ul> <li>The <code>JFrame</code> skeleton &mdash; class header, <code>super()</code>, <code>setTitle</code>, <code>setSize</code>, <code>getContentPane()</code>, <code>setLayout</code>, and the two-line <code>main</code>.</li> <li>The class header with a listener: <code>public class Foo extends JFrame implements ActionListener</code>.</li> <li><code>b.addActionListener(this);</code> and <code>public void actionPerformed(ActionEvent e)</code>.</li> <li>A subclass header, a constructor whose first statement is <code>super(...)</code>, and one <code>@Override</code> method.</li> <li>An interface &mdash; signatures and semicolons &mdash; and a class that implements it, with <code>public</code> on every implemented method.</li> <li>A <code>paintComponent</code> that starts with <code>super.paintComponent(g)</code>.</li> </ul> <p><strong>Things to be able to answer in one sentence:</strong></p> <ul> <li>Which of two classes is the superclass, given a <code>new</code> and a declaration.</li> <li>Whether a method call uses the declared type or the actual object &mdash; and why a field is the other way round.</li> <li>Why <code>Shape s = new Circle(3); s.getRadius();</code> does not compile, and what fixes it.</li> <li>The difference between a compile error and a <code>ClassCastException</code>.</li> <li>Which region of a <code>BorderLayout</code> gets the leftover space, and how many components a region holds.</li> <li>What <code>getActionCommand()</code> returns, and why you compare it with <code>.equals</code>.</li> </ul> <p><strong>The five mistakes that cost the most marks:</strong></p> <ul> <li>Leaving <code>public</code> off a method that implements an interface.</li> <li>Leaving out <code>b.addActionListener(this);</code> &mdash; the compiler will not help you.</li> <li>Declaring a component as a local variable when <code>actionPerformed</code> needs it, or re-declaring a field inside the constructor.</li> <li>Answering a dynamic-binding question from the declared type.</li> <li>Forgetting <code>super(...)</code> when the superclass has no no-argument constructor.</li> </ul> <p><strong>Two things to do that are not on this page.</strong> Work Problem 1 of Lecture 14 (the <code>Printable</code> interface) and Problem 1 of Lecture 16 (the <code>swapColors</code> window) under a clock &mdash; those are last year's actual questions, and between them they were 30 of the 40 marks. Then re-read the <code>Common Mistake</code> boxes in Lectures 12 through 19; they are short, and they are a list of things that have genuinely gone wrong on paper.</p> <p>The exam is 50 minutes for roughly 40 marks, so about a minute a mark. Write the parts you know first &mdash; the class headers, <code>main</code>, the registration line &mdash; and come back to the long constructor. Marks are awarded per line, and a partly finished answer collects most of them.</p> <p><strong>Coming up in Lecture 20.</strong> After the exam we pick up something you have already met three times without being told its name: <code>NumberFormatException</code> when a user types letters into a text field, <code>NullPointerException</code> when an object was never created, <code>ClassCastException</code> when a cast is wrong. Next time we take exceptions seriously &mdash; <code>try</code>, <code>catch</code>, <code>finally</code>, <code>throw</code>, and how to write a program that survives bad input instead
+    of stopping.</p>
+  </div>
+</div>
+
+<nav class="pagenav">
+<span class="disabled"><div class="dir">&larr; Previous</div><div class="ttl">Lecture 19 &mdash; Graphics and Painting</div><div class="pending">posts Thu Nov 12</div></span>
+<span class="disabled next"><div class="dir">Next &rarr;</div><div class="ttl">Lecture 20 &mdash; Exception Handling</div><div class="pending">posts Tue Nov 24</div></span>
+</nav>
+<footer class="pf">CSCI 212 &middot; Object-Oriented Programming in Java &middot; Queens College, CUNY</footer>
+</div>
+<script>
+(()=>{var ut=Object.create;var xe=Object.defineProperty;var ft=Object.getOwnPropertyDescriptor;var gt=Object.getOwnPropertyNames;var ht=Object.getPrototypeOf,dt=Object.prototype.hasOwnProperty;var pt=(e,t)=>()=>{try{return t||e((t={exports:{}}).exports,t),t.exports}catch(n){throw t=0,n}};var Et=(e,t,n,l)=>{if(t&&typeof t=="object"||typeof t=="function")for(let d of gt(t))!dt.call(e,d)&&d!==n&&xe(e,d,{get:()=>t[d],enumerable:!(l=ft(t,d))||l.enumerable});return e};var bt=(e,t,n)=>(n=e!=null?ut(ht(e)):{},Et(t||!e||!e.__esModule?xe(n,"default",{value:e,enumerable:!0}):n,e));var Ke=pt((ln,Ge)=>{function Ie(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(t=>{let n=e[t],l=typeof n;(l==="object"||l==="function")&&!Object.isFrozen(n)&&Ie(n)}),e}var Z=class{constructor(t){t.data===void 0&&(t.data={}),this.data=t.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function Ce(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function k(e,...t){let n=Object.create(null);for(let l in e)n[l]=e[l];return t.forEach(function(l){for(let d in l)n[d]=l[d]}),n}var _t="</span>",Ne=e=>!!e.scope,Mt=(e,{prefix:t})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let n=e.split(".");return[`${t}${n.shift()}`,...n.map((l,d)=>`${l}${"_".repeat(d+1)}`)].join(" ")}return`${t}${e}`},oe=class{constructor(t,n){this.buffer="",this.classPrefix=n.classPrefix,t.walk(this)}addText(t){this.buffer+=Ce(t)}openNode(t){if(!Ne(t))return;let n=Mt(t.scope,{prefix:this.classPrefix});this.span(n)}closeNode(t){Ne(t)&&(this.buffer+=_t)}value(){return this.buffer}span(t){this.buffer+=`<span class="${t}">`}},Re=(e={})=>{let t={children:[]};return Object.assign(t,e),t},ae=class e{constructor(){this.rootNode=Re(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(t){this.top.children.push(t)}openNode(t){let n=Re({scope:t});this.add(n),this.stack.push(n)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(t){return this.constructor._walk(t,this.rootNode)}static _walk(t,n){return typeof n=="string"?t.addText(n):n.children&&(t.openNode(n),n.children.forEach(l=>this._walk(t,l)),t.closeNode(n)),t}static _collapse(t){typeof t!="string"&&t.children&&(t.children.every(n=>typeof n=="string")?t.children=[t.children.join("")]:t.children.forEach(n=>{e._collapse(n)}))}},le=class extends ae{constructor(t){super(),this.options=t}addText(t){t!==""&&this.add(t)}startScope(t){this.openNode(t)}endScope(){this.closeNode()}__addSublanguage(t,n){let l=t.root;n&&(l.scope=`language:${n}`),this.add(l)}toHTML(){return new oe(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function G(e){return e?typeof e=="string"?e:e.source:null}function De(e){return B("(?=",e,")")}function Ot(e){return B("(?:",e,")*")}function wt(e){return B("(?:",e,")?")}function B(...e){return e.map(n=>G(n)).join("")}function xt(e){let t=e[e.length-1];return typeof t=="object"&&t.constructor===Object?(e.splice(e.length-1,1),t):{}}function V(...e){return"("+(xt(e).capture?"":"?:")+e.map(l=>G(l)).join("|")+")"}function ke(e){return new RegExp(e.toString()+"|").exec("").length-1}function Nt(e,t){let n=e&&e.exec(t);return n&&n.index===0}var Rt=new RegExp(V(/\[(?:[^\\\]]|\\.)*\]/,/\(\?<(?![=!])[^>]+>/,/\(\?'[^']+'/,/\(\??/,/\\([1-9][0-9]*)/,/\\./));function fe(e,{joinWith:t}){let n=0;return e.map(l=>{n+=1;let d=n,_=G(l),c="";for(;_.length>0;){let r=Rt.exec(_);if(!r){c+=_;break}c+=_.substring(0,r.index),_=_.substring(r.index+r[0].length),r[0][0]==="\\"&&r[1]?c+="\\"+String(Number(r[1])+d):(c+=r[0],(r[0]==="("||/^\(\?[<']/.test(r[0]))&&n++)}return c}).map(l=>`(${l})`).join(t)}var yt=/\b\B/,ve="[a-zA-Z]\\w*",ge="[a-zA-Z_]\\w*",Le="\\b\\d+(\\.\\d+)?",Be="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Pe="\\b(0b[01]+)",St="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",At=(e={})=>{let t=/^#![ ]*\//;return e.binary&&(e.begin=B(t,/.*\b/,e.binary,/\b.*/)),k({scope:"meta",begin:t,end:/$/,relevance:0,"on:begin":(n,l)=>{n.index!==0&&l.ignoreMatch()}},e)},K={begin:"\\\\[\\s\\S]",relevance:0},Tt={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[K]},It={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[K]},Ct={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},Q=function(e,t,n={}){let l=k({scope:"comment",begin:e,end:t,contains:[]},n);l.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let d=V("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return l.contains.push({begin:B(/[ ]+/,"(",d,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),l},Dt=Q("//","$"),kt=Q("/\\*","\\*/"),vt=Q("#","$"),Lt={scope:"number",begin:Le,relevance:0},Bt={scope:"number",begin:Be,relevance:0},Pt={scope:"number",begin:Pe,relevance:0},$t={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[K,{begin:/\[/,end:/\]/,relevance:0,contains:[K]}]},Ht={scope:"title",begin:ve,relevance:0},Ut={scope:"title",begin:ge,relevance:0},jt={begin:"\\.\\s*"+ge,relevance:0},Gt=function(e){return Object.assign(e,{"on:begin":(t,n)=>{n.data._beginMatch=t[1]},"on:end":(t,n)=>{n.data._beginMatch!==t[1]&&n.ignoreMatch()}})},X=Object.freeze({__proto__:null,APOS_STRING_MODE:Tt,BACKSLASH_ESCAPE:K,BINARY_NUMBER_MODE:Pt,BINARY_NUMBER_RE:Pe,COMMENT:Q,C_BLOCK_COMMENT_MODE:kt,C_LINE_COMMENT_MODE:Dt,C_NUMBER_MODE:Bt,C_NUMBER_RE:Be,END_SAME_AS_BEGIN:Gt,HASH_COMMENT_MODE:vt,IDENT_RE:ve,MATCH_NOTHING_RE:yt,METHOD_GUARD:jt,NUMBER_MODE:Lt,NUMBER_RE:Le,PHRASAL_WORDS_MODE:Ct,QUOTE_STRING_MODE:It,REGEXP_MODE:$t,RE_STARTERS_RE:St,SHEBANG:At,TITLE_MODE:Ht,UNDERSCORE_IDENT_RE:ge,UNDERSCORE_TITLE_MODE:Ut});function Kt(e,t){e.input[e.index-1]==="."&&t.ignoreMatch()}function mt(e,t){e.className!==void 0&&(e.scope=e.className,delete e.className)}function Wt(e,t){t&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=Kt,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function Ft(e,t){Array.isArray(e.illegal)&&(e.illegal=V(...e.illegal))}function zt(e,t){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function Yt(e,t){e.relevance===void 0&&(e.relevance=1)}var Xt=(e,t)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let n=Object.assign({},e);Object.keys(e).forEach(l=>{delete e[l]}),e.keywords=n.keywords,e.begin=B(n.beforeMatch,De(n.begin)),e.starts={relevance:0,contains:[Object.assign(n,{endsParent:!0})]},e.relevance=0,delete n.beforeMatch},Zt=["of","and","for","in","not","or","if","then","parent","list","value"],Jt="keyword";function $e(e,t,n=Jt){let l=Object.create(null);return typeof e=="string"?d(n,e.split(" ")):Array.isArray(e)?d(n,e):Object.keys(e).forEach(function(_){Object.assign(l,$e(e[_],t,_))}),l;function d(_,c){t&&(c=c.map(r=>r.toLowerCase())),c.forEach(function(r){let u=r.split("|");l[u[0]]=[_,Vt(u[0],u[1])]})}}function Vt(e,t){return t?Number(t):Qt(e)?0:1}function Qt(e){return Zt.includes(e.toLowerCase())}var ye={},L=e=>{console.error(e)},Se=(e,...t)=>{console.log(`WARN: ${e}`,...t)},H=(e,t)=>{ye[`${e}/${t}`]||(console.log(`Deprecated as of ${e}. ${t}`),ye[`${e}/${t}`]=!0)},J=new Error;function He(e,t,{key:n}){let l=0,d=e[n],_={},c={};for(let r=1;r<=t.length;r++)c[r+l]=d[r],_[r+l]=!0,l+=ke(t[r-1]);e[n]=c,e[n]._emit=_,e[n]._multi=!0}function qt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw L("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),J;if(typeof e.beginScope!="object"||e.beginScope===null)throw L("beginScope must be object"),J;He(e,e.begin,{key:"beginScope"}),e.begin=fe(e.begin,{joinWith:""})}}function en(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw L("skip, excludeEnd, returnEnd not compatible with endScope: {}"),J;if(typeof e.endScope!="object"||e.endScope===null)throw L("endScope must be object"),J;He(e,e.end,{key:"endScope"}),e.end=fe(e.end,{joinWith:""})}}function tn(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function nn(e){tn(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),qt(e),en(e)}function sn(e){function t(c,r){return new RegExp(G(c),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(r?"g":""))}class n{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(r,u){u.position=this.position++,this.matchIndexes[this.matchAt]=u,this.regexes.push([u,r]),this.matchAt+=ke(r)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let r=this.regexes.map(u=>u[1]);this.matcherRe=t(fe(r,{joinWith:"|"}),!0),this.lastIndex=0}exec(r){this.matcherRe.lastIndex=this.lastIndex;let u=this.matcherRe.exec(r);if(!u)return null;let O=u.findIndex((P,I)=>I>0&&P!==void 0),M=this.matchIndexes[O];return u.splice(0,O),Object.assign(u,M)}}class l{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(r){if(this.multiRegexes[r])return this.multiRegexes[r];let u=new n;return this.rules.slice(r).forEach(([O,M])=>u.addRule(O,M)),u.compile(),this.multiRegexes[r]=u,u}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(r,u){this.rules.push([r,u]),u.type==="begin"&&this.count++}exec(r){let u=this.getMatcher(this.regexIndex);u.lastIndex=this.lastIndex;let O=u.exec(r);if(this.resumingScanAtSamePosition()&&!(O&&O.index===this.lastIndex)){let M=this.getMatcher(0);M.lastIndex=this.lastIndex+1,O=M.exec(r)}return O&&(this.regexIndex+=O.position+1,this.regexIndex===this.count&&this.considerAll()),O}}function d(c){let r=new l;return c.contains.forEach(u=>r.addRule(u.begin,{rule:u,type:"begin"})),c.terminatorEnd&&r.addRule(c.terminatorEnd,{type:"end"}),c.illegal&&r.addRule(c.illegal,{type:"illegal"}),r}function _(c,r){let u=c;if(c.isCompiled)return u;[mt,zt,nn,Xt].forEach(M=>M(c,r)),e.compilerExtensions.forEach(M=>M(c,r)),c.__beforeBegin=null,[Wt,Ft,Yt].forEach(M=>M(c,r)),c.isCompiled=!0;let O=null;return typeof c.keywords=="object"&&c.keywords.$pattern&&(c.keywords=Object.assign({},c.keywords),O=c.keywords.$pattern,delete c.keywords.$pattern),O=O||/\w+/,c.keywords&&(c.keywords=$e(c.keywords,e.case_insensitive)),u.keywordPatternRe=t(O,!0),r&&(c.begin||(c.begin=/\B|\b/),u.beginRe=t(u.begin),!c.end&&!c.endsWithParent&&(c.end=/\B|\b/),c.end&&(u.endRe=t(u.end)),u.terminatorEnd=G(u.end)||"",c.endsWithParent&&r.terminatorEnd&&(u.terminatorEnd+=(c.end?"|":"")+r.terminatorEnd)),c.illegal&&(u.illegalRe=t(c.illegal)),c.contains||(c.contains=[]),c.contains=[].concat(...c.contains.map(function(M){return rn(M==="self"?c:M)})),c.contains.forEach(function(M){_(M,u)}),c.starts&&_(c.starts,r),u.matcher=d(u),u}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=k(e.classNameAliases||{}),_(e)}function Ue(e){return e?e.endsWithParent||Ue(e.starts):!1}function rn(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(t){return k(e,{variants:null},t)})),e.cachedVariants?e.cachedVariants:Ue(e)?k(e,{starts:e.starts?k(e.starts):null}):Object.isFrozen(e)?k(e):e}var cn="11.12.0",ue=class extends Error{constructor(t,n){super(t),this.name="HTMLInjectionError",this.html=n}},ce=Ce,Ae=k,Te=Symbol("nomatch"),on=7,je=function(e){let t=Object.create(null),n=Object.create(null),l=[],d=!0,_="Could not find the language '{}', did you forget to load/include a language module?",c={disableAutodetect:!0,name:"Plain text",contains:[]},r={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:le};function u(i){return r.noHighlightRe.test(i)}function O(i){let a=i.className+" ";a+=i.parentNode?i.parentNode.className:"";let h=r.languageDetectRe.exec(a);if(h){let E=C(h[1]);return E||(Se(_.replace("{}",h[1])),Se("Falling back to no-highlight mode for this block.",i)),E?h[1]:"no-highlight"}return a.split(/\s+/).find(E=>u(E)||C(E))}function M(i,a,h){let E="",w="";typeof a=="object"?(E=i,h=a.ignoreIllegals,w=a.language):(H("10.7.0","highlight(lang, code, ...args) has been deprecated."),H("10.7.0",`Please use highlight(code, options) instead.
+(see the highlight.js issue tracker)`),w=i,E=a),h===void 0&&(h=!0);let y={code:E,language:w};W("before:highlight",y);let D=y.result?y.result:P(y.language,y.code,h);return D.code=y.code,W("after:highlight",D),D}function P(i,a,h,E){let w=Object.create(null);function y(s,o){return s.keywords[o]}function D(){if(!f.keywords){x.addText(b);return}let s=0;f.keywordPatternRe.lastIndex=0;let o=f.keywordPatternRe.exec(b),g="";for(;o;){g+=b.substring(s,o.index);let p=A.case_insensitive?o[0].toLowerCase():o[0],N=y(f,p);if(N){let[T,at]=N;if(x.addText(g),g="",w[p]=(w[p]||0)+1,w[p]<=on&&(Y+=at),T.startsWith("_"))g+=o[0];else{let lt=A.classNameAliases[T]||T;S(o[0],lt)}}else g+=o[0];s=f.keywordPatternRe.lastIndex,o=f.keywordPatternRe.exec(b)}g+=b.substring(s),x.addText(g)}function F(){if(b==="")return;let s=null;if(typeof f.subLanguage=="string"){if(!t[f.subLanguage]){x.addText(b);return}s=P(f.subLanguage,b,!0,we[f.subLanguage]),we[f.subLanguage]=s._top}else s=$(b,f.subLanguage.length?f.subLanguage:null);f.relevance>0&&(Y+=s.relevance),x.__addSublanguage(s._emitter,s.language)}function R(){f.subLanguage!=null?F():D(),b=""}function S(s,o){s!==""&&(x.startScope(o),x.addText(s),x.endScope())}function be(s,o){let g=1,p=o.length-1;for(;g<=p;){if(!s._emit[g]){g++;continue}let N=A.classNameAliases[s[g]]||s[g],T=o[g];N?S(T,N):(b=T,D(),b=""),g++}}function _e(s,o){return s.scope&&typeof s.scope=="string"&&x.openNode(A.classNameAliases[s.scope]||s.scope),s.beginScope&&(s.beginScope._wrap?(S(b,A.classNameAliases[s.beginScope._wrap]||s.beginScope._wrap),b=""):s.beginScope._multi&&(be(s.beginScope,o),b="")),f=Object.create(s,{parent:{value:f}}),f}function Me(s,o,g){let p=Nt(s.endRe,g);if(p){if(s["on:end"]){let N=new Z(s);s["on:end"](o,N),N.isMatchIgnored&&(p=!1)}if(p){for(;s.endsParent&&s.parent;)s=s.parent;return s}}if(s.endsWithParent)return Me(s.parent,o,g)}function it(s){return f.matcher.regexIndex===0?(b+=s[0],1):(re=!0,0)}function st(s){let o=s[0],g=s.rule,p=new Z(g),N=[g.__beforeBegin,g["on:begin"]];for(let T of N)if(T&&(T(s,p),p.isMatchIgnored))return it(o);return g.skip?b+=o:(g.excludeBegin&&(b+=o),R(),!g.returnBegin&&!g.excludeBegin&&(b=o)),_e(g,s),g.returnBegin?0:o.length}function rt(s){let o=s[0],g=a.substring(s.index),p=Me(f,s,g);if(!p)return Te;let N=f;f.endScope&&f.endScope._wrap?(R(),S(o,f.endScope._wrap)):f.endScope&&f.endScope._multi?(R(),be(f.endScope,s)):N.skip?b+=o:(N.returnEnd||N.excludeEnd||(b+=o),R(),N.excludeEnd&&(b=o));do f.scope&&x.closeNode(),!f.skip&&!f.subLanguage&&(Y+=f.relevance),f=f.parent;while(f!==p.parent);return p.starts&&_e(p.starts,s),N.returnEnd?0:o.length}function ct(){let s=[];for(let o=f;o!==A;o=o.parent)o.scope&&s.unshift(o.scope);s.forEach(o=>x.openNode(o))}let z={};function Oe(s,o){let g=o&&o[0];if(b+=s,g==null)return R(),0;if(z.type==="begin"&&o.type==="end"&&z.index===o.index&&g===""){if(b+=a.slice(o.index,o.index+1),!d){let p=new Error(`0 width match regex (${i})`);throw p.languageName=i,p.badRule=z.rule,p}return 1}if(z=o,o.type==="begin")return st(o);if(o.type==="illegal"&&!h){let p=new Error('Illegal lexeme "'+g+'" for mode "'+(f.scope||"<unnamed>")+'"');throw p.mode=f,p}else if(o.type==="end"){let p=rt(o);if(p!==Te)return p}if(o.type==="illegal"&&g==="")return o.index===a.length||(b+=`
+`),1;if(se>1e5&&se>o.index*3)throw new Error("potential infinite loop, way more iterations than matches");return b+=g,g.length}let A=C(i);if(!A)throw L(_.replace("{}",i)),new Error('Unknown language: "'+i+'"');let ot=sn(A),ie="",f=E||ot,we={},x=new r.__emitter(r);ct();let b="",Y=0,v=0,se=0,re=!1;try{if(A.__emitTokens)A.__emitTokens(a,x);else{for(f.matcher.considerAll();;){se++,re?re=!1:f.matcher.considerAll(),f.matcher.lastIndex=v;let s=f.matcher.exec(a);if(!s)break;let o=a.substring(v,s.index),g=Oe(o,s);v=s.index+g}Oe(a.substring(v))}return x.finalize(),ie=x.toHTML(),{language:i,value:ie,relevance:Y,illegal:!1,_emitter:x,_top:f}}catch(s){if(s.message&&s.message.includes("Illegal"))return{language:i,value:ce(a),illegal:!0,relevance:0,_illegalBy:{message:s.message,index:v,context:a.slice(v-100,v+100),mode:s.mode,resultSoFar:ie},_emitter:x};if(d)return{language:i,value:ce(a),illegal:!1,relevance:0,errorRaised:s,_emitter:x,_top:f};throw s}}function I(i){let a={value:ce(i),illegal:!1,relevance:0,_top:c,_emitter:new r.__emitter(r)};return a._emitter.addText(i),a}function $(i,a){a=a||r.languages||Object.keys(t);let h=I(i),E=a.filter(C).filter(Ee).map(R=>P(R,i,!1));E.unshift(h);let w=E.sort((R,S)=>{if(R.relevance!==S.relevance)return S.relevance-R.relevance;if(R.language&&S.language){if(C(R.language).supersetOf===S.language)return 1;if(C(S.language).supersetOf===R.language)return-1}return 0}),[y,D]=w,F=y;return F.secondBest=D,F}function te(i,a,h){let E=a&&n[a]||h;i.classList.add("hljs"),i.classList.add(`language-${E}`)}function ne(i){let a=null,h=O(i);if(u(h))return;if(W("before:highlightElement",{el:i,language:h}),i.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",i);return}if(i.children.length>0&&(r.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("(see the highlight.js security wiki)"),console.warn("The element with unescaped HTML:"),console.warn(i)),r.throwUnescapedHTML))throw new ue("One of your code blocks includes unescaped HTML.",i.innerHTML);a=i;let E=a.textContent,w=h?M(E,{language:h,ignoreIllegals:!0}):$(E);i.innerHTML=w.value,i.dataset.highlighted="yes",te(i,h,w.language),i.result={language:w.language,re:w.relevance,relevance:w.relevance},w.secondBest&&(i.secondBest={language:w.secondBest.language,relevance:w.secondBest.relevance}),W("after:highlightElement",{el:i,result:w,text:E})}function Ye(i){r=Ae(r,i)}let Xe=()=>{m(),H("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function Ze(){m(),H("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let de=!1;function m(){function i(){m()}if(document.readyState==="loading"){de||window.addEventListener("DOMContentLoaded",i,!1),de=!0;return}document.querySelectorAll(r.cssSelector).forEach(ne)}function Je(i,a){let h=null;try{h=a(e)}catch(E){if(L("Language definition for '{}' could not be registered.".replace("{}",i)),d)L(E);else throw E;h=c}h.name||(h.name=i),t[i]=h,h.rawDefinition=a.bind(null,e),h.aliases&&pe(h.aliases,{languageName:i})}function Ve(i){delete t[i];for(let a of Object.keys(n))n[a]===i&&delete n[a]}function Qe(){return Object.keys(t)}function C(i){return i=(i||"").toLowerCase(),t[i]||t[n[i]]}function pe(i,{languageName:a}){typeof i=="string"&&(i=[i]),i.forEach(h=>{n[h.toLowerCase()]=a})}function Ee(i){let a=C(i);return a&&!a.disableAutodetect}function qe(i){i["before:highlightBlock"]&&!i["before:highlightElement"]&&(i["before:highlightElement"]=a=>{i["before:highlightBlock"](Object.assign({block:a.el},a))}),i["after:highlightBlock"]&&!i["after:highlightElement"]&&(i["after:highlightElement"]=a=>{i["after:highlightBlock"](Object.assign({block:a.el},a))})}function et(i){qe(i),l.push(i)}function tt(i){let a=l.indexOf(i);a!==-1&&l.splice(a,1)}function W(i,a){let h=i;l.forEach(function(E){E[h]&&E[h](a)})}function nt(i){return H("10.7.0","highlightBlock will be removed entirely in v12.0"),H("10.7.0","Please use highlightElement now."),ne(i)}Object.assign(e,{highlight:M,highlightAuto:$,highlightAll:m,highlightElement:ne,highlightBlock:nt,configure:Ye,initHighlighting:Xe,initHighlightingOnLoad:Ze,registerLanguage:Je,unregisterLanguage:Ve,listLanguages:Qe,getLanguage:C,registerAliases:pe,autoDetection:Ee,inherit:Ae,addPlugin:et,removePlugin:tt}),e.debugMode=function(){d=!1},e.safeMode=function(){d=!0},e.versionString=cn,e.regex={concat:B,lookahead:De,either:V,optional:wt,anyNumberOfTimes:Ot};for(let i in X)typeof X[i]=="object"&&Ie(X[i]);return Object.assign(e,X),e},U=je({});U.newInstance=()=>je({});Ge.exports=U;U.HighlightJS=U;U.default=U});var me=bt(Ke(),1);var he=me.default;var j="[0-9](_*[0-9])*",q=`\\.(${j})`,ee="[0-9a-fA-F](_*[0-9a-fA-F])*",We={className:"number",variants:[{begin:`(\\b(${j})((${q})|\\.)?|(${q}))[eE][+-]?(${j})[fFdD]?\\b`},{begin:`\\b(${j})((${q})[fFdD]?\\b|\\.([fFdD]\\b)?)`},{begin:`(${q})[fFdD]?\\b`},{begin:`\\b(${j})[fFdD]\\b`},{begin:`\\b0[xX]((${ee})\\.?|(${ee})?\\.(${ee}))[pP][+-]?(${j})[fFdD]?\\b`},{begin:"\\b(0|[1-9](_*[0-9])*)[lL]?\\b"},{begin:`\\b0[xX](${ee})[lL]?\\b`},{begin:"\\b0(_*[0-7])*[lL]?\\b"},{begin:"\\b0[bB][01](_*[01])*[lL]?\\b"}],relevance:0};function Fe(e,t,n){return n===-1?"":e.replace(t,l=>Fe(e,t,n-1))}function ze(e){let t=e.regex,n="[\xC0-\u02B8a-zA-Z_$][\xC0-\u02B8a-zA-Z_$0-9]*",l="(?:(?:\\s*\\[\\s*])+)?",d=n+"<@@@>"+l,c="(?:"+("\\?(?:\\s+(?:extends|super)\\s+"+d+")?")+"|"+d+")",r=Fe("(?:\\s*<\\s*"+c+"(?:\\s*,\\s*"+c+")*\\s*>)?",/<@@@>/g,2),I={keyword:["synchronized","abstract","private","var","static","if","const ","for","while","strictfp","finally","protected","import","native","final","void","enum","else","break","transient","catch","instanceof","volatile","case","assert","package","default","public","try","switch","continue","throws","protected","public","private","module","requires","exports","do","sealed","yield","permits","goto","when"],literal:["false","true","null"],type:["char","boolean","long","float","int","byte","short","double"],built_in:["super","this"]},$={className:"meta",begin:"@"+n,contains:[{begin:/\(/,end:/\)/,contains:["self"]}]},te={className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[e.C_BLOCK_COMMENT_MODE],endsParent:!0};return{name:"Java",aliases:["jsp"],keywords:I,illegal:/<\/|#/,contains:[e.COMMENT("/\\*\\*","\\*/",{relevance:0,contains:[{begin:/\w+@/,relevance:0},{className:"doctag",begin:"@[A-Za-z]+"}]}),{begin:/import java\.[a-z]+\./,keywords:"import",relevance:2},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE,{begin:/"""/,end:/"""/,className:"string",contains:[e.BACKSLASH_ESCAPE]},e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,{match:[/\b(?:class|interface|enum|extends|implements|new)/,/\s+/,n],className:{1:"keyword",3:"title.class"}},{match:/non-sealed/,scope:"keyword"},{beginKeywords:"new throw return else yield assert",relevance:0},{begin:[n,t.concat(r,l,/\s+/),n,l,/\s*/,/=(?!=)/],className:{1:"type",3:"variable",6:"operator"}},{begin:[/record/,/\s+/,n],className:{1:"keyword",3:"title.class"},contains:[te,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},{begin:[n,t.concat(r,l,/\s+/),n,/\s*(?=\()/],className:{1:"type",3:"title.function"},keywords:I,contains:[{className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[$,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,We,e.C_BLOCK_COMMENT_MODE]},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},We,$]}}he.registerLanguage("java",ze);window.hljs=he;})();
+</script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---- 1. syntax highlighting -------------------------------------- */
+  function highlight() {
+    if (!window.hljs) return;
+    var blocks = document.querySelectorAll('pre code.language-java');
+    for (var i = 0; i < blocks.length; i++) {
+      try { window.hljs.highlightElement(blocks[i]); } catch (e) {}
+    }
+  }
+
+  /* ---- 2. every solution / reveal starts closed --------------------- */
+  function closeAll() {
+    var d = document.querySelectorAll('details.soln');
+    for (var i = 0; i < d.length; i++) { d[i].open = false; }
+  }
+
+  /* ---- 3. show all / hide all -------------------------------------- */
+  function wireToolbar() {
+    var show = document.getElementById('showAll');
+    var hide = document.getElementById('hideAll');
+    function setAll(v) {
+      var d = document.querySelectorAll('details.soln');
+      for (var i = 0; i < d.length; i++) { d[i].open = v; }
+    }
+    if (show) show.addEventListener('click', function () { setAll(true); });
+    if (hide) hide.addEventListener('click', function () { setAll(false); });
+  }
+
+  /* ---- 4. live-coding editors -------------------------------------- */
+  var INDENT = '    ';
+
+  function wireEditors() {
+    var eds = document.querySelectorAll('.editor');
+    for (var i = 0; i < eds.length; i++) { wireOne(eds[i]); }
+  }
+
+  function wireOne(box) {
+    var ta = box.querySelector('textarea');
+    if (!ta) return;
+    var starter = ta.value;
+
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Tab' || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+      ev.preventDefault();
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+
+      if (s === e && !ev.shiftKey) {
+        ta.value = v.slice(0, s) + INDENT + v.slice(e);
+        ta.selectionStart = ta.selectionEnd = s + INDENT.length;
+        return;
+      }
+      /* block indent / outdent over the selected lines */
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var le = v.indexOf('\n', e);
+      if (le === -1) le = v.length;
+      var seg = v.slice(ls, le);
+      var lines = seg.split('\n');
+      var delta0 = 0, total = 0;
+
+      for (var i = 0; i < lines.length; i++) {
+        if (ev.shiftKey) {
+          var m = lines[i].match(/^(\t| {1,4})/);
+          if (m) {
+            lines[i] = lines[i].slice(m[0].length);
+            if (i === 0) delta0 = -m[0].length;
+            total -= m[0].length;
+          }
+        } else {
+          lines[i] = INDENT + lines[i];
+          if (i === 0) delta0 = INDENT.length;
+          total += INDENT.length;
+        }
+      }
+      ta.value = v.slice(0, ls) + lines.join('\n') + v.slice(le);
+      ta.selectionStart = Math.max(ls, s + delta0);
+      ta.selectionEnd = Math.max(ta.selectionStart, e + total);
+    });
+
+    /* keep the indent of the current line when Enter is pressed */
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Enter' || ev.shiftKey || ev.ctrlKey || ev.metaKey) return;
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+      if (s !== e) return;
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var lead = (v.slice(ls, s).match(/^[ \t]*/) || [''])[0];
+      var extra = /[{(\[]\s*$/.test(v.slice(ls, s)) ? INDENT : '';
+      if (!lead && !extra) return;
+      ev.preventDefault();
+      var ins = '\n' + lead + extra;
+      ta.value = v.slice(0, s) + ins + v.slice(e);
+      ta.selectionStart = ta.selectionEnd = s + ins.length;
+    });
+
+    var rst = box.querySelector('[data-act="reset"]');
+    if (rst) rst.addEventListener('click', function () {
+      ta.value = starter;
+      ta.focus();
+      flash(box, 'Reset to starter code');
+    });
+
+    var cpy = box.querySelector('[data-act="copy"]');
+    if (cpy) cpy.addEventListener('click', function () {
+      var done = function () { flash(box, 'Copied — paste it into your IDE'); };
+      var fail = function () { flash(box, 'Copy failed — select the text and press Ctrl/Cmd+C'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value).then(done, function () { legacy(ta, done, fail); });
+      } else {
+        legacy(ta, done, fail);
+      }
+    });
+  }
+
+  function legacy(ta, done, fail) {
+    try {
+      var st = ta.selectionStart, en = ta.selectionEnd;
+      ta.select();
+      var ok = document.execCommand('copy');
+      ta.selectionStart = st; ta.selectionEnd = en;
+      ok ? done() : fail();
+    } catch (e) { fail(); }
+  }
+
+  function flash(box, msg) {
+    var f = box.querySelector('.foot');
+    if (!f) return;
+    if (f.getAttribute('data-base') === null || f.getAttribute('data-base') === undefined) {
+      f.setAttribute('data-base', f.textContent);
+    }
+    f.textContent = msg;
+    window.setTimeout(function () { f.textContent = f.getAttribute('data-base'); }, 2200);
+  }
+
+  /* ---- go ----------------------------------------------------------- */
+  function init() {
+    highlight();
+    closeAll();
+    wireToolbar();
+    wireEditors();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  /* belt and braces: some browsers restore <details> state on soft reload */
+  window.addEventListener('pageshow', closeAll);
+})();
+</script>
+</body>
+</html>

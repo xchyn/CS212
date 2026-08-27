@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class 16 — Abstract Classes and Interfaces | CSCI 212</title>
+<style>
+:root{
+  --ink:#0f172a; --ink2:#334155; --muted:#64748b; --line:#e2e8f0;
+  --bg:#ffffff; --bg2:#f8fafc;
+  --obj:#4f46e5; --def:#2563eb; --ex:#059669; --alg:#7c3aed;
+  --key:#b45309; --warn:#dc2626; --qc:#0891b2; --prac:#be185d; --sum:#475569;
+  --edit:#ea580c; --edit-bg:#fff7ed;
+  --code-bg:#0d1117; --code-bd:#000000;   /* read-only listings: black */
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px 80px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:#0f172a;color:#e2e8f0;font-size:13.5px;
+  border-bottom:3px solid var(--obj);
+}
+.topbar .inner{max-width:900px;margin:0 auto;padding:10px 22px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.topbar a{color:#e2e8f0;text-decoration:none;border-bottom:1px solid transparent}
+.topbar a:hover{border-bottom-color:#94a3b8}
+.topbar .course{font-weight:700;letter-spacing:.02em}
+.topbar .sep{color:#475569}
+.topbar .spacer{flex:1}
+
+/* ---------- title block ---------- */
+.titleblock{padding:34px 0 10px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.eyebrow{
+  font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--obj);margin-bottom:8px;
+}
+.titleblock h1{font-size:33px;line-height:1.2;margin:0 0 10px;letter-spacing:-.015em}
+.titleblock .sub{margin:0;color:var(--muted);font-size:17px;line-height:1.5}
+
+h2{
+  font-size:24px;margin:46px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line);letter-spacing:-.01em;scroll-margin-top:14px;
+}
+h2 .num{color:var(--obj);font-weight:800;margin-right:11px}
+h3{font-size:18.5px;margin:30px 0 10px;color:var(--ink)}
+h4{font-size:16px;margin:20px 0 8px;color:var(--ink2)}
+p{margin:12px 0}
+ul,ol{margin:12px 0;padding-left:26px}
+li{margin:6px 0}
+a{color:var(--def)}
+hr{border:0;border-top:1px solid var(--line);margin:30px 0}
+strong{color:var(--ink)}
+.muted{color:var(--muted)}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--bg2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 20px 16px;margin:22px 0;
+}
+.toc .th{
+  font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;
+}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:30px}
+.toc li{margin:3px 0;font-size:14.5px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- show all / hide all ---------- */
+.tools{
+  display:flex;gap:9px;align-items:center;flex-wrap:wrap;
+  padding:11px 15px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:9px;margin:22px 0;font-size:13.5px;
+}
+.tools .lab{font-weight:700;color:var(--ink2)}
+.tools button{
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  background:#fff;color:var(--ink2);border:1px solid #cbd5e1;
+  border-radius:6px;padding:4px 12px;
+}
+.tools button:hover{background:var(--obj);border-color:var(--obj);color:#fff}
+.tools .muted{font-size:12.5px}
+
+/* ---------- boxes ---------- */
+.box{border:1px solid var(--line);border-left:5px solid var(--muted);border-radius:8px;margin:22px 0;overflow:hidden;background:#fff}
+.box>.hd{
+  padding:9px 16px;font-size:12.5px;font-weight:700;
+  letter-spacing:.075em;text-transform:uppercase;color:#fff;background:var(--muted);
+}
+.box>.hd .tag{margin-left:5px;font-weight:500;text-transform:none;letter-spacing:0;opacity:.92;font-size:13px}
+.box>.bd{padding:4px 18px 14px}
+.box>.bd>:first-child{margin-top:12px}
+.box>.bd>:last-child{margin-bottom:2px}
+
+.box.obj{border-left-color:var(--obj)}  .box.obj>.hd{background:var(--obj)}
+.box.def{border-left-color:var(--def)}  .box.def>.hd{background:var(--def)}
+.box.ex{border-left-color:var(--ex)}    .box.ex>.hd{background:var(--ex)}
+.box.alg{border-left-color:var(--alg)}  .box.alg>.hd{background:var(--alg)}
+.box.key{border-left-color:var(--key)}  .box.key>.hd{background:var(--key)}
+.box.warn{border-left-color:var(--warn)}.box.warn>.hd{background:var(--warn)}
+.box.qc{border-left-color:var(--qc)}    .box.qc>.hd{background:var(--qc)}
+.box.prac{border-left-color:var(--prac)}.box.prac>.hd{background:var(--prac)}
+.box.sum{border-left-color:var(--sum)}  .box.sum>.hd{background:var(--sum)}
+
+.box.obj{background:#f5f5ff}
+.box.qc{background:#f0fbfe}
+.box.warn{background:#fff7f7}
+.box.key{background:#fffbf2}
+.box.sum{background:#f8fafc}
+
+/* ---------- code ---------- */
+/* Read-only listings sit on black, matching CSCI 211, so a code block is never
+   mistaken for the editable live-coding box. */
+pre{
+  margin:14px 0;padding:13px 15px;overflow-x:auto;
+  background:var(--code-bg);border:1px solid var(--code-bd);border-radius:8px;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;color:#c9d1d9;
+}
+pre code{font-family:inherit;font-size:inherit;background:none;padding:0;border:0;color:inherit;display:block}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef2f7;
+  border:1px solid #e2e8f0;border-radius:4px;padding:1px 5px;color:#0b3a5b;
+}
+.filename{
+  font-family:var(--mono);font-size:12px;color:#475569;
+  margin:16px 0 -9px;font-weight:600;
+}
+
+/* comparison block: another language, never syntax-highlighted. Dark like the
+   Java listings, but desaturated and dashed so it reads as "not this course". */
+pre.cmp{background:#161b22;border-style:dashed;border-color:#3f4650;color:#9aa4b2}
+pre.cmp code{color:#9aa4b2}
+
+/* shell commands you type */
+pre.sh{background:#1e293b;border-color:#1e293b;color:#e2e8f0;position:relative;padding-top:26px}
+pre.sh code{color:#e2e8f0}
+pre.sh::before{
+  content:"Terminal";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#86efac;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* output / terminal blocks */
+pre.out{background:#111d33;border-color:#111d33;color:#e2e8f0;position:relative;padding-top:26px}
+pre.out code{color:#e2e8f0}
+pre.out::before{
+  content:"Output";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#7dd3fc;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+pre.err{background:#1f1416;border-color:#7f1d1d;color:#fecdd3;padding-top:26px;position:relative}
+pre.err code{color:#fecdd3}
+pre.err::before{
+  content:"Compiler message";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#fda4af;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* ---- highlight.js, GitHub-dark palette (hand-written, no external file) ---- */
+.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-template-tag,
+.hljs-template-variable,.hljs-type,.hljs-variable.language_{color:#ff7b72}
+.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#d2a8ff}
+.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,
+.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable{color:#79c0ff}
+.hljs-meta .hljs-string,.hljs-regexp,.hljs-string{color:#a5d6ff}
+.hljs-built_in,.hljs-symbol{color:#ffa657}
+.hljs-code,.hljs-comment,.hljs-formula{color:#8b949e;font-style:italic}
+.hljs-name,.hljs-quote,.hljs-selector-pseudo,.hljs-selector-tag{color:#7ee787}
+.hljs-subst{color:#c9d1d9}
+.hljs-section{color:#1f6feb;font-weight:700}
+.hljs-bullet{color:#f2cc60}
+.hljs-emphasis{color:#c9d1d9;font-style:italic}
+.hljs-strong{color:#c9d1d9;font-weight:700}
+
+/* ---------- trace tables ---------- */
+table{border-collapse:collapse;margin:16px 0;font-size:14px;width:100%}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg2);font-weight:700;font-size:13px}
+table.trace td:first-child,table.trace th:first-child{white-space:nowrap}
+table code{font-size:.88em}
+
+/* ---------- multi-part questions ---------- */
+.part{margin:16px 0;padding-left:14px;border-left:2px solid #cbd5e1}
+.part .q{margin:0 0 8px}
+.part .pl{font-weight:700;color:var(--qc);margin-right:6px}
+
+/* ---------- collapsible solutions ---------- */
+details.soln{margin:10px 0 4px}
+details.soln>summary{
+  list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  font-size:12.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:#fff;background:var(--sum);border-radius:6px;padding:5px 13px;
+  user-select:none;
+}
+details.soln>summary::-webkit-details-marker{display:none}
+details.soln>summary::before{content:"\25B6";font-size:9px;transition:transform .15s}
+details.soln[open]>summary::before{transform:rotate(90deg)}
+details.soln>summary::after{content:"Show Answer"}
+details.soln[open]>summary::after{content:"Hide Answer"}
+details.soln>summary:hover{filter:brightness(1.18)}
+
+details.soln.reveal>summary{background:var(--ex)}
+details.soln.reveal>summary::after{content:"Show Output & Explanation"}
+details.soln.reveal[open]>summary::after{content:"Hide Output & Explanation"}
+details.soln.reveal.noout>summary::after{content:"Show Explanation"}
+details.soln.reveal.noout[open]>summary::after{content:"Hide Explanation"}
+
+.ans{
+  margin-top:11px;padding:2px 16px 10px;background:#fff;
+  border:1px solid var(--line);border-left:3px solid var(--sum);border-radius:7px;
+}
+details.soln.reveal .ans{border-left-color:var(--ex)}
+.ans>:first-child{margin-top:12px}
+.ans>:last-child{margin-bottom:6px}
+
+/* ---------- live coding editor ---------- */
+.editor{
+  margin:18px 0;border:2px dashed var(--edit);border-radius:9px;
+  background:var(--edit-bg);overflow:hidden;
+}
+.editor .ehd{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:7px 13px;background:var(--edit);color:#fff;
+  font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+}
+.editor .ehd .etitle{flex:1}
+.editor .ehd button{
+  font:inherit;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  cursor:pointer;background:rgba(255,255,255,.16);color:#fff;
+  border:1px solid rgba(255,255,255,.5);border-radius:5px;padding:3px 10px;
+}
+.editor .ehd button:hover{background:#fff;color:var(--edit)}
+.editor textarea{
+  display:block;width:100%;border:0;outline:0;resize:vertical;
+  padding:12px 15px;background:var(--edit-bg);color:#431407;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;
+  tab-size:4;-moz-tab-size:4;min-height:150px;
+}
+.editor textarea:focus{background:#fff}
+.editor .foot{
+  padding:5px 13px 7px;font-size:11.5px;color:#9a3412;background:#ffedd5;
+  border-top:1px solid #fed7aa;
+}
+
+/* ---------- prev/next nav ---------- */
+.pagenav{display:flex;gap:14px;margin:52px 0 0;flex-wrap:wrap}
+.pagenav a,.pagenav span.disabled{
+  flex:1 1 260px;display:block;text-decoration:none;
+  border:1px solid var(--line);border-radius:9px;padding:12px 16px;background:#fff;
+}
+.pagenav a:hover{border-color:var(--obj);background:var(--bg2)}
+.pagenav .dir{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.pagenav .ttl{font-size:15px;font-weight:600;color:var(--ink);margin-top:3px}
+.pagenav .next{text-align:right}
+.pagenav span.disabled{opacity:.4}
+.pagenav span.disabled .ttl{color:var(--muted)}
+
+footer.pf{
+  margin-top:40px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--muted);text-align:center;
+}
+
+/* ---------- index page ---------- */
+table.sched{font-size:14.5px}
+table.sched th{background:#0f172a;color:#fff;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+table.sched td:first-child{white-space:nowrap;font-weight:700;color:var(--muted);width:60px}
+table.sched tr.examrow td{background:#fff1f2}
+table.sched tr.revrow td{background:#fffbeb}
+table.sched a{font-weight:600;text-decoration:none}
+table.sched a:hover{text-decoration:underline}
+
+
+/* ---------- release gating ---------- */
+.pending{
+  margin-top:4px;font-size:11.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:#b45309;
+}
+.pagenav span.disabled .pending{color:#b45309}
+table.sched tr.pendingrow td{background:#fcfcfd}
+table.sched .unrel{color:var(--muted)}
+table.sched .pending{display:block;margin-top:2px}
+table.sched td.cn{white-space:nowrap;width:52px;font-weight:700;color:var(--muted)}
+table.sched td.dt{white-space:nowrap;width:104px;color:var(--muted);font-size:13.5px}
+table.sched tr.offrow td{background:#f1f5f9;color:var(--muted);font-style:italic}
+.refcard{
+  display:block;text-decoration:none;border:1px solid var(--line);
+  border-left:5px solid var(--alg);border-radius:9px;padding:13px 17px;
+  margin:22px 0;background:#faf9ff;
+}
+.refcard:hover{background:#f5f3ff;border-color:var(--alg)}
+.refcard .rl{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--alg)}
+.refcard .rt{font-size:16px;font-weight:600;color:var(--ink);margin-top:3px}
+.refcard .rd{font-size:14px;color:var(--muted);margin-top:4px}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,.tools,.pagenav,.pending{display:none !important}
+  html,body{width:100%;font-size:10pt}
+  .wrap{max-width:100%;width:100%;padding:0}
+  /* a wide <pre> must wrap rather than widen the page and clip every other
+     element at the paper edge */
+  /* Screen shows code on black; paper does not. Restore a dark-on-light palette
+     for print only, or the dark theme's light tokens vanish on white. */
+  pre{white-space:pre-wrap;overflow:visible;overflow-wrap:anywhere;font-size:8.6pt;
+      background:#f8fafc !important;color:#24292e !important;border-color:#cbd5e1 !important;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  pre code{color:#24292e !important}
+  pre.cmp{background:#fff !important;color:#475569 !important;border-color:#94a3b8 !important}
+  pre.cmp code{color:#475569 !important}
+  pre .hljs-doctag,pre .hljs-keyword,pre .hljs-meta .hljs-keyword,pre .hljs-template-tag,
+  pre .hljs-template-variable,pre .hljs-type,pre .hljs-variable.language_{color:#d73a49 !important}
+  pre .hljs-title,pre .hljs-title.class_,pre .hljs-title.class_.inherited__,
+  pre .hljs-title.function_{color:#6f42c1 !important}
+  pre .hljs-attr,pre .hljs-attribute,pre .hljs-literal,pre .hljs-meta,pre .hljs-number,
+  pre .hljs-operator,pre .hljs-selector-attr,pre .hljs-selector-class,pre .hljs-selector-id,
+  pre .hljs-variable{color:#005cc5 !important}
+  pre .hljs-meta .hljs-string,pre .hljs-regexp,pre .hljs-string{color:#032f62 !important}
+  pre .hljs-built_in,pre .hljs-symbol{color:#e36209 !important}
+  pre .hljs-code,pre .hljs-comment,pre .hljs-formula{color:#6a737d !important}
+  pre .hljs-name,pre .hljs-quote,pre .hljs-selector-pseudo,
+  pre .hljs-selector-tag{color:#22863a !important}
+  pre .hljs-subst,pre .hljs-emphasis,pre .hljs-strong{color:#24292e !important}
+  .filename{color:#475569 !important}
+  table{table-layout:fixed;width:100%;word-wrap:break-word;overflow-wrap:anywhere}
+  .box,.toc{max-width:100%}
+  a{color:var(--ink);text-decoration:none}
+  .box,.part,pre,table,.editor{break-inside:avoid;page-break-inside:avoid}
+  h2{break-after:avoid;page-break-after:avoid}
+  details.soln>summary{display:none !important}
+  details.soln:not([open])>.ans{display:none !important}
+  details.soln::before{
+    content:"Answer withheld — see the online notes.";
+    display:block;font-size:9pt;font-style:italic;color:#64748b;margin:6px 0;
+  }
+  details.soln[open]::before{content:""}
+  .editor textarea{display:none !important}
+  .editor{border:1.5px solid #fdba74 !important;background:#fff;border-style:solid}
+  .editor .ehd{background:#fff !important;color:#9a3412 !important;border-bottom:1px solid #fdba74}
+  .editor .ehd button{display:none}
+  .editor .foot{display:none}
+  .editor::after{content:"";display:block;height:2.1in;background:#fff}
+  pre.out,pre.sh{background:#f1f5f9 !important;color:#0f172a !important;border-color:#94a3b8 !important}
+  pre.err{background:#fef2f2 !important;color:#7f1d1d !important;border-color:#fca5a5 !important}
+  pre.out code,pre.sh code{color:#0f172a !important}
+  pre.err code{color:#7f1d1d !important}
+  pre.out::before,pre.sh::before{color:#475569}
+  pre.err::before{color:#b91c1c}
+  .box>.hd{color:#000;background:#fff !important;border-bottom:1px solid #cbd5e1}
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="inner">
+<span class="course">CSCI 212</span>
+<span class="sep">|</span>
+<a href="index.html">Course index</a>
+<span class="sep">|</span>
+<span>Class 16 of 28</span>
+<span class="sep">|</span>
+<span>Tuesday, October 27</span>
+<span class="spacer"></span>
+<span>Queens College, CUNY</span>
+</div></div>
+<div class="wrap">
+<div class="titleblock">
+  <div class="eyebrow">Session 16 &middot; Lecture 14</div>
+  <h1>Abstract Classes and Interfaces</h1>
+  <p class="sub">How to declare a method without writing it &mdash; and the two different ways Java lets you force somebody else to write it for you.</p>
+</div>
+
+<div class="box obj">
+  <div class="hd">Learning Objectives</div>
+  <div class="bd">
+    <p>By the end of today's session you should be able to:</p>
+    <ol>
+      <li>Explain why a class like <code>Shape</code> should not be instantiable, and mark it <code>abstract</code> so that it is not.</li> <li>Write an <code>abstract</code> method &mdash; a signature with a semicolon and no body &mdash; and say why the class holding it must itself be abstract.</li> <li>Recognise the two compiler errors abstract classes produce: <code>is abstract; cannot be instantiated</code>, and <code>is not abstract and does not override abstract method</code>.</li> <li>Say why an abstract class has a constructor at all when you can never call <code>new</code> on it, and trace what <code>new AbstractCircle(5.0)</code> prints.</li> <li>Declare an <code>interface</code>, implement it with <code>implements</code>, and explain why every method in it is implicitly <code>public</code> and <code>abstract</code>.</li> <li>State the single most important practical difference between the two: a class <code>implements</code> many interfaces but <code>extends</code> exactly one class.</li> <li>Use an interface name as a reference type, and hold completely unrelated classes in one <code>Drawable[]</code>.</li> <li>Choose between an abstract class and an interface for a given design, and defend the choice using the comparison table.</li> </ol> </div> </div> <div class="toc"> <div class="th">On this page</div> <ol> <li><a href="#s1">The shape that is not a shape</a></li> <li><a href="#s2">The <code>abstract</code> keyword</a></li> <li><a href="#s3">What an abstract class still has</a></li> <li><a href="#s4">Interfaces: a contract, not a parent</a></li> <li><a href="#s5">Many interfaces, one superclass</a></li> <li><a href="#s6">What else may live inside an interface</a></li> <li><a href="#s7">Abstract class or interface?</a></li> <li><a href="#prac">Practice Problems</a></li> <li><a href="#summary">Lecture Summary</a></li> </ol> </div> <div class="tools"> <span class="lab">Answers</span> <button id="showAll" type="button">Show all</button> <button id="hideAll" type="button">Hide all</button> <span class="muted">&mdash; every worked-example output and every solution is hidden when the page loads. Work it out first, then reveal.</span> </div> <hr> <h2 id="s1"><span class="num">1.</span>The shape that is not a shape</h2> <p>Last time we got paid for inheritance. A <code>Shape</code> variable could hold a <code>Circle</code>, a single <code>print(Shape)</code> method printed four different strings, and one loop over a <code>Shape[]</code> did the right thing for every element. All of that still stands, and none of it is being retaught today &mdash; you may assume it.</p> <p>But there was something quietly wrong with that <code>Shape</code> class, and we said so at the end of the lecture. Here is the line:</p> <pre><code class="language-java">Shape s = new Shape(10, 20);</code></pre> <p>What is that? It is an object whose area is 20 and whose perimeter is 10, and which has no shape. Nothing checks that 10 and 20 are consistent with each other, because there is nothing to check them against. We had to <em>hand</em> the constructor an area, because a plain <code>Shape</code> has no dimensions from which an area could be computed.</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; the sentence this whole lecture is about</span></div> <div class="bd"> <p>A shape has an area. But there is no such thing as a generic shape whose area you can compute.</p> <p>Both halves of that sentence are true at once, and ordinary classes cannot express it. You want <code>getArea()</code> to <em>exist</em> on <code>Shape</code>, so that general code can call it &mdash; and you want it to be <em>impossible to write</em> on <code>Shape</code>, because there is no formula. What you need is a way to declare a method and refuse to implement it.</p> </div> </div> <p>That is exactly what <code>abstract</code> gives you, and everything else in this lecture follows from it. The same idea shows up all over real programs:</p> <ul> <li>Every <code>Employee</code> has a <code>computePay()</code>, but "an employee" in general does not &mdash; a salaried employee and an hourly employee compute it completely differently.</li> <li>Every <code>Account</code> can <code>applyMonthlyInterest()</code>, but the rate depends entirely on whether it is a checking account or a savings account.</li> <li>Every Swing component can <code>paint</code> itself, but there is no drawing that a generic component would perform.</li> </ul> <p>In every case the general class knows <em>that</em> the operation exists and has no idea <em>how</em> to do it. Today we learn to say that in Java.</p> <div class="box qc"> <div class="hd">Quick Check 14.1</div> <div class="bd"> <p>For each pair, say which of the two classes you would want to stop anyone from instantiating, and give the method that has no sensible general implementation.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>Shape</code> and <code>Circle</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Shape</code>. <code>new Circle(3)</code> is a perfectly meaningful thing to build &mdash; a radius is all a circle needs. <code>new Shape(...)</code> is not, because there is no set of numbers that describes "a shape". The method with no general implementation is <code>getArea()</code> (and <code>getPerimeter()</code>): you cannot write a body for it without knowing what kind of shape you have.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>Animal</code> and <code>Dog</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Animal</code>. Every animal makes a sound, so <code>makeSound()</code> belongs on <code>Animal</code> &mdash; but there is no sound "an animal" makes. <code>new Dog()</code> is fine; <code>new Animal()</code> is a category error dressed up as an object.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>Rectangle</code> and <code>Square</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Neither.</strong> This is the pair that is <em>not</em> like the others. A rectangle is a completely concrete thing: give it a width and a height and it can compute its own area. <code>Square</code> is more specific still. Both should stay instantiable.</p> <p><strong>Things to notice across all three parts.</strong> The test is not "is this class at the top of the hierarchy?" &mdash; it is "can I write every method's body using only what this class knows?" <code>Rectangle</code> passes that test even though other classes extend it. Being a superclass and being abstract are separate questions.</p> </div></details> </div> </div> </div> <h2 id="s2"><span class="num">2.</span>The <code>abstract</code> keyword</h2> <p><code>abstract</code> is a modifier, and it goes in two places: on a method, and on a class.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; abstract method</span></div> <div class="bd"> <p>An <strong>abstract method</strong> is a method declared with the keyword <code>abstract</code> and <em>no body at all</em> &mdash; the signature is followed by a semicolon where the braces would normally be:</p> <p><code>public abstract double getArea();</code></p> <p>It says: <em>every object of this type has a <code>getArea()</code> that returns a <code>double</code>, and I am not the one who writes it.</em> The declaration is a promise to callers and an obligation on subclasses, both at once.</p> </div> </div> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; abstract class</span></div> <div class="bd"> <p>An <strong>abstract class</strong> is a class declared with the keyword <code>abstract</code>. Two things follow immediately:</p> <ul> <li>It <strong>cannot be instantiated</strong>. <code>new AbstractShape()</code> is a compile error.</li> <li>It <strong>may contain abstract methods</strong>. An ordinary class may not.</li> </ul> <p>The two rules are connected: if a class has a method with no body, building one of them would give you an object you could call a method on that does not exist. Java closes that door by refusing to build it.</p> </div> </div> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; the rule that decides everything else</span></div> <div class="bd"> <p><strong>A class containing an abstract method must itself be declared abstract.</strong> The reverse is not true: a class may be abstract with no abstract methods in it at all, if you simply want to forbid instantiating it.</p> </div> </div> <p>Here is the instructor's <code>AbstractShape</code>. Read the class header and the first two methods together &mdash; the <code>abstract</code> on line 1 is there <em>because</em> of the <code>abstract</code> on lines 3 and 4.</p> <p class="filename">AbstractShape.java</p>
+<pre><code class="language-java">public abstract class AbstractShape {
+    // Abstract methods (no implementation)
+    public abstract double getArea();
+    public abstract double getPerimeter();
+
+    // Concrete methods (with implementation)
+    public void printInfo() {
+        System.out.println("Area: " + getArea());
+        System.out.println("Perimeter: " + getPerimeter());
+    }
+
+    // Abstract classes can have constructors
+    public AbstractShape() {
+        System.out.println("Creating a shape");
+    }
+}</code></pre> <p>Look at <code>printInfo()</code> for a moment, because it is doing something that should feel impossible. It is a fully written, working method, and it calls <code>getArea()</code> &mdash; a method whose body does not exist anywhere in this file. That compiles, and at run time it works, because the object that <code>printInfo()</code> is running on is never really an <code>AbstractShape</code>; it is always some concrete subclass that <em>did</em> write <code>getArea()</code>. This is the payoff for everything we did last lecture.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; concrete class</span></div> <div class="bd"> <p>A <strong>concrete class</strong> is any class that is not abstract &mdash; an ordinary class you can call <code>new</code> on. A concrete subclass of an abstract class <strong>must supply a body for every abstract method it inherits</strong>, or the compiler rejects it.</p> <p>The escape hatch is to not be concrete: a subclass may leave some or all of them unimplemented if it declares itself <code>abstract</code> too, passing the obligation further down.</p> </div> </div> <p><code>AbstractCircle</code> is the concrete subclass. It writes both missing bodies, and then adds a method of its own that <code>AbstractShape</code> has never heard of.</p> <p class="filename">AbstractCircle.java</p>
+<pre><code class="language-java">// Concrete subclass must implement all abstract methods
+public class AbstractCircle extends AbstractShape {
+    private double radius;
+
+    public AbstractCircle(double radius) { this.radius = radius; }
+
+    @Override
+    public double getArea() { return Math.PI * radius * radius; }
+
+    @Override
+    public double getPerimeter() { return 2 * Math.PI * radius; }
+
+    public void resize(double factor) {
+        this.radius *= factor;
+        System.out.println("Circle resized to radius " + radius);
+    }
+}</code></pre> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the instructor's ShapeExample, run end to end</span></div> <div class="bd"> <p>This is her demonstration program. <code>processShape</code> takes an <code>AbstractShape</code> &mdash; note that a parameter may have an abstract type even though no <code>AbstractShape</code> object can ever exist, because every argument will really be a subclass.</p> <p class="filename">ShapeExample.java</p>
+<pre><code class="language-java">public class ShapeExample {
+    public static void processShape(AbstractShape shape) {
+        System.out.println("Processing a shape");
+        shape.printInfo();
+        System.out.println("Processing complete");
+    }
+
+    public static void main(String[] args) {
+        AbstractCircle circle = new AbstractCircle(5.0);
+        AbstractShape shape = circle;
+
+        System.out.println("\nDirect call on circle:");
+        circle.printInfo();
+
+        System.out.println("\nPolymorphic call on shape:");
+        shape.printInfo();
+
+        System.out.println("\nProcessing circle:");
+        processShape(circle);
+
+        System.out.println("\nResizing circle:");
+        circle.resize(2.0);
+
+        System.out.println("\nAfter resize - polymorphic call:");
+        shape.printInfo();
+    }
+}</code></pre> <p>Three questions before you open the toggle. What is the <em>very first</em> line of output, and which statement produced it? Do the "Direct call" and "Polymorphic call" blocks differ? And what do the last two lines show after <code>resize(2.0)</code>?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Creating a shape
+
+Direct call on circle:
+Area: 78.53981633974483
+Perimeter: 31.41592653589793
+
+Polymorphic call on shape:
+Area: 78.53981633974483
+Perimeter: 31.41592653589793
+
+Processing circle:
+Processing a shape
+Area: 78.53981633974483
+Perimeter: 31.41592653589793
+Processing complete
+
+Resizing circle:
+Circle resized to radius 10.0
+
+After resize - polymorphic call:
+Area: 314.1592653589793
+Perimeter: 62.83185307179586</code></pre> <p><strong>The first line is <code>Creating a shape</code>, and it comes from the constructor of the abstract class.</strong> No statement in <code>main</code> mentions <code>AbstractShape</code> at all. That line is printed by <code>new AbstractCircle(5.0)</code>, because a subclass constructor always calls its parent's constructor first &mdash; and here <code>AbstractCircle</code>'s constructor does not write <code>super()</code> explicitly, so Java inserted it. Section 3 is about exactly this.</p> <p><strong>The two blocks are identical.</strong> <code>circle</code> and <code>shape</code> are the same object. <code>printInfo()</code> is written once, in <code>AbstractShape</code>, and it calls <code>getArea()</code> on whatever object it is running on &mdash; an <code>AbstractCircle</code> &mdash; so it gets 78.539..., which is &pi; &times; 5<sup>2</sup>.</p> <p><strong>After <code>resize(2.0)</code> the radius is 10, so the area is &pi; &times; 100 = 314.159... and the perimeter is 2&pi; &times; 10 = 62.83...</strong> Notice that <code>shape.printInfo()</code> sees the change without being told anything: <code>shape</code> and <code>circle</code> are two names for one object, exactly as in Lecture 8.</p> <p>One structural thing to take from this program: <code>printInfo()</code> appears three times in the output and is written once in the source, inside a class that can never be instantiated. That is the whole argument for abstract classes in one program &mdash; shared code lives in the parent, the parts that cannot be shared are left as holes, and the subclass fills the holes.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 14.2</div> <div class="bd"> <p>A student writes this subclass of <code>AbstractShape</code> and it will not compile.</p> <pre><code class="language-java">public class AbstractTriangle extends AbstractShape {
+    private double base;
+    private double height;
+
+    public AbstractTriangle(double base, double height) {
+        this.base = base;
+        this.height = height;
+    }
+
+    @Override
+    public double getArea() { return 0.5 * base * height; }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> What does the compiler say, and which line does it point at?</p> <details class="soln"><summary></summary><div class="ans"> <p>It points at the <em>class header</em>, not at any method:</p> <pre class="err"><code>AbstractTriangle.java:1: error: AbstractTriangle is not abstract and does not override abstract method getPerimeter() in AbstractShape
+public class AbstractTriangle extends AbstractShape {
+       ^
+1 error</code></pre> <p><code>getArea()</code> was supplied; <code>getPerimeter()</code> was not. The message names the exact method that is missing and the class it came from, which is the most useful thing about it. It points at the header because the problem is not with any line that is present &mdash; it is with a line that is absent.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Give the two different ways to make this compile, and say when you would choose each.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Fix 1 &mdash; supply the missing body.</strong> This is what you want almost every time. A triangle's perimeter needs the two other sides, so the class needs two more fields:</p> <pre><code class="language-java">public class AbstractTriangle extends AbstractShape {
+    private double base, height, side1, side2;
+    // ... constructor sets all four ...
+
+    @Override
+    public double getArea() { return 0.5 * base * height; }
+
+    @Override
+    public double getPerimeter() { return base + side1 + side2; }
+}</code></pre> <p><strong>Fix 2 &mdash; declare the class <code>abstract</code> as well.</strong> This compiles too:</p> <pre><code class="language-java">public abstract class AbstractTriangle extends AbstractShape {
+    // getArea() implemented, getPerimeter() still abstract
+}</code></pre> <p>It is legal because an abstract class is allowed to have holes in it &mdash; you simply pass the obligation down to <em>its</em> subclasses. Choose this only when the missing method genuinely cannot be written yet: an <code>AbstractTriangle</code> that does not know whether it is equilateral or scalene is a reasonable place to stop.</p> <p><strong>Things to notice across both parts.</strong> The rule is "implement every abstract method <em>or</em> be abstract yourself", and the compiler's message spells out both halves &mdash; <code>is not abstract</code> <em>and</em> <code>does not override</code>. Fixing either half removes the error. Fix 1 gives you a usable class; Fix 2 just moves the problem one level down, so it is the right choice much less often than students expect.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 14.3</div> <div class="bd"> <p>Write the complete, compiling <code>AbstractTriangle</code> described in Fix 1 above: it extends <code>AbstractShape</code>, stores a base, a height and the two other side lengths, and implements both abstract methods. Then write a <code>main</code> that builds a triangle with base 6, height 4 and two sides of 5, and calls the inherited <code>printInfo()</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The obligation is fixed and short: <code>AbstractShape</code> declares exactly two abstract methods, so the class needs exactly two <code>@Override</code> methods. Everything else is ordinary class writing from Lecture 7. Note what you do <em>not</em> write: no <code>printInfo()</code>, because you inherit a working one.</p> <p class="filename">AbstractTriangle.java</p>
+<pre><code class="language-java">public class AbstractTriangle extends AbstractShape {
+    private double base;
+    private double height;
+    private double side1;
+    private double side2;
+
+    public AbstractTriangle(double base, double height, double side1, double side2) {
+        this.base = base;
+        this.height = height;
+        this.side1 = side1;
+        this.side2 = side2;
+    }
+
+    @Override
+    public double getArea() {
+        return 0.5 * base * height;
+    }
+
+    @Override
+    public double getPerimeter() {
+        return base + side1 + side2;
+    }
+
+    public static void main(String args[]) {
+        AbstractTriangle t = new AbstractTriangle(6, 4, 5, 5);
+        t.printInfo();
+    }
+}</code></pre> <pre class="out"><code>Creating a shape
+Area: 12.0
+Perimeter: 16.0</code></pre> <p><strong>Things to notice.</strong> <code>Creating a shape</code> again, before anything you asked for. Every concrete shape you build runs the abstract parent's constructor first, whether you wrote <code>super()</code> or not.</p> <p>The area is 12.0 and not 12, because <code>0.5 * base * height</code> is <code>double</code> arithmetic and Java prints a <code>double</code> with a decimal point &mdash; the Lecture 1 rule, unchanged.</p> <p>Putting <code>main</code> inside <code>AbstractTriangle</code> is a convenience for a small example. It is perfectly legal to put a <code>main</code> in an abstract class too &mdash; <code>main</code> is <code>static</code>, so it belongs to the class rather than to any object, and no object needs to be created for the JVM to call it.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 14.3</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="19" aria-label="Live coding - Quick Check 14.3">public class AbstractTriangle extends AbstractShape {
+    private double base;
+    private double height;
+    private double side1;
+    private double side2;
+
+    // 1. Write a constructor taking base, height, side1, side2.
+
+    // 2. Implement getArea()      -- 0.5 * base * height
+
+    // 3. Implement getPerimeter() -- base + side1 + side2
+
+    public static void main(String args[]) {
+        // 4. Build a 6 by 4 triangle with two sides of 5, and call printInfo().
+
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s3"><span class="num">3.</span>What an abstract class still has</h2> <p>The word "abstract" makes people expect a stripped-down thing. It is the opposite. An abstract class is an ordinary class in every respect except that you cannot say <code>new</code> to it. It may have private fields, constructors, concrete methods, static methods, <code>toString</code>, anything. <code>AbstractShape</code> has two of those three already.</p> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; trying to instantiate it anyway</span></div> <div class="bd"> <p>This is the error the instructor demonstrates in class, and it is worth learning by sight because the wording is unusual:</p> <pre><code class="language-java">AbstractShape abstractShape = new AbstractShape();</code></pre> <pre class="err"><code>NoInstance.java:3: error: AbstractShape is abstract; cannot be instantiated
+        AbstractShape abstractShape = new AbstractShape();
+                                      ^
+1 error</code></pre> <p>The caret points at <code>new</code>, not at the variable. Declaring a variable of an abstract type is completely fine &mdash; <code>AbstractShape shape = circle;</code> on the previous page did exactly that. What is forbidden is <em>constructing</em> one.</p> </div> </div> <p>Which raises the obvious question, and it is the best question in this lecture.</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; why does an abstract class have a constructor?</span></div> <div class="bd"> <p>Because a subclass constructor <em>must</em> call it. <code>new AbstractCircle(5.0)</code> does not build a circle and stop; it builds the <code>AbstractShape</code> part of the object first, then the <code>AbstractCircle</code> part. That first step runs <code>AbstractShape()</code>.</p> <p>The constructor of an abstract class is never called by you. It is called by <code>super(...)</code> &mdash; written explicitly, or inserted by Java when you leave it out. Its job is to initialise the fields that the parent owns, on behalf of an object that will end up being some subclass.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; watching the parent constructor run</span></div> <div class="bd"> <p><code>AbstractShape()</code> prints a line, which makes an invisible thing visible. Look back at <code>AbstractCircle</code>: its constructor is one statement long and does not contain the word <code>super</code>. The other class here is <code>AbstractSquare</code>, which sits two levels below <code>AbstractShape</code> &mdash; it extends <code>AbstractRectangle</code>, and you will see both listed in section 4. Count how many times <code>Creating a shape</code> appears, and decide where each one lands.</p> <p class="filename">ConstructorOrder.java</p>
+<pre><code class="language-java">public class ConstructorOrder {
+    public static void main(String[] args) {
+        System.out.println("about to build a circle");
+        AbstractCircle c = new AbstractCircle(5.0);
+        System.out.println("about to build a square");
+        AbstractSquare q = new AbstractSquare(3);
+        System.out.println("done");
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>about to build a circle
+Creating a shape
+about to build a square
+Creating a shape
+done</code></pre> <p>Twice &mdash; once per object, and each time <em>before</em> the subclass constructor body runs. The <code>AbstractSquare</code> case is the more striking one: <code>AbstractSquare</code> extends <code>AbstractRectangle</code>, which extends <code>AbstractShape</code>, so <code>new AbstractSquare(3)</code> runs three constructors, of which only the top one prints anything.</p> <table class="trace"> <tr><th>Statement</th><th>Constructors that run, in order</th></tr> <tr><td><code>new AbstractCircle(5.0)</code></td><td><code>AbstractShape()</code> &rarr; <code>AbstractCircle(double)</code></td></tr> <tr><td><code>new AbstractSquare(3)</code></td><td><code>AbstractShape()</code> &rarr; <code>AbstractRectangle(double, double)</code> &rarr; <code>AbstractSquare(double)</code></td></tr> </table> <p>This is not new behaviour &mdash; it is the constructor chaining from Lecture 12. The only thing abstractness changes is that the top of the chain is a constructor <em>you can never call directly</em>. It still runs, every single time, on every object in the hierarchy.</p> <p>An abstract class with <code>private</code> fields and a constructor that initialises them is completely normal design, and it is the main reason to prefer an abstract class over an interface. Hold that thought until section 7.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 14.4</div> <div class="bd"> <p>Decide whether each statement is true or false, and say why in one sentence.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> An abstract class must contain at least one abstract method.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>False.</strong> The implication runs one way only. A class with an abstract method must be abstract; an abstract class need not have any. Marking a fully implemented class <code>abstract</code> is a legitimate way of saying "this is a base class, do not instantiate it directly."</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> An abstract class cannot have <code>private</code> fields, because subclasses would not be able to see them.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>False</strong> on both counts. It can have private fields, and subclasses not seeing them is fine &mdash; they reach them through inherited public getters, exactly as <code>AbstractSquare.getSide()</code> reaches the width by calling <code>getWidth()</code>. Private fields plus public getters is the normal design, in an abstract class as much as anywhere else.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>AbstractShape shape = circle;</code> is illegal because <code>AbstractShape</code> cannot be instantiated.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>False.</strong> That line creates no object at all &mdash; it points a new reference at an object that already exists. Declaring a variable, a parameter, a return type or an array element type as an abstract class is not only legal, it is the entire reason for having one.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>public abstract double getArea() { return 0; }</code> is a legal way to give an abstract method a fallback answer.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>False.</strong> <code>abstract</code> and a body are contradictory, and the compiler says so directly:</p> <pre class="err"><code>BadShape2.java:2: error: abstract methods cannot have a body
+    public abstract double getArea() { return 0; }
+                           ^
+1 error</code></pre> <p>If you want a fallback, write an ordinary concrete method &mdash; drop the word <code>abstract</code> and keep the body. Subclasses may then override it or not, as they please. The difference is exactly whether overriding is <em>required</em> or merely <em>permitted</em>.</p> <p><strong>Things to notice across all four parts.</strong> Three of these four are false because people over-read the word "abstract" as meaning "empty" or "special". It only ever means two things: <em>cannot be instantiated</em>, and <em>allowed to have holes</em>. Everything you know about ordinary classes still applies.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 14.5</div> <div class="bd"> <p>What does the following print? <code>AbstractShape</code>, <code>AbstractCircle</code>, <code>AbstractRectangle</code> and <code>AbstractSquare</code> are as given on this page.</p> <pre><code class="language-java">public class ShapeArray {
+    public static void main(String[] args) {
+        AbstractShape[] shapes = { new AbstractCircle(1),
+                                   new AbstractRectangle(4, 3),
+                                   new AbstractSquare(5) };
+
+        double total = 0;
+        for (int i = 0; i &lt; shapes.length; i++) {
+            System.out.println("---");
+            shapes[i].printInfo();
+            total = total + shapes[i].getArea();
+        }
+        System.out.println("Total area: " + total);
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Two separate things are going on and they are easy to run together. The array initialiser constructs all three objects <em>before</em> the loop begins, so every <code>Creating a shape</code> line comes out first, in a block. Only then does the loop start printing. Areas: &pi; &times; 1<sup>2</sup>, 4 &times; 3, and 5 &times; 5.</p> <pre class="out"><code>Creating a shape
+Creating a shape
+Creating a shape
+---
+Area: 3.141592653589793
+Perimeter: 6.283185307179586
+---
+Area: 12.0
+Perimeter: 14.0
+---
+Area: 25.0
+Perimeter: 20.0
+Total area: 40.1415926535898</code></pre> <p><strong>Things to notice.</strong> <code>AbstractShape[]</code> is an array of a type that has no instances &mdash; and it is completely ordinary. Each slot holds a reference to some concrete subclass. This is the <code>Shape[]</code> idea from Lecture 13 with the hole plugged: now it is <em>impossible</em> for a stray <code>new AbstractShape(...)</code> to end up in the array, because no such object can be built.</p> <p>The total prints as <code>40.1415926535898</code> rather than <code>40.141592653589793</code>. Adding 3.141592653589793 + 12 + 25 in <code>double</code> arithmetic loses the last two digits &mdash; ordinary floating-point behaviour, first met in Lecture 1, and not something to correct.</p> </div></details> </div> </div> <h2 id="s4"><span class="num">4.</span>Interfaces: a contract, not a parent</h2> <p>An abstract class solves the "declare it, do not write it" problem, but it does so by being a <em>parent</em>. Everything that gets <code>getArea()</code> from <code>AbstractShape</code> also gets its fields, its constructor, its <code>printInfo()</code>, and &mdash; the expensive part &mdash; uses up its one and only <code>extends</code> slot. Sometimes all you want to say is much smaller than that.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; interface</span></div> <div class="bd"> <p>An <strong>interface</strong> is a reference type in Java, similar to a class, that can contain only constants, method signatures, default methods, static methods and nested types. Interfaces cannot be instantiated &mdash; they can only be <em>implemented</em> by classes, or <em>extended</em> by other interfaces.</p> <p>You declare one with the keyword <code>interface</code> instead of <code>class</code>, and a class signs up to it with <code>implements</code> instead of <code>extends</code>.</p> </div> </div> <p>The instructor gives four reasons to reach for one, and they are worth reading as four different sentences rather than a list:</p> <ul> <li><strong>Define a contract.</strong> An interface says what a class <em>can do</em>, without saying anything at all about how it does it.</li> <li><strong>Enable multiple inheritance.</strong> A class may implement as many interfaces as it likes, while it may extend only one class. This is section 5, and it is the big one.</li> <li><strong>Support loose coupling.</strong> Code can depend on the interface rather than on any particular class that implements it, so the implementation can be swapped out later.</li> <li><strong>Facilitate polymorphism.</strong> Different classes &mdash; with no common ancestor whatsoever &mdash; can be treated the same way as long as they implement the same interface.</li> </ul> <p>Here are the two interfaces the instructor writes for the shape hierarchy. They are tiny on purpose.</p> <p class="filename">Drawable.java</p>
+<pre><code class="language-java">public interface Drawable {
+    void draw();
+
+    default void displayDrawInfo() {
+        System.out.println("This object can be drawn on screen");
+    }
+}</code></pre> <p class="filename">Resizable.java</p>
+<pre><code class="language-java">public interface Resizable {
+    void resize(double factor);
+}</code></pre> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; the two words you do not have to type</span></div> <div class="bd"> <p><code>void draw();</code> inside an interface means <code>public abstract void draw();</code>. Every method declared in an interface is <strong>implicitly public</strong> and <strong>implicitly abstract</strong>, whether you write those words or not.</p> <p>That is why the semicolon on the end looks like an abstract method &mdash; it <em>is</em> an abstract method. An interface is, in the original design, a class in which every method is abstract and nothing else is allowed.</p> </div> </div> <p>Now <code>AbstractRectangle</code>, which is the class the whole lecture has been building toward. Read the header slowly: it <code>extends</code> one class and <code>implements</code> two interfaces, and the order of those words in the header is fixed &mdash; <code>extends</code> always comes first.</p> <p class="filename">AbstractRectangle.java</p>
+<pre><code class="language-java">public class AbstractRectangle extends AbstractShape implements Drawable, Resizable {
+    private double width;
+    private double height;
+
+    public AbstractRectangle(double width, double height) {
+        this.width = width;
+        this.height = height;
+    }
+
+    public double getWidth() {
+        return width;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    @Override
+    public double getArea() {
+        return width * height;
+    }
+
+    @Override
+    public double getPerimeter() {
+        return 2 * (width + height);
+    }
+
+    // Implementing Drawable
+    @Override
+    public void draw() {
+        System.out.println("Drawing a rectangle with width " + width +
+                           " and height " + height);
+    }
+
+    // Implementing Resizable
+    @Override
+    public void resize(double factor) {
+        this.width *= factor;
+        this.height *= factor;
+        System.out.println("Rectangle resized proportionally to width: " +
+                           width + ", height: " + height);
+    }
+
+    // Original resize method is still available
+    public void resize(double widthFactor, double heightFactor) {
+        this.width *= widthFactor;
+        this.height *= heightFactor;
+        System.out.println("Rectangle resized to width: " + width +
+                           ", height: " + height);
+    }
+}</code></pre> <p>Count the obligations that header creates. From <code>AbstractShape</code>: <code>getArea()</code> and <code>getPerimeter()</code>. From <code>Drawable</code>: <code>draw()</code>. From <code>Resizable</code>: <code>resize(double)</code>. Four methods that <em>must</em> appear, from three different sources, and the class supplies all four. The two-argument <code>resize(double, double)</code> at the bottom is not required by anything &mdash; it is an ordinary overload the class happens to offer as well.</p> <p>And here is <code>AbstractSquare</code>, the class the previous section kept referring to. Its header mentions no interfaces at all &mdash; and it is still a <code>Drawable</code> and a <code>Resizable</code>, because <code>implements</code> is inherited exactly like <code>extends</code>. What it does do is <em>override</em> the three inherited methods that need to know they are dealing with a square.</p> <p class="filename">AbstractSquare.java</p>
+<pre><code class="language-java">public class AbstractSquare extends AbstractRectangle {
+
+    public AbstractSquare(double side) {
+        super(side, side);   // call the parent constructor with equal sides
+    }
+
+    public double getSide() {
+        return getWidth();   // or getHeight(); they are always the same
+    }
+
+    @Override
+    public void resize(double widthFactor, double heightFactor) {
+        // Use the larger factor so the square stays a square
+        double factor = Math.max(widthFactor, heightFactor);
+        super.resize(factor, factor);
+        System.out.println("Square constraint maintained: using factor " +
+                           factor + " for both dimensions");
+    }
+
+    @Override
+    public void draw() {
+        System.out.println("Drawing a square with side length " + getSide());
+    }
+
+    @Override
+    public String toString() {
+        return "Square with side length: " + getSide() +
+               ", area: " + getArea() +
+               ", perimeter: " + getPerimeter();
+    }
+}</code></pre> <p>Notice what <code>getSide()</code> does <em>not</em> do: it does not read a <code>side</code> field, because there isn't one. The side length is already stored, twice over, as the parent's <code>width</code> and <code>height</code>, so <code>getSide()</code> just asks for one of them. Section 7 shows what goes wrong if you keep your own copy instead.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; one object, three types</span></div> <div class="bd"> <p>The same <code>AbstractRectangle</code> object is looked at through four different reference types in turn. Nothing is created except at the top; every later line just gives the same object another name.</p> <p class="filename">InterfaceDemo.java</p>
+<pre><code class="language-java">public class InterfaceDemo {
+    public static void main(String[] args) {
+        AbstractRectangle rect = new AbstractRectangle(4, 3);
+
+        System.out.println("--- as an AbstractRectangle ---");
+        rect.printInfo();
+        rect.draw();
+        rect.displayDrawInfo();
+
+        System.out.println("--- through a Drawable reference ---");
+        Drawable d = rect;
+        d.draw();
+        d.displayDrawInfo();
+
+        System.out.println("--- through a Resizable reference ---");
+        Resizable r = rect;
+        r.resize(2.0);
+
+        System.out.println("--- through an AbstractShape reference ---");
+        AbstractShape s = rect;
+        s.printInfo();
+    }
+}</code></pre> <p>Before you reveal: <code>displayDrawInfo()</code> is never written in <code>AbstractRectangle</code>. Where does it come from, and does it print anything? And the last block reports an area &mdash; is it 12 or 48?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Creating a shape
+--- as an AbstractRectangle ---
+Area: 12.0
+Perimeter: 14.0
+Drawing a rectangle with width 4.0 and height 3.0
+This object can be drawn on screen
+--- through a Drawable reference ---
+Drawing a rectangle with width 4.0 and height 3.0
+This object can be drawn on screen
+--- through a Resizable reference ---
+Rectangle resized proportionally to width: 8.0, height: 6.0
+--- through an AbstractShape reference ---
+Area: 48.0
+Perimeter: 28.0</code></pre> <p><code>displayDrawInfo()</code> comes from the interface itself. It is a <strong>default method</strong> &mdash; an interface method that ships with a body &mdash; so every class that implements <code>Drawable</code> gets it for free without writing anything. Section 6 covers those properly.</p> <p>The area is 48, not 12, because the <code>Resizable</code> block ran first and doubled both sides: 8 &times; 6 = 48. The point of the last block is that resizing through a <code>Resizable</code> reference changed the object that the <code>AbstractShape</code> reference is looking at, because there is only one object.</p> <table class="trace"> <tr><th>Reference</th><th>Declared type</th><th>What you may call through it</th></tr> <tr><td><code>rect</code></td><td><code>AbstractRectangle</code></td><td>everything &mdash; all four sources</td></tr> <tr><td><code>d</code></td><td><code>Drawable</code></td><td><code>draw()</code> and <code>displayDrawInfo()</code>, nothing else</td></tr> <tr><td><code>r</code></td><td><code>Resizable</code></td><td><code>resize(double)</code>, nothing else</td></tr> <tr><td><code>s</code></td><td><code>AbstractShape</code></td><td><code>getArea()</code>, <code>getPerimeter()</code>, <code>printInfo()</code></td></tr> </table> <p>That third column is last lecture's rule, unchanged: the declared type decides what you are allowed to write. An interface is just another declared type to apply it to.</p> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; forgetting <code>public</code></span></div> <div class="bd"> <p>Interface methods are implicitly <code>public</code>. When you implement one, you must write <code>public</code> yourself &mdash; leaving it off is not "the same as the interface", it is <em>package-private</em>, which is narrower, and Java never lets an override reduce visibility:</p> <pre><code class="language-java">public class Sticker2 implements Drawable {
+    @Override
+    void draw() {                          // no "public"
+        System.out.println("Drawing a sticker");
+    }
+}</code></pre> <pre class="err"><code>Sticker2.java:7: error: draw() in Sticker2 cannot implement draw() in Drawable
+    void draw() {
+         ^
+  attempting to assign weaker access privileges; was public
+1 error</code></pre> <p>Read the second line of the message: <em>was public</em>. The compiler is telling you what the interface promised on your behalf. This exact error is a question on the instructor's practice problems, and it catches people every time, because the omission looks like nothing.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 14.6</div> <div class="bd"> <p>Each of these three classes is meant to implement <code>Drawable</code> as declared above. Say whether it compiles, and if not, what the compiler says.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> A class with a constructor and a <code>label</code> field, and no other methods at all.</p> <details class="soln"><summary></summary><div class="ans"> <pre><code class="language-java">public class Sticker implements Drawable {
+    private String label;
+
+    public Sticker(String label) { this.label = label; }
+}</code></pre> <p>Does not compile. <code>Drawable</code> declares <code>draw()</code> and the class did not supply it:</p> <pre class="err"><code>Sticker.java:1: error: Sticker is not abstract and does not override abstract method draw() in Drawable
+public class Sticker implements Drawable {
+       ^
+1 error</code></pre> <p>Notice that this is <em>word for word</em> the error from Quick Check 14.2, with an interface in place of an abstract class. The obligation an interface creates is the same kind of obligation an abstract method creates &mdash; because it <em>is</em> an abstract method.</p> <p>And note it does not complain about <code>displayDrawInfo()</code>. That one has a body in the interface, so there is nothing to supply.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> A class that writes <code>public void draw()</code> correctly but also writes its own <code>public void displayDrawInfo()</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p>Compiles, and the class's own version is the one that runs. A default method may be overridden exactly like an inherited concrete method &mdash; the interface's body is a fallback, not a law.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>AbstractCircle</code> exactly as written in section 2, used as <code>Resizable r = new AbstractCircle(5.0);</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Does not compile &mdash; and this is the interesting one, because <code>AbstractCircle</code> already has a method whose signature is <em>identical</em> to the one <code>Resizable</code> demands: <code>public void resize(double factor)</code>. It has the method. It just never signed the contract.</p> <pre class="err"><code>NotDeclared.java:3: error: incompatible types: AbstractCircle cannot be converted to Resizable
+        Resizable r = new AbstractCircle(5.0);
+                      ^
+1 error</code></pre> <p>The fix is one word in the class header, and no change to the body at all:</p> <pre><code class="language-java">public class AbstractCircle extends AbstractShape implements Resizable {
+    // ... exactly as before; resize(double) already satisfies the interface ...
+}</code></pre> <p><strong>Things to notice across all three parts.</strong> Java's interfaces are <em>nominal</em>, not structural: a class implements an interface because it says it does, never because its methods happen to line up. That may look like bureaucracy, but it is what makes <code>implements Resizable</code> a meaningful statement of intent rather than an accident, and it is why the compiler can tell you in part (a) exactly what you owe.</p> </div></details> </div> </div> </div> <h2 id="s5"><span class="num">5.</span>Many interfaces, one superclass</h2> <p>This is the difference that decides which of the two tools you reach for in real code.</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; the one-parent rule</span></div> <div class="bd"> <p>A Java class may <code>extends</code> <strong>exactly one</strong> class. It may <code>implements</code> <strong>as many interfaces as it likes</strong>, separated by commas.</p> <p>So <code>extends</code> is a scarce resource and <code>implements</code> is not. Spend the <code>extends</code> slot on the thing the class fundamentally <em>is</em>; use interfaces for everything it can <em>do</em>.</p> </div> </div> <p>Try to take two parents and the parser gives up before it even gets to the meaning:</p> <p class="filename">TwoParents.java</p>
+<pre><code class="language-java">abstract class Shape1 { public abstract double getArea(); }
+abstract class Drawing { public abstract void draw(); }
+
+class Both extends Shape1, Drawing {         // does not compile
+    public double getArea() { return 0; }
+    public void draw() { }
+}</code></pre> <pre class="err"><code>TwoParents.java:4: error: '{' expected
+class Both extends Shape1, Drawing {
+                         ^
+1 error</code></pre> <p>Java forbids multiple class inheritance deliberately. If two parents both had a <code>describe()</code> method with a body, an object of the child would carry two different bodies for one call and nobody could say which should win. Interfaces sidestep the problem completely: in the original design they have no bodies to conflict, so inheriting ten of them creates no ambiguity at all.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; interface as a reference type</span></div> <div class="bd"> <p>An interface name may be used anywhere a type is wanted: a variable, a parameter, a return type, an array element type. A reference of interface type may point at an object of <em>any</em> class that implements it, and through that reference you may call exactly the methods the interface declares &mdash; no more.</p> <p>Crucially, those classes need share nothing else. Two classes with no common ancestor above <code>Object</code> can sit in the same <code>Drawable[]</code>.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; an array of things that have nothing in common</span></div> <div class="bd"> <p><code>TextLabel</code> is not a shape. It does not extend <code>AbstractShape</code>, it has no area, and it would be absurd to give it one. All it promises is that it can be drawn.</p> <p class="filename">TextLabel.java</p>
+<pre><code class="language-java">// A TextLabel is not a shape at all -- it does not extend AbstractShape.
+// It only promises that it can be drawn.
+public class TextLabel implements Drawable {
+    private String text;
+
+    public TextLabel(String text) { this.text = text; }
+
+    @Override
+    public void draw() {
+        System.out.println("Drawing the text \"" + text + "\"");
+    }
+}</code></pre> <p class="filename">DrawAll.java</p>
+<pre><code class="language-java">public class DrawAll {
+    public static void drawEverything(Drawable[] items) {
+        for (int i = 0; i &lt; items.length; i++) {
+            items[i].draw();
+        }
+    }
+
+    public static void main(String[] args) {
+        Drawable[] items = { new AbstractRectangle(4, 3),
+                             new AbstractSquare(5),
+                             new TextLabel("Hello") };
+
+        System.out.println("--- drawing them all ---");
+        drawEverything(items);
+    }
+}</code></pre> <p>Two things to predict. How many <code>Creating a shape</code> lines appear, and where? And could <code>drawEverything</code> have taken an <code>AbstractShape[]</code> instead?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Creating a shape
+Creating a shape
+--- drawing them all ---
+Drawing a rectangle with width 4.0 and height 3.0
+Drawing a square with side length 5.0
+Drawing the text "Hello"</code></pre> <p><strong>Two, not three</strong>, and both before the header line, because the array initialiser runs before the <code>println</code>. The rectangle and the square each run <code>AbstractShape()</code> on the way up their constructor chain; <code>TextLabel</code> does not, because <code>TextLabel</code> is not in that hierarchy at all. Its parent is <code>Object</code>.</p> <p><strong>No, <code>drawEverything</code> could not have taken an <code>AbstractShape[]</code>.</strong> A <code>TextLabel</code> is not an <code>AbstractShape</code>, so it could not go in the array &mdash; and even if you dropped it, <code>AbstractShape</code> does not declare <code>draw()</code>, so <code>items[i].draw()</code> would not compile. The only type that covers all three objects <em>and</em> guarantees a <code>draw()</code> is the interface.</p> <p>This is the thing an abstract class cannot do. <code>AbstractRectangle</code> and <code>AbstractSquare</code> are relatives; <code>TextLabel</code> is a stranger. An abstract class groups relatives. An interface groups strangers who can all do the same job. Both are useful; they are useful for different jobs.</p> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; expecting more from an interface reference</span></div> <div class="bd"> <p>An interface reference sees the interface's methods and nothing else, even when the object obviously has more. Given <code>Drawable d = new AbstractRectangle(4, 3);</code>:</p> <pre><code class="language-java">d.draw();          // fine    -- declared in Drawable
+d.printInfo();     // error   -- declared in AbstractShape
+d.resize(2.0);     // error   -- declared in Resizable</code></pre> <pre class="err"><code>OnlyInterface.java:5: error: cannot find symbol
+        d.printInfo();
+         ^
+  symbol:   method printInfo()
+  location: variable d of type Drawable
+OnlyInterface.java:6: error: cannot find symbol
+        d.resize(2.0);
+         ^
+  symbol:   method resize(double)
+  location: variable d of type Drawable
+2 errors</code></pre> <p><code>location: variable d of type Drawable</code> is the same message shape as <code>location: variable s of type Shape</code> from Lecture 13, for the same reason. And the fix is the same: cast to a type that does declare the method, guarded by <code>instanceof</code> if you are not certain. <code>((Resizable) d).resize(2.0)</code> compiles and works here.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 14.7</div> <div class="bd"> <p>Let <code>AbstractSquare sq = new AbstractSquare(5);</code> &mdash; recall that <code>AbstractSquare</code> extends <code>AbstractRectangle</code>, which extends <code>AbstractShape</code> and implements <code>Drawable</code> and <code>Resizable</code>. For each declaration, say whether it compiles.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>Drawable d = sq;</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compiles. <code>AbstractSquare</code> does not say <code>implements Drawable</code> in its own header, but it inherits the obligation and the implementation from <code>AbstractRectangle</code>, and <code>implements</code> is inherited: every <code>AbstractSquare</code> <em>is a</em> <code>Drawable</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>Resizable r = sq;</code> followed by <code>r.resize(2.0, 3.0);</code></p> <details class="soln"><summary></summary><div class="ans"> <p>The declaration compiles; the call does not. <code>Resizable</code> declares only <code>resize(double)</code>. The two-argument <code>resize(double, double)</code> is an ordinary overload that <code>AbstractRectangle</code> added on its own, and it is invisible through a <code>Resizable</code> reference:</p> <pre class="err"><code>QB.java:6: error: method resize in interface Resizable cannot be applied to given types;
+        r.resize(2.0, 3.0);
+         ^
+  required: double
+  found:    double,double
+  reason: actual and formal argument lists differ in length
+1 error</code></pre> <p>These are two different methods that share a name. An interface obliges you to provide one <em>signature</em>, not one name &mdash; and it exposes only that signature.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>AbstractShape s = sq;</code> followed by <code>s.draw();</code></p> <details class="soln"><summary></summary><div class="ans"> <p>The declaration compiles; the call does not. <code>AbstractShape</code> knows nothing about <code>Drawable</code> &mdash; the two are attached to the hierarchy at <code>AbstractRectangle</code>, one level below. Going up to <code>AbstractShape</code> throws that away.</p> <pre class="err"><code>QC2.java:6: error: cannot find symbol
+        s.draw();
+         ^
+  symbol:   method draw()
+  location: variable s of type AbstractShape
+1 error</code></pre> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>Drawable d = new AbstractCircle(3);</code>, with <code>AbstractCircle</code> exactly as written in section 2.</p> <details class="soln"><summary></summary><div class="ans"> <p>Does not compile. <code>AbstractCircle</code> never declares <code>implements Drawable</code> and has no <code>draw()</code> method &mdash; unlike the <code>Resizable</code> case in Quick Check 14.6(c), here it does not even have the method, so signing the contract would require writing one.</p> <p><strong>Things to notice across all four parts.</strong> Draw the picture before answering any of these: a vertical chain <code>AbstractShape</code> to <code>AbstractRectangle</code> to <code>AbstractSquare</code>, with <code>Drawable</code> and <code>Resizable</code> hanging off <code>AbstractRectangle</code>. A reference of type <code>T</code> can hold your object exactly when <code>T</code> is somewhere at or above the object's class in that picture &mdash; and you may call exactly what <code>T</code> itself declares. Interfaces do not change last lecture's rule; they just add more boxes above you.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 14.8</div> <div class="bd"> <p>Write a complete class <code>AbstractTriangle</code> that extends <code>AbstractShape</code> <em>and</em> implements both <code>Drawable</code> and <code>Resizable</code>. It stores a base, a height and the two other sides; <code>draw()</code> announces the base and height; <code>resize(double factor)</code> scales all four numbers and reports the new base and height. Then write a <code>main</code> that builds a 6 by 4 triangle with two sides of 5, prints its info, draws it, resizes it by 2 and prints its info again.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> List the obligations before writing a line. <code>AbstractShape</code> wants <code>getArea()</code> and <code>getPerimeter()</code>. <code>Drawable</code> wants <code>draw()</code>. <code>Resizable</code> wants <code>resize(double)</code>. Four methods, all <code>public</code>. Nothing else is required &mdash; <code>printInfo()</code> and <code>displayDrawInfo()</code> both arrive with bodies already attached, one from the abstract class and one from the interface.</p> <p>In <code>resize</code>, scale <em>all four</em> fields. Scaling only the base and height would leave the perimeter wrong, because <code>side1</code> and <code>side2</code> feed into it.</p> <p class="filename">AbstractTriangle.java</p>
+<pre><code class="language-java">public class AbstractTriangle extends AbstractShape implements Drawable, Resizable {
+    private double base;
+    private double height;
+    private double side1;
+    private double side2;
+
+    public AbstractTriangle(double base, double height, double side1, double side2) {
+        this.base = base;
+        this.height = height;
+        this.side1 = side1;
+        this.side2 = side2;
+    }
+
+    @Override
+    public double getArea() {
+        return 0.5 * base * height;
+    }
+
+    @Override
+    public double getPerimeter() {
+        return base + side1 + side2;
+    }
+
+    @Override
+    public void draw() {
+        System.out.println("Drawing a triangle with base " + base +
+                           " and height " + height);
+    }
+
+    @Override
+    public void resize(double factor) {
+        this.base *= factor;
+        this.height *= factor;
+        this.side1 *= factor;
+        this.side2 *= factor;
+        System.out.println("Triangle resized to base " + base +
+                           " and height " + height);
+    }
+}</code></pre> <p class="filename">TriangleDemo.java</p>
+<pre><code class="language-java">public class TriangleDemo {
+    public static void main(String[] args) {
+        AbstractTriangle t = new AbstractTriangle(6, 4, 5, 5);
+
+        System.out.println();
+        t.printInfo();          // inherited concrete method from AbstractShape
+        t.draw();               // from Drawable
+        t.displayDrawInfo();    // Drawable's default method
+
+        System.out.println();
+        AbstractShape s = t;    // the abstract class type
+        s.printInfo();
+
+        Drawable d = t;         // the interface type
+        d.draw();
+
+        Resizable r = t;        // the other interface type
+        r.resize(2.0);
+
+        System.out.println();
+        s.printInfo();
+    }
+}</code></pre> <pre class="out"><code>Creating a shape
+
+Area: 12.0
+Perimeter: 16.0
+Drawing a triangle with base 6.0 and height 4.0
+This object can be drawn on screen
+
+Area: 12.0
+Perimeter: 16.0
+Drawing a triangle with base 6.0 and height 4.0
+Triangle resized to base 12.0 and height 8.0
+
+Area: 48.0
+Perimeter: 32.0</code></pre> <p><strong>Things to notice.</strong> The final area is 48, not 24. Scaling a shape by a factor of 2 multiplies its area by 4 &mdash; both the base and the height doubled &mdash; while the perimeter merely doubles, 16 to 32. If your answer had 24 in it, you scaled the area instead of scaling the dimensions.</p> <p><code>t</code>, <code>s</code>, <code>d</code> and <code>r</code> are four names for one object. Each name exposes a different slice of it, and the slices overlap in nothing: <code>printInfo()</code> only through <code>s</code>, <code>draw()</code> only through <code>d</code>, <code>resize</code> only through <code>r</code>. The object does not change; the view does.</p> <p>The single word <code>implements Drawable, Resizable</code> in the header is what makes lines like <code>Drawable d = t;</code> legal. Take it out and the class still compiles &mdash; all four methods are still there &mdash; but the three interface-typed declarations stop compiling. That is Quick Check 14.6(c) again, and it is worth having burned in.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 14.8</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="19" aria-label="Live coding - Quick Check 14.8">public class AbstractTriangle extends AbstractShape implements Drawable, Resizable {
+    private double base;
+    private double height;
+    private double side1;
+    private double side2;
+
+    // 1. Constructor: base, height, side1, side2.
+
+    // 2. getArea()      -- required by AbstractShape
+
+    // 3. getPerimeter() -- required by AbstractShape
+
+    // 4. draw()         -- required by Drawable
+
+    // 5. resize(double factor) -- required by Resizable; scale ALL FOUR fields
+
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s6"><span class="num">6.</span>What else may live inside an interface</h2> <p>So far every interface on this page has been a list of method signatures plus, in one case, a method that came with a body. Java allows four kinds of member in an interface, and the instructor's fuller <code>Drawable</code> shows all four at once. This is a separate program from the short <code>Drawable</code> in section 4 &mdash; same name, more inside it &mdash; so read it on its own.</p> <p class="filename">Drawable.java</p>
+<pre><code class="language-java">import java.awt.Color;
+
+public interface Drawable {
+    // Constants (implicitly public, static and final)
+    Color DEFAULT_COLOR = Color.BLACK;
+
+    // Abstract methods (implicitly public and abstract)
+    void draw();
+    boolean isVisible();
+
+    // Since Java 8: default methods, which come with an implementation
+    default void displayInfo() {
+        System.out.println("This is a drawable object");
+    }
+
+    // Since Java 8: static methods, called on the interface itself
+    static void printHelp() {
+        System.out.println("Drawable objects can be drawn on a surface");
+    }
+}</code></pre> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; constants, default methods, static methods</span></div> <div class="bd"> <p>A <strong>field</strong> in an interface is implicitly <code>public static final</code> &mdash; a shared, unchangeable constant. You must give it a value on the spot, because <code>final</code> means it can never be assigned later. There is no such thing as an instance variable in an interface.</p> <p>A <strong>default method</strong> is declared with the keyword <code>default</code> and has a body. Every implementing class inherits it and may override it. Default methods were added in Java 8 so that a method could be added to an existing interface without breaking every class that already implemented it.</p> <p>A <strong>static method</strong> in an interface has a body and belongs to the interface, not to any object. You call it as <code>Drawable.printHelp()</code>, exactly like <code>Math.sqrt</code>.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; a default method taken and a default method overridden</span></div> <div class="bd"> <p>Two classes implement the interface above. <code>Circle</code> is the instructor's, and it overrides <code>displayInfo()</code>. <code>Square</code> is added here for contrast and does <em>not</em> override it. Both supply the two genuinely abstract methods, because there is no choice about those.</p> <p class="filename">Circle.java</p>
+<pre><code class="language-java">public class Circle implements Drawable {
+    private double radius;
+    private boolean visible;
+
+    public Circle(double radius) {
+        this.radius = radius;
+        this.visible = true;
+    }
+
+    // Must implement all abstract methods from the interface
+    @Override
+    public void draw() {
+        System.out.println("Drawing a circle with radius " + radius);
+    }
+
+    @Override
+    public boolean isVisible() {
+        return visible;
+    }
+
+    // The displayInfo() default method can be used as is,
+    // or can be overridden if needed
+    @Override
+    public void displayInfo() {
+        System.out.println("Circle with radius: " + radius);
+    }
+}</code></pre> <p class="filename">Square.java</p>
+<pre><code class="language-java">public class Square implements Drawable {
+    private double side;
+
+    public Square(double side) { this.side = side; }
+
+    @Override
+    public void draw() {
+        System.out.println("Drawing a square with side " + side);
+    }
+
+    @Override
+    public boolean isVisible() { return true; }
+    // displayInfo() is NOT overridden here
+}</code></pre> <p class="filename">DrawableDemo.java</p>
+<pre><code class="language-java">public class DrawableDemo {
+    public static void main(String[] args) {
+        Circle c = new Circle(3);
+        Square s = new Square(4);
+
+        c.draw();
+        c.displayInfo();          // Circle overrode the default method
+
+        s.draw();
+        s.displayInfo();          // Square uses the default method as written
+
+        Drawable.printHelp();     // static: called on the interface, not an object
+        System.out.println("The default color is " + Drawable.DEFAULT_COLOR);
+        System.out.println("Is the circle visible? " + c.isVisible());
+    }
+}</code></pre> <p><code>Square</code> never wrote a <code>displayInfo()</code>. Does the call <code>s.displayInfo()</code> compile, and if so, what does it print?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Drawing a circle with radius 3.0
+Circle with radius: 3.0
+Drawing a square with side 4.0
+This is a drawable object
+Drawable objects can be drawn on a surface
+The default color is java.awt.Color[r=0,g=0,b=0]
+Is the circle visible? true</code></pre> <p>It compiles, and it prints the interface's own text. That is precisely what "default" means: a body that applies unless the class supplies a better one. <code>Circle</code> supplied a better one, so <code>Circle</code> printed its own line.</p> <p><code>Drawable.printHelp()</code> is called on the interface name. There is no object involved and there could not be &mdash; a static method is not inherited by implementing classes in a way that lets you call <code>c.printHelp()</code>.</p> <p><code>Drawable.DEFAULT_COLOR</code> prints as <code>java.awt.Color[r=0,g=0,b=0]</code>, which is the <code>toString</code> that <code>java.awt.Color</code> happens to define for black. The point is not the formatting &mdash; it is that a single shared constant lives in the interface and every implementing class can read it by name.</p> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Warning<span class="tag">&mdash; three things an interface may not contain</span></div> <div class="bd"> <p>Each of these is a one-line compile error, and the messages are terse because the parser gives up early.</p> <p class="filename">1. An abstract method with a body (you forgot the word default)</p>
+<pre class="cmp"><code>public interface BadIface1 {
+    void draw() {
+        System.out.println("drawing");
+    }
+}
+
+BadIface1.java:2: error: interface abstract methods cannot have body</code></pre> <p class="filename">2. A field with no value (there are no instance variables in an interface)</p>
+<pre class="cmp"><code>public interface BadIface2 {
+    int count;
+    void draw();
+}
+
+BadIface2.java:2: error: = expected</code></pre> <p class="filename">3. A constructor (there is nothing to construct)</p>
+<pre class="cmp"><code>public interface BadIface4 {
+    BadIface4() { }
+    void draw();
+}
+
+BadIface4.java:2: error: &lt;identifier&gt; expected</code></pre> <p>The <code>= expected</code> message in case 2 is the compiler being helpful in a roundabout way: every field in an interface is <code>final</code>, so the only legal continuation after <code>int count</code> is <code>= something</code>. And because the fields are <code>final</code>, assigning to one later fails too &mdash; <code>Drawable.DEFAULT_COLOR = Color.RED;</code> gives <code>cannot assign a value to static final variable DEFAULT_COLOR</code>.</p> </div> </div> <p>One more thing an interface can do: extend another interface, with <code>extends</code>, exactly as a class would. Here is the instructor's example.</p> <p class="filename">Shape.java</p>
+<pre><code class="language-java">public interface Shape {
+    double getArea();
+    double getPerimeter();
+}</code></pre> <p class="filename">ColoredShape.java</p>
+<pre><code class="language-java">import java.awt.Color;
+
+public interface ColoredShape extends Shape {
+    Color getColor();
+    void setColor(Color color);
+}</code></pre> <p>A class that says <code>implements ColoredShape</code> must now write all <em>four</em> methods, because <code>ColoredShape</code> carries <code>Shape</code>'s two along with its own. And a <code>ColoredShape</code> reference may call all four, while a <code>Shape</code> reference pointed at the same object may call only two &mdash; the same widening rule as always. Unlike a class, an interface may extend several interfaces at once: <code>interface A extends B, C</code> is legal, because there are still no competing bodies to choose between.</p> <div class="box qc"> <div class="hd">Quick Check 14.9</div> <div class="bd"> <p>Consider this interface and the class below it.</p> <pre><code class="language-java">interface Greeter {
+    String name();
+
+    default void greet() {
+        System.out.println("Hello, " + name() + "!");
+    }
+
+    static void banner() {
+        System.out.println("=== greetings ===");
+    }
+}
+
+class Student implements Greeter {
+    private String who;
+    public Student(String who) { this.who = who; }
+    public String name() { return who; }
+}
+
+class Robot implements Greeter {
+    public String name() { return "unit 7"; }
+    public void greet() { System.out.println("GREETINGS, HUMAN."); }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>Greeter.banner();</code> then <code>new Student("Ana").greet();</code> then <code>new Robot().greet();</code> &mdash; what is printed?</p> <details class="soln"><summary></summary><div class="ans"> <pre class="out"><code>=== greetings ===
+Hello, Ana!
+GREETINGS, HUMAN.</code></pre> <p><code>Student</code> inherits the default <code>greet()</code>, which calls <code>name()</code> &mdash; and <code>name()</code> is abstract in the interface, so the version that runs is <code>Student</code>'s. A default method calling an abstract method from the same interface is the same pattern as <code>AbstractShape.printInfo()</code> calling <code>getArea()</code>.</p> <p><code>Robot</code> overrode <code>greet()</code>, so its own body runs and <code>name()</code> is never called.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Does <code>new Student("Ana").banner();</code> compile?</p> <details class="soln"><summary></summary><div class="ans"> <p>No. A static interface method is not inherited by implementing classes; it belongs to the interface and only to the interface. Write <code>Greeter.banner();</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>Greeter g = new Robot(); g.name();</code> &mdash; legal? And <code>Greeter g2 = new Greeter();</code>?</p> <details class="soln"><summary></summary><div class="ans"> <p>The first is legal: <code>Greeter</code> is a reference type and <code>name()</code> is declared in it.</p> <p>The second is not. An interface is abstract in the strongest sense, and the error is the same one abstract classes give:</p> <pre class="err"><code>NewInterface.java:3: error: Drawable is abstract; cannot be instantiated
+        Drawable d = new Drawable();
+                     ^
+1 error</code></pre> <p>(That message is from the equivalent attempt with <code>Drawable</code>; the wording for <code>Greeter</code> is identical.)</p> <p><strong>Things to notice across all three parts.</strong> <code>default</code> and <code>static</code> look similar &mdash; both are interface methods with bodies &mdash; and they behave in opposite ways. A <code>default</code> method belongs to the <em>object</em> and is inherited and overridable. A <code>static</code> method belongs to the <em>interface</em> and is neither. When in doubt, ask whether the method needs to know which object it is running on.</p> </div></details> </div> </div> </div> <h2 id="s7"><span class="num">7.</span>Abstract class or interface?</h2> <p>You now have two mechanisms that both let you declare a method without writing it. They overlap, they are not interchangeable, and this table is the thing to memorise. It is the instructor's, with a few rows added.</p> <table> <tr><th>Feature</th><th>Interface</th><th>Abstract class</th></tr> <tr><td>Keyword to declare</td><td><code>interface</code></td><td><code>abstract class</code></td></tr> <tr><td>Keyword to sign up</td><td><code>implements</code></td><td><code>extends</code></td></tr> <tr><td>Methods</td><td>All abstract (before Java 8); <code>default</code> and <code>static</code> methods may have bodies</td><td>Can have both abstract and concrete methods</td></tr> <tr><td>Variables</td><td>Only constants &mdash; implicitly <code>public static final</code></td><td>Can have instance variables, of any access level</td></tr> <tr><td>Constructor</td><td>Cannot have constructors</td><td>Can have constructors, called by <code>super(...)</code></td></tr> <tr><td>Multiple inheritance</td><td>A class can implement multiple interfaces</td><td>A class can extend only one abstract class</td></tr> <tr><td>Access modifiers</td><td>All methods are <code>public</code> by default</td><td>Methods can have any access modifier</td></tr> <tr><td>Can it be instantiated?</td><td>No</td><td>No</td></tr> <tr><td>Purpose</td><td>To define capabilities &mdash; what a class <em>can do</em></td><td>To define a base class with common features &mdash; what a class <em>is</em></td></tr> </table> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; is-a versus can-do</span></div> <div class="bd"> <p>Read an <code>extends</code> as <strong>"is a"</strong>: an <code>AbstractRectangle</code> <em>is an</em> <code>AbstractShape</code>. Read an <code>implements</code> as <strong>"can"</strong>: an <code>AbstractRectangle</code> <em>can be drawn</em> and <em>can be resized</em>.</p> <p>A class has exactly one answer to "what is it?" and any number of answers to "what can it do?" &mdash; which is precisely why Java gives you one <code>extends</code> and unlimited <code>implements</code>.</p> </div> </div> <p>The instructor's decision rule, which is the same idea stated as a checklist:</p> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; choosing between the two</span></div> <div class="bd"> <p><strong>Use an interface when:</strong></p> <ol> <li>You need to define common behavior for <em>unrelated</em> classes.</li> <li>You need multiple inheritance &mdash; the class already extends something else, or will need to.</li> <li>You want to specify <em>what</em> a class does, not <em>how</em> it does it.</li> </ol> <p><strong>Use an abstract class when:</strong></p> <ol> <li>You want to share code among <em>closely related</em> classes.</li> <li>You need to declare non-public members.</li> <li>You need instance variables or constructors.</li> <li>You want to provide a partial implementation.</li> </ol> <p>And when both apply &mdash; which is common &mdash; use both, exactly as <code>AbstractRectangle</code> does. The two mechanisms were never meant to compete.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 14.10</div> <div class="bd"> <p>For each design, say whether you would write an interface, an abstract class, or both, and give one sentence of justification.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Every employee in a payroll system has a name, an ID and a hire date, and every employee can compute their pay &mdash; but salaried, hourly and commissioned employees compute it completely differently.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Abstract class.</strong> Three fields shared by every subclass means instance variables and a constructor to initialise them, and neither is possible in an interface. <code>computePay()</code> is the abstract method; <code>getName()</code> and <code>toString()</code> are concrete and written once.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> A file, a database row and a network message can all be <em>saved</em>, and your program has one <code>saveAll</code> routine that should handle a mixture of them.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Interface.</strong> The three classes have nothing in common &mdash; no shared fields, no shared code, and they almost certainly already extend different things. All they share is a capability, which is exactly what an interface is for. <code>saveAll</code> takes a <code>Saveable[]</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> The shape hierarchy on this page: shapes share an area and a perimeter, some of them can be drawn on screen, and some of them can be resized.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Both</strong>, and this is why the instructor's example is built the way it is. "Has an area and a perimeter" is what a shape <em>is</em>, and <code>printInfo()</code> is real shared code, so that is the abstract class. "Can be drawn" and "can be resized" are capabilities that some shapes have and some non-shapes also have &mdash; <code>TextLabel</code> can be drawn and is not a shape at all &mdash; so those are interfaces.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> A <code>Comparable</code> notion: any two objects of the same kind can be put in order.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Interface</strong> &mdash; and Java agrees, which is why <code>java.lang.Comparable</code> is one. Being orderable is a capability, it applies to classes with no relationship (<code>String</code>, <code>Integer</code>, <code>Date</code>), and there is no shared code or state to inherit. Any class that wants to be sortable implements it, whatever else it already extends.</p> <p><strong>Things to notice across all four parts.</strong> Ask two questions in order. <em>Is there shared state or shared code?</em> If yes, you need an abstract class, because an interface cannot hold either. <em>Do unrelated classes need this?</em> If yes, you need an interface, because they cannot all extend one parent. Answer both yes and you write both, as in part (c).</p> </div></details> </div> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; storing the same fact twice</span></div> <div class="bd"> <p><code>AbstractSquare</code> inherits <code>width</code> and <code>height</code> from <code>AbstractRectangle</code>, and it is tempting to add a <code>side</code> field of its own so the class has a name for the thing it cares about. Do not &mdash; unless you are prepared to keep it in step forever:</p> <pre><code class="language-java">class BadSquare extends AbstractRectangle {
+    private double side;                       // a second copy of the same fact
+
+    public BadSquare(double side) {
+        super(side, side);
+        this.side = side;
+    }
+
+    public double getSide() { return side; }   // reads the copy, not the parent
+
+    @Override
+    public void draw() {
+        System.out.println("Drawing a square with side length " + getSide());
+    }
+}</code></pre> <p class="filename">StaleSquare.java</p>
+<pre><code class="language-java">public class StaleSquare {
+    public static void main(String[] args) {
+        BadSquare sq = new BadSquare(5);
+        sq.draw();
+        sq.resize(2.0);
+        sq.draw();
+        System.out.println("but getWidth() says " + sq.getWidth());
+    }
+}</code></pre> <pre class="out"><code>Creating a shape
+Drawing a square with side length 5.0
+Rectangle resized proportionally to width: 10.0, height: 10.0
+Drawing a square with side length 5.0
+but getWidth() says 10.0</code></pre> <p>The square was resized to 10 and still says 5, because <code>resize</code> is inherited from <code>AbstractRectangle</code> and knows nothing about a <code>side</code> field it has never heard of. The <code>AbstractSquare</code> in section 4 avoids this by writing <code>getSide()</code> as <code>return getWidth();</code> &mdash; there is one copy of the number, in the parent, and the child just asks for it.</p> <p>Worth knowing, because you will see it in other people's code: a class may hold such a field and still be correct, as long as nothing ever reads it. That is a fragile kind of correct. The moment someone writes <code>return side;</code> inside <code>getSide()</code>, the output above is what they get, and nothing in the compiler will warn them.</p> <p>This is not a rule about squares. Any time a subclass duplicates state that its parent already owns, a parent method that updates the original will silently leave the copy stale. Derive, do not duplicate.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 14.11</div> <div class="bd"> <p>Which of these headers are legal Java? <code>AbstractShape</code>, <code>AbstractRectangle</code>, <code>Drawable</code> and <code>Resizable</code> are as on this page.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>class H1 extends AbstractRectangle implements Drawable</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Legal. It is also redundant &mdash; <code>AbstractRectangle</code> already implements <code>Drawable</code>, so <code>H1</code> would be a <code>Drawable</code> without the second clause &mdash; but saying it again compiles and costs nothing. You have now seen this redundancy three times: here, in Practice Problem 2's <code>Square</code>, and in Practice Problem 4's <code>Orange</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>class H2 implements Drawable extends AbstractShape</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Not legal. The order is fixed: <code>extends</code> first, then <code>implements</code>. Getting it backwards is a pure syntax error, and the parser gives up at the word it did not expect:</p> <pre class="err"><code>H2.java:1: error: '{' expected
+public class H2 implements Drawable extends AbstractShape {
+                                   ^
+1 error</code></pre> <p>There is a reason for the order beyond convention: there is at most one <code>extends</code>, so putting it first keeps the interesting, unbounded part of the header at the end.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>interface H3 extends Drawable, Resizable</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Legal. An interface uses <code>extends</code> (not <code>implements</code>) to build on other interfaces, and unlike a class it may extend <em>several</em> at once &mdash; there are no competing method bodies to choose between. A class that says <code>implements H3</code> must then supply <code>draw()</code>, <code>resize(double)</code> and anything <code>H3</code> adds of its own.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>class H4 extends AbstractShape, Object</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Not legal, for the reason section 5 gave: one <code>extends</code> per class, full stop. The parser reports the same <code>'{' expected</code> at the comma.</p> <p><strong>Things to notice across all four parts.</strong> Two words, two rules. <code>extends</code> takes exactly one name and appears at most once, whether the class is abstract or not. <code>implements</code> takes a comma-separated list of any length &mdash; and on an interface, confusingly, that list is spelled <code>extends</code> too. When you see <code>extends</code> in a header, look at the first keyword of the declaration to know which rule applies.</p> </div></details> </div> </div> </div> <h2 id="prac"><span class="num">&#9733;</span>Practice Problems</h2> <div class="box prac"> <div class="hd">Practice Problems<span class="tag">&mdash; interfaces are the exam favourite here</span></div> <div class="bd"> <p>The first four are the instructor's own, from Exam 2 and the practice sets. Every one of them is about <em>interfaces</em> rather than abstract classes, which is a useful signal about where the marks tend to be, and every one of them asks you to write a class header and a method &mdash; not just to predict output. Get the headers right and most of the credit is already yours. The last two are written for these notes: one is a find-the-errors question covering both halves of the lecture, and one asks you to make the design decision from section 7 yourself.</p> </div> </div> <h3>Problem 1 &mdash; Implement an interface, then extend the implementation <span class="muted">(from CSCI 212 Exam 2, Spring 2025, Problem 1)</span></h3> <p>Consider the following interface:</p> <p class="filename">Printable.java</p>
+<pre><code class="language-java">public interface Printable {
+    void printInfo();
+    void printInfo(int times);
+}</code></pre> <p>Write a class <code>Document</code> that implements <code>Printable</code>. The class should:</p> <ul> <li>Have a private <code>String</code> field <code>content</code>;</li> <li>Have a constructor that takes the content as a parameter;</li> <li>Implement the <code>printInfo()</code> method to print the content;</li> <li>Implement the <code>printInfo(int times)</code> method to print the content the specified number of times.</li> </ul> <p>Then write a subclass <code>FormattedDocument</code> that extends <code>Document</code> and has only one method. That method should override <code>printInfo()</code> to print the content in ALL CAPS. <em>Hint: you can use the <code>String</code> method <code>toUpperCase()</code>.</em></p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The interface names two obligations, so <code>Document</code> needs exactly two <code>@Override</code> methods, both <code>public</code>. <code>printInfo(int times)</code> should not repeat the printing logic &mdash; it should call <code>printInfo()</code> in a loop, which is shorter and, as we will see, does something useful for the subclass for free.</p> <p><code>FormattedDocument</code> is where the marks are lost. It must call <code>super(content)</code>, because <code>Document</code> has no no-argument constructor. And it has to read <code>content</code> &mdash; which is <code>private</code>, so it cannot touch it directly. The cleanest fix that respects the stated requirement is a <code>protected</code> getter on <code>Document</code>.</p> <p class="filename">Document.java</p>
+<pre><code class="language-java">public class Document implements Printable {
+    private String content;
+
+    public Document(String content) {
+        this.content = content;
+    }
+
+    protected String getContent() {
+        return content;
+    }
+
+    @Override
+    public void printInfo() {
+        System.out.println(content);
+    }
+
+    @Override
+    public void printInfo(int times) {
+        for (int i = 0; i &lt; times; i++) {
+            printInfo();
+        }
+    }
+}</code></pre> <p class="filename">FormattedDocument.java</p>
+<pre><code class="language-java">public class FormattedDocument extends Document {
+
+    public FormattedDocument(String content) {
+        super(content);
+    }
+
+    @Override
+    public void printInfo() {
+        System.out.println(getContent().toUpperCase());
+    }
+}</code></pre> <p class="filename">DocumentDemo.java</p>
+<pre><code class="language-java">public class DocumentDemo {
+    public static void main(String[] args) {
+        Printable d = new Document("hello csci 212");
+        d.printInfo();
+        d.printInfo(2);
+
+        System.out.println("---");
+
+        Printable f = new FormattedDocument("hello csci 212");
+        f.printInfo();
+        f.printInfo(3);
+    }
+}</code></pre> <pre class="out"><code>hello csci 212
+hello csci 212
+hello csci 212
+---
+HELLO CSCI 212
+HELLO CSCI 212
+HELLO CSCI 212
+HELLO CSCI 212</code></pre> <p><strong>Things to notice.</strong> <code>FormattedDocument</code> overrides only <code>printInfo()</code>, exactly as the question demands &mdash; and yet <code>f.printInfo(3)</code> prints three capitalised lines. The inherited <code>printInfo(int)</code> calls <code>printInfo()</code>, and that call goes to the object's own version. One override changed the behaviour of a method that was not overridden. Writing <code>printInfo(int)</code> as a loop over <code>printInfo()</code> rather than duplicating the <code>println</code> is what bought that.</p> <p><strong>The <code>private</code> trap.</strong> The obvious thing to write in <code>FormattedDocument</code> is <code>System.out.println(super.content.toUpperCase());</code>. It does not compile:</p> <pre class="err"><code>FormattedDocument.java:6: error: content has private access in Document
+        System.out.println(super.content.toUpperCase());
+                                ^
+1 error</code></pre> <p><code>private</code> means private to the class, not to the family &mdash; a subclass cannot see it, and <code>super.</code> does not change that. The two repairs are the getter shown above, or declaring the field <code>protected String content;</code> in <code>Document</code>, after which plain <code>content.toUpperCase()</code> works in the subclass. Both are accepted; the getter keeps the field private as the question asked.</p> <p>Note also that <code>Printable</code> declares two methods with the same name and different parameter lists. That is ordinary overloading, and an interface may do it. It obliges you to write two separate methods, not one.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 1</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="21" aria-label="Live coding - Practice Problem 1">public class Document implements Printable {
+    // 1. private String field content
+
+    // 2. constructor taking the content
+
+    // 3. printInfo()          -- print the content
+
+    // 4. printInfo(int times) -- print it that many times
+
+}
+
+// -------- second file --------
+
+public class FormattedDocument extends Document {
+    // 5. constructor -- remember super(content)
+
+    // 6. override printInfo() to print in ALL CAPS
+
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 2 &mdash; Implement an interface and a superclass at once <span class="muted">(from Exam 2 Practice Problems)</span></h3> <p>Given the following two files:</p> <p class="filename">Shape.java</p>
+<pre><code class="language-java">public interface Shape {
+    public int area();
+    public int perimeter();
+}</code></pre> <p class="filename">Rectangle.java</p>
+<pre><code class="language-java">public class Rectangle implements Shape {
+    private int width;
+    private int length;
+
+    public Rectangle(int length, int width) {
+        this.length = length;
+        this.width = width;
+    }
+
+    public int area() { return length * width; }
+
+    public int perimeter() { return 2 * (length + width); }
+
+    // setter and getter methods are omitted.
+
+    public String toString() { return "rectangle"; }
+}</code></pre> <p>Write a class <code>Square</code> that is a subclass of <code>Rectangle</code> and implements the interface <code>Shape</code>. Add a field <code>count</code> to this class to count the number of squares created in the program, implement the constructor (remembering to update <code>count</code>), and write only one method <code>toString</code>, returning the <code>String</code> <code>"square"</code>. Then give the output of each of the six marked lines.</p> <pre><code class="language-java">public static void main(String[] args) {
+    Square s = new Square(3);
+    System.out.println(s.perimeter());   //---------(a)
+    Shape p = new Square(5);
+    System.out.println(p.toString());    //---------(b)
+    Rectangle r = new Square(6);
+    System.out.println(r);               //---------(c)
+    System.out.println(s.area());        //---------(d)
+    System.out.println(p.perimeter());   //---------(e)
+    System.out.println(r.area());        //---------(f)
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> <code>Square</code> needs nothing of its own except a side length, and it does not even store that &mdash; it hands the side to <code>Rectangle</code> twice through <code>super</code>. The counter must be <code>static</code>, because it counts squares in the whole program rather than belonging to any one square, and it is incremented in the constructor so that every construction path is covered.</p> <p>For the output, notice that <code>area()</code> and <code>perimeter()</code> are never overridden anywhere, so the answers come straight from <code>Rectangle</code>'s arithmetic on a square's equal sides. Only <code>toString</code> is overridden, and it ignores everything.</p> <p class="filename">Square.java</p>
+<pre><code class="language-java">public class Square extends Rectangle implements Shape {
+    private static int count = 0;
+
+    public Square(int sideLength) {
+        super(sideLength, sideLength);
+        count++;
+    }
+
+    @Override
+    public String toString() { return "square"; }
+
+    public static void main(String[] args) {
+        Square s = new Square(3);
+        System.out.println(s.perimeter());   //---------(a)
+        Shape p = new Square(5);
+        System.out.println(p.toString());    //---------(b)
+        Rectangle r = new Square(6);
+        System.out.println(r);               //---------(c)
+        System.out.println(s.area());        //---------(d)
+        System.out.println(p.perimeter());   //---------(e)
+        System.out.println(r.area());        //---------(f)
+        System.out.println("squares created: " + count);
+    }
+}</code></pre> <pre class="out"><code>12
+square
+square
+9
+20
+36
+squares created: 3</code></pre> <table class="trace"> <tr><th>Line</th><th>Expression</th><th>Result</th><th>Why</th></tr> <tr><td>(a)</td><td><code>s.perimeter()</code></td><td><code>12</code></td><td><code>Rectangle.perimeter()</code> on 3 by 3: 2 &times; (3 + 3)</td></tr> <tr><td>(b)</td><td><code>p.toString()</code></td><td><code>square</code></td><td><code>p</code> is declared <code>Shape</code>, but the object is a <code>Square</code> and <code>Square</code> overrides <code>toString</code></td></tr> <tr><td>(c)</td><td><code>println(r)</code></td><td><code>square</code></td><td><code>println</code> of an object calls its <code>toString</code>; same override</td></tr> <tr><td>(d)</td><td><code>s.area()</code></td><td><code>9</code></td><td>3 &times; 3</td></tr> <tr><td>(e)</td><td><code>p.perimeter()</code></td><td><code>20</code></td><td>2 &times; (5 + 5); <code>perimeter()</code> is declared in <code>Shape</code>, so the call compiles through a <code>Shape</code> reference</td></tr> <tr><td>(f)</td><td><code>r.area()</code></td><td><code>36</code></td><td>6 &times; 6</td></tr> </table> <p><strong>Things to notice.</strong> Line (b) is the one the problem is built around. <code>p</code> is declared with an <em>interface</em> type, and <code>toString()</code> is not even mentioned in <code>Shape</code> &mdash; yet the call compiles. It compiles because every reference type in Java, interfaces included, is guaranteed to have <code>Object</code>'s methods available, and <code>toString()</code> is one of them. The object then supplies its own version.</p> <p><code>implements Shape</code> on <code>Square</code> is redundant: <code>Rectangle</code> already implements <code>Shape</code>, so <code>Square</code> is a <code>Shape</code> regardless. It is harmless, it is what the question asks for, and it documents the intent. Nothing obliges you to write any methods for it, because <code>Rectangle</code> already did.</p> <p><code>count</code> reaches 3 because three <code>Square</code> objects are built &mdash; sides 3, 5 and 6. It is a <code>static</code> field, so there is exactly one copy shared by all of them; had you written <code>private int count = 0;</code> every square would have had its own copy sitting at 1.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 2</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="10" aria-label="Live coding - Practice Problem 2">public class Square extends Rectangle implements Shape {
+    // 1. a static counter of how many squares have been created
+
+    // 2. a constructor taking the side length; call super and bump the counter
+
+    // 3. toString() returning "square"
+
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 3 &mdash; Write the interface, then the subclass <span class="muted">(from Exam 2 Practice Problems)</span></h3> <p>Consider the following class.</p> <p class="filename">B.java</p>
+<pre><code class="language-java">public class B implements A {
+
+    public void printMessage() {
+        printAnswer();
+        System.out.println("unknown");
+    }
+
+    void printAnswer() { System.out.print("The answer is "); }
+
+    public void printMessage(int x) {
+        for (int i = 0; i &lt; x; i++) printMessage();
+    }
+
+    public static void main(String args[]) {
+        A a = new C();
+        B b = new B();
+        a.printMessage();
+        b.printMessage();
+        b = (B) a;
+        b.printMessage(2);
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> Write the interface <code>A</code> that requires the two <code>printMessage</code> methods.</p> <details class="soln"><summary></summary><div class="ans"> <p class="filename">A.java</p>
+<pre><code class="language-java">public interface A {
+    void printMessage();
+    void printMessage(int x);
+}</code></pre> <p>Two signatures, semicolons, no bodies, no modifiers needed &mdash; <code>public</code> and <code>abstract</code> are implicit. Note what does <em>not</em> go in: <code>printAnswer()</code> is not part of the contract. <code>B</code> may have as many extra methods as it likes; the interface constrains the minimum, not the maximum.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Write a subclass <code>C</code> of <code>B</code> that has only one method. That method should override <code>public void printMessage()</code> and make it print <code>The answer is 42</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p class="filename">C.java</p>
+<pre><code class="language-java">public class C extends B {
+    public void printMessage() {
+        printAnswer();
+        System.out.println(42);
+    }
+}</code></pre> <p>The required text is <code>The answer is 42</code>, and <code>printAnswer()</code> already prints <code>The answer is </code> with a trailing space and no newline &mdash; so reusing it and adding <code>42</code> produces exactly the wanted line in two statements. Writing <code>System.out.println("The answer is 42");</code> would also produce the right text, but reusing the inherited helper is what the question is fishing for.</p> <p><code>C</code> writes no constructor. It does not need one: <code>B</code> has only the implicit no-argument constructor, so <code>C</code> gets an implicit one too.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> With <code>A</code> and <code>C</code> as above, what is the output when <code>B.main</code> runs?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Four calls, so four blocks of output. Take them one at a time and, for each, ask which object it is running on.</p> <table class="trace"> <tr><th>Statement</th><th>Object</th><th>Which <code>printMessage()</code> body</th><th>Printed</th></tr> <tr><td><code>a.printMessage()</code></td><td>a <code>C</code></td><td><code>C</code>'s</td><td><code>The answer is 42</code></td></tr> <tr><td><code>b.printMessage()</code></td><td>a <code>B</code></td><td><code>B</code>'s</td><td><code>The answer is unknown</code></td></tr> <tr><td><code>b = (B) a;</code></td><td>&mdash;</td><td>&mdash;</td><td>nothing &mdash; <code>b</code> now points at the <code>C</code></td></tr> <tr><td><code>b.printMessage(2)</code></td><td>the <code>C</code></td><td><code>B</code>'s <code>printMessage(int)</code>, calling <code>C</code>'s <code>printMessage()</code> twice</td><td>two <code>The answer is 42</code> lines</td></tr> </table> <pre class="out"><code>The answer is 42
+The answer is unknown
+The answer is 42
+The answer is 42</code></pre> <p><strong>Things to notice.</strong> The cast <code>(B) a</code> succeeds because the object really is a <code>C</code>, and every <code>C</code> is a <code>B</code>. It changes nothing about the object &mdash; the last two lines are <code>C</code>'s text, not <code>B</code>'s.</p> <p><code>printMessage(int)</code> is written once, in <code>B</code>, and <code>C</code> never touches it. Yet running it on a <code>C</code> produces <code>C</code>'s output, because its body calls <code>printMessage()</code> on the same object. This is exactly the structure of Problem 1's <code>printInfo(int)</code>, and exactly the structure of <code>AbstractShape.printInfo()</code> calling <code>getArea()</code>. Once you have seen the pattern three times it stops being a puzzle: <em>a shared method that calls a replaceable one gives you shared code with per-class behaviour.</em></p> <p>Note also that <code>printAnswer()</code> has no access modifier, which makes it package-private. <code>C</code> can call it because both classes are in the same package. Had <code>printAnswer()</code> been <code>private</code>, <code>C</code> would not compile.</p> </div></details> </div> <h3>Problem 4 &mdash; Class headers and one override <span class="muted">(from Final Practice Problems)</span></h3> <p>A class named <code>Fruit</code> implements an interface called <code>Edible</code>. The interface has a single method called <code>howToEat()</code>. A class called <code>Orange</code> extends <code>Fruit</code> and implements <code>Edible</code>. Write the class header for the <code>Orange</code> class and override the <code>howToEat()</code> method of the <code>Fruit</code> class. The method should print a brief message about how to eat an orange. Do not write any other methods or constructors.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The whole question is the header. <code>extends</code> comes before <code>implements</code>, the class name comes first, and both are on one line. The method must be <code>public</code> &mdash; <code>howToEat()</code> reached <code>Fruit</code> from an interface, so it is <code>public</code> there and cannot become narrower here.</p> <p class="filename">Orange.java</p>
+<pre><code class="language-java">public class Orange extends Fruit implements Edible {
+    @Override
+    public void howToEat() {
+        System.out.println("Peel the orange, separate into segments, and enjoy!");
+    }
+}</code></pre> <p>Here are the two supporting files and a driver, so you can see it run:</p> <p class="filename">Edible.java</p>
+<pre><code class="language-java">public interface Edible {
+    void howToEat();
+}</code></pre> <p class="filename">Fruit.java</p>
+<pre><code class="language-java">public class Fruit implements Edible {
+    @Override
+    public void howToEat() {
+        System.out.println("Wash it and eat it.");
+    }
+}</code></pre> <p class="filename">FruitDemo.java</p>
+<pre><code class="language-java">public class FruitDemo {
+    public static void main(String[] args) {
+        Edible[] basket = { new Fruit(), new Orange() };
+        for (int i = 0; i &lt; basket.length; i++) {
+            basket[i].howToEat();
+        }
+    }
+}</code></pre> <pre class="out"><code>Wash it and eat it.
+Peel the orange, separate into segments, and enjoy!</code></pre> <p><strong>Things to notice.</strong> <code>implements Edible</code> on <code>Orange</code> is redundant &mdash; <code>Fruit</code> already implements it, so <code>Orange</code> is <code>Edible</code> either way &mdash; but the question asks for it and it is harmless. Exactly the same redundancy appears in Problem 2's <code>Square</code>. It is worth recognising as redundancy rather than as a rule.</p> <p>The <code>Edible[]</code> in the driver is the point of the whole exercise: one array, one loop, and each element does its own thing. If you added <code>Apple</code> and <code>Banana</code> tomorrow, the loop would not change.</p> <p>No constructor is written anywhere, which the question explicitly permits. <code>Fruit</code> gets the implicit no-argument constructor, and <code>Orange</code> gets one that calls it.</p> </div></details> <h3>Problem 5 &mdash; Find the three errors <span class="muted">(added for these notes)</span></h3> <p>Exactly 3 of the numbered lines below are wrong. Identify the 3 lines, say what is wrong with each, and give a corrected version. Lines without a number are correct as written.</p> <p class="filename">ShapeErrors.java</p>
+<pre><code class="language-java">abstract class AbstractShape {
+    public abstract double getArea();
+
+    public void printInfo() {
+        System.out.println("Area: " + getArea());
+    }
+}
+
+interface Resizable {
+    void resize(double factor);
+}
+
+class AbstractCircle extends AbstractShape implements Resizable {   // line 1
+    private double radius;
+
+    public AbstractCircle(double radius) { this.radius = radius; }
+
+    public double getArea() { return Math.PI * radius * radius; }
+
+    void resize(double factor) {                                    // line 2
+        this.radius *= factor;
+    }
+}
+
+public class ShapeErrors {
+    public static void main(String args[]) {
+        AbstractShape s = new AbstractShape();                      // line 3
+        Resizable r = new AbstractCircle(2);                        // line 4
+        r.printInfo();                                              // line 5
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Check three separate things, in this order. First, does every class meet all its obligations, and with the right access? Second, is anything being constructed that cannot be? Third, for each call, is the method visible from the <em>declared</em> type of the reference?</p> <p>Lines 1 and 4 are fine, and it is worth seeing why before hunting for what is not. Line 1 is a legal header &mdash; a class may extend one class and implement interfaces in the same breath. Line 4 is a legal declaration &mdash; an interface is a reference type, and <code>AbstractCircle</code> implements it.</p> <p><strong>Error 1 &mdash; line 2, missing <code>public</code>.</strong> <code>resize</code> came from an interface, so it is <code>public</code> there, and an implementation may never be less visible.</p> <pre class="err"><code>ShapeErrors.java:20: error: resize(double) in AbstractCircle cannot implement resize(double) in Resizable
+    void resize(double factor) {                                    // line 2
+         ^
+  attempting to assign weaker access privileges; was public</code></pre> <p>Corrected: <code>public void resize(double factor) {</code></p> <p><strong>Error 2 &mdash; line 3, instantiating an abstract class.</strong></p> <pre class="err"><code>ShapeErrors.java:27: error: AbstractShape is abstract; cannot be instantiated
+        AbstractShape s = new AbstractShape();                      // line 3
+                          ^</code></pre> <p>Corrected: build a concrete subclass instead &mdash; <code>AbstractShape s = new AbstractCircle(3);</code>. Note that the <em>declaration</em> <code>AbstractShape s</code> was never the problem.</p> <p><strong>Error 3 &mdash; line 5, calling through the wrong type.</strong> <code>printInfo()</code> is declared in <code>AbstractShape</code>, and <code>r</code> is declared <code>Resizable</code>. The two types know nothing about each other.</p> <pre class="err"><code>ShapeErrors.java:29: error: cannot find symbol
+        r.printInfo();                                              // line 5
+         ^
+  symbol:   method printInfo()
+  location: variable r of type Resizable</code></pre> <p>Corrected: <code>((AbstractShape) r).printInfo();</code>, or simply call it through <code>s</code>.</p> <p>With all three fixed &mdash; and giving the two references something interesting to do:</p> <p class="filename">ShapeErrors.java</p>
+<pre><code class="language-java">abstract class AbstractShape {
+    public abstract double getArea();
+
+    public void printInfo() {
+        System.out.println("Area: " + getArea());
+    }
+}
+
+interface Resizable {
+    void resize(double factor);
+}
+
+class AbstractCircle extends AbstractShape implements Resizable {   // line 1
+    private double radius;
+
+    public AbstractCircle(double radius) { this.radius = radius; }
+
+    public double getArea() { return Math.PI * radius * radius; }
+
+    public void resize(double factor) {                             // line 2
+        this.radius *= factor;
+    }
+}
+
+public class ShapeErrors {
+    public static void main(String args[]) {
+        AbstractShape s = new AbstractCircle(3);                    // line 3
+        Resizable r = new AbstractCircle(2);                        // line 4
+        s.printInfo();                                              // line 5
+        r.resize(2.0);
+        ((AbstractShape) r).printInfo();
+    }
+}</code></pre> <pre class="out"><code>Area: 28.274333882308138
+Area: 50.26548245743669</code></pre> <p><strong>Things to notice.</strong> All three errors were reported by a single <code>javac</code> run. Type errors, unlike a missing semicolon, do not stop the parser, so the compiler keeps going and finds everything &mdash; use that, and read the whole list before you start fixing.</p> <p>The second area is 50.265..., which is &pi; &times; 4<sup>2</sup>: the radius-2 circle was resized by a factor of 2. If you expected &pi; &times; 2<sup>2</sup> you forgot the <code>r.resize(2.0)</code> line.</p> <p>Errors 1 and 3 are the two halves of the same idea, seen from opposite sides. Line 2 is about what a class <em>owes</em> an interface; line 5 is about what a reference <em>gets</em> from one. An interface is a contract, and a contract binds both parties.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 5</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="28" aria-label="Live coding - Practice Problem 5">abstract class AbstractShape {
+    public abstract double getArea();
+
+    public void printInfo() {
+        System.out.println("Area: " + getArea());
+    }
+}
+
+interface Resizable {
+    void resize(double factor);
+}
+
+class AbstractCircle extends AbstractShape implements Resizable {   // line 1
+    private double radius;
+
+    public AbstractCircle(double radius) { this.radius = radius; }
+
+    public double getArea() { return Math.PI * radius * radius; }
+
+    void resize(double factor) {                                    // line 2
+        this.radius *= factor;
+    }
+}
+
+public class ShapeErrors {
+    public static void main(String args[]) {
+        AbstractShape s = new AbstractShape();                      // line 3
+        Resizable r = new AbstractCircle(2);                        // line 4
+        r.printInfo();                                              // line 5
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 6 &mdash; Design it yourself <span class="muted">(added for these notes)</span></h3> <p>A small library system needs to model books, DVDs and staff members.</p> <ul> <li>Every <strong>library item</strong> has a title and an ID number, can report a <code>getLateFeePerDay()</code>, and can <code>describe()</code> itself. Books and DVDs charge different late fees. The <code>describe()</code> output is the same shape for every item: the title, then the ID.</li> <li>Books, DVDs <em>and staff members</em> can all be <strong>searched for by name</strong> through a single <code>search</code> routine. A staff member is not a library item and has no late fee.</li> </ul> <p>Decide which parts should be an abstract class and which should be an interface, write them, write <code>Book</code>, <code>Dvd</code> and <code>StaffMember</code>, and write a <code>main</code> that puts one of each into a single array and searches it.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Apply the two questions from Quick Check 14.10. <em>Is there shared state or shared code?</em> Yes &mdash; every item has a title and an ID, and <code>describe()</code> is written once for all of them. That is an abstract class, <code>LibraryItem</code>, with a constructor. The late fee differs per subclass and has no sensible general value, so it is the abstract method.</p> <p><em>Do unrelated classes need this?</em> Yes &mdash; <code>StaffMember</code> is not a <code>LibraryItem</code> and must never be given a late fee, yet it has to go in the same search. So "can be searched by name" is an interface, <code>Searchable</code>, with one method. Every class implements it, including the two that already extend <code>LibraryItem</code>.</p> <p class="filename">Searchable.java</p>
+<pre><code class="language-java">public interface Searchable {
+    String getSearchName();
+}</code></pre> <p class="filename">LibraryItem.java</p>
+<pre><code class="language-java">public abstract class LibraryItem implements Searchable {
+    private String title;
+    private int id;
+
+    public LibraryItem(String title, int id) {
+        this.title = title;
+        this.id = id;
+    }
+
+    public String getTitle() { return title; }
+
+    public int getId() { return id; }
+
+    // No sensible general answer -- every kind of item charges differently.
+    public abstract double getLateFeePerDay();
+
+    // Written once, shared by every subclass.
+    public void describe() {
+        System.out.println(title + " (id " + id + "), late fee "
+                           + getLateFeePerDay() + " per day");
+    }
+
+    @Override
+    public String getSearchName() { return title; }
+}</code></pre> <p class="filename">Book.java</p>
+<pre><code class="language-java">public class Book extends LibraryItem {
+    private String author;
+
+    public Book(String title, int id, String author) {
+        super(title, id);
+        this.author = author;
+    }
+
+    @Override
+    public double getLateFeePerDay() { return 0.25; }
+}</code></pre> <p class="filename">Dvd.java</p>
+<pre><code class="language-java">public class Dvd extends LibraryItem {
+    private int minutes;
+
+    public Dvd(String title, int id, int minutes) {
+        super(title, id);
+        this.minutes = minutes;
+    }
+
+    @Override
+    public double getLateFeePerDay() { return 1.50; }
+}</code></pre> <p class="filename">StaffMember.java</p>
+<pre><code class="language-java">// Not a LibraryItem. It has no title, no ID and no late fee --
+// it only promises that it can be found by name.
+public class StaffMember implements Searchable {
+    private String name;
+
+    public StaffMember(String name) { this.name = name; }
+
+    @Override
+    public String getSearchName() { return name; }
+}</code></pre> <p class="filename">Library.java</p>
+<pre><code class="language-java">public class Library {
+    public static void search(Searchable[] all, String wanted) {
+        System.out.println("searching for \"" + wanted + "\"");
+        for (int i = 0; i &lt; all.length; i++) {
+            if (all[i].getSearchName().equals(wanted)) {
+                System.out.println("   found: " + all[i].getSearchName());
+            }
+        }
+    }
+
+    public static void main(String args[]) {
+        Book b = new Book("Java Basics", 101, "Gosling");
+        Dvd d = new Dvd("Java Basics", 202, 95);
+        StaffMember st = new StaffMember("Chyn");
+
+        b.describe();
+        d.describe();
+
+        Searchable[] all = { b, d, st };
+        search(all, "Java Basics");
+        search(all, "Chyn");
+        search(all, "Missing Title");
+    }
+}</code></pre> <pre class="out"><code>Java Basics (id 101), late fee 0.25 per day
+Java Basics (id 202), late fee 1.5 per day
+searching for "Java Basics"
+   found: Java Basics
+   found: Java Basics
+searching for "Chyn"
+   found: Chyn
+searching for "Missing Title"</code></pre> <p><strong>Things to notice.</strong> <code>describe()</code> is written once and produces two different lines, because it calls <code>getLateFeePerDay()</code> &mdash; a method it does not implement. That is the <code>printInfo()</code> pattern from section 2, and by now it should look routine.</p> <p><code>LibraryItem implements Searchable</code> and supplies <code>getSearchName()</code> once, so <code>Book</code> and <code>Dvd</code> inherit it and write nothing. An abstract class is allowed to implement an interface on its subclasses' behalf, and doing so is often the tidiest arrangement: the abstract class handles the part that is the same, the interface reaches the classes that are unrelated.</p> <p>The <code>Searchable[]</code> holds a <code>Book</code>, a <code>Dvd</code> and a <code>StaffMember</code>. There is no class type in Java that could hold all three &mdash; their only common ancestor is <code>Object</code>, which has no <code>getSearchName()</code>. Only the interface makes the array possible, and only the interface makes <code>all[i].getSearchName()</code> compile.</p> <p><code>1.5</code> prints where you wrote <code>1.50</code>, because a <code>double</code> has no idea how many zeros you typed. To show money properly you would want <code>DecimalFormat</code> or <code>String.format</code>. And if you are wondering whether a late fee should be a <code>double</code> at all &mdash; it should not, for real money; use cents in an <code>int</code>. That is a Lecture 1 lesson coming back around.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 6</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="20" aria-label="Live coding - Practice Problem 6">public interface Searchable {
+    // 1. one method: String getSearchName();
+}
+
+public abstract class LibraryItem implements Searchable {
+    // 2. private title and id, a constructor, and getters
+
+    // 3. an abstract getLateFeePerDay()
+
+    // 4. a concrete describe() that prints title, id and the late fee
+
+    // 5. getSearchName() returning the title
+}
+
+public class StaffMember implements Searchable {
+    // 6. a name, a constructor, and getSearchName() returning the name
+    //    -- note: NOT a LibraryItem
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <div class="box qc"> <div class="hd">Quick Check 14.12</div> <div class="bd"> <p>One line each. These are the whole lecture.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> You have written a class with one abstract method and forgotten to mark the class <code>abstract</code>. What does the compiler say?</p> <details class="soln"><summary></summary><div class="ans"> <p>It reports the class as not overriding its own abstract method &mdash; which reads oddly until you realise the rule is uniform:</p> <pre class="err"><code>BadShape.java:1: error: BadShape is not abstract and does not override abstract method getArea() in BadShape
+public class BadShape {
+       ^
+1 error</code></pre> <p>Note <code>in BadShape</code> at the end: the method it is complaining about is in the very class it is complaining about. Every concrete class must have a body for every abstract method visible to it, and it makes no difference where the declaration came from.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Why can an interface not have a constructor?</p> <details class="soln"><summary></summary><div class="ans"> <p>Because a constructor's job is to initialise the fields of a new object, and an interface has neither &mdash; no instance fields to initialise, and no objects, since it cannot be instantiated. An abstract class cannot be instantiated either, but it <em>does</em> own fields, and some subclass object will contain them, so its constructor has real work to do.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> A class already extends <code>AbstractShape</code>. You now want it to be usable anywhere a <code>Comparable</code> is wanted. What do you write, and what could you <em>not</em> have done if <code>Comparable</code> had been an abstract class?</p> <details class="soln"><summary></summary><div class="ans"> <p>Add <code>implements Comparable</code> to the header and write the required method. You could not have done it at all if <code>Comparable</code> were an abstract class: the one <code>extends</code> slot is already spent on <code>AbstractShape</code>, and Java has no second one.</p> <p>This is the practical reason the Java library defines capabilities as interfaces. <code>Comparable</code>, <code>Runnable</code> and Swing's listener types are all interfaces precisely so that any class, whatever it already extends, can sign up.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> In one sentence each: what does an abstract class give you that an interface cannot, and what does an interface give you that an abstract class cannot?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>An abstract class gives you state and construction</strong> &mdash; instance fields, non-public members, and a constructor that runs on every object in the hierarchy.</p> <p><strong>An interface gives you multiplicity</strong> &mdash; a class may implement any number of them, so completely unrelated classes can share a type.</p> <p><strong>Things to notice across all four parts.</strong> Every question on this page comes back to those two sentences. If a design needs shared data, only an abstract class will do. If it needs unrelated classes to share a type, only an interface will do. Needing both is normal, and writing both is the answer. The header <code>class AbstractRectangle extends AbstractShape implements Drawable, Resizable</code> is not a compromise; it is the design.</p> </div></details> </div> </div> </div> <div class="box sum" id="summary"> <div class="hd">Lecture Summary</div> <div class="bd"> <ul> <li>An <strong>abstract method</strong> is a signature with a semicolon and no body. A class containing one <strong>must</strong> be declared <code>abstract</code>; the reverse does not follow.</li> <li>An <strong>abstract class cannot be instantiated</strong> &mdash; <code>AbstractShape is abstract; cannot be instantiated</code> &mdash; but variables, parameters, return types and arrays of that type are all perfectly legal.</li> <li>A concrete subclass must implement <em>every</em> inherited abstract method, or declare itself abstract too. The error names the exact method: <code>is not abstract and does not override abstract method getPerimeter()</code>.</li> <li>An abstract class keeps everything else a class has: private fields, concrete methods, and a <strong>constructor</strong>, which runs on every subclass object via <code>super(...)</code> even though you can never call <code>new</code> on it yourself.</li> <li>A concrete method may call an abstract one &mdash; <code>printInfo()</code> calls <code>getArea()</code>. That is the whole point: shared code in the parent, the unwritable part left as a hole.</li> <li>An <strong>interface</strong> declares a contract. Its methods are implicitly <code>public</code> and <code>abstract</code>; leaving <code>public</code> off an implementation gives <code>attempting to assign weaker access privileges</code>.</li> <li><strong>A class <code>extends</code> one class and <code>implements</code> as many interfaces as it likes.</strong> That is the difference that decides the design. <code>extends</code> is "is a"; <code>implements</code> is "can".</li> <li>An interface name is a reference type, so a <code>Drawable[]</code> can hold classes with no common ancestor &mdash; and through it you may call only what the interface declares.</li> <li>Interfaces may also hold constants (<code>public static final</code>), <code>default</code> methods with bodies, and <code>static</code> methods; and one interface may <code>extends</code> another.</li> <li>Choose an <strong>abstract class</strong> when you need shared state, constructors or non-public members; an <strong>interface</strong> when unrelated classes need a common type. Needing both is normal.</li> </ul> <p><strong>Coming up in Lecture 15.</strong> Next time we open a window &mdash; <code>JFrame</code>, <code>JLabel</code>, and code that runs when a user clicks something. You will recognise everything on that page: a <code>JFrame</code> is a class you <code>extends</code>, <code>WindowAdapter</code> is an abstract class that exists purely to be subclassed, and <code>WindowListener</code> is an interface with seven methods that a class <code>implements</code> in order to be handed events. Swing is built out of the two ideas from
+    today, and nothing else.</p>
+  </div>
+</div>
+
+<nav class="pagenav">
+<span class="disabled"><div class="dir">&larr; Previous</div><div class="ttl">Lecture 13 &mdash; Polymorphism and Dynamic Binding</div><div class="pending">posts Thu Oct 22</div></span>
+<span class="disabled next"><div class="dir">Next &rarr;</div><div class="ttl">Lecture 15 &mdash; GUI I: Windows, JFrame and Events</div><div class="pending">posts Thu Oct 29</div></span>
+</nav>
+<footer class="pf">CSCI 212 &middot; Object-Oriented Programming in Java &middot; Queens College, CUNY</footer>
+</div>
+<script>
+(()=>{var ut=Object.create;var xe=Object.defineProperty;var ft=Object.getOwnPropertyDescriptor;var gt=Object.getOwnPropertyNames;var ht=Object.getPrototypeOf,dt=Object.prototype.hasOwnProperty;var pt=(e,t)=>()=>{try{return t||e((t={exports:{}}).exports,t),t.exports}catch(n){throw t=0,n}};var Et=(e,t,n,l)=>{if(t&&typeof t=="object"||typeof t=="function")for(let d of gt(t))!dt.call(e,d)&&d!==n&&xe(e,d,{get:()=>t[d],enumerable:!(l=ft(t,d))||l.enumerable});return e};var bt=(e,t,n)=>(n=e!=null?ut(ht(e)):{},Et(t||!e||!e.__esModule?xe(n,"default",{value:e,enumerable:!0}):n,e));var Ke=pt((ln,Ge)=>{function Ie(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(t=>{let n=e[t],l=typeof n;(l==="object"||l==="function")&&!Object.isFrozen(n)&&Ie(n)}),e}var Z=class{constructor(t){t.data===void 0&&(t.data={}),this.data=t.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function Ce(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function k(e,...t){let n=Object.create(null);for(let l in e)n[l]=e[l];return t.forEach(function(l){for(let d in l)n[d]=l[d]}),n}var _t="</span>",Ne=e=>!!e.scope,Mt=(e,{prefix:t})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let n=e.split(".");return[`${t}${n.shift()}`,...n.map((l,d)=>`${l}${"_".repeat(d+1)}`)].join(" ")}return`${t}${e}`},oe=class{constructor(t,n){this.buffer="",this.classPrefix=n.classPrefix,t.walk(this)}addText(t){this.buffer+=Ce(t)}openNode(t){if(!Ne(t))return;let n=Mt(t.scope,{prefix:this.classPrefix});this.span(n)}closeNode(t){Ne(t)&&(this.buffer+=_t)}value(){return this.buffer}span(t){this.buffer+=`<span class="${t}">`}},Re=(e={})=>{let t={children:[]};return Object.assign(t,e),t},ae=class e{constructor(){this.rootNode=Re(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(t){this.top.children.push(t)}openNode(t){let n=Re({scope:t});this.add(n),this.stack.push(n)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(t){return this.constructor._walk(t,this.rootNode)}static _walk(t,n){return typeof n=="string"?t.addText(n):n.children&&(t.openNode(n),n.children.forEach(l=>this._walk(t,l)),t.closeNode(n)),t}static _collapse(t){typeof t!="string"&&t.children&&(t.children.every(n=>typeof n=="string")?t.children=[t.children.join("")]:t.children.forEach(n=>{e._collapse(n)}))}},le=class extends ae{constructor(t){super(),this.options=t}addText(t){t!==""&&this.add(t)}startScope(t){this.openNode(t)}endScope(){this.closeNode()}__addSublanguage(t,n){let l=t.root;n&&(l.scope=`language:${n}`),this.add(l)}toHTML(){return new oe(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function G(e){return e?typeof e=="string"?e:e.source:null}function De(e){return B("(?=",e,")")}function Ot(e){return B("(?:",e,")*")}function wt(e){return B("(?:",e,")?")}function B(...e){return e.map(n=>G(n)).join("")}function xt(e){let t=e[e.length-1];return typeof t=="object"&&t.constructor===Object?(e.splice(e.length-1,1),t):{}}function V(...e){return"("+(xt(e).capture?"":"?:")+e.map(l=>G(l)).join("|")+")"}function ke(e){return new RegExp(e.toString()+"|").exec("").length-1}function Nt(e,t){let n=e&&e.exec(t);return n&&n.index===0}var Rt=new RegExp(V(/\[(?:[^\\\]]|\\.)*\]/,/\(\?<(?![=!])[^>]+>/,/\(\?'[^']+'/,/\(\??/,/\\([1-9][0-9]*)/,/\\./));function fe(e,{joinWith:t}){let n=0;return e.map(l=>{n+=1;let d=n,_=G(l),c="";for(;_.length>0;){let r=Rt.exec(_);if(!r){c+=_;break}c+=_.substring(0,r.index),_=_.substring(r.index+r[0].length),r[0][0]==="\\"&&r[1]?c+="\\"+String(Number(r[1])+d):(c+=r[0],(r[0]==="("||/^\(\?[<']/.test(r[0]))&&n++)}return c}).map(l=>`(${l})`).join(t)}var yt=/\b\B/,ve="[a-zA-Z]\\w*",ge="[a-zA-Z_]\\w*",Le="\\b\\d+(\\.\\d+)?",Be="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Pe="\\b(0b[01]+)",St="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",At=(e={})=>{let t=/^#![ ]*\//;return e.binary&&(e.begin=B(t,/.*\b/,e.binary,/\b.*/)),k({scope:"meta",begin:t,end:/$/,relevance:0,"on:begin":(n,l)=>{n.index!==0&&l.ignoreMatch()}},e)},K={begin:"\\\\[\\s\\S]",relevance:0},Tt={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[K]},It={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[K]},Ct={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},Q=function(e,t,n={}){let l=k({scope:"comment",begin:e,end:t,contains:[]},n);l.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let d=V("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return l.contains.push({begin:B(/[ ]+/,"(",d,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),l},Dt=Q("//","$"),kt=Q("/\\*","\\*/"),vt=Q("#","$"),Lt={scope:"number",begin:Le,relevance:0},Bt={scope:"number",begin:Be,relevance:0},Pt={scope:"number",begin:Pe,relevance:0},$t={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[K,{begin:/\[/,end:/\]/,relevance:0,contains:[K]}]},Ht={scope:"title",begin:ve,relevance:0},Ut={scope:"title",begin:ge,relevance:0},jt={begin:"\\.\\s*"+ge,relevance:0},Gt=function(e){return Object.assign(e,{"on:begin":(t,n)=>{n.data._beginMatch=t[1]},"on:end":(t,n)=>{n.data._beginMatch!==t[1]&&n.ignoreMatch()}})},X=Object.freeze({__proto__:null,APOS_STRING_MODE:Tt,BACKSLASH_ESCAPE:K,BINARY_NUMBER_MODE:Pt,BINARY_NUMBER_RE:Pe,COMMENT:Q,C_BLOCK_COMMENT_MODE:kt,C_LINE_COMMENT_MODE:Dt,C_NUMBER_MODE:Bt,C_NUMBER_RE:Be,END_SAME_AS_BEGIN:Gt,HASH_COMMENT_MODE:vt,IDENT_RE:ve,MATCH_NOTHING_RE:yt,METHOD_GUARD:jt,NUMBER_MODE:Lt,NUMBER_RE:Le,PHRASAL_WORDS_MODE:Ct,QUOTE_STRING_MODE:It,REGEXP_MODE:$t,RE_STARTERS_RE:St,SHEBANG:At,TITLE_MODE:Ht,UNDERSCORE_IDENT_RE:ge,UNDERSCORE_TITLE_MODE:Ut});function Kt(e,t){e.input[e.index-1]==="."&&t.ignoreMatch()}function mt(e,t){e.className!==void 0&&(e.scope=e.className,delete e.className)}function Wt(e,t){t&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=Kt,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function Ft(e,t){Array.isArray(e.illegal)&&(e.illegal=V(...e.illegal))}function zt(e,t){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function Yt(e,t){e.relevance===void 0&&(e.relevance=1)}var Xt=(e,t)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let n=Object.assign({},e);Object.keys(e).forEach(l=>{delete e[l]}),e.keywords=n.keywords,e.begin=B(n.beforeMatch,De(n.begin)),e.starts={relevance:0,contains:[Object.assign(n,{endsParent:!0})]},e.relevance=0,delete n.beforeMatch},Zt=["of","and","for","in","not","or","if","then","parent","list","value"],Jt="keyword";function $e(e,t,n=Jt){let l=Object.create(null);return typeof e=="string"?d(n,e.split(" ")):Array.isArray(e)?d(n,e):Object.keys(e).forEach(function(_){Object.assign(l,$e(e[_],t,_))}),l;function d(_,c){t&&(c=c.map(r=>r.toLowerCase())),c.forEach(function(r){let u=r.split("|");l[u[0]]=[_,Vt(u[0],u[1])]})}}function Vt(e,t){return t?Number(t):Qt(e)?0:1}function Qt(e){return Zt.includes(e.toLowerCase())}var ye={},L=e=>{console.error(e)},Se=(e,...t)=>{console.log(`WARN: ${e}`,...t)},H=(e,t)=>{ye[`${e}/${t}`]||(console.log(`Deprecated as of ${e}. ${t}`),ye[`${e}/${t}`]=!0)},J=new Error;function He(e,t,{key:n}){let l=0,d=e[n],_={},c={};for(let r=1;r<=t.length;r++)c[r+l]=d[r],_[r+l]=!0,l+=ke(t[r-1]);e[n]=c,e[n]._emit=_,e[n]._multi=!0}function qt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw L("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),J;if(typeof e.beginScope!="object"||e.beginScope===null)throw L("beginScope must be object"),J;He(e,e.begin,{key:"beginScope"}),e.begin=fe(e.begin,{joinWith:""})}}function en(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw L("skip, excludeEnd, returnEnd not compatible with endScope: {}"),J;if(typeof e.endScope!="object"||e.endScope===null)throw L("endScope must be object"),J;He(e,e.end,{key:"endScope"}),e.end=fe(e.end,{joinWith:""})}}function tn(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function nn(e){tn(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),qt(e),en(e)}function sn(e){function t(c,r){return new RegExp(G(c),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(r?"g":""))}class n{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(r,u){u.position=this.position++,this.matchIndexes[this.matchAt]=u,this.regexes.push([u,r]),this.matchAt+=ke(r)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let r=this.regexes.map(u=>u[1]);this.matcherRe=t(fe(r,{joinWith:"|"}),!0),this.lastIndex=0}exec(r){this.matcherRe.lastIndex=this.lastIndex;let u=this.matcherRe.exec(r);if(!u)return null;let O=u.findIndex((P,I)=>I>0&&P!==void 0),M=this.matchIndexes[O];return u.splice(0,O),Object.assign(u,M)}}class l{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(r){if(this.multiRegexes[r])return this.multiRegexes[r];let u=new n;return this.rules.slice(r).forEach(([O,M])=>u.addRule(O,M)),u.compile(),this.multiRegexes[r]=u,u}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(r,u){this.rules.push([r,u]),u.type==="begin"&&this.count++}exec(r){let u=this.getMatcher(this.regexIndex);u.lastIndex=this.lastIndex;let O=u.exec(r);if(this.resumingScanAtSamePosition()&&!(O&&O.index===this.lastIndex)){let M=this.getMatcher(0);M.lastIndex=this.lastIndex+1,O=M.exec(r)}return O&&(this.regexIndex+=O.position+1,this.regexIndex===this.count&&this.considerAll()),O}}function d(c){let r=new l;return c.contains.forEach(u=>r.addRule(u.begin,{rule:u,type:"begin"})),c.terminatorEnd&&r.addRule(c.terminatorEnd,{type:"end"}),c.illegal&&r.addRule(c.illegal,{type:"illegal"}),r}function _(c,r){let u=c;if(c.isCompiled)return u;[mt,zt,nn,Xt].forEach(M=>M(c,r)),e.compilerExtensions.forEach(M=>M(c,r)),c.__beforeBegin=null,[Wt,Ft,Yt].forEach(M=>M(c,r)),c.isCompiled=!0;let O=null;return typeof c.keywords=="object"&&c.keywords.$pattern&&(c.keywords=Object.assign({},c.keywords),O=c.keywords.$pattern,delete c.keywords.$pattern),O=O||/\w+/,c.keywords&&(c.keywords=$e(c.keywords,e.case_insensitive)),u.keywordPatternRe=t(O,!0),r&&(c.begin||(c.begin=/\B|\b/),u.beginRe=t(u.begin),!c.end&&!c.endsWithParent&&(c.end=/\B|\b/),c.end&&(u.endRe=t(u.end)),u.terminatorEnd=G(u.end)||"",c.endsWithParent&&r.terminatorEnd&&(u.terminatorEnd+=(c.end?"|":"")+r.terminatorEnd)),c.illegal&&(u.illegalRe=t(c.illegal)),c.contains||(c.contains=[]),c.contains=[].concat(...c.contains.map(function(M){return rn(M==="self"?c:M)})),c.contains.forEach(function(M){_(M,u)}),c.starts&&_(c.starts,r),u.matcher=d(u),u}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=k(e.classNameAliases||{}),_(e)}function Ue(e){return e?e.endsWithParent||Ue(e.starts):!1}function rn(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(t){return k(e,{variants:null},t)})),e.cachedVariants?e.cachedVariants:Ue(e)?k(e,{starts:e.starts?k(e.starts):null}):Object.isFrozen(e)?k(e):e}var cn="11.12.0",ue=class extends Error{constructor(t,n){super(t),this.name="HTMLInjectionError",this.html=n}},ce=Ce,Ae=k,Te=Symbol("nomatch"),on=7,je=function(e){let t=Object.create(null),n=Object.create(null),l=[],d=!0,_="Could not find the language '{}', did you forget to load/include a language module?",c={disableAutodetect:!0,name:"Plain text",contains:[]},r={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:le};function u(i){return r.noHighlightRe.test(i)}function O(i){let a=i.className+" ";a+=i.parentNode?i.parentNode.className:"";let h=r.languageDetectRe.exec(a);if(h){let E=C(h[1]);return E||(Se(_.replace("{}",h[1])),Se("Falling back to no-highlight mode for this block.",i)),E?h[1]:"no-highlight"}return a.split(/\s+/).find(E=>u(E)||C(E))}function M(i,a,h){let E="",w="";typeof a=="object"?(E=i,h=a.ignoreIllegals,w=a.language):(H("10.7.0","highlight(lang, code, ...args) has been deprecated."),H("10.7.0",`Please use highlight(code, options) instead.
+(see the highlight.js issue tracker)`),w=i,E=a),h===void 0&&(h=!0);let y={code:E,language:w};W("before:highlight",y);let D=y.result?y.result:P(y.language,y.code,h);return D.code=y.code,W("after:highlight",D),D}function P(i,a,h,E){let w=Object.create(null);function y(s,o){return s.keywords[o]}function D(){if(!f.keywords){x.addText(b);return}let s=0;f.keywordPatternRe.lastIndex=0;let o=f.keywordPatternRe.exec(b),g="";for(;o;){g+=b.substring(s,o.index);let p=A.case_insensitive?o[0].toLowerCase():o[0],N=y(f,p);if(N){let[T,at]=N;if(x.addText(g),g="",w[p]=(w[p]||0)+1,w[p]<=on&&(Y+=at),T.startsWith("_"))g+=o[0];else{let lt=A.classNameAliases[T]||T;S(o[0],lt)}}else g+=o[0];s=f.keywordPatternRe.lastIndex,o=f.keywordPatternRe.exec(b)}g+=b.substring(s),x.addText(g)}function F(){if(b==="")return;let s=null;if(typeof f.subLanguage=="string"){if(!t[f.subLanguage]){x.addText(b);return}s=P(f.subLanguage,b,!0,we[f.subLanguage]),we[f.subLanguage]=s._top}else s=$(b,f.subLanguage.length?f.subLanguage:null);f.relevance>0&&(Y+=s.relevance),x.__addSublanguage(s._emitter,s.language)}function R(){f.subLanguage!=null?F():D(),b=""}function S(s,o){s!==""&&(x.startScope(o),x.addText(s),x.endScope())}function be(s,o){let g=1,p=o.length-1;for(;g<=p;){if(!s._emit[g]){g++;continue}let N=A.classNameAliases[s[g]]||s[g],T=o[g];N?S(T,N):(b=T,D(),b=""),g++}}function _e(s,o){return s.scope&&typeof s.scope=="string"&&x.openNode(A.classNameAliases[s.scope]||s.scope),s.beginScope&&(s.beginScope._wrap?(S(b,A.classNameAliases[s.beginScope._wrap]||s.beginScope._wrap),b=""):s.beginScope._multi&&(be(s.beginScope,o),b="")),f=Object.create(s,{parent:{value:f}}),f}function Me(s,o,g){let p=Nt(s.endRe,g);if(p){if(s["on:end"]){let N=new Z(s);s["on:end"](o,N),N.isMatchIgnored&&(p=!1)}if(p){for(;s.endsParent&&s.parent;)s=s.parent;return s}}if(s.endsWithParent)return Me(s.parent,o,g)}function it(s){return f.matcher.regexIndex===0?(b+=s[0],1):(re=!0,0)}function st(s){let o=s[0],g=s.rule,p=new Z(g),N=[g.__beforeBegin,g["on:begin"]];for(let T of N)if(T&&(T(s,p),p.isMatchIgnored))return it(o);return g.skip?b+=o:(g.excludeBegin&&(b+=o),R(),!g.returnBegin&&!g.excludeBegin&&(b=o)),_e(g,s),g.returnBegin?0:o.length}function rt(s){let o=s[0],g=a.substring(s.index),p=Me(f,s,g);if(!p)return Te;let N=f;f.endScope&&f.endScope._wrap?(R(),S(o,f.endScope._wrap)):f.endScope&&f.endScope._multi?(R(),be(f.endScope,s)):N.skip?b+=o:(N.returnEnd||N.excludeEnd||(b+=o),R(),N.excludeEnd&&(b=o));do f.scope&&x.closeNode(),!f.skip&&!f.subLanguage&&(Y+=f.relevance),f=f.parent;while(f!==p.parent);return p.starts&&_e(p.starts,s),N.returnEnd?0:o.length}function ct(){let s=[];for(let o=f;o!==A;o=o.parent)o.scope&&s.unshift(o.scope);s.forEach(o=>x.openNode(o))}let z={};function Oe(s,o){let g=o&&o[0];if(b+=s,g==null)return R(),0;if(z.type==="begin"&&o.type==="end"&&z.index===o.index&&g===""){if(b+=a.slice(o.index,o.index+1),!d){let p=new Error(`0 width match regex (${i})`);throw p.languageName=i,p.badRule=z.rule,p}return 1}if(z=o,o.type==="begin")return st(o);if(o.type==="illegal"&&!h){let p=new Error('Illegal lexeme "'+g+'" for mode "'+(f.scope||"<unnamed>")+'"');throw p.mode=f,p}else if(o.type==="end"){let p=rt(o);if(p!==Te)return p}if(o.type==="illegal"&&g==="")return o.index===a.length||(b+=`
+`),1;if(se>1e5&&se>o.index*3)throw new Error("potential infinite loop, way more iterations than matches");return b+=g,g.length}let A=C(i);if(!A)throw L(_.replace("{}",i)),new Error('Unknown language: "'+i+'"');let ot=sn(A),ie="",f=E||ot,we={},x=new r.__emitter(r);ct();let b="",Y=0,v=0,se=0,re=!1;try{if(A.__emitTokens)A.__emitTokens(a,x);else{for(f.matcher.considerAll();;){se++,re?re=!1:f.matcher.considerAll(),f.matcher.lastIndex=v;let s=f.matcher.exec(a);if(!s)break;let o=a.substring(v,s.index),g=Oe(o,s);v=s.index+g}Oe(a.substring(v))}return x.finalize(),ie=x.toHTML(),{language:i,value:ie,relevance:Y,illegal:!1,_emitter:x,_top:f}}catch(s){if(s.message&&s.message.includes("Illegal"))return{language:i,value:ce(a),illegal:!0,relevance:0,_illegalBy:{message:s.message,index:v,context:a.slice(v-100,v+100),mode:s.mode,resultSoFar:ie},_emitter:x};if(d)return{language:i,value:ce(a),illegal:!1,relevance:0,errorRaised:s,_emitter:x,_top:f};throw s}}function I(i){let a={value:ce(i),illegal:!1,relevance:0,_top:c,_emitter:new r.__emitter(r)};return a._emitter.addText(i),a}function $(i,a){a=a||r.languages||Object.keys(t);let h=I(i),E=a.filter(C).filter(Ee).map(R=>P(R,i,!1));E.unshift(h);let w=E.sort((R,S)=>{if(R.relevance!==S.relevance)return S.relevance-R.relevance;if(R.language&&S.language){if(C(R.language).supersetOf===S.language)return 1;if(C(S.language).supersetOf===R.language)return-1}return 0}),[y,D]=w,F=y;return F.secondBest=D,F}function te(i,a,h){let E=a&&n[a]||h;i.classList.add("hljs"),i.classList.add(`language-${E}`)}function ne(i){let a=null,h=O(i);if(u(h))return;if(W("before:highlightElement",{el:i,language:h}),i.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",i);return}if(i.children.length>0&&(r.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("(see the highlight.js security wiki)"),console.warn("The element with unescaped HTML:"),console.warn(i)),r.throwUnescapedHTML))throw new ue("One of your code blocks includes unescaped HTML.",i.innerHTML);a=i;let E=a.textContent,w=h?M(E,{language:h,ignoreIllegals:!0}):$(E);i.innerHTML=w.value,i.dataset.highlighted="yes",te(i,h,w.language),i.result={language:w.language,re:w.relevance,relevance:w.relevance},w.secondBest&&(i.secondBest={language:w.secondBest.language,relevance:w.secondBest.relevance}),W("after:highlightElement",{el:i,result:w,text:E})}function Ye(i){r=Ae(r,i)}let Xe=()=>{m(),H("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function Ze(){m(),H("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let de=!1;function m(){function i(){m()}if(document.readyState==="loading"){de||window.addEventListener("DOMContentLoaded",i,!1),de=!0;return}document.querySelectorAll(r.cssSelector).forEach(ne)}function Je(i,a){let h=null;try{h=a(e)}catch(E){if(L("Language definition for '{}' could not be registered.".replace("{}",i)),d)L(E);else throw E;h=c}h.name||(h.name=i),t[i]=h,h.rawDefinition=a.bind(null,e),h.aliases&&pe(h.aliases,{languageName:i})}function Ve(i){delete t[i];for(let a of Object.keys(n))n[a]===i&&delete n[a]}function Qe(){return Object.keys(t)}function C(i){return i=(i||"").toLowerCase(),t[i]||t[n[i]]}function pe(i,{languageName:a}){typeof i=="string"&&(i=[i]),i.forEach(h=>{n[h.toLowerCase()]=a})}function Ee(i){let a=C(i);return a&&!a.disableAutodetect}function qe(i){i["before:highlightBlock"]&&!i["before:highlightElement"]&&(i["before:highlightElement"]=a=>{i["before:highlightBlock"](Object.assign({block:a.el},a))}),i["after:highlightBlock"]&&!i["after:highlightElement"]&&(i["after:highlightElement"]=a=>{i["after:highlightBlock"](Object.assign({block:a.el},a))})}function et(i){qe(i),l.push(i)}function tt(i){let a=l.indexOf(i);a!==-1&&l.splice(a,1)}function W(i,a){let h=i;l.forEach(function(E){E[h]&&E[h](a)})}function nt(i){return H("10.7.0","highlightBlock will be removed entirely in v12.0"),H("10.7.0","Please use highlightElement now."),ne(i)}Object.assign(e,{highlight:M,highlightAuto:$,highlightAll:m,highlightElement:ne,highlightBlock:nt,configure:Ye,initHighlighting:Xe,initHighlightingOnLoad:Ze,registerLanguage:Je,unregisterLanguage:Ve,listLanguages:Qe,getLanguage:C,registerAliases:pe,autoDetection:Ee,inherit:Ae,addPlugin:et,removePlugin:tt}),e.debugMode=function(){d=!1},e.safeMode=function(){d=!0},e.versionString=cn,e.regex={concat:B,lookahead:De,either:V,optional:wt,anyNumberOfTimes:Ot};for(let i in X)typeof X[i]=="object"&&Ie(X[i]);return Object.assign(e,X),e},U=je({});U.newInstance=()=>je({});Ge.exports=U;U.HighlightJS=U;U.default=U});var me=bt(Ke(),1);var he=me.default;var j="[0-9](_*[0-9])*",q=`\\.(${j})`,ee="[0-9a-fA-F](_*[0-9a-fA-F])*",We={className:"number",variants:[{begin:`(\\b(${j})((${q})|\\.)?|(${q}))[eE][+-]?(${j})[fFdD]?\\b`},{begin:`\\b(${j})((${q})[fFdD]?\\b|\\.([fFdD]\\b)?)`},{begin:`(${q})[fFdD]?\\b`},{begin:`\\b(${j})[fFdD]\\b`},{begin:`\\b0[xX]((${ee})\\.?|(${ee})?\\.(${ee}))[pP][+-]?(${j})[fFdD]?\\b`},{begin:"\\b(0|[1-9](_*[0-9])*)[lL]?\\b"},{begin:`\\b0[xX](${ee})[lL]?\\b`},{begin:"\\b0(_*[0-7])*[lL]?\\b"},{begin:"\\b0[bB][01](_*[01])*[lL]?\\b"}],relevance:0};function Fe(e,t,n){return n===-1?"":e.replace(t,l=>Fe(e,t,n-1))}function ze(e){let t=e.regex,n="[\xC0-\u02B8a-zA-Z_$][\xC0-\u02B8a-zA-Z_$0-9]*",l="(?:(?:\\s*\\[\\s*])+)?",d=n+"<@@@>"+l,c="(?:"+("\\?(?:\\s+(?:extends|super)\\s+"+d+")?")+"|"+d+")",r=Fe("(?:\\s*<\\s*"+c+"(?:\\s*,\\s*"+c+")*\\s*>)?",/<@@@>/g,2),I={keyword:["synchronized","abstract","private","var","static","if","const ","for","while","strictfp","finally","protected","import","native","final","void","enum","else","break","transient","catch","instanceof","volatile","case","assert","package","default","public","try","switch","continue","throws","protected","public","private","module","requires","exports","do","sealed","yield","permits","goto","when"],literal:["false","true","null"],type:["char","boolean","long","float","int","byte","short","double"],built_in:["super","this"]},$={className:"meta",begin:"@"+n,contains:[{begin:/\(/,end:/\)/,contains:["self"]}]},te={className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[e.C_BLOCK_COMMENT_MODE],endsParent:!0};return{name:"Java",aliases:["jsp"],keywords:I,illegal:/<\/|#/,contains:[e.COMMENT("/\\*\\*","\\*/",{relevance:0,contains:[{begin:/\w+@/,relevance:0},{className:"doctag",begin:"@[A-Za-z]+"}]}),{begin:/import java\.[a-z]+\./,keywords:"import",relevance:2},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE,{begin:/"""/,end:/"""/,className:"string",contains:[e.BACKSLASH_ESCAPE]},e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,{match:[/\b(?:class|interface|enum|extends|implements|new)/,/\s+/,n],className:{1:"keyword",3:"title.class"}},{match:/non-sealed/,scope:"keyword"},{beginKeywords:"new throw return else yield assert",relevance:0},{begin:[n,t.concat(r,l,/\s+/),n,l,/\s*/,/=(?!=)/],className:{1:"type",3:"variable",6:"operator"}},{begin:[/record/,/\s+/,n],className:{1:"keyword",3:"title.class"},contains:[te,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},{begin:[n,t.concat(r,l,/\s+/),n,/\s*(?=\()/],className:{1:"type",3:"title.function"},keywords:I,contains:[{className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[$,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,We,e.C_BLOCK_COMMENT_MODE]},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},We,$]}}he.registerLanguage("java",ze);window.hljs=he;})();
+</script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---- 1. syntax highlighting -------------------------------------- */
+  function highlight() {
+    if (!window.hljs) return;
+    var blocks = document.querySelectorAll('pre code.language-java');
+    for (var i = 0; i < blocks.length; i++) {
+      try { window.hljs.highlightElement(blocks[i]); } catch (e) {}
+    }
+  }
+
+  /* ---- 2. every solution / reveal starts closed --------------------- */
+  function closeAll() {
+    var d = document.querySelectorAll('details.soln');
+    for (var i = 0; i < d.length; i++) { d[i].open = false; }
+  }
+
+  /* ---- 3. show all / hide all -------------------------------------- */
+  function wireToolbar() {
+    var show = document.getElementById('showAll');
+    var hide = document.getElementById('hideAll');
+    function setAll(v) {
+      var d = document.querySelectorAll('details.soln');
+      for (var i = 0; i < d.length; i++) { d[i].open = v; }
+    }
+    if (show) show.addEventListener('click', function () { setAll(true); });
+    if (hide) hide.addEventListener('click', function () { setAll(false); });
+  }
+
+  /* ---- 4. live-coding editors -------------------------------------- */
+  var INDENT = '    ';
+
+  function wireEditors() {
+    var eds = document.querySelectorAll('.editor');
+    for (var i = 0; i < eds.length; i++) { wireOne(eds[i]); }
+  }
+
+  function wireOne(box) {
+    var ta = box.querySelector('textarea');
+    if (!ta) return;
+    var starter = ta.value;
+
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Tab' || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+      ev.preventDefault();
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+
+      if (s === e && !ev.shiftKey) {
+        ta.value = v.slice(0, s) + INDENT + v.slice(e);
+        ta.selectionStart = ta.selectionEnd = s + INDENT.length;
+        return;
+      }
+      /* block indent / outdent over the selected lines */
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var le = v.indexOf('\n', e);
+      if (le === -1) le = v.length;
+      var seg = v.slice(ls, le);
+      var lines = seg.split('\n');
+      var delta0 = 0, total = 0;
+
+      for (var i = 0; i < lines.length; i++) {
+        if (ev.shiftKey) {
+          var m = lines[i].match(/^(\t| {1,4})/);
+          if (m) {
+            lines[i] = lines[i].slice(m[0].length);
+            if (i === 0) delta0 = -m[0].length;
+            total -= m[0].length;
+          }
+        } else {
+          lines[i] = INDENT + lines[i];
+          if (i === 0) delta0 = INDENT.length;
+          total += INDENT.length;
+        }
+      }
+      ta.value = v.slice(0, ls) + lines.join('\n') + v.slice(le);
+      ta.selectionStart = Math.max(ls, s + delta0);
+      ta.selectionEnd = Math.max(ta.selectionStart, e + total);
+    });
+
+    /* keep the indent of the current line when Enter is pressed */
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Enter' || ev.shiftKey || ev.ctrlKey || ev.metaKey) return;
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+      if (s !== e) return;
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var lead = (v.slice(ls, s).match(/^[ \t]*/) || [''])[0];
+      var extra = /[{(\[]\s*$/.test(v.slice(ls, s)) ? INDENT : '';
+      if (!lead && !extra) return;
+      ev.preventDefault();
+      var ins = '\n' + lead + extra;
+      ta.value = v.slice(0, s) + ins + v.slice(e);
+      ta.selectionStart = ta.selectionEnd = s + ins.length;
+    });
+
+    var rst = box.querySelector('[data-act="reset"]');
+    if (rst) rst.addEventListener('click', function () {
+      ta.value = starter;
+      ta.focus();
+      flash(box, 'Reset to starter code');
+    });
+
+    var cpy = box.querySelector('[data-act="copy"]');
+    if (cpy) cpy.addEventListener('click', function () {
+      var done = function () { flash(box, 'Copied — paste it into your IDE'); };
+      var fail = function () { flash(box, 'Copy failed — select the text and press Ctrl/Cmd+C'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value).then(done, function () { legacy(ta, done, fail); });
+      } else {
+        legacy(ta, done, fail);
+      }
+    });
+  }
+
+  function legacy(ta, done, fail) {
+    try {
+      var st = ta.selectionStart, en = ta.selectionEnd;
+      ta.select();
+      var ok = document.execCommand('copy');
+      ta.selectionStart = st; ta.selectionEnd = en;
+      ok ? done() : fail();
+    } catch (e) { fail(); }
+  }
+
+  function flash(box, msg) {
+    var f = box.querySelector('.foot');
+    if (!f) return;
+    if (f.getAttribute('data-base') === null || f.getAttribute('data-base') === undefined) {
+      f.setAttribute('data-base', f.textContent);
+    }
+    f.textContent = msg;
+    window.setTimeout(function () { f.textContent = f.getAttribute('data-base'); }, 2200);
+  }
+
+  /* ---- go ----------------------------------------------------------- */
+  function init() {
+    highlight();
+    closeAll();
+    wireToolbar();
+    wireEditors();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  /* belt and braces: some browsers restore <details> state on soft reload */
+  window.addEventListener('pageshow', closeAll);
+})();
+</script>
+</body>
+</html>

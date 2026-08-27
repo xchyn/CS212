@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class 7 — Classes and Objects | CSCI 212</title>
+<style>
+:root{
+  --ink:#0f172a; --ink2:#334155; --muted:#64748b; --line:#e2e8f0;
+  --bg:#ffffff; --bg2:#f8fafc;
+  --obj:#4f46e5; --def:#2563eb; --ex:#059669; --alg:#7c3aed;
+  --key:#b45309; --warn:#dc2626; --qc:#0891b2; --prac:#be185d; --sum:#475569;
+  --edit:#ea580c; --edit-bg:#fff7ed;
+  --code-bg:#0d1117; --code-bd:#000000;   /* read-only listings: black */
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px 80px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:#0f172a;color:#e2e8f0;font-size:13.5px;
+  border-bottom:3px solid var(--obj);
+}
+.topbar .inner{max-width:900px;margin:0 auto;padding:10px 22px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.topbar a{color:#e2e8f0;text-decoration:none;border-bottom:1px solid transparent}
+.topbar a:hover{border-bottom-color:#94a3b8}
+.topbar .course{font-weight:700;letter-spacing:.02em}
+.topbar .sep{color:#475569}
+.topbar .spacer{flex:1}
+
+/* ---------- title block ---------- */
+.titleblock{padding:34px 0 10px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.eyebrow{
+  font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--obj);margin-bottom:8px;
+}
+.titleblock h1{font-size:33px;line-height:1.2;margin:0 0 10px;letter-spacing:-.015em}
+.titleblock .sub{margin:0;color:var(--muted);font-size:17px;line-height:1.5}
+
+h2{
+  font-size:24px;margin:46px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line);letter-spacing:-.01em;scroll-margin-top:14px;
+}
+h2 .num{color:var(--obj);font-weight:800;margin-right:11px}
+h3{font-size:18.5px;margin:30px 0 10px;color:var(--ink)}
+h4{font-size:16px;margin:20px 0 8px;color:var(--ink2)}
+p{margin:12px 0}
+ul,ol{margin:12px 0;padding-left:26px}
+li{margin:6px 0}
+a{color:var(--def)}
+hr{border:0;border-top:1px solid var(--line);margin:30px 0}
+strong{color:var(--ink)}
+.muted{color:var(--muted)}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--bg2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 20px 16px;margin:22px 0;
+}
+.toc .th{
+  font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;
+}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:30px}
+.toc li{margin:3px 0;font-size:14.5px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- show all / hide all ---------- */
+.tools{
+  display:flex;gap:9px;align-items:center;flex-wrap:wrap;
+  padding:11px 15px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:9px;margin:22px 0;font-size:13.5px;
+}
+.tools .lab{font-weight:700;color:var(--ink2)}
+.tools button{
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  background:#fff;color:var(--ink2);border:1px solid #cbd5e1;
+  border-radius:6px;padding:4px 12px;
+}
+.tools button:hover{background:var(--obj);border-color:var(--obj);color:#fff}
+.tools .muted{font-size:12.5px}
+
+/* ---------- boxes ---------- */
+.box{border:1px solid var(--line);border-left:5px solid var(--muted);border-radius:8px;margin:22px 0;overflow:hidden;background:#fff}
+.box>.hd{
+  padding:9px 16px;font-size:12.5px;font-weight:700;
+  letter-spacing:.075em;text-transform:uppercase;color:#fff;background:var(--muted);
+}
+.box>.hd .tag{margin-left:5px;font-weight:500;text-transform:none;letter-spacing:0;opacity:.92;font-size:13px}
+.box>.bd{padding:4px 18px 14px}
+.box>.bd>:first-child{margin-top:12px}
+.box>.bd>:last-child{margin-bottom:2px}
+
+.box.obj{border-left-color:var(--obj)}  .box.obj>.hd{background:var(--obj)}
+.box.def{border-left-color:var(--def)}  .box.def>.hd{background:var(--def)}
+.box.ex{border-left-color:var(--ex)}    .box.ex>.hd{background:var(--ex)}
+.box.alg{border-left-color:var(--alg)}  .box.alg>.hd{background:var(--alg)}
+.box.key{border-left-color:var(--key)}  .box.key>.hd{background:var(--key)}
+.box.warn{border-left-color:var(--warn)}.box.warn>.hd{background:var(--warn)}
+.box.qc{border-left-color:var(--qc)}    .box.qc>.hd{background:var(--qc)}
+.box.prac{border-left-color:var(--prac)}.box.prac>.hd{background:var(--prac)}
+.box.sum{border-left-color:var(--sum)}  .box.sum>.hd{background:var(--sum)}
+
+.box.obj{background:#f5f5ff}
+.box.qc{background:#f0fbfe}
+.box.warn{background:#fff7f7}
+.box.key{background:#fffbf2}
+.box.sum{background:#f8fafc}
+
+/* ---------- code ---------- */
+/* Read-only listings sit on black, matching CSCI 211, so a code block is never
+   mistaken for the editable live-coding box. */
+pre{
+  margin:14px 0;padding:13px 15px;overflow-x:auto;
+  background:var(--code-bg);border:1px solid var(--code-bd);border-radius:8px;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;color:#c9d1d9;
+}
+pre code{font-family:inherit;font-size:inherit;background:none;padding:0;border:0;color:inherit;display:block}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef2f7;
+  border:1px solid #e2e8f0;border-radius:4px;padding:1px 5px;color:#0b3a5b;
+}
+.filename{
+  font-family:var(--mono);font-size:12px;color:#475569;
+  margin:16px 0 -9px;font-weight:600;
+}
+
+/* comparison block: another language, never syntax-highlighted. Dark like the
+   Java listings, but desaturated and dashed so it reads as "not this course". */
+pre.cmp{background:#161b22;border-style:dashed;border-color:#3f4650;color:#9aa4b2}
+pre.cmp code{color:#9aa4b2}
+
+/* shell commands you type */
+pre.sh{background:#1e293b;border-color:#1e293b;color:#e2e8f0;position:relative;padding-top:26px}
+pre.sh code{color:#e2e8f0}
+pre.sh::before{
+  content:"Terminal";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#86efac;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* output / terminal blocks */
+pre.out{background:#111d33;border-color:#111d33;color:#e2e8f0;position:relative;padding-top:26px}
+pre.out code{color:#e2e8f0}
+pre.out::before{
+  content:"Output";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#7dd3fc;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+pre.err{background:#1f1416;border-color:#7f1d1d;color:#fecdd3;padding-top:26px;position:relative}
+pre.err code{color:#fecdd3}
+pre.err::before{
+  content:"Compiler message";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#fda4af;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* ---- highlight.js, GitHub-dark palette (hand-written, no external file) ---- */
+.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-template-tag,
+.hljs-template-variable,.hljs-type,.hljs-variable.language_{color:#ff7b72}
+.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#d2a8ff}
+.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,
+.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable{color:#79c0ff}
+.hljs-meta .hljs-string,.hljs-regexp,.hljs-string{color:#a5d6ff}
+.hljs-built_in,.hljs-symbol{color:#ffa657}
+.hljs-code,.hljs-comment,.hljs-formula{color:#8b949e;font-style:italic}
+.hljs-name,.hljs-quote,.hljs-selector-pseudo,.hljs-selector-tag{color:#7ee787}
+.hljs-subst{color:#c9d1d9}
+.hljs-section{color:#1f6feb;font-weight:700}
+.hljs-bullet{color:#f2cc60}
+.hljs-emphasis{color:#c9d1d9;font-style:italic}
+.hljs-strong{color:#c9d1d9;font-weight:700}
+
+/* ---------- trace tables ---------- */
+table{border-collapse:collapse;margin:16px 0;font-size:14px;width:100%}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg2);font-weight:700;font-size:13px}
+table.trace td:first-child,table.trace th:first-child{white-space:nowrap}
+table code{font-size:.88em}
+
+/* ---------- multi-part questions ---------- */
+.part{margin:16px 0;padding-left:14px;border-left:2px solid #cbd5e1}
+.part .q{margin:0 0 8px}
+.part .pl{font-weight:700;color:var(--qc);margin-right:6px}
+
+/* ---------- collapsible solutions ---------- */
+details.soln{margin:10px 0 4px}
+details.soln>summary{
+  list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  font-size:12.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:#fff;background:var(--sum);border-radius:6px;padding:5px 13px;
+  user-select:none;
+}
+details.soln>summary::-webkit-details-marker{display:none}
+details.soln>summary::before{content:"\25B6";font-size:9px;transition:transform .15s}
+details.soln[open]>summary::before{transform:rotate(90deg)}
+details.soln>summary::after{content:"Show Answer"}
+details.soln[open]>summary::after{content:"Hide Answer"}
+details.soln>summary:hover{filter:brightness(1.18)}
+
+details.soln.reveal>summary{background:var(--ex)}
+details.soln.reveal>summary::after{content:"Show Output & Explanation"}
+details.soln.reveal[open]>summary::after{content:"Hide Output & Explanation"}
+details.soln.reveal.noout>summary::after{content:"Show Explanation"}
+details.soln.reveal.noout[open]>summary::after{content:"Hide Explanation"}
+
+.ans{
+  margin-top:11px;padding:2px 16px 10px;background:#fff;
+  border:1px solid var(--line);border-left:3px solid var(--sum);border-radius:7px;
+}
+details.soln.reveal .ans{border-left-color:var(--ex)}
+.ans>:first-child{margin-top:12px}
+.ans>:last-child{margin-bottom:6px}
+
+/* ---------- live coding editor ---------- */
+.editor{
+  margin:18px 0;border:2px dashed var(--edit);border-radius:9px;
+  background:var(--edit-bg);overflow:hidden;
+}
+.editor .ehd{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:7px 13px;background:var(--edit);color:#fff;
+  font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+}
+.editor .ehd .etitle{flex:1}
+.editor .ehd button{
+  font:inherit;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  cursor:pointer;background:rgba(255,255,255,.16);color:#fff;
+  border:1px solid rgba(255,255,255,.5);border-radius:5px;padding:3px 10px;
+}
+.editor .ehd button:hover{background:#fff;color:var(--edit)}
+.editor textarea{
+  display:block;width:100%;border:0;outline:0;resize:vertical;
+  padding:12px 15px;background:var(--edit-bg);color:#431407;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;
+  tab-size:4;-moz-tab-size:4;min-height:150px;
+}
+.editor textarea:focus{background:#fff}
+.editor .foot{
+  padding:5px 13px 7px;font-size:11.5px;color:#9a3412;background:#ffedd5;
+  border-top:1px solid #fed7aa;
+}
+
+/* ---------- prev/next nav ---------- */
+.pagenav{display:flex;gap:14px;margin:52px 0 0;flex-wrap:wrap}
+.pagenav a,.pagenav span.disabled{
+  flex:1 1 260px;display:block;text-decoration:none;
+  border:1px solid var(--line);border-radius:9px;padding:12px 16px;background:#fff;
+}
+.pagenav a:hover{border-color:var(--obj);background:var(--bg2)}
+.pagenav .dir{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.pagenav .ttl{font-size:15px;font-weight:600;color:var(--ink);margin-top:3px}
+.pagenav .next{text-align:right}
+.pagenav span.disabled{opacity:.4}
+.pagenav span.disabled .ttl{color:var(--muted)}
+
+footer.pf{
+  margin-top:40px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--muted);text-align:center;
+}
+
+/* ---------- index page ---------- */
+table.sched{font-size:14.5px}
+table.sched th{background:#0f172a;color:#fff;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+table.sched td:first-child{white-space:nowrap;font-weight:700;color:var(--muted);width:60px}
+table.sched tr.examrow td{background:#fff1f2}
+table.sched tr.revrow td{background:#fffbeb}
+table.sched a{font-weight:600;text-decoration:none}
+table.sched a:hover{text-decoration:underline}
+
+
+/* ---------- release gating ---------- */
+.pending{
+  margin-top:4px;font-size:11.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:#b45309;
+}
+.pagenav span.disabled .pending{color:#b45309}
+table.sched tr.pendingrow td{background:#fcfcfd}
+table.sched .unrel{color:var(--muted)}
+table.sched .pending{display:block;margin-top:2px}
+table.sched td.cn{white-space:nowrap;width:52px;font-weight:700;color:var(--muted)}
+table.sched td.dt{white-space:nowrap;width:104px;color:var(--muted);font-size:13.5px}
+table.sched tr.offrow td{background:#f1f5f9;color:var(--muted);font-style:italic}
+.refcard{
+  display:block;text-decoration:none;border:1px solid var(--line);
+  border-left:5px solid var(--alg);border-radius:9px;padding:13px 17px;
+  margin:22px 0;background:#faf9ff;
+}
+.refcard:hover{background:#f5f3ff;border-color:var(--alg)}
+.refcard .rl{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--alg)}
+.refcard .rt{font-size:16px;font-weight:600;color:var(--ink);margin-top:3px}
+.refcard .rd{font-size:14px;color:var(--muted);margin-top:4px}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,.tools,.pagenav,.pending{display:none !important}
+  html,body{width:100%;font-size:10pt}
+  .wrap{max-width:100%;width:100%;padding:0}
+  /* a wide <pre> must wrap rather than widen the page and clip every other
+     element at the paper edge */
+  /* Screen shows code on black; paper does not. Restore a dark-on-light palette
+     for print only, or the dark theme's light tokens vanish on white. */
+  pre{white-space:pre-wrap;overflow:visible;overflow-wrap:anywhere;font-size:8.6pt;
+      background:#f8fafc !important;color:#24292e !important;border-color:#cbd5e1 !important;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  pre code{color:#24292e !important}
+  pre.cmp{background:#fff !important;color:#475569 !important;border-color:#94a3b8 !important}
+  pre.cmp code{color:#475569 !important}
+  pre .hljs-doctag,pre .hljs-keyword,pre .hljs-meta .hljs-keyword,pre .hljs-template-tag,
+  pre .hljs-template-variable,pre .hljs-type,pre .hljs-variable.language_{color:#d73a49 !important}
+  pre .hljs-title,pre .hljs-title.class_,pre .hljs-title.class_.inherited__,
+  pre .hljs-title.function_{color:#6f42c1 !important}
+  pre .hljs-attr,pre .hljs-attribute,pre .hljs-literal,pre .hljs-meta,pre .hljs-number,
+  pre .hljs-operator,pre .hljs-selector-attr,pre .hljs-selector-class,pre .hljs-selector-id,
+  pre .hljs-variable{color:#005cc5 !important}
+  pre .hljs-meta .hljs-string,pre .hljs-regexp,pre .hljs-string{color:#032f62 !important}
+  pre .hljs-built_in,pre .hljs-symbol{color:#e36209 !important}
+  pre .hljs-code,pre .hljs-comment,pre .hljs-formula{color:#6a737d !important}
+  pre .hljs-name,pre .hljs-quote,pre .hljs-selector-pseudo,
+  pre .hljs-selector-tag{color:#22863a !important}
+  pre .hljs-subst,pre .hljs-emphasis,pre .hljs-strong{color:#24292e !important}
+  .filename{color:#475569 !important}
+  table{table-layout:fixed;width:100%;word-wrap:break-word;overflow-wrap:anywhere}
+  .box,.toc{max-width:100%}
+  a{color:var(--ink);text-decoration:none}
+  .box,.part,pre,table,.editor{break-inside:avoid;page-break-inside:avoid}
+  h2{break-after:avoid;page-break-after:avoid}
+  details.soln>summary{display:none !important}
+  details.soln:not([open])>.ans{display:none !important}
+  details.soln::before{
+    content:"Answer withheld — see the online notes.";
+    display:block;font-size:9pt;font-style:italic;color:#64748b;margin:6px 0;
+  }
+  details.soln[open]::before{content:""}
+  .editor textarea{display:none !important}
+  .editor{border:1.5px solid #fdba74 !important;background:#fff;border-style:solid}
+  .editor .ehd{background:#fff !important;color:#9a3412 !important;border-bottom:1px solid #fdba74}
+  .editor .ehd button{display:none}
+  .editor .foot{display:none}
+  .editor::after{content:"";display:block;height:2.1in;background:#fff}
+  pre.out,pre.sh{background:#f1f5f9 !important;color:#0f172a !important;border-color:#94a3b8 !important}
+  pre.err{background:#fef2f2 !important;color:#7f1d1d !important;border-color:#fca5a5 !important}
+  pre.out code,pre.sh code{color:#0f172a !important}
+  pre.err code{color:#7f1d1d !important}
+  pre.out::before,pre.sh::before{color:#475569}
+  pre.err::before{color:#b91c1c}
+  .box>.hd{color:#000;background:#fff !important;border-bottom:1px solid #cbd5e1}
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="inner">
+<span class="course">CSCI 212</span>
+<span class="sep">|</span>
+<a href="index.html">Course index</a>
+<span class="sep">|</span>
+<span>Class 7 of 28</span>
+<span class="sep">|</span>
+<span>Tuesday, September 22</span>
+<span class="spacer"></span>
+<span>Queens College, CUNY</span>
+</div></div>
+<div class="wrap">
+<div class="titleblock">
+  <div class="eyebrow">Session 7 &middot; Lecture 7</div>
+  <h1>Classes and Objects</h1>
+  <p class="sub">The pivot of the course: instead of writing programs that manipulate data, we start writing programs that are made of things.</p>
+</div>
+
+<div class="box obj">
+  <div class="hd">Learning Objectives</div>
+  <div class="bd">
+    <p>By the end of today's session you should be able to:</p>
+    <ol>
+      <li>State the difference between a <em>class</em> and an <em>object</em>, and identify each one in a piece of code.</li>
+      <li>Write a class from scratch with private instance variables, constructors, getters, setters and instance methods.</li>
+      <li>Explain what <code>private</code> does, what the compiler says when you ignore it, and why encapsulation is worth the extra typing.</li> <li>Explain why writing <em>any</em> constructor removes the free no-arg constructor, and recognize the exact <code>javac</code> error that results.</li> <li>Use <code>this</code> to tell an instance variable apart from a parameter of the same name, and predict what happens when you forget it.</li> <li>Write a setter that validates its argument instead of accepting anything it is handed.</li> <li>Define <code>toString</code> and predict what <code>System.out.println(obj)</code> prints both with it and without it.</li> <li>Build a class whose instance variables are themselves objects, and call methods on those inner objects.</li> </ol> </div> </div> <div class="toc"> <div class="th">On this page</div> <ol> <li><a href="#s1">Blueprints and instances</a></li> <li><a href="#s2">Writing a class: the recipe</a></li> <li><a href="#s3"><code>private</code>, and why encapsulation matters</a></li> <li><a href="#s4">Constructors, and the <code>this</code> keyword</a></li> <li><a href="#s5">Getters, setters, and the setter that says no</a></li> <li><a href="#s6"><code>toString</code></a></li> <li><a href="#s7">Objects inside objects</a></li> <li><a href="#prac">Practice Problems</a></li> <li><a href="#summary">Lecture Summary</a></li> </ol> </div> <div class="tools"> <span class="lab">Answers</span> <button id="showAll" type="button">Show all</button> <button id="hideAll" type="button">Hide all</button> <span class="muted">&mdash; every worked-example output and every solution is hidden when the page loads. Work it out first, then reveal.</span> </div> <hr> <h2 id="s1"><span class="num">1.</span>Blueprints and instances</h2> <p>Everything in the first six lectures was <em>your</em> code operating on <em>Java's</em> types. You declared an <code>int</code>, you built a <code>String</code>, you filled an array, you grew an <code>ArrayList</code>. Somebody else designed those types; you used them. Today that stops. From here to the end of the semester you design the types.</p> <p>Start with the problem that makes this necessary. Suppose you are keeping a roster of people, and each person has a name and an age. With what you know so far you would reach for two arrays.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; why two arrays is not enough</span></div> <div class="bd"> <p>Here is a roster of three people held in two parallel arrays, and a small edit: move the first person to the end of the list. The programmer rotates the <code>names</code> array correctly &mdash; and forgets the <code>ages</code> array, because nothing in the code ties them together.</p> <p class="filename">Roster.java</p>
+<pre><code class="language-java">public class Roster {
+    public static void main(String[] args) {
+        String names[] = {"Ana", "Ben", "Cara"};
+        int ages[]     = {20, 22, 21};
+
+        // Put the roster in a different order: move the first entry to the end.
+        String tempName = names[0];
+        names[0] = names[1];
+        names[1] = names[2];
+        names[2] = tempName;
+
+        for (int i = 0; i &lt; 3; i++) {
+            System.out.println(names[i] + " is " + ages[i]);
+        }
+    }
+}</code></pre> <p>Ana is 20, Ben is 22, Cara is 21. What does this print?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Ben is 20 Cara is 22 Ana is 21 </code></pre> <p>Every single age is now attached to the wrong person, and the program did not complain once. Nothing in Java knows that <code>names[1]</code> and <code>ages[1]</code> describe the same human being. That knowledge existed only in the programmer's head, and the moment it slipped, the data silently became wrong.</p> 
+</div></details> <p>Now the same edit, written with a <code>Person</code> type that we are about to build. Read the rotation code carefully: it is the same three assignments, on one array instead of two.</p> <p class="filename">Roster2.java</p>
+<pre><code class="language-java">public class Roster2 {
+    public static void main(String[] args) {
+        Person people[] = { new Person("Ana", 20),
+                            new Person("Ben", 22),
+                            new Person("Cara", 21) };
+
+        // Put the roster in a different order: move the first entry to the end.
+        Person temp = people[0];
+        people[0] = people[1];
+        people[1] = people[2];
+        people[2] = temp;
+
+        for (int i = 0; i &lt; 3; i++) {
+            System.out.println(people[i].getName() + " is " + people[i].getAge());
+        }
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Ben is 22 Cara is 21 Ana is 20 </code></pre> <p>Correct, and &mdash; more importantly &mdash; it could not have gone wrong. A name and an age are no longer two facts that happen to sit at the same index in two places. They are one thing. When you move that thing, both facts move with it, because there is nothing left to move separately.</p> <p>That is the whole argument for object-oriented programming in one example. The rest of the semester is detail.</p> 
+</div></details> </div> </div> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; class and object</span></div> <div class="bd"> <p>A <strong>class</strong> is a blueprint or template that defines the structure and behavior of objects. <code>Car</code>, <code>Person</code>, <code>BankAccount</code> are classes. A class is a description; writing one creates nothing at run time.</p> <p>An <strong>object</strong> is an <em>instance</em> of a class, created in memory. <code>myCar</code>, <code>student1</code>, <code>person2</code> are objects. Each object made from a class has its own copy of that class's data, and there can be as many of them as you like.</p> </div> </div> <div class="box key"> <div class="hd">Key Idea</div> <div class="bd"> <p>The blueprint of a house is not a house. You can hand one blueprint to a builder and get a hundred houses, each with its own address and its own furniture, all laid out the same way. <code>class Person</code> is the blueprint. Every <code>new Person(...)</code> is another house.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 7.1</div> <div class="bd"> <p>Look at this line, which you have written many times already:</p> <pre><code class="language-java">Scanner input = new Scanner(System.in); </code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> Which part of that line is the class, and which part is the object?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Scanner</code> is the class &mdash; the blueprint, written by the authors of the Java library, describing what every scanner can do. The object is the thing created by <code>new Scanner(System.in)</code>, and <code>input</code> is the name you gave it.</p> <p>Notice <code>Scanner</code> appears twice for two different reasons: once as the <em>type</em> of the variable, and once as the thing being constructed after <code>new</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> You have been creating objects since Lecture 3 without calling them that. Name two other classes from earlier in this course that you have made objects of with <code>new</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>ArrayList</code> from Lecture 6 (<code>new ArrayList()</code>), and <code>DecimalFormat</code> from the formatting work (<code>new DecimalFormat("#.##")</code>). <code>File</code>, <code>PrintWriter</code> and <code>Random</code> all count too.</p> <p><strong>Things to notice across both parts.</strong> Nothing new is happening today on the <em>using</em> side. You already know how to make an object and call methods on it with a dot. What is new is that from now on <em>you</em> write the class that sits behind the dot. The strangeness of this lecture is entirely on the authoring side, not the calling side.</p> </div></details> </div> </div> </div> <h2 id="s2"><span class="num">2.</span>Writing a class: the recipe</h2> <p>Every class you write this semester follows the same five steps, in the same order. Learn the order and the blank page stops being frightening.</p> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; how to create a class</span></div> <div class="bd"> <ol> <li><strong>Define the class structure.</strong> Start with the <code>class</code> keyword and a name. Use PascalCase &mdash; <code>Person</code>, <code>BankAccount</code>, <code>TrafficSignal</code> &mdash; and put the class in a file with exactly that name plus <code>.java</code>.</li> <li><strong>Declare instance variables.</strong> These define the object's <em>state</em>. Mark them <code>private</code> for encapsulation (&sect;3).</li> <li><strong>Create constructors.</strong> Constructors initialize an object at the moment it is created. You can write both a default (no-argument) version and parameterized versions (&sect;4).</li> <li><strong>Add getters and setters.</strong> Controlled access to the private variables: accessors that read (getters) and mutators that write (setters) (&sect;5).</li> <li><strong>Add methods.</strong> The object's <em>behavior</em> &mdash; anything else it can do.</li> </ol> </div> </div> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; instance variable</span></div> <div class="bd"> <p>An <strong>instance variable</strong> (also called a <strong>field</strong> or an <strong>attribute</strong>) is a variable declared directly inside a class, outside every method. Each object gets its own copy of every instance variable, which is exactly why two <code>Person</code> objects can hold two different names.</p> <p>Contrast this with a <em>local</em> variable, declared inside a method: a local variable exists only while that method runs and belongs to nobody. An instance variable lives as long as the object does.</p> </div> </div> <p>Here is the recipe carried out end to end. This is the class we will keep coming back to.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the Person class, all five steps</span></div> <div class="bd"> <p>Read it against the five steps: the header, then two private instance variables, then two constructors, then four accessors and mutators, then one behavior method. The comments mark the boundaries.</p> <p class="filename">Person.java</p>
+<pre><code class="language-java">public class Person {
+    // Instance variables
+    private String name;
+    private int age;
+
+    // Default constructor (no-args)
+    public Person() {
+        this.name = "Unknown";
+        this.age = 0;
+    }
+
+    // Non-default constructor
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    // Getters
+    public String getName() { return name; }
+    public int getAge() { return age; }
+
+    // Setters
+    public void setName(String name) { this.name = name; }
+    public void setAge(int age) {
+        if (age &gt;= 0) {
+            this.age = age;
+        }
+    }
+
+    // Methods
+    public void introduce() {
+        System.out.println("Hi, I'm " + name + ".");
+    }
+}</code></pre> <p>Two things to notice before we run anything. First, there is no <code>main</code> here at all. A class does not have to be a program; <code>Person.java</code> is a <em>type</em>, and something else will use it. Second, <code>introduce</code> is not <code>static</code>. It has no parameters and yet it prints a name &mdash; because it is called <em>on</em> a particular person, and <code>name</code> means "the name of the object I was called on".</p> <p>Now a second file that actually does something. Both files go in the same folder; <code>javac Person.java Main.java</code> compiles them together.</p> <p class="filename">Main.java</p>
+<pre><code class="language-java">public class Main {
+    public static void main(String[] args) {
+        // Create objects using the constructors
+        Person person1 = new Person();
+        Person person2 = new Person("John", 18);
+
+        // Call methods
+        person1.introduce();
+        person2.introduce();
+
+        // Use setters and getters
+        person1.setAge(21);
+        System.out.println(person1.getAge());
+    }
+}</code></pre> <p>Three lines of output. Write down all three before you reveal.</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Hi, I'm Unknown. Hi, I'm John. 21 </code></pre> <table class="trace"> <tr><th>Statement</th><th>What happens</th></tr> <tr><td><code>new Person()</code></td><td>Memory for one <code>Person</code> is allocated; the no-arg constructor runs and sets its <code>name</code> to <code>"Unknown"</code> and its <code>age</code> to 0.</td></tr> <tr><td><code>new Person("John", 18)</code></td><td>A <em>second, separate</em> <code>Person</code> is allocated; the two-argument constructor sets its <code>name</code> to <code>"John"</code> and its <code>age</code> to 18.</td></tr> <tr><td><code>person1.introduce()</code></td><td>Runs <code>introduce</code> with <code>person1</code> as the object, so <code>name</code> means <code>person1</code>'s name.</td></tr> <tr><td><code>person2.introduce()</code></td><td>The same method, the same code, a different object &mdash; and therefore different output.</td></tr> <tr><td><code>person1.setAge(21)</code></td><td>Changes <code>person1</code>'s age only. <code>person2</code> is untouched.</td></tr> </table> <p>The middle two rows are the heart of it. One method body, written once, produced two different lines, because the method reads instance variables and each object has its own. A <code>static</code> method could not do this &mdash; it has no object to read from. That is why almost nothing you write from today on will be <code>static</code>.</p> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; calling an instance method on the class</span></div> <div class="bd"> <p><code>introduce</code> needs a person to introduce. Ask the <em>class</em> to do it and the compiler stops you:</p> <pre class="err"><code>W1.java:3: error: non-static method introduce() cannot be referenced from a static context Person.introduce();
+^
+1 error</code></pre> <p>Read that message as: "you called this from <code>main</code>, where there is no current object, and <code>introduce</code> needs one." The fix is to make an object first and call the method on it.</p> <p>The other half of the same mistake is declaring a variable and forgetting <code>new</code>:</p> <pre class="err"><code>W2.java:4: error: variable p might not have been initialized p.introduce();
+^
+1 error</code></pre> <p><code>Person p;</code> creates a variable that can refer to a <code>Person</code>. It does not create a <code>Person</code>. Only <code>new</code> does that.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 7.2</div> <div class="bd"> <p>Using the <code>Person</code> class exactly as written above, what does this print?</p> <p class="filename">Main2.java</p>
+<pre><code class="language-java">public class Main2 {
+    public static void main(String[] args) {
+        Person a = new Person();
+        Person b = new Person("Ana", 20);
+        Person c = new Person("Ben", 20);
+
+        a.setName("Alex");
+        b.setAge(21);
+
+        a.introduce();
+        b.introduce();
+        c.introduce();
+        System.out.println(a.getAge() + " " + b.getAge() + " " + c.getAge());
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Draw three boxes, one per object, and write the two instance variables in each. Then walk down the statements, changing only the box that is named to the left of the dot.</p> <table class="trace"> <tr><th>Object</th><th><code>name</code> after construction</th><th><code>age</code> after construction</th><th>after the two setter calls</th></tr> <tr><td><code>a</code></td><td><code>"Unknown"</code></td><td>0</td><td><code>"Alex"</code>, 0</td></tr> <tr><td><code>b</code></td><td><code>"Ana"</code></td><td>20</td><td><code>"Ana"</code>, 21</td></tr> <tr><td><code>c</code></td><td><code>"Ben"</code></td><td>20</td><td>unchanged</td></tr> </table> <pre class="out"><code>Hi, I'm Alex. Hi, I'm Ana. Hi, I'm Ben. 0 21 20 </code></pre> <p><strong>Things to notice.</strong> The last line is where people lose the point. <code>a</code>'s age is still 0, because <code>setName</code> changed the name and nothing else &mdash; a setter touches exactly one instance variable. And <code>c</code> is 20 while <code>b</code> is 21, even though both were constructed with the same number, because <code>b.setAge(21)</code> reached into <code>b</code>'s box only. Three objects, three independent sets of instance variables. That independence is the thing to hold on to.</p> </div></details> </div> </div> <h2 id="s3"><span class="num">3.</span><code>private</code>, and why encapsulation matters</h2> <p>Every instance variable in <code>Person</code> is declared <code>private</code>. That word is doing real work, and the reason is not tidiness.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; private and encapsulation</span></div> <div class="bd"> <p><code>private</code> means: this member can be used only by code <em>inside this class</em>. Any other class that mentions it by name gets a compile error.</p> <p><strong>Encapsulation</strong> is the practice of making the data private and exposing it only through methods you wrote. The object keeps control of its own state: nothing gets in or out except through a door you built and can inspect.</p> </div> </div> <p>Watch what the compiler does when another class reaches for a private field directly.</p> <p class="filename">Peek.java</p>
+<pre><code class="language-java">public class Peek {
+    public static void main(String[] args) {
+        Person p = new Person("John", 18);
+        System.out.println(p.age);
+    }
+}</code></pre> <pre class="err"><code>Peek.java:4: error: age has private access in Person System.out.println(p.age);
+^
+1 error</code></pre> <p>That is the entire mechanism. There is no runtime check, no permission system, no cost: the compiler simply refuses to build a program that pokes at another object's insides.</p> <p>So why bother, when <code>public int age;</code> would have compiled and <code>p.age</code> would have worked? Three reasons, in increasing order of how much they will matter to you.</p> <ul> <li><strong>You can validate.</strong> If the only way to change the age is <code>setAge</code>, then <code>setAge</code> gets to decide. Ours refuses negative ages. A public field cannot refuse anything: <code>p.age = -400;</code> would just be true from then on.</li> <li><strong>You can change your mind later.</strong> Suppose next month you decide to store a birth year instead of an age. If everybody outside used <code>getAge()</code>, you rewrite <code>getAge()</code> to compute the age and every other file in the project keeps compiling. If everybody used <code>p.age</code>, every one of those files breaks.</li> <li><strong>You can find the bug.</strong> When an age goes wrong and there is exactly one method in the program that can write it, you know where to put the breakpoint. When the field is public, "who set this?" has no answer short of reading the whole project.</li> </ul> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; the default posture</span></div> <div class="bd"> <p>Instance variables <code>private</code>, methods <code>public</code>, unless you have a specific reason to do otherwise. Say what the object <em>does</em> in public and keep what it <em>has</em> to yourself. On this instructor's exams, a class written with public instance variables loses points even when it runs.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 7.3</div> <div class="bd"> <p>Here is a class and a program that uses it.</p> <pre><code class="language-java">public class Temperature {
+    private double celsius;
+    public Temperature(double celsius) {
+        this.celsius = celsius;
+    }
+    public double getCelsius() {
+        return celsius;
+    }
+    public double getFahrenheit() {
+        return celsius * 9 / 5 + 32;
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> A user of this class writes <code>t.celsius = 100;</code>. What happens, and when?</p> <details class="soln"><summary></summary><div class="ans"> <p>It fails at <em>compile</em> time, with <code>error: celsius has private access in Temperature</code>. The program never runs, so there is no chance of a wrong answer reaching a user. Errors caught by the compiler are the cheapest errors there are.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> The class stores only <code>celsius</code>, yet it offers <code>getFahrenheit()</code>. Is that legal? Should a getter always just return a field?</p> <details class="soln"><summary></summary><div class="ans"> <p>Perfectly legal, and rather good design. A getter is an ordinary method; nothing requires it to return a stored value. <code>getFahrenheit()</code> computes its answer, so the two temperatures can never disagree &mdash; which is exactly the bug you would get if you stored both and updated one.</p> <p>This is the second bullet from the section above, in miniature: callers say what they want, not how it is stored, so you are free to change how it is stored.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> There is no <code>setCelsius</code>. Is the class broken?</p> <details class="soln"><summary></summary><div class="ans"> <p>No. A class is under no obligation to provide a setter for every field. Leaving <code>setCelsius</code> out makes a <code>Temperature</code> <strong>immutable</strong>: once constructed it can never change, so no other part of the program can corrupt it, and you never have to wonder whether it changed behind your back. <code>String</code> works exactly this way, which is why <code>s.toUpperCase()</code> returns a new string instead of modifying <code>s</code>.</p> <p><strong>Things to notice across all three parts.</strong> "Getter and setter for every field" is a habit, not a rule. Provide the doors your class actually needs. Every setter you leave out is a way the object can no longer be broken.</p> </div></details> </div> </div> </div> <h2 id="s4"><span class="num">4.</span>Constructors, and the <code>this</code> keyword</h2> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; constructor</span></div> <div class="bd"> <p>A <strong>constructor</strong> is a special method that runs once, automatically, when an object is created with <code>new</code>. Its job is to put the new object's instance variables into a sensible starting state.</p> <p>Two rules of syntax, both of which trip people up:</p> <ul> <li>Its name is <em>exactly</em> the class name, capital letter and all.</li> <li>It has <strong>no return type</strong> &mdash; not even <code>void</code>. Writing <code>public void Person()</code> does not declare a constructor; it declares an ordinary method that happens to be called <code>Person</code>, and Java will never call it for you.</li> </ul> </div> </div> <p>A class may have several constructors as long as their parameter lists differ &mdash; this is just method overloading from Lecture 2, applied to constructors. <code>Person</code> has two: a <strong>no-arg</strong> (or default) constructor that installs placeholder values, and a <strong>parameterized</strong> one that takes the values from the caller.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the constructor you get for free</span></div> <div class="bd"> <p>If you write no constructor at all, Java supplies an invisible no-arg constructor that does nothing. The instance variables are still initialized &mdash; not to garbage, as they would be in C++, but to Java's fixed defaults. This class has no constructor anywhere in it, yet <code>new Book()</code> compiles:</p> <p class="filename">Book.java</p>
+<pre><code class="language-java">public class Book {
+    private String title;
+    private int pages;
+    private double price;
+    private boolean borrowed;
+
+    public String toString() {
+        return title + " / " + pages + " / " + price + " / " + borrowed;
+    }
+}</code></pre> <p class="filename">BookDemo.java</p>
+<pre><code class="language-java">public class BookDemo {
+    public static void main(String[] args) {
+        Book b = new Book();
+        System.out.println(b);
+    }
+}</code></pre> <p>Four values. What are they?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>null / 0 / 0.0 / false </code></pre> <table class="trace"> <tr><th>Kind of instance variable</th><th>Default value</th></tr> <tr><td>any object type (<code>String</code>, <code>Point</code>, an array, &hellip;)</td><td><code>null</code></td></tr> <tr><td><code>byte</code> <code>short</code> <code>int</code> <code>long</code></td><td><code>0</code></td></tr> <tr><td><code>float</code> <code>double</code></td><td><code>0.0</code></td></tr> <tr><td><code>char</code></td><td>the character with code 0</td></tr> <tr><td><code>boolean</code></td><td><code>false</code></td></tr> </table> <p>These defaults apply to instance variables only. A <em>local</em> variable inside a method gets no default at all &mdash; that is why <code>int x; System.out.println(x);</code> inside <code>main</code> is a compile error while a field is silently zero.</p> <p>The <code>null</code> in that output is the one to remember. It is the value of an object variable that does not refer to anything yet, and it is where <code>NullPointerException</code> comes from. If <code>Book</code> had a <code>getTitle().length()</code> call anywhere, that program would have crashed.</p> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; writing one constructor removes the free one</span></div> <div class="bd"> <p>The free no-arg constructor is a courtesy, and Java withdraws it the moment you write a constructor of your own &mdash; any constructor, with any parameters. This class has one two-argument constructor and nothing else:</p> <p class="filename">Student.java</p>
+<pre><code class="language-java">public class Student {
+    private String name;
+    private int credits;
+
+    public Student(String name, int credits) {
+        this.name = name;
+        this.credits = credits;
+    }
+
+    public String toString() {
+        return name + " (" + credits + " credits)";
+    }
+}</code></pre> <p class="filename">StudentDemo.java</p>
+<pre><code class="language-java">public class StudentDemo {
+    public static void main(String[] args) {
+        Student a = new Student("Maria", 30);
+        Student b = new Student();
+        System.out.println(a);
+        System.out.println(b);
+    }
+}</code></pre> <p>The first line is fine. The second one does not compile:</p> <pre class="err"><code>StudentDemo.java:4: error: constructor Student in class Student cannot be applied to given types;
+        Student b = new Student();
+                    ^
+  required: String,int
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+1 error</code></pre> <p>Read the three extra lines: <code>required</code> is what the only constructor wants, <code>found</code> is what you supplied. The fix is to write the no-arg constructor yourself if you want one &mdash; which is exactly why <code>Person</code> above has both. This error appears every semester, usually the first time someone adds a parameterized constructor to a class that already worked.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 7.4</div> <div class="bd"> <p>Consider this class.</p> <pre><code class="language-java">public class Ticket {
+    private String plate;
+    private double fine;
+    public Ticket(String plate) {
+        this.plate = plate;
+        this.fine = 25.0;
+    }
+}</code></pre> <p>For each of the following, say whether it compiles, and why.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>Ticket t = new Ticket("ABC1234");</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compiles. One <code>String</code> argument, and there is a constructor that takes one <code>String</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>Ticket t = new Ticket();</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Does not compile: <code>constructor Ticket in class Ticket cannot be applied to given types; required: String, found: no arguments</code>. Writing the one-argument constructor removed the free no-arg one.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>Ticket t = new Ticket("ABC1234", 50.0);</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Does not compile either &mdash; there is no two-parameter constructor. You would have to add one. Note that adding it is fine: a class may have as many constructors as you like, provided no two have the same parameter list.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> Someone "fixes" (b) by adding <code>public void Ticket() { }</code> to the class. Does <code>new Ticket()</code> compile now?</p> <details class="soln"><summary></summary><div class="ans"> <p>No. <code>public void Ticket()</code> has a return type, so it is an ordinary method named <code>Ticket</code>, not a constructor. The class still has exactly one constructor, and <code>new Ticket()</code> still fails with the same message. Delete the word <code>void</code> and it becomes a real constructor.</p> <p><strong>Things to notice across all four parts.</strong> Part (d) is the single most common way this goes wrong, and the reason it is so hard to spot is that the file compiles perfectly &mdash; the error appears in whatever <em>other</em> file said <code>new</code>. When a <code>new</code> call is rejected and the constructor is clearly right there in front of you, check for a stray return type first.</p> </div></details> </div> </div> </div> <h3 style="font-size:1.02rem">The <code>this</code> keyword</h3> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; this</span></div> <div class="bd"> <p>Inside any constructor or instance method, <code>this</code> refers to <strong>the object the method was called on</strong> &mdash; the current object. <code>this.name</code> therefore means "the <code>name</code> instance variable of the object I am working on", as opposed to any local variable or parameter that happens to also be called <code>name</code>.</p> </div> </div> <p>Most of the time you can leave <code>this</code> out: inside <code>introduce()</code> the bare word <code>name</code> already means <code>this.name</code>, because there is nothing else called <code>name</code> in scope. There is exactly one situation where you cannot leave it out, and it is a situation Java programmers deliberately walk into several times per class.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; what happens when you forget <code>this</code></span></div> <div class="bd"> <p>The convention is to name a constructor's parameter after the field it initializes: <code>Person(String name, int age)</code>. That is good for readability, but it means the parameter <code>name</code> <strong>shadows</strong> the field <code>name</code> &mdash; inside the constructor, the bare word <code>name</code> refers to the parameter. Here is the same constructor with the <code>this.</code> removed.</p> <p class="filename">Broken.java</p>
+<pre><code class="language-java">public class Broken {
+    private String name;
+    private int age;
+
+    public Broken(String name, int age) {
+        name = name;    // no 'this' -- does nothing useful
+        age = age;      // no 'this' -- does nothing useful
+    }
+
+    public String toString() {
+        return "name = " + name + ", age = " + age;
+    }
+}</code></pre> <p class="filename">BrokenDemo.java</p>
+<pre><code class="language-java">public class BrokenDemo {
+    public static void main(String[] args) {
+        Broken b = new Broken("John", 18);
+        System.out.println(b);
+    }
+}</code></pre> <p>Before revealing: does this even compile? And if it does, what does it print?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>name = null, age = 0 </code></pre> <p>It compiles cleanly &mdash; no error, and no warning either, even with <code>javac -Xlint:all</code>. <code>name = name;</code> assigns the parameter to itself, which is legal and pointless. The fields are never written, so they keep the defaults from the previous example: <code>null</code> and <code>0</code>.</p> <table class="trace"> <tr><th>Written</th><th>Means</th><th>Effect</th></tr> <tr><td><code>name = name;</code></td><td>parameter = parameter</td><td>nothing; the field is untouched</td></tr> <tr><td><code>this.name = name;</code></td><td>field = parameter</td><td>the field is initialized &mdash; what you wanted</td></tr> <tr><td><code>this.name = this.name;</code></td><td>field = field</td><td>nothing; the parameter is ignored</td></tr> </table> <p>Read the middle row aloud as "this object's name gets the name I was passed" and the line stops looking like a tautology. The left side is the field because of <code>this.</code>; the right side is the parameter because it is the nearest thing in scope.</p> <p>You can avoid the whole issue by naming the parameter something else &mdash; the instructor's <code>Point</code> class does exactly that with <code>xValue</code> and <code>yValue</code>, and then plain <code>x = xValue;</code> is unambiguous. Both styles are correct and you will see both. What you must never do is use the same name and forget the <code>this.</code>, because nothing will tell you.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 7.5</div> <div class="bd"> <p>This class is meant to hold a rectangle's width and height and report its area. It compiles and runs, and every rectangle has area 0.0. Find the two bugs and fix them.</p> <pre><code class="language-java">public class Rect {
+    private double width;
+    private double height;
+    public Rect(double width, double height) {
+        width = width;
+        height = height;
+    }
+    public double area() {
+        return width * height;
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Area is 0.0 for every object, so the fields are never written. Look at every line that is supposed to write a field and ask which <code>width</code> each side of the <code>=</code> refers to.</p> <p>Both constructor lines are self-assignments: the parameter <code>width</code> shadows the field <code>width</code>, so <code>width = width;</code> copies the parameter onto itself and leaves the field at its default <code>0.0</code>. Then <code>area()</code> returns <code>0.0 * 0.0</code>.</p> <p class="filename">Rect.java</p>
+<pre><code class="language-java">public class Rect {
+    private double width;
+    private double height;
+    public Rect(double width, double height) {
+        this.width = width;
+        this.height = height;
+    }
+    public double area() {
+        return width * height;
+    }
+}</code></pre> <pre class="out"><code>12.0 </code></pre> <p>(That is <code>new Rect(3, 4).area()</code>.)</p> <p><strong>Things to notice.</strong> <code>area()</code> needs no <code>this</code> at all: there is no parameter called <code>width</code> inside it, so the bare name already reaches the field. <code>this</code> is only mandatory where something closer to hand has the same name. Writing <code>return this.width * this.height;</code> is also correct and some teams require it for exactly this reason &mdash; it makes "is this a field?" answerable without scrolling.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 7.5</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="7" aria-label="Live coding - Quick Check 7.5">public class Rect {
+    private double width;
+    private double height;
+    public Rect(double width, double height) {
+        // Fix these two lines so the fields actually get set. width = width; height = height; } public double area() { return width * height; } public static void main(String[] args) { Rect r = new Rect(3, 4); System.out.println(r.area());   // should print 12.0 } }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s5"><span class="num">5.</span>Getters, setters, and the setter that says no</h2> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; accessor and mutator</span></div> <div class="bd"> <p>An <strong>accessor</strong>, or <strong>getter</strong>, is a method that reports the value of a private instance variable. By convention it is named <code>getSomething</code>, takes no parameters, and returns the field's type. For a <code>boolean</code> the convention is <code>isSomething</code> instead.</p> <p>A <strong>mutator</strong>, or <strong>setter</strong>, is a method that changes a private instance variable. By convention it is named <code>setSomething</code>, takes one parameter of the field's type, and returns <code>void</code>.</p> </div> </div> <p>Written mechanically, a getter and setter pair looks like pure ceremony &mdash; five lines to do what one public field would have done. The payoff is that a setter is a method, and a method can think before it acts. Look again at the two setters in <code>Person</code>:</p> <pre><code class="language-java">public void setName(String name) {
+    this.name = name;
+}
+public void setAge(int age) {
+    if (age &gt;= 0) {
+        this.age = age;
+    }
+}</code></pre> <p><code>setName</code> accepts anything. <code>setAge</code> does not: an age below zero is meaningless, so the assignment is guarded, and a bad value simply does not get in. A public <code>age</code> field could not have done this.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the guard in action</span></div> <div class="bd"> <p>Using the <code>Person</code> class from &sect;2 unchanged:</p> <p class="filename">SetterDemo.java</p>
+<pre><code class="language-java">public class SetterDemo {
+    public static void main(String[] args) {
+        Person p = new Person("John", 18);
+        System.out.println("Start:        " + p.getAge());
+
+        p.setAge(21);
+        System.out.println("After 21:     " + p.getAge());
+
+        p.setAge(-5);
+        System.out.println("After -5:     " + p.getAge());
+
+        p.setName("Johnathan");
+        System.out.println("Name is now:  " + p.getName());
+    }
+}</code></pre> <p>The third line is the interesting one. What does the age become?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Start:        18
+After 21:     21
+After -5:     21
+Name is now:  Johnathan</code></pre> <p>The age stays 21. <code>setAge(-5)</code> ran, the condition <code>age &gt;= 0</code> was false, the body was skipped, and the method returned normally. The object protected itself and the caller never knew.</p> <p>That last clause is worth arguing about, and you should notice that this design has a real weakness: a rejected value is <em>silently</em> rejected. A program that calls <code>setAge(-5)</code> and then reads <code>getAge()</code> gets 21 and has no way to tell that its request was thrown away. There are three standard ways to do better, all of them beyond today:</p> <ul> <li>Return a <code>boolean</code> from the setter so the caller can check &mdash; simple, but easy to ignore.</li> <li>Print a message, as the instructor's <code>Distance</code> class does in Practice Problem 5.</li> <li>Throw an exception, which forces the caller to deal with it. That is Lecture 20, and it is what professional code does.</li> </ul> <p>For now, take the point that matters: <em>the validation lives in the class, not in every caller</em>. Write it once, in the setter, and no amount of careless calling code can put a negative age into a <code>Person</code>.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 7.6</div> <div class="bd"> <p>Still using <code>Person</code>. What does this print?</p> <p class="filename">GuardDemo.java</p>
+<pre><code class="language-java">public class GuardDemo {
+    public static void main(String[] args) {
+        Person p = new Person();
+        System.out.println(p.getAge());     // line (a)
+        p.setAge(30);
+        System.out.println(p.getAge());     // line (b)
+        p.setAge(-1);
+        System.out.println(p.getAge());     // line (c)
+        p.setAge(0);
+        System.out.println(p.getAge());     // line (d)
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The only question at each <code>setAge</code> call is whether the argument satisfies <code>age &gt;= 0</code>. If it does, the field takes the new value; if not, the field is left exactly as it was.</p> <pre class="out"><code>0 30 30 0 </code></pre> <p><strong>Things to notice.</strong> Line (d) is the trap, and it catches almost everyone. <code>setAge(0)</code> looks like it should be rejected along with <code>-1</code>, but the guard is <code>age &gt;= 0</code>, not <code>age &gt; 0</code>, so zero is a perfectly acceptable age &mdash; and the age drops from 30 back to 0. That is not a bug; it is the specification you wrote when you chose <code>&gt;=</code>. The lesson is that a validating setter is only as good as its condition, and the boundary case is where you should look first.</p> <p>Line (a) also confirms the previous section: the no-arg constructor set the age to 0 explicitly, which happens to be the same value the field would have defaulted to.</p> </div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 7.7</div> <div class="bd"> <p>Write the class <code>Movie</code>. It has two private instance variables, <code>title</code> (a <code>String</code>) and <code>year</code> (an <code>int</code>), a constructor taking both, a getter for each, and a setter for each. The year setter must reject any year before 1888 &mdash; there were no movies &mdash; leaving the year unchanged. Then check your class against this driver:</p> <p class="filename">MovieDemo.java</p>
+<pre><code class="language-java">public class MovieDemo {
+    public static void main(String[] args) {
+        Movie m = new Movie("Metropolis", 1927);
+        System.out.println(m.getTitle() + " " + m.getYear());
+
+        m.setYear(1931);
+        System.out.println(m.getTitle() + " " + m.getYear());
+
+        m.setYear(1200);
+        System.out.println(m.getTitle() + " " + m.getYear());
+
+        m.setTitle("M");
+        System.out.println(m.getTitle() + " " + m.getYear());
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Follow the recipe from &sect;2 in order and do not improvise: two private fields, one two-parameter constructor using <code>this.</code> on both lines, then <code>getTitle</code>, <code>getYear</code>, <code>setTitle</code>, <code>setYear</code>. Only <code>setYear</code> needs a condition, and it is the same shape as <code>setAge</code> in <code>Person</code> &mdash; an <code>if</code> around the assignment, with no <code>else</code>.</p> <p class="filename">Movie.java</p>
+<pre><code class="language-java">public class Movie {
+    private String title;
+    private int year;
+
+    public Movie(String title, int year) {
+        this.title = title;
+        this.year = year;
+    }
+
+    public String getTitle() { return title; }
+    public int getYear() { return year; }
+
+    public void setTitle(String title) { this.title = title; }
+
+    public void setYear(int year) {
+        if (year &gt;= 1888) {
+            this.year = year;
+        }
+    }
+}</code></pre> <pre class="out"><code>Metropolis 1927 Metropolis 1931 Metropolis 1931 M 1931 </code></pre> <p><strong>Things to notice.</strong> The third line proves the guard works: 1200 was rejected and 1931 survived. The fourth proves that <code>setTitle</code> changed only the title &mdash; a setter writes one field.</p> <p>The constructor is <em>not</em> guarded here, which means <code>new Movie("?", 1200)</code> would happily store 1200 and sneak past the rule the setter enforces. That is a genuine hole, and the professional fix is for the constructor to call <code>setYear(year)</code> instead of assigning directly, so there is exactly one place in the class that decides what a legal year is. Practice Problem 5 asks you to guard a constructor directly.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 7.7</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="6" aria-label="Live coding - Quick Check 7.7">public class Movie { // 1. Two private instance variables: title (String) and year (int). // 2. A constructor taking a title and a year. // 3. getTitle() and getYear(). // 4. setTitle(), and setYear() which ignores any year before 1888. } </textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s6"><span class="num">6.</span><code>toString</code></h2> <p>We now have objects, but printing one is still clumsy: <code>person1.getName() + " is " + person1.getAge()</code> at every call site. Java has a standard answer, and it is the first method you will write that Java itself calls on your behalf.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; toString</span></div> <div class="bd"> <p><code>toString()</code> is a method every Java object has. Its job is to return a <code>String</code> describing the object. Whenever an object is used where text is required &mdash; passed to <code>System.out.println</code>, or joined with <code>+</code> to a <code>String</code> &mdash; Java calls that object's <code>toString()</code> and uses the result.</p> <p>Its signature is fixed: <code>public String toString()</code>, no parameters.</p> </div> </div> <p>The instructor's <code>Point</code> class is the standard example, and it is worth reading in full because it also shows an instance method that takes <em>another object of the same class</em> as a parameter.</p> <p class="filename">Point.java</p>
+<pre><code class="language-java">public class Point {
+    private double x, y;
+
+    public Point() {
+        x = 0.0;
+        y = 0.0;
+    }
+
+    public Point(double xValue, double yValue) {
+        x = xValue;
+        y = yValue;
+    }
+
+    public double getX() { return x; }
+    public double getY() { return y; }
+    public void setX(double xValue) { x = xValue; }
+    public void setY(double yValue) { y = yValue; }
+
+    public double distanceTo(Point other) {
+        return Math.sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
+    }
+
+    public String toString() {
+        return "(" + x + ", " + y + ")";
+    }
+}</code></pre> <p>Two details in <code>distanceTo</code> deserve a sentence each.</p> <ul> <li><code>x</code> with no qualifier is <em>this</em> point's x; <code>other.x</code> is the other point's x. One method body, two objects, distinguished only by the dot. This is the usual way a method compares or combines two instances.</li> <li><code>other.x</code> is legal even though <code>x</code> is <code>private</code>. <code>private</code> restricts access to <em>the class</em>, not to the individual object, so code inside <code>Point</code> may read any <code>Point</code>'s private fields. If that surprises you, it should &mdash; it is the one place the word "private" is slightly misleading.</li> </ul> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; Point with and without toString</span></div> <div class="bd"> <p>Here is the instructor's tester. Note that it prints <code>p1</code> directly, with no <code>.getX()</code> in sight.</p> <p class="filename">PointTester.java</p>
+<pre><code class="language-java">public class PointTester {
+    public static void main(String[] args) {
+        Point p1 = new Point();
+        Point p2 = new Point(3, 4);
+        System.out.println(p1);
+        System.out.println(p2);
+        System.out.println(p1.distanceTo(p2));
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>(0.0, 0.0) (3.0, 4.0) 5.0 </code></pre> <p><code>System.out.println(p1)</code> was handed a <code>Point</code>, not a <code>String</code>, so Java called <code>p1.toString()</code> and printed what came back. The formatting decision &mdash; parentheses, comma, space &mdash; was made once, inside <code>Point</code>, and every part of the program that prints a point now gets it.</p> <p>The third line is a 3&ndash;4&ndash;5 right triangle: the distance from the origin to (3, 4) is exactly 5. It prints <code>5.0</code> rather than <code>5</code> because <code>distanceTo</code> returns a <code>double</code> and <code>Math.sqrt</code> always does. Note also that <code>new Point(3, 4)</code> was called with two <code>int</code> literals, and the fields came out as <code>3.0</code> and <code>4.0</code> &mdash; Java widened the <code>int</code>s to <code>double</code>s at the call, exactly as it does for any other method.</p> 
+</div></details> <p>Now delete the <code>toString</code> method from <code>Point</code> and change nothing else. <code>PointTester</code> still compiles, because every object has a <code>toString</code> whether you write one or not &mdash; you inherit a default. What does it look like?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Point@2a139a55 Point@15db9742 5.0 </code></pre> <p><strong>The hexadecimal part is machine-dependent: yours will differ, and it may differ between two runs on the same machine.</strong> The values above are representative, not something to memorize. The shape is fixed, though: the class name, an <code>@</code>, and the object's hash code in hexadecimal.</p> <p>Three consequences worth writing down.</p> <ul> <li>The default is useless for reading, which is why defining <code>toString</code> is close to mandatory for any class you intend to print.</li> <li>It is not useless for <em>identity</em>: the two points printed different codes, so you can see at a glance that they are different objects. That becomes a diagnostic tool in Lecture 8.</li> <li><code>distanceTo</code> is unaffected. <code>toString</code> changes how an object is <em>displayed</em>, and nothing else.</li> </ul> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake</div> <div class="bd"> <p><code>toString</code> takes no arguments and is spelled with a lowercase <code>t</code> and a capital <code>S</code>. Write <code>public String ToString()</code> or <code>public String toString(int digits)</code> and you have simply defined some other method &mdash; the class compiles, <code>println</code> ignores it, and you get <code>Point@2a139a55</code> while staring at a <code>toString</code> you are sure you wrote.</p> <p>Also: <code>System.out.println(p.toString())</code> and <code>System.out.println(p)</code> do the same thing. Writing the explicit call is not wrong &mdash; the instructor's own <code>Test.java</code> in &sect;7 does it &mdash; but the short form is what you will read most often, and it is the reason <code>toString</code> exists.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 7.8</div> <div class="bd"> <p>Using the full <code>Point</code> class above (the one <em>with</em> <code>toString</code>), what does each line print?</p> <pre><code class="language-java">Point a = new Point(1, 2);
+Point b = new Point();
+System.out.println(a);
+// line (a) System.out.println("a is " + a);                // line (b) System.out.println(a.getX() + a.getY());        // line (c) System.out.println("" + a.getX() + a.getY());   // line (d) System.out.println(b.distanceTo(a) == a.distanceTo(b));   // line (e)</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> Line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>(1.0, 2.0)</code>. <code>println</code> receives an object, so it calls <code>toString()</code>. The <code>int</code> arguments <code>1</code> and <code>2</code> were widened to <code>double</code> when the constructor ran, which is why the <code>.0</code> is there.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>a is (1.0, 2.0)</code>. Concatenating an object to a <code>String</code> calls <code>toString()</code> too. This is the same rule from Lecture 1 &mdash; <code>+</code> converts the other operand to text &mdash; and <code>toString</code> is <em>how</em> it converts an object.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>3.0</code>. Both getters return <code>double</code>, no <code>String</code> is anywhere in the expression, so <code>+</code> is addition: 1.0 + 2.0. No <code>toString</code> is involved at all.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> Line (d)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>1.02.0</code>. The empty <code>String</code> at the front makes the first <code>+</code> a concatenation, and from there everything is text. Straight out of Lecture 1, and it appears on every exam.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> Line (e)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>true</code>. <code>b.distanceTo(a)</code> and <code>a.distanceTo(b)</code> both compute the square root of the same sum of squares, so both are the same <code>double</code>, and <code>==</code> on two <code>double</code> values compares the numbers.</p> <p><strong>Things to notice across all five parts.</strong> <code>toString</code> fires in exactly two situations: an object handed to <code>println</code>, and an object joined to a <code>String</code> with <code>+</code>. In (c) neither applies. And be careful with (e): <code>==</code> here is comparing two <code>double</code> primitives, which is fine. <code>==</code> between two <em>objects</em> is a completely different question with a surprising answer &mdash; that is Lecture 9.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 7.9</div> <div class="bd"> <p>A student wants a <code>Course</code> object to print as <code>CSCI 212 (25 seats)</code>, and writes this driver to test it. <code>Course</code> stores a <code>code</code> (a <code>String</code>) and a number of <code>seats</code> (an <code>int</code>).</p> <p class="filename">CourseDemo.java</p>
+<pre><code class="language-java">public class CourseDemo {
+    public static void main(String[] args) {
+        Course a = new Course("CSCI 212", 25);
+        Course b = new Course("CSCI 111", 30);
+
+        System.out.println(a);
+        System.out.println(b);
+        System.out.println("You are in " + a + " this semester.");
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> Here is the first attempt at the class. Does it compile? If not, what is wrong?</p> <pre><code class="language-java">public class Course {
+    private String code;
+    private int seats;
+
+    public Course(String code, int seats) {
+        this.code = code;
+        this.seats = seats;
+    }
+
+    public void toString() {
+        System.out.println(code + " (" + seats + " seats)");
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p>It does not compile, and the message is unusually informative:</p> <pre class="err"><code>Course.java:10: error: toString() in Course cannot override toString() in Object
+    public void toString() {
+                ^
+  return type void is not compatible with String
+1 error</code></pre> <p>The word <em>override</em> is the clue. Every class in Java already has a <code>toString()</code> that returns a <code>String</code> &mdash; that is where <code>Point@2a139a55</code> came from in &sect;6. When you write your own, you are replacing that one, and a replacement has to have the same return type. <code>void</code> is not <code>String</code>, so the compiler refuses.</p> <p>This is worth meeting now, because it is the compiler telling you what <code>toString</code> is <em>for</em>: it hands a <code>String</code> back to whoever asked, and that caller decides whether to print it, store it, or drop it in the middle of a sentence. A <code>toString</code> that prints can only ever do the one thing.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Fixed as below. What are the three lines of output?</p> <p class="filename">Course.java</p>
+<pre><code class="language-java">public class Course {
+    private String code;
+    private int seats;
+
+    public Course(String code, int seats) {
+        this.code = code;
+        this.seats = seats;
+    }
+
+    public String toString() {
+        return code + " (" + seats + " seats)";
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The first two <code>println</code> calls each receive a <code>Course</code>, so each one calls that object's <code>toString()</code>. The third builds a <code>String</code> with <code>+</code>, and joining an object to a <code>String</code> calls <code>toString()</code> as well.</p> <pre class="out"><code>CSCI 212 (25 seats)
+CSCI 111 (30 seats)
+You are in CSCI 212 (25 seats) this semester.</code></pre> <p><strong>Things to notice across both parts.</strong> The third line is the payoff for returning rather than printing: the same <code>toString</code> dropped into the middle of a sentence with no extra work. Had <code>toString</code> printed, that line could not exist.</p> <p>Note also that there is no <code>main</code> in <code>Course.java</code>, which is normal &mdash; <code>CourseDemo</code> has it, and <code>javac Course.java CourseDemo.java</code> compiles both files at once.</p> </div></details> </div> </div> </div> <h2 id="s7"><span class="num">7.</span>Objects inside objects</h2> <p>An instance variable can have any type &mdash; including a class you wrote. That single fact is what lets you build programs out of small parts instead of one enormous class.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; composition</span></div> <div class="bd"> <p><strong>Composition</strong> is building a class out of objects of other classes: a <code>Triangle</code> <em>has</em> three <code>Point</code>s, a <code>Circle</code> <em>has</em> a center <code>Point</code>, a <code>Car</code> <em>has</em> an <code>Engine</code>. It is often called the "has-a" relationship, to contrast it with the "is-a" relationship of inheritance in Lecture 12.</p> <p>Nothing new is required to do it. A <code>Point</code> field is declared, constructed and used just like a <code>String</code> field &mdash; and <code>String</code> was an object all along.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; a Triangle made of three Points</span></div> <div class="bd"> <p>The instructor's <code>Triangle</code> holds three <code>Point</code> objects and reports the lengths of its three sides. Notice that <code>Triangle</code> does no geometry of its own: it asks each <code>Point</code> for the distance to the next one. That is composition working properly &mdash; the class that owns the data does the arithmetic.</p> <p><code>DecimalFormat</code> comes from <code>java.text</code>; the pattern <code>#.##</code> means "up to two decimal places, and drop them if they are zero", which is why 3.0 prints as <code>3</code> below.</p> <p class="filename">Triangle.java</p>
+<pre><code class="language-java">import java.text.DecimalFormat;
+
+public class Triangle {
+    private Point a, b, c;
+
+    public Triangle(Point pA, Point pB, Point pC) {
+        a = pA;
+        b = pB;
+        c = pC;
+    }
+
+    public String toString() {
+        DecimalFormat round = new DecimalFormat("#.##");
+        String ans = "Triangle sides: ";
+        ans += round.format(a.distanceTo(b)) + ", " +
+               round.format(b.distanceTo(c)) + ", " +
+               round.format(c.distanceTo(a)) + "\n";
+        return ans;
+    }
+}</code></pre> <p class="filename">TriangleDemo.java</p>
+<pre><code class="language-java">public class TriangleDemo {
+    public static void main(String[] args) {
+        Point p1 = new Point(0, 0);
+        Point p2 = new Point(3, 0);
+        Point p3 = new Point(0, 4);
+
+        Triangle t = new Triangle(p1, p2, p3);
+        System.out.print(t);
+
+        Triangle unit = new Triangle(new Point(0, 0), new Point(1, 0), new Point(0, 1));
+        System.out.print(unit);
+    }
+}</code></pre> <p>The first triangle has legs 3 and 4. Predict both lines, including how many decimal places each number gets.</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Triangle sides: 3, 5, 4 Triangle sides: 1, 1.41, 1 </code></pre> <p>The sides are listed in the order a-to-b, b-to-c, c-to-a, so the 3&ndash;4&ndash;5 triangle reports <code>3, 5, 4</code> &mdash; the hypotenuse in the middle. Reading the order off the code rather than assuming it is the whole skill here.</p> <p>The second triangle is the unit right triangle, whose hypotenuse is the square root of 2. <code>DecimalFormat("#.##")</code> rounds 1.4142135623730951 to <code>1.41</code>, and prints the two legs as <code>1</code> rather than <code>1.00</code> because <code>#</code> means "a digit, but only if there is one". Compare with the pattern <code>0.00</code>, which would have given <code>1.00</code> and <code>1.41</code>.</p> <p>Notice <code>System.out.print</code>, not <code>println</code>: <code>Triangle</code>'s <code>toString</code> already ends with <code>"\n"</code>. Building the newline into <code>toString</code> is a slightly unusual choice &mdash; most <code>toString</code> methods return a single line and let the caller decide &mdash; and it is the reason you see a stray blank line in the next example.</p> <p>Finally: <code>TriangleDemo</code> never touches <code>x</code> or <code>y</code>. It hands <code>Point</code> objects to a <code>Triangle</code> and gets a <code>String</code> back. Three classes, three jobs, no class reaching into another's data.</p> 
+</div></details> </div> </div> <p>The instructor's own driver builds the three vertices from user input with a <code>Scanner</code>, and stores them in an array of <code>Point</code>. An array of objects works exactly like the array of <code>Person</code> in &sect;1: <code>new Point[3]</code> creates three slots, all <code>null</code>, and each slot must then be filled with its own <code>new Point(...)</code>.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; reading the vertices from the keyboard</span></div> <div class="bd"> <p class="filename">Test.java</p>
+<pre><code class="language-java">import java.util.Scanner;
+
+public class Test {
+    public static void main(String args[]) {
+        Scanner input = new Scanner(System.in);
+        Point pts[] = new Point[3];
+        for (int i = 0; i &lt; 3; i++) {
+            System.out.println("Give the coordinates for the next vertex of your triangle:");
+            pts[i] = new Point(input.nextDouble(), input.nextDouble());
+        }
+        Triangle t = new Triangle(pts[0], pts[1], pts[2]);
+        System.out.println(t.toString());
+        input.close();
+    }
+}</code></pre> <p>To keep the result reproducible we did not type at the keyboard; the six numbers were <em>piped</em> into the program, which means they do not appear in the transcript the way they would if you typed them. These are the three lines that were fed in &mdash; the same 3&ndash;4&ndash;5 triangle as before:</p> <p class="filename">Input piped to the program (not echoed in the output below)</p>
+<pre class="cmp"><code>0 0 3 0 0 4 </code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Give the coordinates for the next vertex of your triangle: Give the coordinates for the next vertex of your triangle: Give the coordinates for the next vertex of your triangle: Triangle sides: 3, 5, 4 </code></pre> <p>Four things this run demonstrates.</p> <ul> <li><strong>Two <code>nextDouble()</code> calls in one statement.</strong> <code>new Point(input.nextDouble(), input.nextDouble())</code> reads two numbers, left to right, and passes them as <code>x</code> and <code>y</code>. <code>nextDouble</code> skips whitespace, so <code>0 0</code> on one line and <code>0</code> then <code>0</code> on two lines are read identically.</li> <li><strong>The array holds references, not points.</strong> After <code>new Point[3]</code> all three slots are <code>null</code>; the loop replaces each <code>null</code> with a real object. Forget the <code>pts[i] = new Point(...)</code> line and you get a <code>NullPointerException</code>, not an empty triangle.</li> <li><strong>The blank line at the end is real.</strong> <code>toString</code> ends with <code>"\n"</code> and <code>println</code> adds another, so the output finishes with an empty line. That is the cost of putting a newline inside a <code>toString</code>.</li> <li><strong><code>t.toString()</code> is written out in full here</strong>, where <code>System.out.println(t)</code> would have done the same thing. Both forms are correct.</li> </ul> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 7.10</div> <div class="bd"> <p>Here is a <code>Segment</code> class built from two <code>Point</code>s, using the <code>Point</code> class from &sect;6.</p> <p class="filename">Segment.java</p>
+<pre><code class="language-java">public class Segment {
+    private Point start, end;
+
+    public Segment(Point start, Point end) {
+        this.start = start;
+        this.end = end;
+    }
+
+    public double length() {
+        return start.distanceTo(end);
+    }
+
+    public String toString() {
+        return start + "--" + end;
+    }
+}</code></pre> <p class="filename">SegmentDemo.java</p>
+<pre><code class="language-java">public class SegmentDemo {
+    public static void main(String[] args) {
+        Point p = new Point(1, 1);
+        Point q = new Point(4, 5);
+
+        Segment s = new Segment(p, q);
+        System.out.println(s);              // line (a)
+        System.out.println(s.length());     // line (b)
+
+        Segment t = new Segment(new Point(), q);
+        System.out.println(t);              // line (c)
+        System.out.println(t.length());     // line (d)
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> What do the first two <code>println</code> calls print?</p> <details class="soln"><summary></summary><div class="ans"> <pre class="out"><code>(1.0, 1.0)--(4.0, 5.0) 5.0 </code></pre> <p>Line (a) is the interesting one: <code>Segment.toString</code> writes <code>start + "--" + end</code>, and <code>start</code> is a <code>Point</code>, so <em>its</em> <code>toString</code> runs to produce <code>(1.0, 1.0)</code>. One <code>toString</code> calling another is completely normal and is how a composed object describes itself.</p> <p>Line (b) is another 3&ndash;4&ndash;5 triangle in disguise: from (1, 1) to (4, 5) is 3 across and 4 up.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What do the last two <code>println</code> calls print?</p> <details class="soln"><summary></summary><div class="ans"> <pre class="out"><code>(0.0, 0.0)--(4.0, 5.0) 6.4031242374328485 </code></pre> <p><code>new Point()</code> uses <code>Point</code>'s no-arg constructor, giving the origin. The distance from (0, 0) to (4, 5) is the square root of 41, and a <code>double</code> shows it to about fifteen significant digits.</p> <p><strong>Things to notice across both parts.</strong> <code>Segment</code> contains no arithmetic whatsoever &mdash; <code>length()</code> delegates to <code>Point.distanceTo</code>, and <code>toString</code> delegates to <code>Point.toString</code>. When you write a class that holds other objects, ask what the inner object already knows how to do before you write any code. If you find yourself calling <code>getX()</code> and <code>getY()</code> and doing algebra inside <code>Segment</code>, the method you wanted probably belongs on <code>Point</code>.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 7.11</div> <div class="bd"> <p>Each of these three class declarations has exactly one thing wrong with it. Say what, and give the corrected line. In part (c), assume <code>Dog</code> is a working class with a constructor <code>Dog(String)</code> and a <code>setName(String)</code> method.</p> <div class="part"> <p class="q"><span class="pl">(a)</span></p> <pre><code class="language-java">public class Dog {
+    private String name;
+    public void Dog(String name) {
+        this.name = name;
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><code>public void Dog(String name)</code> has a return type, so it is a method, not a constructor. <code>new Dog("Rex")</code> will not compile. Corrected: <code>public Dog(String name) {</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span></p> <pre><code class="language-java">public class Dog {
+    private String name;
+    public Dog(String n) {
+        name = n;
+    }
+    public String toString(String prefix) {
+        return prefix + name;
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><code>toString</code> must take no parameters. As written, this is an unrelated overloaded method, and <code>System.out.println(myDog)</code> will print <code>Dog@</code> and a hash code. Corrected: <code>public String toString() {</code>, with the body returning <code>name</code> (or whatever text you want). Note that the constructor here is fine &mdash; the parameter is called <code>n</code>, so <code>name = n;</code> is unambiguous and <code>this.</code> is optional.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span></p> <pre><code class="language-java">public class Kennel {
+    private Dog resident;
+
+    public Kennel() {
+        resident.setName("Rex");
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><code>resident</code> is an object field that was never constructed, so it is <code>null</code>, and calling a method on <code>null</code> throws a <code>NullPointerException</code> at run time &mdash; this one compiles and then crashes:</p> <pre class="out"><code>Exception in thread "main" java.lang.NullPointerException: Cannot invoke "Dog.setName(String)" because "this.resident" is null at Kennel.&lt;init&gt;(Kennel.java:5)
+	at KennelDemo.main(KennelDemo.java:5)</code></pre> <p>Corrected: <code>resident = new Dog("Rex");</code>, which both creates the object and names it. (<code>Kennel.&lt;init&gt;</code> in that trace is how the JVM spells "the constructor of <code>Kennel</code>".)</p> <p><strong>Things to notice across all three parts.</strong> Declaring a field of a class type does not create an object of that type, any more than <code>Person p;</code> created a person in &sect;2. Every object field needs its own <code>new</code> somewhere &mdash; usually in the constructor, sometimes handed in as a parameter the way <code>Triangle</code> receives its three <code>Point</code>s.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 7.12</div> <div class="bd"> <p>Write a class <code>Rectangle</code> that stores its lower-left corner as a <code>Point</code> and its width and height as <code>double</code>s. Give it a three-parameter constructor (corner, width, height), an <code>area()</code> method, and a <code>toString()</code> that prints, for example, <code>Rectangle at (1.0, 2.0) 3.0 by 4.0</code>. Use the <code>Point</code> class from &sect;6 unchanged.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Three private fields, one of which happens to be an object. The constructor takes all three and assigns with <code>this.</code> since the names collide. <code>area()</code> is one multiplication. <code>toString()</code> concatenates the corner &mdash; and because <code>corner</code> is a <code>Point</code>, joining it with <code>+</code> calls <code>Point.toString()</code> for you, so you never mention <code>x</code> or <code>y</code>.</p> <p class="filename">Rectangle.java</p>
+<pre><code class="language-java">public class Rectangle {
+    private Point corner;
+    private double width, height;
+
+    public Rectangle(Point corner, double width, double height) {
+        this.corner = corner;
+        this.width = width;
+        this.height = height;
+    }
+
+    public double area() {
+        return width * height;
+    }
+
+    public String toString() {
+        return "Rectangle at " + corner + " " + width + " by " + height;
+    }
+}</code></pre> <p class="filename">RectangleDemo.java</p>
+<pre><code class="language-java">public class RectangleDemo {
+    public static void main(String[] args) {
+        Rectangle r = new Rectangle(new Point(1, 2), 3, 4);
+        System.out.println(r);
+        System.out.println(r.area());
+
+        Rectangle unit = new Rectangle(new Point(), 1, 1);
+        System.out.println(unit);
+        System.out.println(unit.area());
+    }
+}</code></pre> <pre class="out"><code>Rectangle at (1.0, 2.0) 3.0 by 4.0
+12.0
+Rectangle at (0.0, 0.0) 1.0 by 1.0
+1.0</code></pre> <p><strong>Things to notice.</strong> <code>new Rectangle(new Point(1, 2), 3, 4)</code> constructs two objects in one line: the <code>Point</code> is built first, because arguments are evaluated before the call, and the reference to it is handed to <code>Rectangle</code>'s constructor. Nesting <code>new</code> like this is idiomatic and you should get comfortable reading it.</p> <p><code>width</code> and <code>height</code> print as <code>3.0</code> and <code>4.0</code> although the call passed the <code>int</code>s <code>3</code> and <code>4</code> &mdash; the widening happened at the call, as usual.</p> <p>One design question worth sitting with: <code>Rectangle</code> stores a reference to the <code>Point</code> it was given, not a copy of it. If somebody still holds that <code>Point</code> and calls <code>setX</code> on it, the rectangle moves. Whether that is a feature or a disaster is the subject of the next lecture.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 7.12</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="6" aria-label="Live coding - Quick Check 7.12">public class Rectangle {
+    // 1. private Point corner;  private double width, height; // 2. Constructor: Rectangle(Point corner, double width, double height) // 3. area() // 4. toString(), e.g.  Rectangle at (1.0, 2.0) 3.0 by 4.0 public static void main(String[] args) { Rectangle r = new Rectangle(new Point(1, 2), 3, 4); System.out.println(r); System.out.println(r.area()); } }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="prac"><span class="num">&#9733;</span>Practice Problems</h2> <div class="box prac"> <div class="hd">Practice Problems<span class="tag">&mdash; write-a-class questions are worth the most points on Exam 1</span></div> <div class="bd"> <p>"Write complete Java code for the class X" is worth 15 to 20 points on this instructor's exams &mdash; the largest single block on the paper &mdash; and the rubric pays per feature: private instance variables with the right types, the constructor, then a few points for each method. The first five problems below are hers, taken from real exams and practice sets. Work them on paper, in the order given, and write out every brace: the exam is closed book and there is no compiler in the room.</p> </div> </div> <h3>Problem 1 &mdash; Write the class <code>Circle</code> <span class="muted">(from CSCI 212 Exam 1, Spring 2025)</span></h3> <p>Write a complete Java code for the class <code>Circle</code>. You should use exactly two instance variables <code>radius</code> and <code>center</code> that have types <code>double</code> and <code>Point</code>. You do not need to implement the class <code>Point</code>, but you could use its methods as specified by the following UML diagram.</p> <p class="filename">UML &mdash; the Point class you may assume</p>
+<pre class="cmp"><code>+-----------------------------+ |            Point            | +-----------------------------+ | double x, y                 | +-----------------------------+ | double distanceTo(Point p)  | +-----------------------------+ </code></pre> <p>Your class <code>Circle</code> must have exactly four methods. The methods are a constructor (with 2 parameters) and methods called <code>area</code>, <code>circumference</code> and <code>isOutside</code>. The area and circumference are calculated with the formulas &pi;r<sup>2</sup> and 2&pi;r, where r is the radius. (The value of &pi; is written <code>Math.PI</code> in Java.) The method <code>isOutside</code> tests whether a point is outside the circle (this happens when its distance from the center is larger than the radius).</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Read the specification as a checklist and write the class in the order of the recipe from &sect;2. Two private instance variables with the stated types. One constructor with two parameters &mdash; and the order to choose is the order the spec lists, radius then center. Then three methods, and the return types come from what each one is <em>for</em>: <code>area</code> and <code>circumference</code> produce numbers, so <code>double</code>; <code>isOutside</code> answers a yes-or-no question, so <code>boolean</code>.</p> <p>The only thinking is in <code>isOutside</code>. "Outside" means the distance from the center to the point is larger than the radius. The UML says <code>Point</code> can measure that distance itself, so ask it: <code>center.distanceTo(p)</code>. Do not compute a square root by hand.</p> <p class="filename">Circle.java</p>
+<pre><code class="language-java">public class Circle {
+    private double radius;
+    private Point center;
+
+    public Circle(double myRadius, Point myCenter) {
+        radius = myRadius;
+        center = myCenter;
+    }
+
+    public double area() {
+        return Math.PI * radius * radius;
+    }
+
+    public double circumference() {
+        return 2 * Math.PI * radius;
+    }
+
+    public boolean isOutside(Point p) {
+        return center.distanceTo(p) &gt; radius;
+    }
+}</code></pre> <p>Checked against a driver, using the <code>Point</code> class from &sect;6:</p> <p class="filename">CircleDemo.java</p>
+<pre><code class="language-java">public class CircleDemo {
+    public static void main(String[] args) {
+        Circle c = new Circle(5.0, new Point(0, 0));
+
+        System.out.println("area          = " + c.area());
+        System.out.println("circumference = " + c.circumference());
+
+        System.out.println("(3, 4) outside? " + c.isOutside(new Point(3, 4)));
+        System.out.println("(6, 0) outside? " + c.isOutside(new Point(6, 0)));
+        System.out.println("(1, 1) outside? " + c.isOutside(new Point(1, 1)));
+    }
+}</code></pre> <pre class="out"><code>area          = 78.53981633974483
+circumference = 31.41592653589793
+(3, 4) outside? false
+(6, 0) outside? true
+(1, 1) outside? false</code></pre> <p><strong>Things to notice.</strong> The point (3, 4) is at distance exactly 5 from the origin, which is exactly the radius, and <code>isOutside</code> says <code>false</code>. That is correct by the wording: outside means <em>larger than</em> the radius, so a point on the boundary is not outside. Boundary cases like this are where the graded points are, and <code>&gt;</code> versus <code>&gt;=</code> is the whole question.</p> <p>The parameter names <code>myRadius</code> and <code>myCenter</code> avoid the shadowing problem entirely, which is why no <code>this.</code> appears. Writing <code>public Circle(double radius, Point center) { this.radius = radius; this.center = center; }</code> is equally correct and equally acceptable on the exam.</p> <p>Notice how little <code>Circle</code> knows about geometry. It never touches <code>x</code> or <code>y</code>; it asks a <code>Point</code> to measure a distance. This is the same delegation the <code>Triangle</code> example used, and it is what the exam is really testing when it hands you a UML diagram instead of the source: you are expected to call the advertised method, not reimplement it.</p> <p>Finally, <code>area</code> returns a value rather than printing one. A method that prints cannot be used in a calculation. Return, and let the caller print.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 1</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="6" aria-label="Live coding - Practice Problem 1">public class Circle { // Exactly two instance variables: radius (double) and center (Point). // A constructor with 2 parameters. // area()          -- Math.PI * r * r // circumference() -- 2 * Math.PI * r // isOutside(Point p) -- true when p is farther from the center than the radius } </textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 2 &mdash; Write the class <code>BankAccount</code> <span class="muted">(from CSCI 212 Midterm, Summer 2026)</span></h3> <p>Write complete Java code for the class <code>BankAccount</code>.</p> <ul> <li>The class should use exactly two private instance variables: <code>owner</code> and <code>balance</code>. Their types should be <code>String</code> and <code>double</code>.</li> <li>It must have exactly six methods: a constructor with two parameters, <code>getOwner</code>, <code>getBalance</code>, <code>deposit</code>, <code>withdraw</code> and <code>toString</code>.</li> <li><code>deposit</code> takes a <code>double</code> amount and adds it to the balance.</li> <li><code>withdraw</code> takes a <code>double</code> amount and subtracts it from the balance <em>only if there is enough money in the account</em>.</li> <li><code>toString</code> returns a <code>String</code> of the form <code>owner + " has balance " + balance</code>.</li> </ul> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> This is the recipe again, and the specification hands you the whole checklist. The one place that requires thought is <code>withdraw</code>: "only if there is enough money" means the subtraction is guarded by an <code>if</code>, exactly like <code>setAge</code> in <code>Person</code>. Enough money means the amount does not exceed the balance, so the condition is <code>amount &lt;= balance</code>. And note what <code>withdraw</code> does when there is not enough: nothing. It is a <code>void</code> method with an <code>if</code> and no <code>else</code>.</p> <p class="filename">BankAccount.java</p>
+<pre><code class="language-java">public class BankAccount {
+    private String owner;
+    private double balance;
+
+    public BankAccount(String owner, double balance) {
+        this.owner = owner;
+        this.balance = balance;
+    }
+
+    public String getOwner() { return owner; }
+
+    public double getBalance() { return balance; }
+
+    public void deposit(double amount) {
+        balance += amount;
+    }
+
+    public void withdraw(double amount) {
+        if (amount &lt;= balance) {
+            balance -= amount;
+        }
+    }
+
+    public String toString() {
+        return owner + " has balance " + balance;
+    }
+}</code></pre> <p class="filename">BankDemo.java</p>
+<pre><code class="language-java">public class BankDemo {
+    public static void main(String[] args) {
+        BankAccount acct = new BankAccount("Maria", 100.0);
+        System.out.println(acct);
+
+        acct.deposit(50.0);
+        System.out.println(acct);
+
+        acct.withdraw(30.0);
+        System.out.println(acct);
+
+        acct.withdraw(500.0);
+        System.out.println("After trying to withdraw 500: " + acct);
+
+        System.out.println("getOwner()   -&gt; " + acct.getOwner());
+        System.out.println("getBalance() -&gt; " + acct.getBalance());
+    }
+}</code></pre> <pre class="out"><code>Maria has balance 100.0
+Maria has balance 150.0
+Maria has balance 120.0
+After trying to withdraw 500: Maria has balance 120.0
+getOwner()   -&gt; Maria
+getBalance() -&gt; 120.0</code></pre> <p><strong>Things to notice.</strong> The rubric on this question gives 4 of the 20 points to <code>withdraw</code> specifically for checking before subtracting, and 4 more to <code>toString</code>. An unguarded <code>balance -= amount;</code> runs, compiles, and loses points &mdash; and it lets an account go negative, which is the actual bug being tested.</p> <p><code>deposit</code> is <em>not</em> guarded, because the specification did not ask for it. On an exam, implement what is written. (In real code you would reject a negative deposit, since <code>deposit(-500)</code> is a withdrawal that skips the check.)</p> <p>The balance prints as <code>100.0</code> and <code>120.0</code> because it is a <code>double</code> and Java always shows a decimal point. The specification asked for <code>owner + " has balance " + balance</code>, so that is exactly what <code>toString</code> returns &mdash; no <code>DecimalFormat</code>, no dollar sign, nothing extra. When the required output is spelled out to the character, match it to the character.</p> <p>This class comes back on the same exam: the next problem asks for a <code>SavingsAccount</code> that extends it. Keeping <code>balance</code> private and offering <code>deposit</code> is what makes that possible, and we will do it in Lecture 12.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 2</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="6" aria-label="Live coding - Practice Problem 2">public class BankAccount { // Exactly two private instance variables: owner (String), balance (double). // Constructor with two parameters. // getOwner(), getBalance() // deposit(double amount) // withdraw(double amount)  -- only if there is enough money // toString()  -- owner + " has balance " + balance } </textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 3 &mdash; Write the class <code>TrafficSignal</code> <span class="muted">(from Exam 1 Practice Problems)</span></h3> <p>Write complete code for a class called <code>TrafficSignal</code>. The class represents a traffic signal that cycles through four states: green, yellow, red and leftTurn, in this order &mdash; so leftTurn comes just after red and before green.</p> <p>The class should have only one attribute, <code>light</code>, of type <code>int</code>. The value of this attribute determines the state of the signal; for example, if <code>light</code> has value 0, the signal shows green. The class should have one (default) constructor and only three additional methods. The default color of the light should be red. The three methods are <code>currentLight()</code>, which returns the integer corresponding to the current state; <code>changeLight()</code>, which changes <code>light</code> from the current state to the next state; and <code>toString()</code>, which returns the state as <code>green</code>, <code>yellow</code> and so on.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The whole problem is a numbering decision, so make it first and write it down as a comment: green 0, yellow 1, red 2, leftTurn 3. Everything else follows.</p> <ul> <li>"The default color should be red" means the no-arg constructor sets <code>light = 2;</code>.</li> <li>"changes to the next state", wrapping from leftTurn back to green, is the classic <code>%</code> idiom: <code>light = (light + 1) % 4;</code>. Adding 1 and taking the remainder on division by 4 turns 3 into 0 for free. Resist writing four <code>if</code> statements.</li> <li><code>toString</code> has to turn 0..3 into a word. An array of the four names, indexed by <code>light</code>, is one line; an <code>if</code>/<code>else if</code> chain is four times longer and does the same thing.</li> </ul> <p class="filename">TrafficSignal.java</p>
+<pre><code class="language-java">public class TrafficSignal {
+    // 0 = green, 1 = yellow, 2 = red, 3 = leftTurn
+    private int light;
+
+    public TrafficSignal() {
+        light = 2;              // the default color is red
+    }
+
+    public int currentLight() {
+        return light;
+    }
+
+    public void changeLight() {
+        light = (light + 1) % 4;
+    }
+
+    public String toString() {
+        String names[] = {"green", "yellow", "red", "leftTurn"};
+        return names[light];
+    }
+}</code></pre> <p class="filename">SignalDemo.java</p>
+<pre><code class="language-java">public class SignalDemo {
+    public static void main(String[] args) {
+        TrafficSignal s = new TrafficSignal();
+
+        for (int i = 0; i &lt; 6; i++) {
+            System.out.println(s.currentLight() + "  " + s);
+            s.changeLight();
+        }
+    }
+}</code></pre> <pre class="out"><code>2  red 3  leftTurn 0  green 1  yellow 2  red 3  leftTurn </code></pre> <p><strong>Things to notice.</strong> Six changes bring the signal back to where it started after four, which is the evidence that the wraparound works. If you had written <code>light = light + 1;</code> the fifth line would have printed <code>4</code> and the sixth would have thrown an <code>ArrayIndexOutOfBoundsException</code> from <code>toString</code>.</p> <p>The one attribute is <code>private</code>, and <code>currentLight()</code> is the only way out. That is what makes the invariant "<code>light</code> is always between 0 and 3" something the class can actually promise: the only method that writes <code>light</code> is <code>changeLight</code>, and it cannot produce anything else.</p> <p>Declaring <code>names</code> as a local array inside <code>toString</code> rebuilds it on every call, which is slightly wasteful. The tidy fix is to make it a constant shared by all signals rather than a fresh local &mdash; that needs the <code>static</code> keyword, and it is Lecture 9. A local array is entirely correct in the meantime and gets full credit.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 3</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="6" aria-label="Live coding - Practice Problem 3">public class TrafficSignal {
+    // 0 = green, 1 = yellow, 2 = red, 3 = leftTurn private int light; // Default constructor -- the light starts red. // currentLight() -- returns the int // changeLight()  -- advance to the next state, wrapping around // toString()     -- "green", "yellow", "red", "leftTurn" public static void main(String[] args) { TrafficSignal s = new TrafficSignal(); for (int i = 0; i &lt; 6; i++) { System.out.println(s.currentLight() + "  " + s); s.changeLight(); } } }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 4 &mdash; Find the errors <span class="muted">(from Exam 1 Practice Problems)</span></h3> <p>Read the following code. Then, in each of the labeled lines, find all syntax errors and state the nature of the errors. If there is no error, write "No error".</p> <p class="filename">Y.java</p>
+<pre><code class="language-java">class A {
+    private int count;
+}
+
+class C {
+    private String text = "";
+
+    public void C(String s) {
+        String text = s;
+    }
+}
+
+class D {
+    int x = 3;
+    boolean b;
+
+    public D(boolean b) {
+        this.b = b;
+    }
+
+    public int doIt() {
+        return this;                              // ----- (a)
+    }
+}
+
+public class Y {
+    public static void main(String[] args) {
+        A a = new A();
+        a.count = 10;                             // ----- (b)
+
+        C c = new C("ABC");                       // ----- (c)
+        System.out.println(c.text.toLowerCase()); // ----- (d)
+
+        D d = new D(true);
+        System.out.println(d.doIt());
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>return this;</code> inside <code>public int doIt()</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>this</code> refers to the current object, whose type is <code>D</code>. The method promises to return an <code>int</code>. A <code>D</code> is not an <code>int</code> and there is no conversion, so this is a type error.</p> <pre class="err"><code>Y.java:22: error: incompatible types: D cannot be converted to int return this;
+        // ----- (a)
+^</code></pre> <p>Corrected: <code>return x;</code> &mdash; or change the method's return type to <code>D</code> if you really meant to hand back the object.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>a.count = 10;</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>count</code> is <code>private</code> in <code>A</code>, so no code outside <code>A</code> may name it &mdash; and <code>main</code> is in class <code>Y</code>.</p> <pre class="err"><code>Y.java:29: error: count has private access in A a.count = 10;
+        // ----- (b)
+^</code></pre> <p>Corrected: give <code>A</code> a <code>public void setCount(int count)</code> and call <code>a.setCount(10);</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>C c = new C("ABC");</code></p> <details class="soln"><summary></summary><div class="ans"> <p>This is the trap the whole question is built around. <code>C</code> appears to have a one-argument constructor, but <code>public void C(String s)</code> has a return type, so it is an ordinary method named <code>C</code>. The class therefore has <em>no</em> declared constructor, gets the free no-arg one, and rejects an argument:</p> <pre class="err"><code>Y.java:31: error: constructor C in class C cannot be applied to given types; C c = new C("ABC");
+        // ----- (c)
+^
+  required: no arguments
+  found:    String
+  reason: actual and formal argument lists differ in length</code></pre> <p>Corrected: delete <code>void</code>, making the line <code>public C(String s) {</code>. There is a second bug hiding inside that method too: <code>String text = s;</code> declares a <em>new local variable</em> called <code>text</code> and assigns to that, leaving the field <code>text</code> still <code>""</code>. Once you have made it a real constructor, the body should read <code>text = s;</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>System.out.println(c.text.toLowerCase());</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Same error as (b): <code>text</code> is <code>private</code> in <code>C</code> and cannot be named from class <code>Y</code>.</p> <pre class="err"><code>Y.java:32: error: text has private access in C System.out.println(c.text.toLowerCase()); // ----- (d)
+^</code></pre> <p>Corrected: add <code>public String getText() { return text; }</code> to <code>C</code> and write <code>System.out.println(c.getText().toLowerCase());</code>.</p> <p>Here is the whole thing repaired. All four fixes are the ordinary moves from this lecture &mdash; a real constructor, and public accessors for private fields:</p> <p class="filename">Y.java</p>
+<pre><code class="language-java">class A {
+    private int count;
+
+    public void setCount(int count) { this.count = count; }
+    public int getCount() { return count; }
+}
+
+class C {
+    private String text = "";
+
+    public C(String s) {                          // a constructor: no return type
+        text = s;
+    }
+
+    public String getText() { return text; }
+}
+
+class D {
+    int x = 3;
+    boolean b;
+
+    public D(boolean b) {
+        this.b = b;
+    }
+
+    public int doIt() {
+        return x;                                 // return an int, not the object
+    }
+}
+
+public class Y {
+    public static void main(String[] args) {
+        A a = new A();
+        a.setCount(10);
+        System.out.println(a.getCount());
+
+        C c = new C("ABC");
+        System.out.println(c.getText().toLowerCase());
+
+        D d = new D(true);
+        System.out.println(d.doIt());
+    }
+}</code></pre> <pre class="out"><code>10 abc 3 </code></pre> <p><strong>Things to notice across all four parts.</strong> <code>javac</code> reported all four errors from a single compile, because none of them is a <em>syntax</em> error &mdash; the file parses fine, and the compiler gets far enough to check types and access on every line. Contrast that with a missing semicolon, which stops the parser dead and hides everything after it.</p> <p>Two of the four errors, (b) and (d), are the same error. That is not padding: reaching for a private field from outside is the single most common mistake in the first week of writing classes, and the fix is always the same &mdash; add the accessor you should have written in the first place.</p> </div></details> </div> <h3>Problem 5 &mdash; Write the class <code>Distance</code> <span class="muted">(from Exam 1 Practice Problems)</span></h3> <p>Write a class <code>Distance</code> meeting all of the following requirements.</p> <ul> <li>Two instance variables, <code>feet</code> and <code>inches</code>, stored as <code>int</code>s, and a private constant <code>INCHES_IN_A_FOOT</code> with value 12.</li> <li>A no-argument constructor initializing a <code>Distance</code> to zero feet, zero inches.</li> <li>A two-argument constructor accepting two positive integers for feet and inches. An access (get) method for <code>feet</code> and a mutator (set) method for <code>inches</code>.</li> <li>A public method <code>add</code> that accepts another <code>Distance</code> object and adds that object's distance to the current distance. For example, if <code>x1</code> is 5 feet 8 inches and <code>x2</code> is 2 feet 7 inches, then after <code>x1.add(x2);</code> the object <code>x1</code> is 8 feet 3 inches.</li> <li>A public method <code>metricDistance</code> returning, as a <code>double</code>, the number of meters in the distance. It should use a private variable for the number of meters in a foot (1 foot = 0.3048 meters).</li> <li>Finally, modify the two-argument constructor so that if the number of inches is greater than 11, it prints <code>Illegal number of inches</code> and sets <code>inches</code> to 11.</li> </ul> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Only <code>add</code> needs real thought; everything else is the recipe. Take the worked example seriously: 5 feet 8 inches plus 2 feet 7 inches is 8 feet 3 inches, not 7 feet 15 inches. So <code>add</code> must <em>carry</em>: total the inches, convert every whole 12 of them into a foot, and keep the remainder.</p> <p>The order of those two statements is the trap. Compute the total <em>first</em>, into its own variable, then use it twice &mdash; once divided by 12 for the carry, once modulo 12 for the leftover inches. If you overwrite <code>inches</code> before computing the carry, the carry is always zero and <code>x1</code> comes out as 7 feet 3 inches: an answer that looks nearly right, which is the worst kind.</p> <p class="filename">Distance.java</p>
+<pre><code class="language-java">public class Distance {
+    private int feet;
+    private int inches;
+    private final int INCHES_IN_A_FOOT = 12;
+
+    public Distance() {
+        feet = 0;
+        inches = 0;
+    }
+
+    public Distance(int feet, int inches) {
+        this.feet = feet;
+        if (inches &gt; INCHES_IN_A_FOOT - 1) {
+            System.out.println("Illegal number of inches");
+            this.inches = INCHES_IN_A_FOOT - 1;
+        } else {
+            this.inches = inches;
+        }
+    }
+
+    public int getFeet() { return feet; }
+
+    public void setInches(int inches) { this.inches = inches; }
+
+    public void add(Distance other) {
+        int totalInches = inches + other.inches;
+        feet = feet + other.feet + totalInches / INCHES_IN_A_FOOT;
+        inches = totalInches % INCHES_IN_A_FOOT;
+    }
+
+    public double metricDistance() {
+        final double METERS_PER_FOOT = 0.3048;
+        return (feet + (double) inches / INCHES_IN_A_FOOT) * METERS_PER_FOOT;
+    }
+
+    public String toString() {
+        return feet + " feet, " + inches + " inches";
+    }
+}</code></pre> <p class="filename">DistanceDemo.java</p>
+<pre><code class="language-java">public class DistanceDemo {
+    public static void main(String[] args) {
+        Distance zero = new Distance();
+        System.out.println("zero: " + zero);
+
+        Distance x1 = new Distance(5, 8);
+        Distance x2 = new Distance(2, 7);
+        x1.add(x2);
+        System.out.println("x1 after add: " + x1);
+        System.out.println("x2 is still:  " + x2);
+
+        System.out.println("x1 in meters: " + x1.metricDistance());
+
+        Distance bad = new Distance(3, 15);
+        System.out.println("bad: " + bad);
+    }
+}</code></pre> <pre class="out"><code>zero: 0 feet, 0 inches
+x1 after add: 8 feet, 3 inches
+x2 is still:  2 feet, 7 inches
+x1 in meters: 2.5146
+Illegal number of inches
+bad: 3 feet, 11 inches</code></pre> <p><strong>Things to notice.</strong> <code>add</code> changes the object it is called on and leaves its argument alone &mdash; <code>x2</code> is still 2 feet 7 inches afterwards. That asymmetry is deliberate and it is what "adds the other object's distance to the current distance" means. Compare with <code>Point.distanceTo</code>, which changes neither object and returns a value instead. Deciding whether a method mutates or returns is a design choice you now have to make every time.</p> <p><code>add</code> reads <code>other.inches</code> and <code>other.feet</code> directly, which is legal because <code>add</code> is inside <code>Distance</code> &mdash; the same rule that let <code>Point.distanceTo</code> read <code>other.x</code>.</p> <p><code>(double) inches / INCHES_IN_A_FOOT</code> is doing essential work in <code>metricDistance</code>. Without the cast, <code>8 / 12</code> is integer division and gives 0, so 5 feet 8 inches would come out as exactly 5 feet of metres. This is the Lecture 1 trap, still costing points in Lecture 7.</p> <p>The constant is declared <code>final</code>, so the compiler rejects any attempt to change it. Making it <code>private</code> as the spec asks keeps it out of other classes. One shared copy for all <code>Distance</code> objects would be better still, but that needs <code>static</code> &mdash; Lecture 9.</p> <p>Last, notice that the guard is in the <em>constructor</em>, not only in a setter. <code>setInches</code> as specified is unguarded, so <code>x.setInches(99)</code> still gets through. If you wanted the rule enforced everywhere, you would put it in <code>setInches</code> and have the constructor call <code>setInches(inches)</code>.</p> </div></details> <h3>Problem 6 &mdash; What is the output? <span class="muted">(added for these notes)</span></h3> <p>Consider the following class and program. Every idea from this lecture is somewhere in here &mdash; read the constructors especially carefully.</p> <p class="filename">Counter.java</p>
+<pre><code class="language-java">public class Counter {
+    private String label;
+    private int count;
+
+    public Counter() {
+        this.label = "unnamed";
+        this.count = 0;
+    }
+
+    public Counter(String label, int count) {
+        label = label;                 // look carefully at this line
+        this.count = count;
+    }
+
+    public void bump() { count++; }
+
+    public int getCount() { return count; }
+
+    public void setCount(int count) {
+        if (count &gt;= 0) {
+            this.count = count;
+        }
+    }
+
+    public String toString() {
+        return label + ":" + count;
+    }
+}</code></pre> <p class="filename">CounterDemo.java</p>
+<pre><code class="language-java">public class CounterDemo {
+    public static void main(String[] args) {
+        Counter a = new Counter();
+        System.out.println(a);                 // line (a)
+
+        a.bump();
+        a.bump();
+        System.out.println(a.getCount());      // line (b)
+
+        a.setCount(-3);
+        System.out.println(a.getCount());      // line (c)
+
+        a.setCount(10);
+        System.out.println(a);                 // line (d)
+
+        Counter b = new Counter("clicks", 7);
+        System.out.println(b);                 // line (e)
+        System.out.println(b.getCount());      // line (f)
+
+        b.bump();
+        System.out.println(b);                 // line (g)
+        System.out.println(a);                 // line (h)
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> What is the output at line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>unnamed:0</code>. The no-arg constructor sets both fields, and <code>println</code> of an object calls <code>toString()</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What is the output at line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>2</code>. Two calls to <code>bump()</code>, each one <code>count++</code> on this object.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> What is the output at line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>2</code>. <code>setCount(-3)</code> fails the guard <code>count &gt;= 0</code>, so nothing is assigned and the count stays where it was.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> What is the output at line (d)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>unnamed:10</code>. <code>setCount(10)</code> passes the guard. The label is untouched &mdash; a setter writes one field.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> What is the output at line (e)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>null:7</code>, and this is the whole point of the problem. In the two-argument constructor the line <code>label = label;</code> has no <code>this.</code>, so it assigns the parameter to itself and the field <code>label</code> is never written. It keeps its default, <code>null</code>. The <code>count</code> line does have <code>this.</code>, so 7 lands correctly.</p> <p>Note that <code>null</code> prints as the four characters <code>n u l l</code> when concatenated to a <code>String</code>. It does <em>not</em> throw an exception &mdash; concatenating <code>null</code> is legal. You would only crash if you called a method on it.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(f)</span> What is the output at line (f)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>7</code>. <code>count</code> was set properly; only <code>label</code> was lost.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(g)</span> What is the output at line (g)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>null:8</code>. <code>bump()</code> incremented <code>b</code>'s count from 7 to 8. The broken label is still broken &mdash; nothing repairs it later.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(h)</span> What is the output at line (h)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>unnamed:10</code>. Object <code>a</code> has not been touched since line (d). Everything done to <code>b</code> happened to <code>b</code> alone.</p> <p>The full output:</p> <pre class="out"><code>unnamed:0 2 2 unnamed:10 null:7 7 null:8 unnamed:10 </code></pre> <p><strong>Things to notice across all eight parts.</strong> Three separate lecture ideas each produce exactly one line here, and each is worth a point on an exam: the missing <code>this.</code> in (e), the rejected setter argument in (c), and the independence of two objects in (h). When you are handed a "what is the output" question about a class, read the constructors first with a finger on each <code>=</code> sign, asking which side is the field. Most of the marks are decided there before the program has printed anything.</p> </div></details> </div> <div class="box sum" id="summary"> <div class="hd">Lecture Summary</div> <div class="bd"> <ul> <li>A <strong>class</strong> is a blueprint; an <strong>object</strong> is an instance of it, created with <code>new</code>. One class, any number of objects, each with its own copy of every instance variable.</li> <li>The recipe never changes: class header, private instance variables, constructors, getters and setters, then methods.</li> <li><code>private</code> means "this class only", and the compiler enforces it. Keep fields private and methods public so the object controls its own state.</li> <li>A <strong>constructor</strong> has the class's name and <em>no return type</em>. Write <code>public void Person()</code> and you have written a method, not a constructor.</li> <li>Writing <em>any</em> constructor removes the free no-arg one. If you still want <code>new Thing()</code> to work, write the no-arg constructor yourself.</li> <li>Instance variables get defaults &mdash; <code>null</code>, <code>0</code>, <code>0.0</code>, <code>false</code> &mdash; where local variables get nothing.</li> <li><code>this</code> is the current object. <code>this.name = name;</code> is required whenever a parameter shadows a field, and forgetting it compiles silently and leaves the field at its default.</li> <li>A setter can validate: <code>setAge</code> accepts only <code>age &gt;= 0</code>, so no caller can ever put a negative age into a <code>Person</code>. Write the check once, in the class.</li> <li><code>public String toString()</code> decides what your object looks like when printed. Define it and <code>System.out.println(p)</code> gives <code>(0.0, 0.0)</code>; leave it out and you get the inherited default, <code>Point@</code> followed by a hash code.</li> <li>An instance variable can be an object: a <code>Triangle</code> has three <code>Point</code>s, a <code>Circle</code> has a center. Let the inner object do its own arithmetic and ask it for the answer.</li> </ul> <p><strong>Coming up in Lecture 8: Object References and Aliasing.</strong> One question was left open today. When you write <code>Point c = a;</code>, do you get a second point or a second name for the same point? And when a <code>Triangle</code> stores the <code>Point</code> you handed it, what happens to the triangle if you later move that point? The answers change how you read every program you have written so far, and they are the reason <code>==</code> on objects almost never means what you expect.</p>
+  </div>
+</div>
+
+<nav class="pagenav">
+<span class="disabled"><div class="dir">&larr; Previous</div><div class="ttl">Lecture 6 &mdash; ArrayList</div><div class="pending">posts Thu Sep 17</div></span>
+<span class="disabled next"><div class="dir">Next &rarr;</div><div class="ttl">Lecture 8 &mdash; Object References and Aliasing</div><div class="pending">posts Thu Sep 24</div></span>
+</nav>
+<footer class="pf">CSCI 212 &middot; Object-Oriented Programming in Java &middot; Queens College, CUNY</footer>
+</div>
+<script>
+(()=>{var ut=Object.create;var xe=Object.defineProperty;var ft=Object.getOwnPropertyDescriptor;var gt=Object.getOwnPropertyNames;var ht=Object.getPrototypeOf,dt=Object.prototype.hasOwnProperty;var pt=(e,t)=>()=>{try{return t||e((t={exports:{}}).exports,t),t.exports}catch(n){throw t=0,n}};var Et=(e,t,n,l)=>{if(t&&typeof t=="object"||typeof t=="function")for(let d of gt(t))!dt.call(e,d)&&d!==n&&xe(e,d,{get:()=>t[d],enumerable:!(l=ft(t,d))||l.enumerable});return e};var bt=(e,t,n)=>(n=e!=null?ut(ht(e)):{},Et(t||!e||!e.__esModule?xe(n,"default",{value:e,enumerable:!0}):n,e));var Ke=pt((ln,Ge)=>{function Ie(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(t=>{let n=e[t],l=typeof n;(l==="object"||l==="function")&&!Object.isFrozen(n)&&Ie(n)}),e}var Z=class{constructor(t){t.data===void 0&&(t.data={}),this.data=t.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function Ce(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function k(e,...t){let n=Object.create(null);for(let l in e)n[l]=e[l];return t.forEach(function(l){for(let d in l)n[d]=l[d]}),n}var _t="</span>",Ne=e=>!!e.scope,Mt=(e,{prefix:t})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let n=e.split(".");return[`${t}${n.shift()}`,...n.map((l,d)=>`${l}${"_".repeat(d+1)}`)].join(" ")}return`${t}${e}`},oe=class{constructor(t,n){this.buffer="",this.classPrefix=n.classPrefix,t.walk(this)}addText(t){this.buffer+=Ce(t)}openNode(t){if(!Ne(t))return;let n=Mt(t.scope,{prefix:this.classPrefix});this.span(n)}closeNode(t){Ne(t)&&(this.buffer+=_t)}value(){return this.buffer}span(t){this.buffer+=`<span class="${t}">`}},Re=(e={})=>{let t={children:[]};return Object.assign(t,e),t},ae=class e{constructor(){this.rootNode=Re(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(t){this.top.children.push(t)}openNode(t){let n=Re({scope:t});this.add(n),this.stack.push(n)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(t){return this.constructor._walk(t,this.rootNode)}static _walk(t,n){return typeof n=="string"?t.addText(n):n.children&&(t.openNode(n),n.children.forEach(l=>this._walk(t,l)),t.closeNode(n)),t}static _collapse(t){typeof t!="string"&&t.children&&(t.children.every(n=>typeof n=="string")?t.children=[t.children.join("")]:t.children.forEach(n=>{e._collapse(n)}))}},le=class extends ae{constructor(t){super(),this.options=t}addText(t){t!==""&&this.add(t)}startScope(t){this.openNode(t)}endScope(){this.closeNode()}__addSublanguage(t,n){let l=t.root;n&&(l.scope=`language:${n}`),this.add(l)}toHTML(){return new oe(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function G(e){return e?typeof e=="string"?e:e.source:null}function De(e){return B("(?=",e,")")}function Ot(e){return B("(?:",e,")*")}function wt(e){return B("(?:",e,")?")}function B(...e){return e.map(n=>G(n)).join("")}function xt(e){let t=e[e.length-1];return typeof t=="object"&&t.constructor===Object?(e.splice(e.length-1,1),t):{}}function V(...e){return"("+(xt(e).capture?"":"?:")+e.map(l=>G(l)).join("|")+")"}function ke(e){return new RegExp(e.toString()+"|").exec("").length-1}function Nt(e,t){let n=e&&e.exec(t);return n&&n.index===0}var Rt=new RegExp(V(/\[(?:[^\\\]]|\\.)*\]/,/\(\?<(?![=!])[^>]+>/,/\(\?'[^']+'/,/\(\??/,/\\([1-9][0-9]*)/,/\\./));function fe(e,{joinWith:t}){let n=0;return e.map(l=>{n+=1;let d=n,_=G(l),c="";for(;_.length>0;){let r=Rt.exec(_);if(!r){c+=_;break}c+=_.substring(0,r.index),_=_.substring(r.index+r[0].length),r[0][0]==="\\"&&r[1]?c+="\\"+String(Number(r[1])+d):(c+=r[0],(r[0]==="("||/^\(\?[<']/.test(r[0]))&&n++)}return c}).map(l=>`(${l})`).join(t)}var yt=/\b\B/,ve="[a-zA-Z]\\w*",ge="[a-zA-Z_]\\w*",Le="\\b\\d+(\\.\\d+)?",Be="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Pe="\\b(0b[01]+)",St="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",At=(e={})=>{let t=/^#![ ]*\//;return e.binary&&(e.begin=B(t,/.*\b/,e.binary,/\b.*/)),k({scope:"meta",begin:t,end:/$/,relevance:0,"on:begin":(n,l)=>{n.index!==0&&l.ignoreMatch()}},e)},K={begin:"\\\\[\\s\\S]",relevance:0},Tt={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[K]},It={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[K]},Ct={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},Q=function(e,t,n={}){let l=k({scope:"comment",begin:e,end:t,contains:[]},n);l.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let d=V("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return l.contains.push({begin:B(/[ ]+/,"(",d,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),l},Dt=Q("//","$"),kt=Q("/\\*","\\*/"),vt=Q("#","$"),Lt={scope:"number",begin:Le,relevance:0},Bt={scope:"number",begin:Be,relevance:0},Pt={scope:"number",begin:Pe,relevance:0},$t={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[K,{begin:/\[/,end:/\]/,relevance:0,contains:[K]}]},Ht={scope:"title",begin:ve,relevance:0},Ut={scope:"title",begin:ge,relevance:0},jt={begin:"\\.\\s*"+ge,relevance:0},Gt=function(e){return Object.assign(e,{"on:begin":(t,n)=>{n.data._beginMatch=t[1]},"on:end":(t,n)=>{n.data._beginMatch!==t[1]&&n.ignoreMatch()}})},X=Object.freeze({__proto__:null,APOS_STRING_MODE:Tt,BACKSLASH_ESCAPE:K,BINARY_NUMBER_MODE:Pt,BINARY_NUMBER_RE:Pe,COMMENT:Q,C_BLOCK_COMMENT_MODE:kt,C_LINE_COMMENT_MODE:Dt,C_NUMBER_MODE:Bt,C_NUMBER_RE:Be,END_SAME_AS_BEGIN:Gt,HASH_COMMENT_MODE:vt,IDENT_RE:ve,MATCH_NOTHING_RE:yt,METHOD_GUARD:jt,NUMBER_MODE:Lt,NUMBER_RE:Le,PHRASAL_WORDS_MODE:Ct,QUOTE_STRING_MODE:It,REGEXP_MODE:$t,RE_STARTERS_RE:St,SHEBANG:At,TITLE_MODE:Ht,UNDERSCORE_IDENT_RE:ge,UNDERSCORE_TITLE_MODE:Ut});function Kt(e,t){e.input[e.index-1]==="."&&t.ignoreMatch()}function mt(e,t){e.className!==void 0&&(e.scope=e.className,delete e.className)}function Wt(e,t){t&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=Kt,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function Ft(e,t){Array.isArray(e.illegal)&&(e.illegal=V(...e.illegal))}function zt(e,t){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function Yt(e,t){e.relevance===void 0&&(e.relevance=1)}var Xt=(e,t)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let n=Object.assign({},e);Object.keys(e).forEach(l=>{delete e[l]}),e.keywords=n.keywords,e.begin=B(n.beforeMatch,De(n.begin)),e.starts={relevance:0,contains:[Object.assign(n,{endsParent:!0})]},e.relevance=0,delete n.beforeMatch},Zt=["of","and","for","in","not","or","if","then","parent","list","value"],Jt="keyword";function $e(e,t,n=Jt){let l=Object.create(null);return typeof e=="string"?d(n,e.split(" ")):Array.isArray(e)?d(n,e):Object.keys(e).forEach(function(_){Object.assign(l,$e(e[_],t,_))}),l;function d(_,c){t&&(c=c.map(r=>r.toLowerCase())),c.forEach(function(r){let u=r.split("|");l[u[0]]=[_,Vt(u[0],u[1])]})}}function Vt(e,t){return t?Number(t):Qt(e)?0:1}function Qt(e){return Zt.includes(e.toLowerCase())}var ye={},L=e=>{console.error(e)},Se=(e,...t)=>{console.log(`WARN: ${e}`,...t)},H=(e,t)=>{ye[`${e}/${t}`]||(console.log(`Deprecated as of ${e}. ${t}`),ye[`${e}/${t}`]=!0)},J=new Error;function He(e,t,{key:n}){let l=0,d=e[n],_={},c={};for(let r=1;r<=t.length;r++)c[r+l]=d[r],_[r+l]=!0,l+=ke(t[r-1]);e[n]=c,e[n]._emit=_,e[n]._multi=!0}function qt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw L("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),J;if(typeof e.beginScope!="object"||e.beginScope===null)throw L("beginScope must be object"),J;He(e,e.begin,{key:"beginScope"}),e.begin=fe(e.begin,{joinWith:""})}}function en(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw L("skip, excludeEnd, returnEnd not compatible with endScope: {}"),J;if(typeof e.endScope!="object"||e.endScope===null)throw L("endScope must be object"),J;He(e,e.end,{key:"endScope"}),e.end=fe(e.end,{joinWith:""})}}function tn(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function nn(e){tn(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),qt(e),en(e)}function sn(e){function t(c,r){return new RegExp(G(c),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(r?"g":""))}class n{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(r,u){u.position=this.position++,this.matchIndexes[this.matchAt]=u,this.regexes.push([u,r]),this.matchAt+=ke(r)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let r=this.regexes.map(u=>u[1]);this.matcherRe=t(fe(r,{joinWith:"|"}),!0),this.lastIndex=0}exec(r){this.matcherRe.lastIndex=this.lastIndex;let u=this.matcherRe.exec(r);if(!u)return null;let O=u.findIndex((P,I)=>I>0&&P!==void 0),M=this.matchIndexes[O];return u.splice(0,O),Object.assign(u,M)}}class l{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(r){if(this.multiRegexes[r])return this.multiRegexes[r];let u=new n;return this.rules.slice(r).forEach(([O,M])=>u.addRule(O,M)),u.compile(),this.multiRegexes[r]=u,u}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(r,u){this.rules.push([r,u]),u.type==="begin"&&this.count++}exec(r){let u=this.getMatcher(this.regexIndex);u.lastIndex=this.lastIndex;let O=u.exec(r);if(this.resumingScanAtSamePosition()&&!(O&&O.index===this.lastIndex)){let M=this.getMatcher(0);M.lastIndex=this.lastIndex+1,O=M.exec(r)}return O&&(this.regexIndex+=O.position+1,this.regexIndex===this.count&&this.considerAll()),O}}function d(c){let r=new l;return c.contains.forEach(u=>r.addRule(u.begin,{rule:u,type:"begin"})),c.terminatorEnd&&r.addRule(c.terminatorEnd,{type:"end"}),c.illegal&&r.addRule(c.illegal,{type:"illegal"}),r}function _(c,r){let u=c;if(c.isCompiled)return u;[mt,zt,nn,Xt].forEach(M=>M(c,r)),e.compilerExtensions.forEach(M=>M(c,r)),c.__beforeBegin=null,[Wt,Ft,Yt].forEach(M=>M(c,r)),c.isCompiled=!0;let O=null;return typeof c.keywords=="object"&&c.keywords.$pattern&&(c.keywords=Object.assign({},c.keywords),O=c.keywords.$pattern,delete c.keywords.$pattern),O=O||/\w+/,c.keywords&&(c.keywords=$e(c.keywords,e.case_insensitive)),u.keywordPatternRe=t(O,!0),r&&(c.begin||(c.begin=/\B|\b/),u.beginRe=t(u.begin),!c.end&&!c.endsWithParent&&(c.end=/\B|\b/),c.end&&(u.endRe=t(u.end)),u.terminatorEnd=G(u.end)||"",c.endsWithParent&&r.terminatorEnd&&(u.terminatorEnd+=(c.end?"|":"")+r.terminatorEnd)),c.illegal&&(u.illegalRe=t(c.illegal)),c.contains||(c.contains=[]),c.contains=[].concat(...c.contains.map(function(M){return rn(M==="self"?c:M)})),c.contains.forEach(function(M){_(M,u)}),c.starts&&_(c.starts,r),u.matcher=d(u),u}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=k(e.classNameAliases||{}),_(e)}function Ue(e){return e?e.endsWithParent||Ue(e.starts):!1}function rn(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(t){return k(e,{variants:null},t)})),e.cachedVariants?e.cachedVariants:Ue(e)?k(e,{starts:e.starts?k(e.starts):null}):Object.isFrozen(e)?k(e):e}var cn="11.12.0",ue=class extends Error{constructor(t,n){super(t),this.name="HTMLInjectionError",this.html=n}},ce=Ce,Ae=k,Te=Symbol("nomatch"),on=7,je=function(e){let t=Object.create(null),n=Object.create(null),l=[],d=!0,_="Could not find the language '{}', did you forget to load/include a language module?",c={disableAutodetect:!0,name:"Plain text",contains:[]},r={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:le};function u(i){return r.noHighlightRe.test(i)}function O(i){let a=i.className+" ";a+=i.parentNode?i.parentNode.className:"";let h=r.languageDetectRe.exec(a);if(h){let E=C(h[1]);return E||(Se(_.replace("{}",h[1])),Se("Falling back to no-highlight mode for this block.",i)),E?h[1]:"no-highlight"}return a.split(/\s+/).find(E=>u(E)||C(E))}function M(i,a,h){let E="",w="";typeof a=="object"?(E=i,h=a.ignoreIllegals,w=a.language):(H("10.7.0","highlight(lang, code, ...args) has been deprecated."),H("10.7.0",`Please use highlight(code, options) instead.
+(see the highlight.js issue tracker)`),w=i,E=a),h===void 0&&(h=!0);let y={code:E,language:w};W("before:highlight",y);let D=y.result?y.result:P(y.language,y.code,h);return D.code=y.code,W("after:highlight",D),D}function P(i,a,h,E){let w=Object.create(null);function y(s,o){return s.keywords[o]}function D(){if(!f.keywords){x.addText(b);return}let s=0;f.keywordPatternRe.lastIndex=0;let o=f.keywordPatternRe.exec(b),g="";for(;o;){g+=b.substring(s,o.index);let p=A.case_insensitive?o[0].toLowerCase():o[0],N=y(f,p);if(N){let[T,at]=N;if(x.addText(g),g="",w[p]=(w[p]||0)+1,w[p]<=on&&(Y+=at),T.startsWith("_"))g+=o[0];else{let lt=A.classNameAliases[T]||T;S(o[0],lt)}}else g+=o[0];s=f.keywordPatternRe.lastIndex,o=f.keywordPatternRe.exec(b)}g+=b.substring(s),x.addText(g)}function F(){if(b==="")return;let s=null;if(typeof f.subLanguage=="string"){if(!t[f.subLanguage]){x.addText(b);return}s=P(f.subLanguage,b,!0,we[f.subLanguage]),we[f.subLanguage]=s._top}else s=$(b,f.subLanguage.length?f.subLanguage:null);f.relevance>0&&(Y+=s.relevance),x.__addSublanguage(s._emitter,s.language)}function R(){f.subLanguage!=null?F():D(),b=""}function S(s,o){s!==""&&(x.startScope(o),x.addText(s),x.endScope())}function be(s,o){let g=1,p=o.length-1;for(;g<=p;){if(!s._emit[g]){g++;continue}let N=A.classNameAliases[s[g]]||s[g],T=o[g];N?S(T,N):(b=T,D(),b=""),g++}}function _e(s,o){return s.scope&&typeof s.scope=="string"&&x.openNode(A.classNameAliases[s.scope]||s.scope),s.beginScope&&(s.beginScope._wrap?(S(b,A.classNameAliases[s.beginScope._wrap]||s.beginScope._wrap),b=""):s.beginScope._multi&&(be(s.beginScope,o),b="")),f=Object.create(s,{parent:{value:f}}),f}function Me(s,o,g){let p=Nt(s.endRe,g);if(p){if(s["on:end"]){let N=new Z(s);s["on:end"](o,N),N.isMatchIgnored&&(p=!1)}if(p){for(;s.endsParent&&s.parent;)s=s.parent;return s}}if(s.endsWithParent)return Me(s.parent,o,g)}function it(s){return f.matcher.regexIndex===0?(b+=s[0],1):(re=!0,0)}function st(s){let o=s[0],g=s.rule,p=new Z(g),N=[g.__beforeBegin,g["on:begin"]];for(let T of N)if(T&&(T(s,p),p.isMatchIgnored))return it(o);return g.skip?b+=o:(g.excludeBegin&&(b+=o),R(),!g.returnBegin&&!g.excludeBegin&&(b=o)),_e(g,s),g.returnBegin?0:o.length}function rt(s){let o=s[0],g=a.substring(s.index),p=Me(f,s,g);if(!p)return Te;let N=f;f.endScope&&f.endScope._wrap?(R(),S(o,f.endScope._wrap)):f.endScope&&f.endScope._multi?(R(),be(f.endScope,s)):N.skip?b+=o:(N.returnEnd||N.excludeEnd||(b+=o),R(),N.excludeEnd&&(b=o));do f.scope&&x.closeNode(),!f.skip&&!f.subLanguage&&(Y+=f.relevance),f=f.parent;while(f!==p.parent);return p.starts&&_e(p.starts,s),N.returnEnd?0:o.length}function ct(){let s=[];for(let o=f;o!==A;o=o.parent)o.scope&&s.unshift(o.scope);s.forEach(o=>x.openNode(o))}let z={};function Oe(s,o){let g=o&&o[0];if(b+=s,g==null)return R(),0;if(z.type==="begin"&&o.type==="end"&&z.index===o.index&&g===""){if(b+=a.slice(o.index,o.index+1),!d){let p=new Error(`0 width match regex (${i})`);throw p.languageName=i,p.badRule=z.rule,p}return 1}if(z=o,o.type==="begin")return st(o);if(o.type==="illegal"&&!h){let p=new Error('Illegal lexeme "'+g+'" for mode "'+(f.scope||"<unnamed>")+'"');throw p.mode=f,p}else if(o.type==="end"){let p=rt(o);if(p!==Te)return p}if(o.type==="illegal"&&g==="")return o.index===a.length||(b+=`
+`),1;if(se>1e5&&se>o.index*3)throw new Error("potential infinite loop, way more iterations than matches");return b+=g,g.length}let A=C(i);if(!A)throw L(_.replace("{}",i)),new Error('Unknown language: "'+i+'"');let ot=sn(A),ie="",f=E||ot,we={},x=new r.__emitter(r);ct();let b="",Y=0,v=0,se=0,re=!1;try{if(A.__emitTokens)A.__emitTokens(a,x);else{for(f.matcher.considerAll();;){se++,re?re=!1:f.matcher.considerAll(),f.matcher.lastIndex=v;let s=f.matcher.exec(a);if(!s)break;let o=a.substring(v,s.index),g=Oe(o,s);v=s.index+g}Oe(a.substring(v))}return x.finalize(),ie=x.toHTML(),{language:i,value:ie,relevance:Y,illegal:!1,_emitter:x,_top:f}}catch(s){if(s.message&&s.message.includes("Illegal"))return{language:i,value:ce(a),illegal:!0,relevance:0,_illegalBy:{message:s.message,index:v,context:a.slice(v-100,v+100),mode:s.mode,resultSoFar:ie},_emitter:x};if(d)return{language:i,value:ce(a),illegal:!1,relevance:0,errorRaised:s,_emitter:x,_top:f};throw s}}function I(i){let a={value:ce(i),illegal:!1,relevance:0,_top:c,_emitter:new r.__emitter(r)};return a._emitter.addText(i),a}function $(i,a){a=a||r.languages||Object.keys(t);let h=I(i),E=a.filter(C).filter(Ee).map(R=>P(R,i,!1));E.unshift(h);let w=E.sort((R,S)=>{if(R.relevance!==S.relevance)return S.relevance-R.relevance;if(R.language&&S.language){if(C(R.language).supersetOf===S.language)return 1;if(C(S.language).supersetOf===R.language)return-1}return 0}),[y,D]=w,F=y;return F.secondBest=D,F}function te(i,a,h){let E=a&&n[a]||h;i.classList.add("hljs"),i.classList.add(`language-${E}`)}function ne(i){let a=null,h=O(i);if(u(h))return;if(W("before:highlightElement",{el:i,language:h}),i.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",i);return}if(i.children.length>0&&(r.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("(see the highlight.js security wiki)"),console.warn("The element with unescaped HTML:"),console.warn(i)),r.throwUnescapedHTML))throw new ue("One of your code blocks includes unescaped HTML.",i.innerHTML);a=i;let E=a.textContent,w=h?M(E,{language:h,ignoreIllegals:!0}):$(E);i.innerHTML=w.value,i.dataset.highlighted="yes",te(i,h,w.language),i.result={language:w.language,re:w.relevance,relevance:w.relevance},w.secondBest&&(i.secondBest={language:w.secondBest.language,relevance:w.secondBest.relevance}),W("after:highlightElement",{el:i,result:w,text:E})}function Ye(i){r=Ae(r,i)}let Xe=()=>{m(),H("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function Ze(){m(),H("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let de=!1;function m(){function i(){m()}if(document.readyState==="loading"){de||window.addEventListener("DOMContentLoaded",i,!1),de=!0;return}document.querySelectorAll(r.cssSelector).forEach(ne)}function Je(i,a){let h=null;try{h=a(e)}catch(E){if(L("Language definition for '{}' could not be registered.".replace("{}",i)),d)L(E);else throw E;h=c}h.name||(h.name=i),t[i]=h,h.rawDefinition=a.bind(null,e),h.aliases&&pe(h.aliases,{languageName:i})}function Ve(i){delete t[i];for(let a of Object.keys(n))n[a]===i&&delete n[a]}function Qe(){return Object.keys(t)}function C(i){return i=(i||"").toLowerCase(),t[i]||t[n[i]]}function pe(i,{languageName:a}){typeof i=="string"&&(i=[i]),i.forEach(h=>{n[h.toLowerCase()]=a})}function Ee(i){let a=C(i);return a&&!a.disableAutodetect}function qe(i){i["before:highlightBlock"]&&!i["before:highlightElement"]&&(i["before:highlightElement"]=a=>{i["before:highlightBlock"](Object.assign({block:a.el},a))}),i["after:highlightBlock"]&&!i["after:highlightElement"]&&(i["after:highlightElement"]=a=>{i["after:highlightBlock"](Object.assign({block:a.el},a))})}function et(i){qe(i),l.push(i)}function tt(i){let a=l.indexOf(i);a!==-1&&l.splice(a,1)}function W(i,a){let h=i;l.forEach(function(E){E[h]&&E[h](a)})}function nt(i){return H("10.7.0","highlightBlock will be removed entirely in v12.0"),H("10.7.0","Please use highlightElement now."),ne(i)}Object.assign(e,{highlight:M,highlightAuto:$,highlightAll:m,highlightElement:ne,highlightBlock:nt,configure:Ye,initHighlighting:Xe,initHighlightingOnLoad:Ze,registerLanguage:Je,unregisterLanguage:Ve,listLanguages:Qe,getLanguage:C,registerAliases:pe,autoDetection:Ee,inherit:Ae,addPlugin:et,removePlugin:tt}),e.debugMode=function(){d=!1},e.safeMode=function(){d=!0},e.versionString=cn,e.regex={concat:B,lookahead:De,either:V,optional:wt,anyNumberOfTimes:Ot};for(let i in X)typeof X[i]=="object"&&Ie(X[i]);return Object.assign(e,X),e},U=je({});U.newInstance=()=>je({});Ge.exports=U;U.HighlightJS=U;U.default=U});var me=bt(Ke(),1);var he=me.default;var j="[0-9](_*[0-9])*",q=`\\.(${j})`,ee="[0-9a-fA-F](_*[0-9a-fA-F])*",We={className:"number",variants:[{begin:`(\\b(${j})((${q})|\\.)?|(${q}))[eE][+-]?(${j})[fFdD]?\\b`},{begin:`\\b(${j})((${q})[fFdD]?\\b|\\.([fFdD]\\b)?)`},{begin:`(${q})[fFdD]?\\b`},{begin:`\\b(${j})[fFdD]\\b`},{begin:`\\b0[xX]((${ee})\\.?|(${ee})?\\.(${ee}))[pP][+-]?(${j})[fFdD]?\\b`},{begin:"\\b(0|[1-9](_*[0-9])*)[lL]?\\b"},{begin:`\\b0[xX](${ee})[lL]?\\b`},{begin:"\\b0(_*[0-7])*[lL]?\\b"},{begin:"\\b0[bB][01](_*[01])*[lL]?\\b"}],relevance:0};function Fe(e,t,n){return n===-1?"":e.replace(t,l=>Fe(e,t,n-1))}function ze(e){let t=e.regex,n="[\xC0-\u02B8a-zA-Z_$][\xC0-\u02B8a-zA-Z_$0-9]*",l="(?:(?:\\s*\\[\\s*])+)?",d=n+"<@@@>"+l,c="(?:"+("\\?(?:\\s+(?:extends|super)\\s+"+d+")?")+"|"+d+")",r=Fe("(?:\\s*<\\s*"+c+"(?:\\s*,\\s*"+c+")*\\s*>)?",/<@@@>/g,2),I={keyword:["synchronized","abstract","private","var","static","if","const ","for","while","strictfp","finally","protected","import","native","final","void","enum","else","break","transient","catch","instanceof","volatile","case","assert","package","default","public","try","switch","continue","throws","protected","public","private","module","requires","exports","do","sealed","yield","permits","goto","when"],literal:["false","true","null"],type:["char","boolean","long","float","int","byte","short","double"],built_in:["super","this"]},$={className:"meta",begin:"@"+n,contains:[{begin:/\(/,end:/\)/,contains:["self"]}]},te={className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[e.C_BLOCK_COMMENT_MODE],endsParent:!0};return{name:"Java",aliases:["jsp"],keywords:I,illegal:/<\/|#/,contains:[e.COMMENT("/\\*\\*","\\*/",{relevance:0,contains:[{begin:/\w+@/,relevance:0},{className:"doctag",begin:"@[A-Za-z]+"}]}),{begin:/import java\.[a-z]+\./,keywords:"import",relevance:2},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE,{begin:/"""/,end:/"""/,className:"string",contains:[e.BACKSLASH_ESCAPE]},e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,{match:[/\b(?:class|interface|enum|extends|implements|new)/,/\s+/,n],className:{1:"keyword",3:"title.class"}},{match:/non-sealed/,scope:"keyword"},{beginKeywords:"new throw return else yield assert",relevance:0},{begin:[n,t.concat(r,l,/\s+/),n,l,/\s*/,/=(?!=)/],className:{1:"type",3:"variable",6:"operator"}},{begin:[/record/,/\s+/,n],className:{1:"keyword",3:"title.class"},contains:[te,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},{begin:[n,t.concat(r,l,/\s+/),n,/\s*(?=\()/],className:{1:"type",3:"title.function"},keywords:I,contains:[{className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[$,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,We,e.C_BLOCK_COMMENT_MODE]},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},We,$]}}he.registerLanguage("java",ze);window.hljs=he;})();
+</script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---- 1. syntax highlighting -------------------------------------- */
+  function highlight() {
+    if (!window.hljs) return;
+    var blocks = document.querySelectorAll('pre code.language-java');
+    for (var i = 0; i < blocks.length; i++) {
+      try { window.hljs.highlightElement(blocks[i]); } catch (e) {}
+    }
+  }
+
+  /* ---- 2. every solution / reveal starts closed --------------------- */
+  function closeAll() {
+    var d = document.querySelectorAll('details.soln');
+    for (var i = 0; i < d.length; i++) { d[i].open = false; }
+  }
+
+  /* ---- 3. show all / hide all -------------------------------------- */
+  function wireToolbar() {
+    var show = document.getElementById('showAll');
+    var hide = document.getElementById('hideAll');
+    function setAll(v) {
+      var d = document.querySelectorAll('details.soln');
+      for (var i = 0; i < d.length; i++) { d[i].open = v; }
+    }
+    if (show) show.addEventListener('click', function () { setAll(true); });
+    if (hide) hide.addEventListener('click', function () { setAll(false); });
+  }
+
+  /* ---- 4. live-coding editors -------------------------------------- */
+  var INDENT = '    ';
+
+  function wireEditors() {
+    var eds = document.querySelectorAll('.editor');
+    for (var i = 0; i < eds.length; i++) { wireOne(eds[i]); }
+  }
+
+  function wireOne(box) {
+    var ta = box.querySelector('textarea');
+    if (!ta) return;
+    var starter = ta.value;
+
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Tab' || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+      ev.preventDefault();
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+
+      if (s === e && !ev.shiftKey) {
+        ta.value = v.slice(0, s) + INDENT + v.slice(e);
+        ta.selectionStart = ta.selectionEnd = s + INDENT.length;
+        return;
+      }
+      /* block indent / outdent over the selected lines */
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var le = v.indexOf('\n', e);
+      if (le === -1) le = v.length;
+      var seg = v.slice(ls, le);
+      var lines = seg.split('\n');
+      var delta0 = 0, total = 0;
+
+      for (var i = 0; i < lines.length; i++) {
+        if (ev.shiftKey) {
+          var m = lines[i].match(/^(\t| {1,4})/);
+          if (m) {
+            lines[i] = lines[i].slice(m[0].length);
+            if (i === 0) delta0 = -m[0].length;
+            total -= m[0].length;
+          }
+        } else {
+          lines[i] = INDENT + lines[i];
+          if (i === 0) delta0 = INDENT.length;
+          total += INDENT.length;
+        }
+      }
+      ta.value = v.slice(0, ls) + lines.join('\n') + v.slice(le);
+      ta.selectionStart = Math.max(ls, s + delta0);
+      ta.selectionEnd = Math.max(ta.selectionStart, e + total);
+    });
+
+    /* keep the indent of the current line when Enter is pressed */
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Enter' || ev.shiftKey || ev.ctrlKey || ev.metaKey) return;
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+      if (s !== e) return;
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var lead = (v.slice(ls, s).match(/^[ \t]*/) || [''])[0];
+      var extra = /[{(\[]\s*$/.test(v.slice(ls, s)) ? INDENT : '';
+      if (!lead && !extra) return;
+      ev.preventDefault();
+      var ins = '\n' + lead + extra;
+      ta.value = v.slice(0, s) + ins + v.slice(e);
+      ta.selectionStart = ta.selectionEnd = s + ins.length;
+    });
+
+    var rst = box.querySelector('[data-act="reset"]');
+    if (rst) rst.addEventListener('click', function () {
+      ta.value = starter;
+      ta.focus();
+      flash(box, 'Reset to starter code');
+    });
+
+    var cpy = box.querySelector('[data-act="copy"]');
+    if (cpy) cpy.addEventListener('click', function () {
+      var done = function () { flash(box, 'Copied — paste it into your IDE'); };
+      var fail = function () { flash(box, 'Copy failed — select the text and press Ctrl/Cmd+C'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value).then(done, function () { legacy(ta, done, fail); });
+      } else {
+        legacy(ta, done, fail);
+      }
+    });
+  }
+
+  function legacy(ta, done, fail) {
+    try {
+      var st = ta.selectionStart, en = ta.selectionEnd;
+      ta.select();
+      var ok = document.execCommand('copy');
+      ta.selectionStart = st; ta.selectionEnd = en;
+      ok ? done() : fail();
+    } catch (e) { fail(); }
+  }
+
+  function flash(box, msg) {
+    var f = box.querySelector('.foot');
+    if (!f) return;
+    if (f.getAttribute('data-base') === null || f.getAttribute('data-base') === undefined) {
+      f.setAttribute('data-base', f.textContent);
+    }
+    f.textContent = msg;
+    window.setTimeout(function () { f.textContent = f.getAttribute('data-base'); }, 2200);
+  }
+
+  /* ---- go ----------------------------------------------------------- */
+  function init() {
+    highlight();
+    closeAll();
+    wireToolbar();
+    wireEditors();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  /* belt and braces: some browsers restore <details> state on soft reload */
+  window.addEventListener('pageshow', closeAll);
+})();
+</script>
+</body>
+</html>

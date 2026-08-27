@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class 25 — Linked Lists, Stacks and Queues | CSCI 212</title>
+<style>
+:root{
+  --ink:#0f172a; --ink2:#334155; --muted:#64748b; --line:#e2e8f0;
+  --bg:#ffffff; --bg2:#f8fafc;
+  --obj:#4f46e5; --def:#2563eb; --ex:#059669; --alg:#7c3aed;
+  --key:#b45309; --warn:#dc2626; --qc:#0891b2; --prac:#be185d; --sum:#475569;
+  --edit:#ea580c; --edit-bg:#fff7ed;
+  --code-bg:#0d1117; --code-bd:#000000;   /* read-only listings: black */
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px 80px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:#0f172a;color:#e2e8f0;font-size:13.5px;
+  border-bottom:3px solid var(--obj);
+}
+.topbar .inner{max-width:900px;margin:0 auto;padding:10px 22px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.topbar a{color:#e2e8f0;text-decoration:none;border-bottom:1px solid transparent}
+.topbar a:hover{border-bottom-color:#94a3b8}
+.topbar .course{font-weight:700;letter-spacing:.02em}
+.topbar .sep{color:#475569}
+.topbar .spacer{flex:1}
+
+/* ---------- title block ---------- */
+.titleblock{padding:34px 0 10px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.eyebrow{
+  font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--obj);margin-bottom:8px;
+}
+.titleblock h1{font-size:33px;line-height:1.2;margin:0 0 10px;letter-spacing:-.015em}
+.titleblock .sub{margin:0;color:var(--muted);font-size:17px;line-height:1.5}
+
+h2{
+  font-size:24px;margin:46px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line);letter-spacing:-.01em;scroll-margin-top:14px;
+}
+h2 .num{color:var(--obj);font-weight:800;margin-right:11px}
+h3{font-size:18.5px;margin:30px 0 10px;color:var(--ink)}
+h4{font-size:16px;margin:20px 0 8px;color:var(--ink2)}
+p{margin:12px 0}
+ul,ol{margin:12px 0;padding-left:26px}
+li{margin:6px 0}
+a{color:var(--def)}
+hr{border:0;border-top:1px solid var(--line);margin:30px 0}
+strong{color:var(--ink)}
+.muted{color:var(--muted)}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--bg2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 20px 16px;margin:22px 0;
+}
+.toc .th{
+  font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;
+}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:30px}
+.toc li{margin:3px 0;font-size:14.5px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- show all / hide all ---------- */
+.tools{
+  display:flex;gap:9px;align-items:center;flex-wrap:wrap;
+  padding:11px 15px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:9px;margin:22px 0;font-size:13.5px;
+}
+.tools .lab{font-weight:700;color:var(--ink2)}
+.tools button{
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  background:#fff;color:var(--ink2);border:1px solid #cbd5e1;
+  border-radius:6px;padding:4px 12px;
+}
+.tools button:hover{background:var(--obj);border-color:var(--obj);color:#fff}
+.tools .muted{font-size:12.5px}
+
+/* ---------- boxes ---------- */
+.box{border:1px solid var(--line);border-left:5px solid var(--muted);border-radius:8px;margin:22px 0;overflow:hidden;background:#fff}
+.box>.hd{
+  padding:9px 16px;font-size:12.5px;font-weight:700;
+  letter-spacing:.075em;text-transform:uppercase;color:#fff;background:var(--muted);
+}
+.box>.hd .tag{margin-left:5px;font-weight:500;text-transform:none;letter-spacing:0;opacity:.92;font-size:13px}
+.box>.bd{padding:4px 18px 14px}
+.box>.bd>:first-child{margin-top:12px}
+.box>.bd>:last-child{margin-bottom:2px}
+
+.box.obj{border-left-color:var(--obj)}  .box.obj>.hd{background:var(--obj)}
+.box.def{border-left-color:var(--def)}  .box.def>.hd{background:var(--def)}
+.box.ex{border-left-color:var(--ex)}    .box.ex>.hd{background:var(--ex)}
+.box.alg{border-left-color:var(--alg)}  .box.alg>.hd{background:var(--alg)}
+.box.key{border-left-color:var(--key)}  .box.key>.hd{background:var(--key)}
+.box.warn{border-left-color:var(--warn)}.box.warn>.hd{background:var(--warn)}
+.box.qc{border-left-color:var(--qc)}    .box.qc>.hd{background:var(--qc)}
+.box.prac{border-left-color:var(--prac)}.box.prac>.hd{background:var(--prac)}
+.box.sum{border-left-color:var(--sum)}  .box.sum>.hd{background:var(--sum)}
+
+.box.obj{background:#f5f5ff}
+.box.qc{background:#f0fbfe}
+.box.warn{background:#fff7f7}
+.box.key{background:#fffbf2}
+.box.sum{background:#f8fafc}
+
+/* ---------- code ---------- */
+/* Read-only listings sit on black, matching CSCI 211, so a code block is never
+   mistaken for the editable live-coding box. */
+pre{
+  margin:14px 0;padding:13px 15px;overflow-x:auto;
+  background:var(--code-bg);border:1px solid var(--code-bd);border-radius:8px;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;color:#c9d1d9;
+}
+pre code{font-family:inherit;font-size:inherit;background:none;padding:0;border:0;color:inherit;display:block}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef2f7;
+  border:1px solid #e2e8f0;border-radius:4px;padding:1px 5px;color:#0b3a5b;
+}
+.filename{
+  font-family:var(--mono);font-size:12px;color:#475569;
+  margin:16px 0 -9px;font-weight:600;
+}
+
+/* comparison block: another language, never syntax-highlighted. Dark like the
+   Java listings, but desaturated and dashed so it reads as "not this course". */
+pre.cmp{background:#161b22;border-style:dashed;border-color:#3f4650;color:#9aa4b2}
+pre.cmp code{color:#9aa4b2}
+
+/* shell commands you type */
+pre.sh{background:#1e293b;border-color:#1e293b;color:#e2e8f0;position:relative;padding-top:26px}
+pre.sh code{color:#e2e8f0}
+pre.sh::before{
+  content:"Terminal";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#86efac;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* output / terminal blocks */
+pre.out{background:#111d33;border-color:#111d33;color:#e2e8f0;position:relative;padding-top:26px}
+pre.out code{color:#e2e8f0}
+pre.out::before{
+  content:"Output";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#7dd3fc;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+pre.err{background:#1f1416;border-color:#7f1d1d;color:#fecdd3;padding-top:26px;position:relative}
+pre.err code{color:#fecdd3}
+pre.err::before{
+  content:"Compiler message";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#fda4af;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* ---- highlight.js, GitHub-dark palette (hand-written, no external file) ---- */
+.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-template-tag,
+.hljs-template-variable,.hljs-type,.hljs-variable.language_{color:#ff7b72}
+.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#d2a8ff}
+.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,
+.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable{color:#79c0ff}
+.hljs-meta .hljs-string,.hljs-regexp,.hljs-string{color:#a5d6ff}
+.hljs-built_in,.hljs-symbol{color:#ffa657}
+.hljs-code,.hljs-comment,.hljs-formula{color:#8b949e;font-style:italic}
+.hljs-name,.hljs-quote,.hljs-selector-pseudo,.hljs-selector-tag{color:#7ee787}
+.hljs-subst{color:#c9d1d9}
+.hljs-section{color:#1f6feb;font-weight:700}
+.hljs-bullet{color:#f2cc60}
+.hljs-emphasis{color:#c9d1d9;font-style:italic}
+.hljs-strong{color:#c9d1d9;font-weight:700}
+
+/* ---------- trace tables ---------- */
+table{border-collapse:collapse;margin:16px 0;font-size:14px;width:100%}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg2);font-weight:700;font-size:13px}
+table.trace td:first-child,table.trace th:first-child{white-space:nowrap}
+table code{font-size:.88em}
+
+/* ---------- multi-part questions ---------- */
+.part{margin:16px 0;padding-left:14px;border-left:2px solid #cbd5e1}
+.part .q{margin:0 0 8px}
+.part .pl{font-weight:700;color:var(--qc);margin-right:6px}
+
+/* ---------- collapsible solutions ---------- */
+details.soln{margin:10px 0 4px}
+details.soln>summary{
+  list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  font-size:12.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:#fff;background:var(--sum);border-radius:6px;padding:5px 13px;
+  user-select:none;
+}
+details.soln>summary::-webkit-details-marker{display:none}
+details.soln>summary::before{content:"\25B6";font-size:9px;transition:transform .15s}
+details.soln[open]>summary::before{transform:rotate(90deg)}
+details.soln>summary::after{content:"Show Answer"}
+details.soln[open]>summary::after{content:"Hide Answer"}
+details.soln>summary:hover{filter:brightness(1.18)}
+
+details.soln.reveal>summary{background:var(--ex)}
+details.soln.reveal>summary::after{content:"Show Output & Explanation"}
+details.soln.reveal[open]>summary::after{content:"Hide Output & Explanation"}
+details.soln.reveal.noout>summary::after{content:"Show Explanation"}
+details.soln.reveal.noout[open]>summary::after{content:"Hide Explanation"}
+
+.ans{
+  margin-top:11px;padding:2px 16px 10px;background:#fff;
+  border:1px solid var(--line);border-left:3px solid var(--sum);border-radius:7px;
+}
+details.soln.reveal .ans{border-left-color:var(--ex)}
+.ans>:first-child{margin-top:12px}
+.ans>:last-child{margin-bottom:6px}
+
+/* ---------- live coding editor ---------- */
+.editor{
+  margin:18px 0;border:2px dashed var(--edit);border-radius:9px;
+  background:var(--edit-bg);overflow:hidden;
+}
+.editor .ehd{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:7px 13px;background:var(--edit);color:#fff;
+  font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+}
+.editor .ehd .etitle{flex:1}
+.editor .ehd button{
+  font:inherit;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  cursor:pointer;background:rgba(255,255,255,.16);color:#fff;
+  border:1px solid rgba(255,255,255,.5);border-radius:5px;padding:3px 10px;
+}
+.editor .ehd button:hover{background:#fff;color:var(--edit)}
+.editor textarea{
+  display:block;width:100%;border:0;outline:0;resize:vertical;
+  padding:12px 15px;background:var(--edit-bg);color:#431407;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;
+  tab-size:4;-moz-tab-size:4;min-height:150px;
+}
+.editor textarea:focus{background:#fff}
+.editor .foot{
+  padding:5px 13px 7px;font-size:11.5px;color:#9a3412;background:#ffedd5;
+  border-top:1px solid #fed7aa;
+}
+
+/* ---------- prev/next nav ---------- */
+.pagenav{display:flex;gap:14px;margin:52px 0 0;flex-wrap:wrap}
+.pagenav a,.pagenav span.disabled{
+  flex:1 1 260px;display:block;text-decoration:none;
+  border:1px solid var(--line);border-radius:9px;padding:12px 16px;background:#fff;
+}
+.pagenav a:hover{border-color:var(--obj);background:var(--bg2)}
+.pagenav .dir{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.pagenav .ttl{font-size:15px;font-weight:600;color:var(--ink);margin-top:3px}
+.pagenav .next{text-align:right}
+.pagenav span.disabled{opacity:.4}
+.pagenav span.disabled .ttl{color:var(--muted)}
+
+footer.pf{
+  margin-top:40px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--muted);text-align:center;
+}
+
+/* ---------- index page ---------- */
+table.sched{font-size:14.5px}
+table.sched th{background:#0f172a;color:#fff;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+table.sched td:first-child{white-space:nowrap;font-weight:700;color:var(--muted);width:60px}
+table.sched tr.examrow td{background:#fff1f2}
+table.sched tr.revrow td{background:#fffbeb}
+table.sched a{font-weight:600;text-decoration:none}
+table.sched a:hover{text-decoration:underline}
+
+
+/* ---------- release gating ---------- */
+.pending{
+  margin-top:4px;font-size:11.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:#b45309;
+}
+.pagenav span.disabled .pending{color:#b45309}
+table.sched tr.pendingrow td{background:#fcfcfd}
+table.sched .unrel{color:var(--muted)}
+table.sched .pending{display:block;margin-top:2px}
+table.sched td.cn{white-space:nowrap;width:52px;font-weight:700;color:var(--muted)}
+table.sched td.dt{white-space:nowrap;width:104px;color:var(--muted);font-size:13.5px}
+table.sched tr.offrow td{background:#f1f5f9;color:var(--muted);font-style:italic}
+.refcard{
+  display:block;text-decoration:none;border:1px solid var(--line);
+  border-left:5px solid var(--alg);border-radius:9px;padding:13px 17px;
+  margin:22px 0;background:#faf9ff;
+}
+.refcard:hover{background:#f5f3ff;border-color:var(--alg)}
+.refcard .rl{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--alg)}
+.refcard .rt{font-size:16px;font-weight:600;color:var(--ink);margin-top:3px}
+.refcard .rd{font-size:14px;color:var(--muted);margin-top:4px}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,.tools,.pagenav,.pending{display:none !important}
+  html,body{width:100%;font-size:10pt}
+  .wrap{max-width:100%;width:100%;padding:0}
+  /* a wide <pre> must wrap rather than widen the page and clip every other
+     element at the paper edge */
+  /* Screen shows code on black; paper does not. Restore a dark-on-light palette
+     for print only, or the dark theme's light tokens vanish on white. */
+  pre{white-space:pre-wrap;overflow:visible;overflow-wrap:anywhere;font-size:8.6pt;
+      background:#f8fafc !important;color:#24292e !important;border-color:#cbd5e1 !important;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  pre code{color:#24292e !important}
+  pre.cmp{background:#fff !important;color:#475569 !important;border-color:#94a3b8 !important}
+  pre.cmp code{color:#475569 !important}
+  pre .hljs-doctag,pre .hljs-keyword,pre .hljs-meta .hljs-keyword,pre .hljs-template-tag,
+  pre .hljs-template-variable,pre .hljs-type,pre .hljs-variable.language_{color:#d73a49 !important}
+  pre .hljs-title,pre .hljs-title.class_,pre .hljs-title.class_.inherited__,
+  pre .hljs-title.function_{color:#6f42c1 !important}
+  pre .hljs-attr,pre .hljs-attribute,pre .hljs-literal,pre .hljs-meta,pre .hljs-number,
+  pre .hljs-operator,pre .hljs-selector-attr,pre .hljs-selector-class,pre .hljs-selector-id,
+  pre .hljs-variable{color:#005cc5 !important}
+  pre .hljs-meta .hljs-string,pre .hljs-regexp,pre .hljs-string{color:#032f62 !important}
+  pre .hljs-built_in,pre .hljs-symbol{color:#e36209 !important}
+  pre .hljs-code,pre .hljs-comment,pre .hljs-formula{color:#6a737d !important}
+  pre .hljs-name,pre .hljs-quote,pre .hljs-selector-pseudo,
+  pre .hljs-selector-tag{color:#22863a !important}
+  pre .hljs-subst,pre .hljs-emphasis,pre .hljs-strong{color:#24292e !important}
+  .filename{color:#475569 !important}
+  table{table-layout:fixed;width:100%;word-wrap:break-word;overflow-wrap:anywhere}
+  .box,.toc{max-width:100%}
+  a{color:var(--ink);text-decoration:none}
+  .box,.part,pre,table,.editor{break-inside:avoid;page-break-inside:avoid}
+  h2{break-after:avoid;page-break-after:avoid}
+  details.soln>summary{display:none !important}
+  details.soln:not([open])>.ans{display:none !important}
+  details.soln::before{
+    content:"Answer withheld — see the online notes.";
+    display:block;font-size:9pt;font-style:italic;color:#64748b;margin:6px 0;
+  }
+  details.soln[open]::before{content:""}
+  .editor textarea{display:none !important}
+  .editor{border:1.5px solid #fdba74 !important;background:#fff;border-style:solid}
+  .editor .ehd{background:#fff !important;color:#9a3412 !important;border-bottom:1px solid #fdba74}
+  .editor .ehd button{display:none}
+  .editor .foot{display:none}
+  .editor::after{content:"";display:block;height:2.1in;background:#fff}
+  pre.out,pre.sh{background:#f1f5f9 !important;color:#0f172a !important;border-color:#94a3b8 !important}
+  pre.err{background:#fef2f2 !important;color:#7f1d1d !important;border-color:#fca5a5 !important}
+  pre.out code,pre.sh code{color:#0f172a !important}
+  pre.err code{color:#7f1d1d !important}
+  pre.out::before,pre.sh::before{color:#475569}
+  pre.err::before{color:#b91c1c}
+  .box>.hd{color:#000;background:#fff !important;border-bottom:1px solid #cbd5e1}
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="inner">
+<span class="course">CSCI 212</span>
+<span class="sep">|</span>
+<a href="index.html">Course index</a>
+<span class="sep">|</span>
+<span>Class 25 of 28</span>
+<span class="sep">|</span>
+<span>Tuesday, December 1</span>
+<span class="spacer"></span>
+<span>Queens College, CUNY</span>
+</div></div>
+<div class="wrap">
+<div class="titleblock">
+  <div class="eyebrow">Session 25 &middot; Lecture 21</div>
+  <h1>Linked Lists, Stacks and Queues</h1>
+  <p class="sub">Three containers you build yourself out of one tiny class &mdash; an object that holds a value and a reference to another object just like it.</p>
+</div>
+
+<div class="box obj">
+  <div class="hd">Learning Objectives</div>
+  <div class="bd">
+    <p>By the end of today's session you should be able to:</p>
+    <ol>
+      <li>Say what an array cannot do &mdash; grow, and absorb an insertion in the middle without shifting &mdash; and explain why that motivates a different kind of container.</li>
+      <li>Write the <code>Node</code> class from memory and explain what its <code>next</code> field actually holds.</li> <li>Draw a linked list as boxes and arrows, and read the answer to a question off your own diagram.</li> <li>Write the traversal loop <code>Node n = head; while (n != null) { ...; n = n.getNext(); }</code> without thinking about it.</li> <li>Implement <code>addHead</code>, <code>addTail</code> and <code>removeHead</code>, and get the empty-list and last-node cases right.</li> <li>Perform the pointer surgery for inserting and deleting in the middle of a list, and say which single link does the work.</li> <li>Implement a <code>Stack</code> (LIFO: <code>push</code>, <code>pop</code>, <code>peek</code>) and a <code>Queue</code> (FIFO: <code>enqueue</code>, <code>dequeue</code>, <code>front</code>) on top of the same <code>LinkedList</code>, and explain why they need no new storage code at all.</li> <li>Predict the output of a program that runs the same data through a <code>Stack</code> and a <code>Queue</code>.</li> <li>Explain why naming your own class <code>Stack</code> or <code>LinkedList</code> collides with <code>java.util</code>, and what the compiler does about it.</li> <li>State the one limitation of everything we build today, and name the language feature that removes it.</li> </ol> </div> </div> <div class="toc"> <div class="th">On this page</div> <ol> <li><a href="#s1">When an array is the wrong container</a></li> <li><a href="#s2">The <code>Node</code>: a value, and an arrow</a></li> <li><a href="#s3">Building the <code>LinkedList</code>: <code>addHead</code>, <code>addTail</code>, <code>removeHead</code></a></li> <li><a href="#s4">Traversal, search and deletion &mdash; the pointer surgery</a></li> <li><a href="#s5"><code>Stack</code>: last in, first out</a></li> <li><a href="#s6"><code>Queue</code>: first in, first out</a></li> <li><a href="#s7">The library versions, and the one thing still missing</a></li> <li><a href="#prac">Practice Problems</a></li> <li><a href="#summary">Lecture Summary</a></li> </ol> </div> <div class="tools"> <span class="lab">Answers</span> <button id="showAll" type="button">Show all</button> <button id="hideAll" type="button">Hide all</button> <span class="muted">&mdash; every worked-example output and every solution is hidden when the page loads. Work it out first, then reveal.</span> </div> <hr> <h2 id="s1"><span class="num">1.</span>When an array is the wrong container</h2> <p>Last time you learned to handle things that go wrong at run time: <code>try</code>/<code>catch</code>, <code>throw</code>, <code>throws</code>, and how to write an exception class of your own. Today we put that to work almost immediately &mdash; the very first data structure we build will <code>throw</code> an exception when you ask it for an element it does not have.</p> <p>But the real starting point is a complaint about arrays. You have used them since Lecture 3, and they have two properties you have probably been quietly working around.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; data structure</span></div> <div class="bd"> <p>A <strong>data structure</strong> is a specialized format for organizing, processing, retrieving and storing data. Choosing one is a design decision: each structure makes some operations cheap and others expensive, and you pick the one whose cheap operations are the ones your program does most.</p> <p>Today we build three of the most fundamental: a <strong>linked list</strong>, a <strong>stack</strong> and a <strong>queue</strong>.</p> </div> </div> <p>Here is the complaint, made concrete. Suppose you have five numbers in an array and you need to insert a sixth in the middle.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; what an array makes you pay for</span></div> <div class="bd"> <p>This program stores 10, 20, 30, 40, 50 and then inserts 25 at index 2. Before you open the toggle, answer two questions: how many elements have to move, and what happens to the 50?</p> <p class="filename">ArrayLimits.java</p>
+<pre><code class="language-java">public class ArrayLimits {
+    public static void main(String args[]) {
+        int[] a = new int[5];
+        a[0] = 10; a[1] = 20; a[2] = 30; a[3] = 40; a[4] = 50;
+        System.out.print("Start:  ");
+        print(a);
+
+        // Insert 25 at index 2. Everything from index 2 rightward must shift.
+        int newValue = 25, at = 2;
+        for (int i = a.length - 1; i &gt; at; i--)
+            a[i] = a[i - 1];       // 4 moves for a 5-slot array
+        a[at] = newValue;
+        System.out.print("After:  ");
+        print(a);
+
+        System.out.println("The 50 fell off the end: the array cannot grow.");
+
+        // And there is no room for a sixth element at all.
+        try {
+            a[5] = 60;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("a[5] = 60 threw " + e);
+        }
+    }
+
+    public static void print(int[] a) {
+        for (int i = 0; i &lt; a.length; i++) System.out.print(a[i] + " ");
+        System.out.println();
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Start:  10 20 30 40 50
+After:  10 20 25 30 40
+The 50 fell off the end: the array cannot grow.
+a[5] = 60 threw java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for length 5</code></pre> <p>Two separate problems, both structural:</p> <ul> <li><strong>Fixed size.</strong> <code>new int[5]</code> reserves exactly five slots, once, forever. There is no <code>a.grow()</code>. To get a sixth slot you must allocate a whole new array and copy everything across.</li> <li><strong>Insertion means shifting.</strong> To open a hole at index 2 in a list of <em>n</em> items, you move the <em>n</em>&nbsp;&minus;&nbsp;2 items after it. Insert near the front of a million-element array and you move nearly a million values to store one.</li> </ul> <p>What the array <em>is</em> good at is the thing we are about to lose: <code>a[7]</code> reaches the eighth element instantly, no matter how big the array is, because the slots are laid out consecutively in memory and the JVM can compute the address.</p> 
+</div></details> </div> </div> <p>You have met one fix already: <code>ArrayList</code> from Lecture 6 grows for you. But look at how it does it &mdash; internally it holds an array, and when that array fills up it allocates a bigger one and copies. <code>add(0, x)</code> still shifts everything. The growth is hidden, not free.</p> <p>The alternative is to stop insisting that the elements sit next to each other in memory. If each element carries directions to the next one, they can live anywhere, and inserting means rewriting one set of directions rather than moving a thousand values.</p> <div class="box key"> <div class="hd">Key Idea</div> <div class="bd"> <p>An array stores its elements <em>next to each other</em> and finds element <em>i</em> by arithmetic. A linked list stores its elements <em>anywhere</em> and finds element <em>i</em> by following <em>i</em> arrows. That single trade decides everything else: the list gives up instant random access, and buys unlimited growth and cheap insertion.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 21.1</div> <div class="bd"> <p>For each operation, say whether an array or a linked list handles it better, and why.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> "Give me the 500th element."</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Array.</strong> <code>a[499]</code> is one address calculation, and it costs the same whether the array holds 500 elements or 500 million. A linked list has no way to jump: it must start at the first node and follow 499 arrows.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> "Insert a new value right after the first element."</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Linked list.</strong> Every later element in an array shifts one slot to the right &mdash; that is work proportional to the size of the array. In a linked list you create one node and change two arrows, and the cost is the same whether the list has three elements or three million.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> "I have no idea how many values there will be &mdash; somewhere between 3 and 300,000."</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Linked list.</strong> An array forces you to guess. Guess low and you overflow; guess high and 299,997 slots sit empty. A linked list allocates exactly one node per value as the values arrive, which is what her notes mean by <em>dynamic size</em> and <em>no wasted memory allocation</em>.</p> <p><strong>Things to notice across all three parts.</strong> There is no winner here, only a trade. Write down the operations your program actually performs most often, and pick the structure that makes <em>those</em> cheap. That habit is most of what "choosing a data structure" means in practice.</p> </div></details> </div> </div> </div> <h2 id="s2"><span class="num">2.</span>The <code>Node</code>: a value, and an arrow</h2> <p>Everything today is built from one small class. It has two fields: a piece of data, and a reference to another object of the same class.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; node, linked list, head, tail</span></div> <div class="bd"> <p>A <strong>node</strong> is an object holding two things: the <em>data</em> (the value being stored) and a <em>reference to the next node</em> in the sequence.</p> <p>A <strong>linked list</strong> is a linear data structure made of nodes chained together by those references. The <strong>head</strong> is a reference to the first node; the <strong>tail</strong> is a reference to the last node. The last node's <code>next</code> is <code>null</code>, which is how a traversal knows it has reached the end.</p> <p>An empty list is <code>head == null</code>. There is nothing else to it &mdash; the list <em>is</em> the reference to its first node.</p> </div> </div> <p>This is the moment Lecture 8 pays off. A field of a class type does not hold an object; it holds a <strong>reference</strong> &mdash; an arrow to an object living somewhere on the heap. The <code>next</code> field of a <code>Node</code> is exactly that: an arrow to another <code>Node</code>. Nothing is nested, nothing is copied, and a <code>Node</code> does not "contain" the rest of the list. It points at it.</p> <p class="filename">Three nodes chained together</p>
+<pre class="cmp"><code>head
+ |
+ v
++------+------+     +------+------+     +------+------+
+|  10  |  o---+---&gt; |  20  |  o---+---&gt; |  30  | null |
++------+------+     +------+------+     +------+------+
+ data   next         data   next         data   next</code></pre> <p>Here is the class. This is exactly the <code>Node</code> from the Spring 2025 notes.</p> <p class="filename">Node.java</p>
+<pre><code class="language-java">public class Node {
+   private Integer data;    // Stores the actual value
+   private Node next;       // Reference to the next node
+
+   // Default constructor
+   public Node() {
+      data = null;
+      next = null;
+   }
+
+   // Parameterized constructor
+   public Node(Integer d, Node n) {
+      data = d;
+      next = n;
+   }
+
+   // Getters and setters
+   public Integer getData() { return data; }
+
+   public Node getNext() { return next; }
+
+   public void setData(Integer d) { data = d; }
+
+   public void setNext(Node n) { next = n; }
+}</code></pre> <p>Two details in that class are worth pausing on.</p> <ul> <li><strong>The field <code>next</code> has type <code>Node</code>.</strong> A class may declare a field of its own type, because the field is a reference, not a copy. If Java tried to embed one <code>Node</code> inside another the definition would be infinitely large; an arrow costs the same regardless of what it points at.</li> <li><strong>The data is <code>Integer</code>, not <code>int</code>.</strong> <code>Integer</code> is the wrapper class from Lecture 6 &mdash; an object holding an <code>int</code>. Because it is an object, <code>data</code> can be <code>null</code>, and because of autoboxing you can still write <code>new Node(10, null)</code> and let Java wrap the <code>10</code> for you. Remember this choice; &sect;7 comes back to it.</li> </ul> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; a chain built by hand, with no list class at all</span></div> <div class="bd"> <p>Before we write a <code>LinkedList</code> class, build a list out of nothing but three <code>Node</code> objects. Notice that the nodes are created <em>back to front</em>: to hand a node its <code>next</code> you need the next node to already exist.</p> <p>Predict two things before you open the toggle: what the first loop prints, and what the list looks like after <code>head.setNext(extra)</code>.</p> <p class="filename">NodeChain.java</p>
+<pre><code class="language-java">public class NodeChain {
+    public static void main(String args[]) {
+        // Build the chain back to front, so each node can point at the one after it.
+        Node third  = new Node(30, null);
+        Node second = new Node(20, third);
+        Node first  = new Node(10, second);
+
+        // "The list" is nothing more than a reference to the first node.
+        Node head = first;
+
+        // Walk it. This loop is the traversal you will write a hundred times.
+        Node n = head;
+        while (n != null) {
+            System.out.print(n.getData() + " --&gt; ");
+            n = n.getNext();
+        }
+        System.out.println("null");
+
+        // Proof that these are references, not copies.
+        System.out.println("head.getNext() == second ? " + (head.getNext() == second));
+        System.out.println("third.getNext() is        " + third.getNext());
+
+        // Splice a new node between first and second — no shifting, two assignments.
+        Node extra = new Node(15, head.getNext());
+        head.setNext(extra);
+
+        n = head;
+        while (n != null) {
+            System.out.print(n.getData() + " --&gt; ");
+            n = n.getNext();
+        }
+        System.out.println("null");
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>10 --&gt; 20 --&gt; 30 --&gt; null
+head.getNext() == second ? true
+third.getNext() is        null
+10 --&gt; 15 --&gt; 20 --&gt; 30 --&gt; null</code></pre> <p><strong>The traversal loop.</strong> Learn these three lines as a single unit; you will write them in every method for the rest of the lecture.</p> <pre><code class="language-java">Node n = head;                 // start at the front
+while (n != null) {            // stop when you fall off the end
+    // ... do something with n.getData() ...
+    n = n.getNext();           // step to the next node
+}</code></pre> <p><code>n</code> is a <em>walker</em>: a local reference that moves along the chain. Assigning <code>n = n.getNext()</code> does not move any node &mdash; it moves the arrow that is looking at them, exactly like <code>i++</code> in an array loop. And <code>while (n != null)</code> is the termination test only because the last node's <code>next</code> is <code>null</code>.</p> <p><strong><code>head.getNext() == second</code> is <code>true</code></strong> because <code>==</code> on references asks "same object?", and there is genuinely only one object called 20. <code>second</code> and <code>first.next</code> are two arrows to it.</p> <p><strong>The splice.</strong> Inserting 15 between 10 and 20 took two assignments and moved nothing:</p> <p class="filename">Splicing 15 in between 10 and 20</p>
+<pre class="cmp"><code>before                head
+                       |
+                       v
+                    [10| o-]---------&gt;[20| o-]--&gt;[30|null]
+
+step 1: new Node(15, head.getNext())
+        the new node points at 20; nothing else has changed yet
+                    [10| o-]---------&gt;[20| o-]--&gt;[30|null]
+                                       ^
+                    [15| o-]-----------/
+
+step 2: head.setNext(extra)
+        the 10 now points at the new node instead of at 20
+                    [10| o-]--&gt;[15| o-]--&gt;[20| o-]--&gt;[30|null]</code></pre> <p>The order matters enormously. The new node is given its forward link <em>first</em>, while <code>head.getNext()</code> still reaches the 20. Do it the other way round &mdash; <code>head.setNext(extra)</code> before <code>extra</code> knows where to point &mdash; and you have overwritten the only arrow to the rest of the list, and 20 and 30 are gone.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 21.2</div> <div class="bd"> <p>Someone tries to build the same three-node chain front to back instead of back to front:</p> <pre><code class="language-java">Node first  = new Node(10, null);
+Node second = new Node(20, null);
+Node third  = new Node(30, null);
+Node head = first;</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> What does the traversal loop print now, and why?</p> <details class="soln"><summary></summary><div class="ans"> <p>It prints <code>10 --&gt; null</code>. Three <code>Node</code> objects exist, but none of them points at another: every <code>next</code> was set to <code>null</code>. The walker starts at <code>first</code>, prints 10, then <code>n = n.getNext()</code> makes <code>n</code> <code>null</code> and the loop ends. The 20 and the 30 are perfectly good objects that simply are not in the list.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Add the two statements that repair the chain, without creating any new <code>Node</code>.</p> <details class="soln"><summary></summary><div class="ans"> <pre><code class="language-java">first.setNext(second);      // the 10 node now points at the 20 node
+second.setNext(third);      // the 20 node now points at the 30 node</code></pre> <p>Now the arrows exist and the same loop prints <code>10 --&gt; 20 --&gt; 30 --&gt; null</code>.</p> <p><strong>Things to notice across both parts.</strong> Creating the objects and linking them are two separate jobs. Building back to front lets the constructor do the linking for you (<code>new Node(20, third)</code>); building front to back means you must come back with <code>setNext</code> afterwards. Both are fine &mdash; what is not fine is doing only half of it, which is the most common way a first linked list quietly loses its data.</p> </div></details> </div> </div> </div> <h2 id="s3"><span class="num">3.</span>Building the <code>LinkedList</code>: <code>addHead</code>, <code>addTail</code>, <code>removeHead</code></h2> <p>Handling loose <code>Node</code> variables works, but it puts the bookkeeping on whoever uses the list. Wrap it in a class instead. The class holds three private fields &mdash; the head, the tail and the size &mdash; and every method's job is to keep all three consistent.</p> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; the three invariants a list method must preserve</span></div> <div class="bd"> <p>Every method you write on this class must leave all three of these true:</p> <ol> <li><code>head</code> refers to the first node, or is <code>null</code> if the list is empty.</li> <li><code>tail</code> refers to the <em>last</em> node &mdash; the one whose <code>next</code> is <code>null</code> &mdash; or is <code>null</code> if the list is empty.</li> <li><code>size</code> equals the number of nodes reachable from <code>head</code>.</li> </ol> <p>Almost every linked-list bug you will ever write is one of these three quietly going false. When a list misbehaves, check them in order.</p> </div> </div> <p>Here is the class from the Spring 2025 notes, in full.</p> <p class="filename">LinkedList.java</p>
+<pre><code class="language-java">public class LinkedList {
+   // Instance variables
+   private Node head, tail;  // References to first and last nodes
+   private int size;         // Number of elements in the list
+
+   // Constructor
+   public LinkedList() {
+      head = tail = null;    // Empty list has no nodes
+      size = 0;
+   }
+
+   // Utility methods
+   public int size() {
+      return size;
+   }
+
+   public boolean isEmpty() {
+      return size == 0;
+   }
+
+   // Add element to the front of the list
+   public void addHead(Integer d) {
+      // Create new node that points to current head
+      Node n = new Node(d, head);
+      head = n;              // New node becomes the head
+      size++;
+      if (tail == null)      // If list was empty
+         tail = head;        // Head is also the tail
+   }
+
+   // Add element to the end of the list
+   public void addTail(Integer d) {
+      Node n = new Node(d, null);
+      if (tail == null)      // If list is empty
+         head = tail = n;    // New node is both head and tail
+      else {
+         tail.setNext(n);    // Current tail points to new node
+         tail = n;           // New node becomes the tail
+      }
+      size++;
+   }
+
+   // Remove the first element
+   public Integer removeHead() throws Exception {
+      if (head == null)
+         throw new Exception("Empty List");
+      Node n = head;
+      head = head.getNext(); // Second node becomes head
+      if (head == null)      // If list becomes empty
+         tail = head;        // Tail is also null
+      size--;
+      return n.getData();    // Return removed value
+   }
+
+   // Display the list
+   public String toString() {
+      String ans = "";
+      Node n = head;
+      while (n != null) {
+         ans += n.getData();
+         ans += "--&gt;";
+         n = n.getNext();
+      }
+      return ans;
+   }
+}</code></pre> <p>Read the three interesting methods one at a time.</p> <p><strong><code>addHead</code> is two lines plus a special case.</strong> <code>new Node(d, head)</code> builds a node whose <code>next</code> is whatever the head currently is &mdash; that is the entire insertion. Then <code>head</code> is moved to the new node. If the list was empty, <code>head</code> was <code>null</code>, so the new node's <code>next</code> is <code>null</code>, which is correct; the only extra work is pointing <code>tail</code> at it too, because a one-node list has the same node as head and tail.</p> <p class="filename">addHead(5) on the list 10 20 30</p>
+<pre class="cmp"><code>before      head ---&gt; [10| o-]--&gt;[20| o-]--&gt;[30|null] &lt;--- tail
+
+new Node(5, head)
+            head ---&gt; [10| o-]--&gt;[20| o-]--&gt;[30|null] &lt;--- tail
+                       ^
+            [ 5| o-]---/
+
+head = n
+            head ---&gt; [ 5| o-]--&gt;[10| o-]--&gt;[20| o-]--&gt;[30|null] &lt;--- tail</code></pre> <p><strong><code>addTail</code> needs the <code>tail</code> field to be fast.</strong> Without it you would have to walk the whole list to find the last node every single time. With it, appending is: build a node, point the old tail at it, and move <code>tail</code>. The <code>if (tail == null)</code> branch covers the empty list, where there is no old tail to point at and the new node becomes both ends.</p> <p><strong><code>removeHead</code> is where the exception lives.</strong> There is no sensible <code>Integer</code> to return from an empty list, so the method throws instead &mdash; the Lecture 20 material, used in anger on the first day it is available. Note the signature: <code>throws Exception</code> is a <em>checked</em> exception, so every caller must either catch it or declare <code>throws</code> itself. That is not an accident; it forces the caller to decide what an empty list means for their program.</p> <div class="box qc"> <div class="hd">Quick Check 21.3</div> <div class="bd"> <p>Suppose the class had no <code>tail</code> field at all &mdash; only <code>head</code> and <code>size</code>.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Write <code>addTail</code> under that restriction.</p> <details class="soln"><summary></summary><div class="ans"> <p>You would have to find the last node yourself, by walking there:</p> <pre><code class="language-java">public void addTail(Integer d) {
+    Node n = new Node(d, null);
+    if (head == null) {          // empty list: the new node is the head
+        head = n;
+    } else {
+        Node p = head;
+        while (p.getNext() != null) p = p.getNext();   // walk to the last node
+        p.setNext(n);
+    }
+    size++;
+}</code></pre> <p>Note the loop condition: <code>p.getNext() != null</code>, not <code>p != null</code>. You want to stop <em>on</em> the last node, not one past it &mdash; if <code>p</code> became <code>null</code> you would have nothing to call <code>setNext</code> on.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Which of <code>addHead</code>, <code>addTail</code> and <code>removeHead</code> would get slower, and by how much?</p> <details class="soln"><summary></summary><div class="ans"> <p>Only <code>addTail</code>, and it goes from a fixed handful of steps to one step per node in the list. Building a list of 1,000 elements with <code>addTail</code> would do about half a million pointer-follows instead of 1,000.</p> <p><code>addHead</code> and <code>removeHead</code> are untouched, because they only ever work at the front, which <code>head</code> already gives you directly.</p> <p><strong>Things to notice across both parts.</strong> The <code>tail</code> field is not decoration &mdash; it is the entire reason <code>enqueue</code> is cheap, and therefore the reason a <code>Queue</code> built on this list is worth having. Extra fields that make an operation fast are a standard trade: you pay a little memory and a little bookkeeping (every method that could change the last node must maintain <code>tail</code>) to make a common operation cheap.</p> </div></details> </div> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; exercising every method</span></div> <div class="bd"> <p>This driver adds at both ends, removes, empties the list completely, and then adds again. That last step is the interesting one: after the list has been drained, is it still usable? Predict the whole output, and pay attention to how <code>toString</code> renders the list.</p> <p class="filename">ListDemo.java</p>
+<pre><code class="language-java">public class ListDemo {
+    public static void main(String args[]) throws Exception {
+        LinkedList list = new LinkedList();
+        System.out.println("empty?  " + list.isEmpty() + "   size " + list.size());
+
+        list.addTail(10);
+        list.addTail(20);
+        list.addTail(30);
+        System.out.println("addTail 10,20,30 -&gt; " + list);
+
+        list.addHead(5);
+        System.out.println("addHead 5        -&gt; " + list);
+
+        System.out.println("size " + list.size() + "   empty? " + list.isEmpty());
+
+        System.out.println("removeHead gives " + list.removeHead());
+        System.out.println("now              -&gt; " + list);
+
+        while (!list.isEmpty()) list.removeHead();
+        System.out.println("after emptying   -&gt; [" + list + "]  size " + list.size());
+
+        // Now the list is empty again. Does it still work?
+        list.addTail(99);
+        System.out.println("addTail 99       -&gt; " + list);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>empty?  true   size 0
+addTail 10,20,30 -&gt; 10--&gt;20--&gt;30--&gt;
+addHead 5        -&gt; 5--&gt;10--&gt;20--&gt;30--&gt;
+size 4   empty? false
+removeHead gives 5
+now              -&gt; 10--&gt;20--&gt;30--&gt;
+after emptying   -&gt; []  size 0
+addTail 99       -&gt; 99--&gt;</code></pre> <p>Three things to pull out.</p> <ul> <li><strong><code>main</code> is declared <code>throws Exception</code>.</strong> <code>removeHead</code> throws a checked exception, so <code>main</code> has to say something about it. Declaring <code>throws</code> on <code>main</code> is the lazy option and it is fine for a driver; in real code you would catch it where you can do something useful. We do exactly that in &sect;5.</li> <li><strong><code>toString</code> puts an arrow after the <em>last</em> element too.</strong> <code>10--&gt;20--&gt;30--&gt;</code> has a trailing <code>--&gt;</code> because the loop appends the arrow after every node without asking whether it is the last one. That is the instructor's implementation and it is what your list will print. Fixing it is a one-line change &mdash; append the arrow only when <code>n.getNext() != null</code> &mdash; but leave it alone for now, because every output on this page was produced by the class exactly as she wrote it.</li> <li><strong>The list survives being emptied.</strong> <code>addTail(99)</code> on the drained list gives <code>99--&gt;</code>, which is only correct because <code>removeHead</code> reset <code>tail</code> to <code>null</code> when the last node went. Take that line out and the list breaks in a way that is genuinely hard to see &mdash; as the next box shows.</li> </ul> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; forgetting to reset the tail</span></div> <div class="bd"> <p>The two lines inside <code>removeHead</code> that look like a formality are not:</p> <pre><code class="language-java">if (head == null)      // If list becomes empty
+   tail = head;        // Tail is also null</code></pre> <p>Delete them and every existing test still passes, because nothing that only adds and reads can tell the difference. The damage appears one step later. Here is a copy of the class with exactly those two lines removed:</p> <p class="filename">BadListDemo.java</p>
+<pre><code class="language-java">// A deliberately broken copy of removeHead: it forgets to reset the tail
+// when the last node is removed. Everything else is identical.
+class BadList {
+    private Node head, tail;
+    private int size;
+
+    public BadList() { head = tail = null; size = 0; }
+
+    public boolean isEmpty() { return size == 0; }
+    public int size() { return size; }
+
+    public void addTail(Integer d) {
+        Node n = new Node(d, null);
+        if (tail == null) head = tail = n;
+        else { tail.setNext(n); tail = n; }
+        size++;
+    }
+
+    public Integer removeHead() throws Exception {
+        if (head == null) throw new Exception("Empty List");
+        Node n = head;
+        head = head.getNext();
+        // MISSING: if (head == null) tail = null;
+        size--;
+        return n.getData();
+    }
+
+    public String toString() {
+        String ans = "";
+        Node n = head;
+        while (n != null) { ans += n.getData(); ans += "--&gt;"; n = n.getNext(); }
+        return ans;
+    }
+}
+
+public class BadListDemo {
+    public static void main(String args[]) throws Exception {
+        BadList list = new BadList();
+        list.addTail(10);
+        list.removeHead();                 // list is now empty...
+        System.out.println("size after removing the only node: " + list.size());
+        System.out.println("list prints as: [" + list + "]");
+        list.addTail(99);                  // ...but tail still points at the dead node
+        System.out.println("after addTail(99): [" + list + "]   size " + list.size());
+    }
+}</code></pre> <pre class="out"><code>size after removing the only node: 0
+list prints as: []
+after addTail(99): []   size 1</code></pre> <p>The list now claims to hold one element and prints as empty. <code>tail</code> was still pointing at the removed 10, so <code>addTail(99)</code> attached the 99 to a node that <code>head</code> can no longer reach. The 99 exists; it is simply not in the list. Invariants 2 and 3 both went false, and no exception was thrown to tell you.</p> <p>This is the shape of most linked-list bugs: not a crash, but a structure that lies about itself. Check the invariants after every method you write, especially in the empty-list and last-node cases.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 21.4</div> <div class="bd"> <p>Predict the exact output of this program, using the instructor's <code>LinkedList</code>.</p> <pre><code class="language-java">public class TraceDemo {
+    public static void main(String args[]) throws Exception {
+        LinkedList list = new LinkedList();
+        list.addHead(1);
+        list.addTail(2);
+        list.addHead(3);
+        list.addTail(4);
+        System.out.println(list);              // line (a)
+        System.out.println(list.size());       // line (b)
+        list.removeHead();
+        list.addHead(5);
+        System.out.println(list);              // line (c)
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Keep a running picture. <code>addHead</code> puts the value on the left end, <code>addTail</code> on the right end, <code>removeHead</code> takes from the left. Track <code>head</code> and <code>tail</code> as well as the contents &mdash; that is what the trace table is for.</p> <table class="trace"> <tr><th>Statement</th><th>List afterwards</th><th><code>head</code></th><th><code>tail</code></th><th><code>size</code></th></tr> <tr><td><code>new LinkedList()</code></td><td>(empty)</td><td><code>null</code></td><td><code>null</code></td><td>0</td></tr> <tr><td><code>addHead(1)</code></td><td>1</td><td>1</td><td>1</td><td>1</td></tr> <tr><td><code>addTail(2)</code></td><td>1, 2</td><td>1</td><td>2</td><td>2</td></tr> <tr><td><code>addHead(3)</code></td><td>3, 1, 2</td><td>3</td><td>2</td><td>3</td></tr> <tr><td><code>addTail(4)</code></td><td>3, 1, 2, 4</td><td>3</td><td>4</td><td>4</td></tr> <tr><td><code>removeHead()</code></td><td>1, 2, 4</td><td>1</td><td>4</td><td>3</td></tr> <tr><td><code>addHead(5)</code></td><td>5, 1, 2, 4</td><td>5</td><td>4</td><td>4</td></tr> </table> <pre class="out"><code>3--&gt;1--&gt;2--&gt;4--&gt;
+4
+5--&gt;1--&gt;2--&gt;4--&gt;</code></pre> <p><strong>Things to notice.</strong> The very first <code>addHead(1)</code> is the empty-list case: <code>tail</code> was <code>null</code>, so the <code>if</code> fired and <code>tail</code> became the new node. Every later <code>addHead</code> leaves <code>tail</code> alone, because the list already had a last node and the last node did not change. Also note the trailing <code>--&gt;</code> on lines (a) and (c) &mdash; that is <code>toString</code>, not a fourth element.</p> </div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 21.5</div> <div class="bd"> <p>Add two methods to <code>LinkedList</code>: <code>sum()</code>, returning the total of every value in the list (<code>0</code> for an empty list), and <code>count()</code>, returning the number of nodes by <em>walking the chain</em> rather than returning the <code>size</code> field. Then write a <code>main</code> that tests both, including on an empty list.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Both methods are the same traversal loop with a different accumulator. Start the walker at <code>head</code>, loop while it is not <code>null</code>, do the work, step forward. Neither method modifies anything, so neither can break an invariant, and neither needs to throw: an empty list has a perfectly good sum of 0 and count of 0.</p> <p>Both go inside <code>LinkedList.java</code>, alongside the methods that are already there &mdash; they need direct access to the private <code>head</code> field, which is exactly why they belong in the class rather than in the driver.</p> <p class="filename">LinkedList.java</p>
+<pre><code class="language-java">// Add up every value in the list.
+public int sum() {
+   int total = 0;
+   Node n = head;
+   while (n != null) {
+      total += n.getData();
+      n = n.getNext();
+   }
+   return total;
+}
+
+// Count the nodes by walking, instead of trusting the size field.
+public int count() {
+   int c = 0;
+   Node n = head;
+   while (n != null) {
+      c++;
+      n = n.getNext();
+   }
+   return c;
+}</code></pre> <p class="filename">SumDemo.java</p>
+<pre><code class="language-java">public class SumDemo {
+    public static void main(String args[]) {
+        LinkedList list = new LinkedList();
+        list.addTail(10);
+        list.addTail(20);
+        list.addTail(30);
+        System.out.println("list  " + list);
+        System.out.println("sum   " + list.sum());
+        System.out.println("count " + list.count() + "   size " + list.size());
+
+        LinkedList empty = new LinkedList();
+        System.out.println("empty sum " + empty.sum() + "   count " + empty.count());
+    }
+}</code></pre> <pre class="out"><code>list  10--&gt;20--&gt;30--&gt;
+sum   60
+count 3   size 3
+empty sum 0   count 0</code></pre> <p><strong>Things to notice.</strong> <code>total += n.getData()</code> mixes an <code>int</code> with an <code>Integer</code>; Java unboxes the <code>Integer</code> automatically. That is convenient but it is also where a <code>null</code> data value would blow up with a <code>NullPointerException</code>, since there is no number inside a <code>null</code> to add.</p> <p><code>count()</code> looks redundant next to <code>size</code>, and in a correct list it is. That is precisely why it is useful: writing a test that asserts <code>count() == size()</code> catches the class of bug the previous warning box describes, where the <code>size</code> field and the actual chain disagree. In production you keep the <code>size</code> field, because returning it is instant while counting costs a full walk of the list.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 21.5</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="16" aria-label="Live coding - Quick Check 21.5">public class SumDemo {
+    public static void main(String args[]) {
+        LinkedList list = new LinkedList();
+        list.addTail(10);
+        list.addTail(20);
+        list.addTail(30);
+
+        // Add sum() and count() to LinkedList, then call them here.
+        // Both are the same traversal loop with a different accumulator:
+        //     Node n = head;
+        //     while (n != null) { ... ; n = n.getNext(); }
+
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s4"><span class="num">4.</span>Traversal, search and deletion &mdash; the pointer surgery</h2> <p>Her class can add at both ends and remove from the front. That is enough to build a stack and a queue, which is where we are going, but a list you cannot search or delete from the middle is not much of a list. Three more methods finish the job, and the third one is the one students lose the thread on, so we will go through it slowly.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; traversal</span></div> <div class="bd"> <p>A <strong>traversal</strong> is a walk from the head to the end of the list, visiting each node once. It is the only way to reach an element that is not the head, and it costs one step per node &mdash; so a linked list has no fast <code>get(i)</code>.</p> <p>Every method in this section is a traversal that stops somewhere interesting.</p> </div> </div> <p><code>contains</code> and <code>indexOf</code> stop when they find the value. <code>remove</code> stops at the node <em>before</em> the one it wants to unhook, and that difference is the whole trick.</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; to delete a node, you need the node in front of it</span></div> <div class="bd"> <p>A singly linked node has no arrow pointing backwards. To remove the node holding 30 from <code>10 --&gt; 20 --&gt; 30 --&gt; 40</code>, you must change the <code>next</code> of the node holding 20 &mdash; and from 30 there is no way to reach 20. So the search loop must stop <em>one node early</em>, holding a reference conventionally called <code>prev</code>.</p> </div> </div> <p class="filename">Deleting the 30 from 10 20 30 40</p>
+<pre class="cmp"><code>before                       prev       victim
+                              |          |
+                              v          v
+         head --&gt; [10| o-]--&gt;[20| o-]--&gt;[30| o-]--&gt;[40|null] &lt;-- tail
+
+prev.setNext(victim.getNext())
+
+after    head --&gt; [10| o-]--&gt;[20| o-]------------\
+                                                  \
+                                    [30| o-]       &gt;[40|null] &lt;-- tail
+                                    (unreachable)
+
+         the 30 node still exists, but nothing points at it any more, so the
+         garbage collector reclaims it. No shifting, one assignment.</code></pre> <p>Here is the complete class with the three methods added. Everything above the comment line is unchanged from &sect;3.</p> <p class="filename">LinkedList.java</p>
+<pre><code class="language-java">public class LinkedList {
+   private Node head, tail;
+   private int size;
+
+   public LinkedList() { head = tail = null; size = 0; }
+
+   public int size()          { return size; }
+   public boolean isEmpty()   { return size == 0; }
+
+   public void addHead(Integer d) {
+      Node n = new Node(d, head);
+      head = n;
+      size++;
+      if (tail == null) tail = head;
+   }
+
+   public void addTail(Integer d) {
+      Node n = new Node(d, null);
+      if (tail == null) head = tail = n;
+      else { tail.setNext(n); tail = n; }
+      size++;
+   }
+
+   public Integer removeHead() throws Exception {
+      if (head == null) throw new Exception("Empty List");
+      Node n = head;
+      head = head.getNext();
+      if (head == null) tail = head;
+      size--;
+      return n.getData();
+   }
+
+   // ---- the three new methods -------------------------------------------
+
+   // Does the list contain this value? Traversal, stopping early on a hit.
+   public boolean contains(Integer d) {
+      Node n = head;
+      while (n != null) {
+         if (n.getData().equals(d)) return true;
+         n = n.getNext();
+      }
+      return false;
+   }
+
+   // Position of the first node holding d, or -1 if there is none.
+   public int indexOf(Integer d) {
+      Node n = head;
+      int i = 0;
+      while (n != null) {
+         if (n.getData().equals(d)) return i;
+         n = n.getNext();
+         i++;
+      }
+      return -1;
+   }
+
+   // Remove the first node holding d. Returns true if something was removed.
+   public boolean remove(Integer d) {
+      if (head == null) return false;
+
+      if (head.getData().equals(d)) {        // case 1: it is the head
+         head = head.getNext();
+         if (head == null) tail = null;      // the list is now empty
+         size--;
+         return true;
+      }
+
+      Node prev = head;                      // case 2: it is further along
+      while (prev.getNext() != null &amp;&amp; !prev.getNext().getData().equals(d))
+         prev = prev.getNext();
+
+      if (prev.getNext() == null) return false;   // ran off the end: not found
+
+      Node victim = prev.getNext();
+      prev.setNext(victim.getNext());        // the one link that does the work
+      if (victim == tail) tail = prev;       // we just removed the last node
+      size--;
+      return true;
+   }
+
+   public String toString() {
+      String ans = "";
+      Node n = head;
+      while (n != null) {
+         ans += n.getData();
+         ans += "--&gt;";
+         n = n.getNext();
+      }
+      return ans;
+   }
+}</code></pre> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; comparing <code>Integer</code> values with <code>==</code></span></div> <div class="bd"> <p>The search loops use <code>n.getData().equals(d)</code>, not <code>n.getData() == d</code>. The data is an <code>Integer</code>, which is an <em>object</em>, so <code>==</code> compares references &mdash; the Lecture 9 lesson, in a new place. It appears to work for small values because Java caches the <code>Integer</code> objects for &minus;128 through 127 and hands out the same one every time, and then silently stops working at 128. Use <code>equals</code> for every wrapper and every <code>String</code>, always.</p> </div> </div> <p>Two more things about <code>remove</code> before the example.</p> <ul> <li><strong>The head is a separate case.</strong> There is no node in front of the head, so there is no <code>prev</code> to re-point. Instead you move <code>head</code> itself. Every deletion routine you ever write on a singly linked list will have this shape: a special case for the front, then a general loop for everything else.</li> <li><strong>The condition is written in that order for a reason.</strong> <code>prev.getNext() != null &amp;&amp; !prev.getNext().getData().equals(d)</code> tests for the end of the list <em>first</em>. <code>&amp;&amp;</code> short-circuits, so when <code>prev</code> is the last node the second half is never evaluated and there is no <code>NullPointerException</code>. Swap the two halves and the method crashes on every search that fails.</li> </ul> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; every deletion case in one run</span></div> <div class="bd"> <p>This driver removes from the middle, then from the front, then the last node, then asks for something that is not there &mdash; and finally appends, to prove the <code>tail</code> survived. Work out all four <code>remove</code> results before you look.</p> <p class="filename">SearchDemo.java</p>
+<pre><code class="language-java">public class SearchDemo {
+    public static void main(String args[]) {
+        LinkedList list = new LinkedList();
+        for (int i = 10; i &lt;= 50; i += 10) list.addTail(i);
+        System.out.println("list      " + list + "   size " + list.size());
+
+        System.out.println("contains(30)  " + list.contains(30));
+        System.out.println("contains(35)  " + list.contains(35));
+        System.out.println("indexOf(30)   " + list.indexOf(30));
+        System.out.println("indexOf(35)   " + list.indexOf(35));
+
+        System.out.println("remove(30)    " + list.remove(30) + "   " + list);
+        System.out.println("remove(10)    " + list.remove(10) + "   " + list);
+        System.out.println("remove(50)    " + list.remove(50) + "   " + list);
+        System.out.println("remove(99)    " + list.remove(99) + "   " + list);
+        System.out.println("size " + list.size());
+
+        // The tail must still be right after removing the last node.
+        list.addTail(60);
+        System.out.println("addTail(60)   " + list);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>list      10--&gt;20--&gt;30--&gt;40--&gt;50--&gt;   size 5
+contains(30)  true
+contains(35)  false
+indexOf(30)   2
+indexOf(35)   -1
+remove(30)    true   10--&gt;20--&gt;40--&gt;50--&gt;
+remove(10)    true   20--&gt;40--&gt;50--&gt;
+remove(50)    true   20--&gt;40--&gt;
+remove(99)    false   20--&gt;40--&gt;
+size 2
+addTail(60)   20--&gt;40--&gt;60--&gt;</code></pre> <p>Here is <code>remove(30)</code> step by step. <code>prev</code> starts at the head and stops as soon as the node <em>after</em> it holds 30.</p> <table class="trace"> <tr><th>Step</th><th><code>prev</code> is at</th><th><code>prev.getNext()</code> is</th><th>Condition</th><th>Action</th></tr> <tr><td>1</td><td>10</td><td>20</td><td>not null, and 20 is not 30 &rarr; keep going</td><td><code>prev = prev.getNext()</code></td></tr> <tr><td>2</td><td>20</td><td>30</td><td>not null, but 30 <em>is</em> 30 &rarr; stop</td><td>exit the loop</td></tr> <tr><td>3</td><td>20</td><td>30</td><td>&mdash;</td><td><code>victim = prev.getNext()</code> &mdash; the 30 node</td></tr> <tr><td>4</td><td>20</td><td>40</td><td>&mdash;</td><td><code>prev.setNext(victim.getNext())</code> &mdash; 20 now points at 40</td></tr> <tr><td>5</td><td>&mdash;</td><td>&mdash;</td><td><code>victim == tail</code>? no</td><td><code>tail</code> unchanged; <code>size</code> becomes 4</td></tr> </table> <p>And the four calls cover the four cases you must always test:</p> <table class="trace"> <tr><th>Call</th><th>Case</th><th>What changes</th></tr> <tr><td><code>remove(30)</code></td><td>middle</td><td>one <code>setNext</code> on the node before it</td></tr> <tr><td><code>remove(10)</code></td><td>front</td><td><code>head</code> moves forward; no <code>prev</code> involved</td></tr> <tr><td><code>remove(50)</code></td><td>last node</td><td>the <code>setNext</code>, <em>and</em> <code>tail</code> moves back to <code>prev</code></td></tr> <tr><td><code>remove(99)</code></td><td>not present</td><td>nothing &mdash; the loop runs off the end and returns <code>false</code></td></tr> </table> <p>The final <code>addTail(60)</code> is the proof that <code>if (victim == tail) tail = prev;</code> was needed. Without it, <code>tail</code> would still point at the removed 50 and the 60 would be attached to a node that is no longer in the list &mdash; the same silent corruption as the warning box in &sect;3, in a different method.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 21.6</div> <div class="bd"> <p>A student writes this version of <code>remove</code>, which does not bother with <code>prev</code>:</p> <pre><code class="language-java">public boolean remove(Integer d) {
+    Node n = head;
+    while (n != null) {
+        if (n.getData().equals(d)) {
+            n = n.getNext();          // "skip over" the node
+            size--;
+            return true;
+        }
+        n = n.getNext();
+    }
+    return false;
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> The list is <code>10--&gt;20--&gt;30--&gt;</code>. After <code>remove(20)</code>, what does the list print?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>10--&gt;20--&gt;30--&gt;</code> &mdash; completely unchanged. The method returns <code>true</code> and decrements <code>size</code>, but it removed nothing.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Explain exactly why. What does <code>n = n.getNext();</code> actually change?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>n</code> is a <em>local reference variable</em>. Assigning to it moves the arrow that <code>n</code> holds; it does not touch any <code>Node</code> object and it certainly does not touch the <code>next</code> field of the node before it. This is the Lecture 8 distinction between <em>rebinding a variable</em> and <em>mutating an object</em>: you have rebound <code>n</code>, and nothing in the list has been mutated.</p> <p>To actually unhook the 20 you must call <code>setNext</code> <em>on the node holding 10</em>, and the only way to have that node in your hand is to have stopped the walk one step earlier. That is what <code>prev</code> is for.</p> <p><strong>Things to notice across both parts.</strong> The bug is worse than a no-op, because <code>size--</code> still ran. The list now says its size is 2 while holding three nodes, so invariant 3 is false and, for instance, <code>while (!list.isEmpty()) list.removeHead();</code> would leave one node behind. A method that lies is harder to debug than a method that crashes.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 21.7</div> <div class="bd"> <p>Write a method <code>max()</code> for <code>LinkedList</code> that returns the largest value in the list, and <code>throws Exception</code> with the message <code>"Empty List"</code> if the list is empty. Then write a <code>main</code> that tests it on a list and on an empty list, catching the exception.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> An empty list has no maximum, so this is a genuine error case &mdash; exactly like <code>removeHead</code>, and it should behave the same way. Otherwise it is the standard traversal, with the running answer seeded from the first node rather than from a made-up value like <code>0</code> (which would be wrong for a list of negative numbers).</p> <p class="filename">LinkedList.java</p>
+<pre><code class="language-java">// The largest value in the list. An empty list has no largest value.
+public Integer max() throws Exception {
+   if (head == null)
+      throw new Exception("Empty List");
+   Integer best = head.getData();
+   Node n = head.getNext();          // start comparing from the second node
+   while (n != null) {
+      if (n.getData() &gt; best) best = n.getData();
+      n = n.getNext();
+   }
+   return best;
+}</code></pre> <p class="filename">MaxDemo.java</p>
+<pre><code class="language-java">public class MaxDemo {
+    public static void main(String args[]) {
+        LinkedList list = new LinkedList();
+        list.addTail(-9);
+        list.addTail(-3);
+        list.addTail(-7);
+
+        try {
+            System.out.println("list " + list + "   max " + list.max());
+        } catch (Exception e) {
+            System.out.println("caught: " + e.getMessage());
+        }
+
+        LinkedList empty = new LinkedList();
+        try {
+            System.out.println("empty max " + empty.max());
+        } catch (Exception e) {
+            System.out.println("caught: " + e.getMessage());
+        }
+    }
+}</code></pre> <pre class="out"><code>list -9--&gt;-3--&gt;-7--&gt;   max -3
+caught: Empty List</code></pre> <p><strong>Things to notice.</strong> Seeding <code>best</code> with <code>0</code> would have returned <code>0</code> for this list, which is not even in it. Seeding from the first element is the safe habit, and it is the reason the method has to reject the empty list: there is no first element to seed from.</p> <p><code>n.getData() &gt; best</code> compares two <code>Integer</code> objects with <code>&gt;</code>. That is legal, and unlike <code>==</code> it is safe, because <code>&gt;</code> has no meaning for references so Java unboxes both sides to <code>int</code> and compares numbers. <code>==</code> is the one operator that does something different, which is exactly why it is the one that catches people out.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 21.7</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="15" aria-label="Live coding - Quick Check 21.7">public class MaxDemo {
+    public static void main(String args[]) {
+        LinkedList list = new LinkedList();
+        list.addTail(-9);
+        list.addTail(-3);
+        list.addTail(-7);
+
+        // 1. Add max() to LinkedList. Throw new Exception("Empty List") if head is null.
+        // 2. Call it here inside a try/catch and print the result.
+        // 3. Then try it on a brand new, empty LinkedList.
+
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s5"><span class="num">5.</span><code>Stack</code>: last in, first out</h2> <p>Now the payoff. A stack and a queue are not new storage &mdash; they are the list you already have, with a rule about where you are allowed to touch it.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; stack, LIFO</span></div> <div class="bd"> <p>A <strong>stack</strong> is a linear data structure that follows the <strong>Last-In-First-Out</strong> (LIFO) principle: the last element added is the first one removed. Elements are added to the <em>top</em> (<code>push</code>) and removed from the <em>top</em> (<code>pop</code>). Looking at the top without removing it is <code>peek</code>.</p> <p>The picture is a stack of plates. You put a plate on top; you take a plate off the top; you never reach into the middle.</p> </div> </div> <p>The list gives us <code>addHead</code> and <code>removeHead</code>, and both of them work at the same end. That end is the top of the stack, and that is the entire implementation.</p> <p class="filename">Stack.java</p>
+<pre><code class="language-java">public class Stack {
+   private LinkedList data;  // The underlying LinkedList
+
+   public Stack() {
+      data = new LinkedList();
+   }
+
+   // Remove from top (LIFO principle)
+   public Integer pop() throws Exception {
+      return data.removeHead();
+   }
+
+   // Add to top
+   public void push(Integer x) {
+      data.addHead(x);
+   }
+
+   // Additional useful methods
+   public boolean isEmpty() {
+      return data.isEmpty();
+   }
+
+   public int size() {
+      return data.size();
+   }
+}</code></pre> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; the stack owns a list; it is not a list</span></div> <div class="bd"> <p><code>private LinkedList data;</code> is <strong>composition</strong>, not inheritance. The <code>Stack</code> <em>has a</em> list rather than <em>being</em> one, and because <code>data</code> is private, nobody outside can call <code>addTail</code> on it. That is the point: the restriction <em>is</em> the data structure. A stack is exactly a list that has had every operation except the two at the front taken away.</p> <p>Every method here is a one-liner. There is no new storage code anywhere in this file, which is a good sign that you built the list right.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; push, pop, and popping an empty stack</span></div> <div class="bd"> <p>This driver pushes 1, 2, 3, pops twice, pushes a 4, drains the stack, and then pops once more from an empty stack. Write down all four popped values in order, and decide what you think the last <code>pop</code> does, before you reveal.</p> <p class="filename">StackDemo.java</p>
+<pre><code class="language-java">public class StackDemo {
+    public static void main(String args[]) {
+        Stack s = new Stack();
+        s.push(1);
+        s.push(2);
+        s.push(3);
+        System.out.println("size " + s.size() + "   empty? " + s.isEmpty());
+
+        try {
+            System.out.println("pop " + s.pop());
+            System.out.println("pop " + s.pop());
+            s.push(4);
+            while (!s.isEmpty()) System.out.println("pop " + s.pop());
+            System.out.println("pop from an empty stack:");
+            System.out.println(s.pop());
+        } catch (Exception e) {
+            System.out.println("caught: " + e.getMessage());
+        }
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>size 3   empty? false
+pop 3
+pop 2
+pop 4
+pop 1
+pop from an empty stack:
+caught: Empty List</code></pre> <p>Trace the underlying list. <code>push</code> is <code>addHead</code>, so the newest value is always leftmost, and <code>pop</code> is <code>removeHead</code>, so it always takes the leftmost.</p> <table class="trace"> <tr><th>Statement</th><th>The list inside</th><th>Returned</th></tr> <tr><td><code>push(1)</code></td><td><code>1</code></td><td>&mdash;</td></tr> <tr><td><code>push(2)</code></td><td><code>2 --&gt; 1</code></td><td>&mdash;</td></tr> <tr><td><code>push(3)</code></td><td><code>3 --&gt; 2 --&gt; 1</code></td><td>&mdash;</td></tr> <tr><td><code>pop()</code></td><td><code>2 --&gt; 1</code></td><td><code>3</code></td></tr> <tr><td><code>pop()</code></td><td><code>1</code></td><td><code>2</code></td></tr> <tr><td><code>push(4)</code></td><td><code>4 --&gt; 1</code></td><td>&mdash;</td></tr> <tr><td><code>pop()</code></td><td><code>1</code></td><td><code>4</code></td></tr> <tr><td><code>pop()</code></td><td>(empty)</td><td><code>1</code></td></tr> <tr><td><code>pop()</code></td><td>(empty)</td><td>throws <code>Exception("Empty List")</code></td></tr> </table> <p><strong>The <code>push(4)</code> in the middle is the part people get wrong.</strong> It does not go to the bottom or to some remembered position &mdash; it goes on top of what is left, so it comes back out <em>before</em> the 1 that was pushed first and has been sitting there the whole time.</p> <p><strong>Popping an empty stack throws.</strong> <code>pop</code> calls <code>removeHead</code>, which sees <code>head == null</code> and throws <code>new Exception("Empty List")</code>. It does not return <code>null</code> and it does not return a sentinel like &minus;1 &mdash; and that is the right choice, because <code>null</code> and &minus;1 are both values a caller might legitimately have pushed. Because <code>Exception</code> is a checked exception, the compiler will not let you call <code>pop</code> without a <code>try</code>/<code>catch</code> or a <code>throws</code> on your own method.</p> <p>Left uncaught, it ends the program:</p> <p class="filename">PopEmpty.java</p>
+<pre><code class="language-java">public class PopEmpty {
+    public static void main(String args[]) throws Exception {
+        Stack s = new Stack();
+        System.out.println("about to pop an empty stack");
+        System.out.println(s.pop());
+        System.out.println("this line never runs");
+    }
+}</code></pre> <pre class="out"><code>about to pop an empty stack
+Exception in thread "main" java.lang.Exception: Empty List
+	at LinkedList.removeHead(LinkedList.java:46)
+	at Stack.pop(Stack.java:10)
+	at PopEmpty.main(PopEmpty.java:5)</code></pre> <p>Read that stack trace from the bottom up and it tells you the whole story: <code>main</code> called <code>Stack.pop</code>, which called <code>LinkedList.removeHead</code>, which threw. The line numbers depend on how your files are laid out, but the order of the calls does not.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 21.8</div> <div class="bd"> <p>A stack starts empty. Perform, in order: <code>push(4)</code>, <code>push(7)</code>, <code>pop()</code>, <code>push(1)</code>, <code>push(9)</code>, <code>pop()</code>, <code>pop()</code>, <code>push(2)</code>.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> What values did the three <code>pop()</code> calls return, in order?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>7</code>, then <code>9</code>, then <code>1</code>. Each <code>pop</code> takes whatever is on top at that moment, so you have to interleave the operations rather than reading all the pushes first.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What is in the stack at the end, from top to bottom, and what is <code>size()</code>?</p> <details class="soln"><summary></summary><div class="ans"> <table class="trace"> <tr><th>Operation</th><th>Stack, top on the left</th><th>Returned</th></tr> <tr><td><code>push(4)</code></td><td><code>4</code></td><td>&mdash;</td></tr> <tr><td><code>push(7)</code></td><td><code>7 4</code></td><td>&mdash;</td></tr> <tr><td><code>pop()</code></td><td><code>4</code></td><td><code>7</code></td></tr> <tr><td><code>push(1)</code></td><td><code>1 4</code></td><td>&mdash;</td></tr> <tr><td><code>push(9)</code></td><td><code>9 1 4</code></td><td>&mdash;</td></tr> <tr><td><code>pop()</code></td><td><code>1 4</code></td><td><code>9</code></td></tr> <tr><td><code>pop()</code></td><td><code>4</code></td><td><code>1</code></td></tr> <tr><td><code>push(2)</code></td><td><code>2 4</code></td><td>&mdash;</td></tr> </table> <p>Top to bottom: <code>2</code>, <code>4</code>. <code>size()</code> is 2.</p> <p><strong>Things to notice across both parts.</strong> The 4 was pushed first and is still there at the end &mdash; on a stack, the oldest item is the one furthest from being retrieved. That is the property that makes a stack the right tool for "undo", for the JVM's own record of which method called which, and for reversing anything: whatever goes in first comes out last.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 21.9</div> <div class="bd"> <p>Her <code>Stack</code> has no <code>peek</code>. Add one: <code>peek()</code> returns the top value <em>without</em> removing it, and throws <code>Exception("Empty List")</code> on an empty stack. You will need one new method on <code>LinkedList</code> too. Write both, plus a <code>main</code> that shows <code>peek</code> does not change the size.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> <code>Stack</code> cannot look inside <code>data</code> &mdash; <code>head</code> is private to <code>LinkedList</code>. So the new work belongs in <code>LinkedList</code>: a <code>peekHead</code> that returns <code>head.getData()</code> and throws on an empty list, mirroring <code>removeHead</code> exactly but without the surgery. Then <code>Stack.peek</code> is another one-liner, like every other method in the class.</p> <p class="filename">LinkedList.java</p>
+<pre><code class="language-java">// Look at the first value without removing it.
+public Integer peekHead() throws Exception {
+   if (head == null)
+      throw new Exception("Empty List");
+   return head.getData();
+}</code></pre> <p class="filename">Stack.java</p>
+<pre><code class="language-java">// Look at the top without removing it
+public Integer peek() throws Exception {
+   return data.peekHead();
+}</code></pre> <p>The <code>Queue</code> of &sect;6 removes from the head too, so its "look at the front" method is the very same one-liner under a different name. Add it now, and the demo below exercises both:</p> <p class="filename">Queue.java</p>
+<pre><code class="language-java">// Look at the front without removing it
+public Integer front() throws Exception {
+   return data.peekHead();
+}</code></pre> <p class="filename">PeekDemo.java</p>
+<pre><code class="language-java">public class PeekDemo {
+    public static void main(String args[]) throws Exception {
+        Stack s = new Stack();
+        s.push(1); s.push(2); s.push(3);
+        System.out.println("peek " + s.peek() + "   size " + s.size());
+        System.out.println("peek " + s.peek() + "   size " + s.size());
+        System.out.println("pop  " + s.pop()  + "   size " + s.size());
+        System.out.println("peek " + s.peek() + "   size " + s.size());
+
+        Queue q = new Queue();
+        q.enqueue(1); q.enqueue(2); q.enqueue(3);
+        System.out.println("front " + q.front() + "   size " + q.size());
+        System.out.println("dequeue " + q.dequeue() + "   front " + q.front());
+    }
+}</code></pre> <pre class="out"><code>peek 3   size 3
+peek 3   size 3
+pop  3   size 2
+peek 2   size 2
+front 1   size 3
+dequeue 1   front 2</code></pre> <p><strong>Things to notice.</strong> Peeking twice gives the same answer and leaves the size alone; that is the whole difference between <code>peek</code> and <code>pop</code>, and it is worth testing explicitly, because a <code>peek</code> that accidentally removes is easy to write and hard to spot.</p> <p>The same <code>peekHead</code> serves the <code>Queue</code> from &sect;6, where it is called <code>front</code> &mdash; because a queue removes from the head too, the front of the queue is the head of the list. One method on the list, two names above it. That is composition earning its keep.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 21.9</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="13" aria-label="Live coding - Quick Check 21.9">public class PeekDemo {
+    public static void main(String args[]) throws Exception {
+        Stack s = new Stack();
+        s.push(1); s.push(2); s.push(3);
+
+        // 1. Add peekHead() to LinkedList: throw if head is null, else return head.getData().
+        // 2. Add peek() to Stack: return data.peekHead();
+        // 3. Print peek() twice and the size, then pop() and peek() again.
+
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s6"><span class="num">6.</span><code>Queue</code>: first in, first out</h2> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; queue, FIFO</span></div> <div class="bd"> <p>A <strong>queue</strong> is a linear data structure that follows the <strong>First-In-First-Out</strong> (FIFO) principle: the first element added is the first one removed. Elements are added at the <em>rear</em> (<code>enqueue</code>) and removed from the <em>front</em> (<code>dequeue</code>). Looking at the front without removing it is <code>front</code>, or <code>peek</code>.</p> <p>The picture is a line at a counter. You join at the back; you are served from the front; nobody cuts in.</p> </div> </div> <p>The only change from the stack is which end things go in. A queue adds at the tail and removes from the head, so it uses <code>addTail</code> and <code>removeHead</code> &mdash; and this is exactly why the list keeps a <code>tail</code> field. Without it, every <code>enqueue</code> would have to walk the whole list first.</p> <p class="filename">Queue.java</p>
+<pre><code class="language-java">public class Queue {
+   private LinkedList data;  // The underlying LinkedList
+
+   public Queue() {
+      data = new LinkedList();
+   }
+
+   // Remove from front (FIFO principle)
+   public Integer dequeue() throws Exception {
+      return data.removeHead();
+   }
+
+   // Add to rear
+   public void enqueue(Integer x) {
+      data.addTail(x);
+   }
+
+   // Additional useful methods
+   public boolean isEmpty() {
+      return data.isEmpty();
+   }
+
+   public int size() {
+      return data.size();
+   }
+}</code></pre> <p>Put the two files side by side and the difference is one word.</p> <table> <tr><th></th><th><code>Stack</code> (LIFO)</th><th><code>Queue</code> (FIFO)</th></tr> <tr><td>Add</td><td><code>push</code> &rarr; <code>data.addHead(x)</code></td><td><code>enqueue</code> &rarr; <code>data.addTail(x)</code></td></tr> <tr><td>Remove</td><td><code>pop</code> &rarr; <code>data.removeHead()</code></td><td><code>dequeue</code> &rarr; <code>data.removeHead()</code></td></tr> <tr><td>Look</td><td><code>peek</code> &rarr; <code>data.peekHead()</code></td><td><code>front</code> &rarr; <code>data.peekHead()</code></td></tr> <tr><td>Both ends the same?</td><td>yes &mdash; add and remove at the head</td><td>no &mdash; add at the tail, remove at the head</td></tr> </table> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the same five numbers, two structures</span></div> <div class="bd"> <p>Feed 1, 2, 3, 4, 5 into a queue and a stack, then drain both. This is the single clearest demonstration of what LIFO and FIFO mean. Predict both lines.</p> <p class="filename">QueueDemo.java</p>
+<pre><code class="language-java">public class QueueDemo {
+    public static void main(String args[]) throws Exception {
+        Queue q = new Queue();
+        Stack  s = new Stack();
+
+        for (int i = 1; i &lt;= 5; i++) { q.enqueue(i); s.push(i); }
+
+        System.out.print("queue comes out: ");
+        while (!q.isEmpty()) System.out.print(q.dequeue() + " ");
+        System.out.println();
+
+        System.out.print("stack comes out: ");
+        while (!s.isEmpty()) System.out.print(s.pop() + " ");
+        System.out.println();
+
+        System.out.println("both were fed 1 2 3 4 5, and both stored it in a LinkedList.");
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>queue comes out: 1 2 3 4 5
+stack comes out: 5 4 3 2 1
+both were fed 1 2 3 4 5, and both stored it in a LinkedList.</code></pre> <p>Identical input, identical storage, opposite output &mdash; and no code in either class knows anything about nodes. The <code>LinkedList</code> is doing all the work; the <code>Stack</code> and the <code>Queue</code> only decide which end of it the outside world may reach.</p> <p>The stack's output is the input reversed, and that is not a coincidence you should forget: "run it through a stack" is the standard way to reverse a sequence, and Practice Problem 1 is an exam question built on exactly that trick.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 21.10</div> <div class="bd"> <p>Predict the output of each marked line. <code>Stack</code> and <code>Queue</code> are the classes above.</p> <pre><code class="language-java">public class MixDemo {
+    public static void main(String args[]) throws Exception {
+        Stack s = new Stack();
+        Queue q = new Queue();
+
+        for (int i = 1; i &lt;= 4; i++) { s.push(i); q.enqueue(i); }
+
+        System.out.println(s.pop() + " " + q.dequeue());     // line (a)
+        s.push(9);
+        q.enqueue(9);
+        System.out.println(s.pop() + " " + q.dequeue());     // line (b)
+        System.out.println(s.size() + " " + q.size());       // line (c)
+
+        while (!s.isEmpty()) System.out.print(s.pop() + " ");
+        System.out.println();                                // line (d)
+        while (!q.isEmpty()) System.out.print(q.dequeue() + " ");
+        System.out.println();                                // line (e)
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> Line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>4 1</code>. Both hold 1, 2, 3, 4. The stack gives back the newest (4); the queue gives back the oldest (1).</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>9 2</code>. The stack now holds 1, 2, 3 with 9 pushed on top, so <code>pop</code> returns the 9 it was just handed. The queue holds 2, 3, 4 with 9 joining the back, so <code>dequeue</code> returns the 2 that has been waiting longest. Same value pushed into both, opposite consequences.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>3 3</code>. Each got four adds plus one more, and two removals: 5 &minus; 2 = 3. The sizes must match &mdash; both structures received exactly the same sequence of operations, and only the <em>order</em> of the contents differs.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> Line (d)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>3 2 1</code> &mdash; with a trailing space, because the <code>print</code> puts a space after every value. The stack holds 3, 2, 1 from the top down: the 9 and the 4 are gone.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> Line (e)?</p> <details class="soln"><summary></summary><div class="ans"> <pre class="out"><code>4 1
+9 2
+3 3
+3 2 1
+3 4 9</code></pre> <p>Line (e) is <code>3 4 9</code>. The queue lost the 1 and the 2, leaving 3 and 4, with the 9 at the back.</p> <p><strong>Things to notice across all five parts.</strong> Track the two structures in two columns rather than trying to hold both in your head:</p> <table class="trace"> <tr><th>After</th><th>Stack (top on the left)</th><th>Queue (front on the left)</th></tr> <tr><td>the <code>for</code> loop</td><td><code>4 3 2 1</code></td><td><code>1 2 3 4</code></td></tr> <tr><td>line (a)</td><td><code>3 2 1</code></td><td><code>2 3 4</code></td></tr> <tr><td>the two adds</td><td><code>9 3 2 1</code></td><td><code>2 3 4 9</code></td></tr> <tr><td>line (b)</td><td><code>3 2 1</code></td><td><code>3 4 9</code></td></tr> </table> <p>The stack column always changes on the left; the queue column loses on the left and gains on the right. Once the columns are on paper, every line is a read-off.</p> </div></details> </div> </div> </div> <h2 id="s7"><span class="num">7.</span>The library versions, and the one thing still missing</h2> <p>Java already ships all three of these structures. We built them anyway, because you cannot reason about a container you have never taken apart &mdash; and because the exam expects you to be able to write <code>Node</code> and <code>LinkedList</code> from scratch. But you should know what is in the library, because that is what you will actually use afterwards.</p> <table> <tr><th>What we built</th><th>The library equivalent</th><th>Notes</th></tr> <tr><td><code>LinkedList</code></td><td><code>java.util.LinkedList</code></td><td>A doubly linked list: each node points backwards as well as forwards. <code>addFirst</code>, <code>addLast</code>, <code>removeFirst</code>, <code>removeLast</code>, <code>get(i)</code>.</td></tr> <tr><td><code>Stack</code></td><td><code>java.util.Stack</code></td><td><code>push</code>, <code>pop</code>, <code>peek</code>, <code>empty</code>. Old, built on <code>Vector</code>; <code>ArrayDeque</code> is the modern choice, but <code>Stack</code> is what her exams use.</td></tr> <tr><td><code>Queue</code></td><td><code>java.util.Queue</code> (an interface), usually <code>new ArrayDeque()</code></td><td><code>add</code>/<code>offer</code>, <code>remove</code>/<code>poll</code>, <code>peek</code>.</td></tr> </table> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the library versions, and what they do when empty</span></div> <div class="bd"> <p>One program touching all three. Notice that <code>Queue</code> is an interface, so the variable is declared <code>Queue</code> but the object created is an <code>ArrayDeque</code>. The last two lines are the interesting ones: what does the library do when you take from an empty structure?</p> <p class="filename">LibraryDemo.java</p>
+<pre><code class="language-java">import java.util.LinkedList;
+import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Queue;
+
+public class LibraryDemo {
+    public static void main(String args[]) {
+        LinkedList&lt;String&gt; list = new LinkedList&lt;&gt;();
+        list.addFirst("b");
+        list.addFirst("a");
+        list.addLast("c");
+        System.out.println("LinkedList  " + list + "   size " + list.size());
+
+        Stack&lt;Integer&gt; s = new Stack&lt;&gt;();
+        s.push(1); s.push(2); s.push(3);
+        System.out.println("Stack       " + s + "   peek " + s.peek());
+        System.out.println("pop " + s.pop() + " " + s.pop() + "   now " + s);
+
+        Queue&lt;Integer&gt; q = new ArrayDeque&lt;&gt;();
+        q.add(1); q.add(2); q.add(3);
+        System.out.println("ArrayDeque  " + q + "   peek " + q.peek());
+        System.out.println("remove " + q.remove() + " " + q.remove() + "   now " + q);
+
+        Stack&lt;Integer&gt; empty = new Stack&lt;&gt;();
+        try {
+            empty.pop();
+        } catch (Exception e) {
+            System.out.println("library pop on empty threw " + e);
+        }
+        System.out.println("ArrayDeque poll on empty gives " + new ArrayDeque&lt;Integer&gt;().poll());
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>LinkedList  [a, b, c]   size 3
+Stack       [1, 2, 3]   peek 3
+pop 3 2   now [1]
+ArrayDeque  [1, 2, 3]   peek 1
+remove 1 2   now [3]
+library pop on empty threw java.util.EmptyStackException
+ArrayDeque poll on empty gives null</code></pre> <p>Three differences from ours worth naming.</p> <ul> <li><strong><code>toString</code> is <code>[a, b, c]</code>, not <code>a--&gt;b--&gt;c--&gt;</code>.</strong> The library prints collections in square brackets with comma separators. Our arrow format is a teaching convenience.</li> <li><strong>The library <code>Stack</code> prints bottom-to-top.</strong> <code>[1, 2, 3]</code> has the top element, 3, on the <em>right</em> &mdash; the opposite of the way we have been drawing our stack. <code>peek</code> returns 3, which is the reliable way to tell which end is the top.</li> <li><strong>Empty behaviour differs, deliberately.</strong> <code>java.util.Stack.pop</code> throws an <em>unchecked</em> <code>EmptyStackException</code>, so the compiler does not force you to catch it. <code>ArrayDeque</code> gives you a choice: <code>remove()</code> throws, <code>poll()</code> returns <code>null</code>. Ours throws a checked <code>Exception</code>, which is the strictest of the three &mdash; the compiler will not let you forget about it.</li> </ul> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; your <code>Stack</code> and <code>java.util.Stack</code> have the same name</span></div> <div class="bd"> <p>Her classes are called <code>LinkedList</code>, <code>Stack</code> and <code>Queue</code>. So are three classes in <code>java.util</code>. Put your <code>Stack.java</code> in a folder and then write <code>import java.util.*;</code> in a program in that same folder, and the compiler has to choose &mdash; and it chooses <em>yours</em>, because a class in your own package beats a wildcard import. If you then try to use it like the library one:</p> <pre><code class="language-java">import java.util.*;
+
+public class Collide {
+    public static void main(String args[]) {
+        Stack&lt;Integer&gt; s = new Stack&lt;&gt;();
+        s.push(1);
+        System.out.println(s);
+    }
+}</code></pre> <pre class="err"><code>Collide.java:5: error: type Stack does not take parameters
+        Stack&lt;Integer&gt; s = new Stack&lt;&gt;();
+             ^
+Collide.java:5: error: cannot infer type arguments for Stack
+        Stack&lt;Integer&gt; s = new Stack&lt;&gt;();
+                                    ^
+  reason: cannot use '&lt;&gt;' with non-generic class Stack
+2 errors</code></pre> <p>The message is baffling until you realize it is describing your own class, which indeed takes no type parameters. The reverse case is quieter and worse: a <em>single-type</em> import, <code>import java.util.Stack;</code>, does the opposite &mdash; it shadows your class, so <code>new Stack()</code> silently builds the library one and your carefully written implementation is never used. Neither of these is an error you can fix by staring at the line it points to.</p> <p>Two habits avoid the whole problem: do not write <code>import java.util.*;</code> in a project that defines its own <code>Stack</code>, <code>Queue</code> or <code>LinkedList</code>, and when you write your own container, give it a name the library does not already have &mdash; <code>MyStack</code>, <code>IntStack</code>, <code>LinkedIntList</code>.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 21.11</div> <div class="bd"> <p>You are working in a folder that contains our <code>Node.java</code>, <code>LinkedList.java</code>, <code>Stack.java</code> and <code>Queue.java</code>. You now write a new program in the same folder that needs a <code>Scanner</code>, so you begin it with <code>import java.util.*;</code> and then write <code>Stack s = new Stack();</code>.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Does the program compile, and which <code>Stack</code> does <code>s</code> refer to?</p> <details class="soln"><summary></summary><div class="ans"> <p>It compiles, and <code>s</code> is <em>our</em> <code>Stack</code>. A type declared in your own package beats one brought in by a wildcard <code>import ...*</code>, so the compiler never even considers <code>java.util.Stack</code> here.</p> <p>The trouble starts the moment you use it like the library class. <code>s.push("hi")</code> fails because ours takes an <code>Integer</code>; <code>s.empty()</code> fails because ours has no such method (it has <code>isEmpty</code>); and <code>Stack&lt;Integer&gt; s = new Stack&lt;&gt;();</code> fails with <code>type Stack does not take parameters</code>, which is a confusing message until you realize it is talking about your file.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> You change the first line to <code>import java.util.Stack;</code> to "be more specific". What happens now?</p> <details class="soln"><summary></summary><div class="ans"> <p>Now the opposite: a single-type import <em>shadows</em> a class of the same name in your own package, so <code>s</code> refers to <code>java.util.Stack</code> and your <code>Stack.java</code> is ignored. The file still compiles &mdash; there is no error, no warning &mdash; and the program runs against the library class.</p> <p>That is the more dangerous of the two, because nothing tells you. A test that was supposed to be exercising your implementation quietly passes by exercising Oracle's.</p> <p><strong>Things to notice across both parts.</strong> Two nearly identical import lines, two opposite results, neither of them announced. Name collisions are not a Java quirk to memorize for the exam &mdash; they are a reason to choose class names carefully. Your own container is <code>MyStack</code> and this entire problem never happens.</p> </div></details> </div> </div> </div> <p>Which leaves one last thing, and it is the thing that decides what next lecture is about.</p> <div class="box warn"> <div class="hd">Warning<span class="tag">&mdash; our containers hold <code>Integer</code> and nothing else</span></div> <div class="bd"> <p>Look again at the field in <code>Node</code>: <code>private Integer data;</code>. Every method that touches it &mdash; <code>addHead(Integer d)</code>, <code>push(Integer x)</code>, <code>enqueue(Integer x)</code> &mdash; is written for one specific type. Try to store anything else and the compiler stops you:</p> <p class="filename">OnlyIntegers.java</p>
+<pre><code class="language-java">public class OnlyIntegers {
+    public static void main(String args[]) {
+        LinkedList list = new LinkedList();
+        list.addTail(10);          // fine: int is auto-boxed into an Integer
+        list.addTail("hello");     // we would like a list of Strings too
+    }
+}</code></pre> <pre class="err"><code>OnlyIntegers.java:5: error: incompatible types: String cannot be converted to Integer
+        list.addTail("hello");     // we would like a list of Strings too
+                     ^
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+1 error</code></pre> <p>To get a list of <code>String</code>s you would copy all three files and change every <code>Integer</code> to <code>String</code>. Then a list of <code>Point</code>s: copy again. Every bug you later find must be fixed in every copy. Her own note for the next session names the problem in one line: <em>"Each data structure implemented with specific data types (e.g., Integer). Limited reusability across different data types."</em></p> <p>You could make <code>data</code> an <code>Object</code>, since every class extends <code>Object</code>. That compiles, and it is how Java collections worked before 2004 &mdash; but then <code>getData()</code> returns an <code>Object</code>, you must cast every value on the way out, and nothing stops you putting a <code>String</code> into a list you intended for numbers until it explodes at run time. Trading a compile error for a run-time crash is a bad trade.</p> <p>The real fix is the subject of Lecture 22.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 21.12</div> <div class="bd"> <p>You want a linked list of <code>String</code>s as well as one of <code>Integer</code>s.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Using only what this lecture covers, what are your two options, and what is wrong with each?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Option 1: copy the files</strong> and replace <code>Integer</code> with <code>String</code> throughout, giving <code>StringNode</code>, <code>StringLinkedList</code> and so on. It works, it is type-safe, and it is duplicated code: three files per type, and every future fix has to be applied to all of them. Duplicated code is how classes drift apart and bugs come back.</p> <p><strong>Option 2: store <code>Object</code>.</strong> One set of files serves every type, but <code>getData()</code> now returns <code>Object</code>, so every caller writes <code>String s = (String) list.removeHead();</code>. The compiler cannot check that cast, so a list you believed held <code>String</code>s throws a <code>ClassCastException</code> at run time the first time someone slips a <code>Point</code> in.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What would the ideal solution look like, if you could design it? Describe it in words, not code.</p> <details class="soln"><summary></summary><div class="ans"> <p>You would write the class <em>once</em>, leaving the element type as a blank to be filled in later, and say at the point of use which type this particular list holds: something like "a list of <code>String</code>" versus "a list of <code>Integer</code>", with the compiler checking every call against whichever you chose. One copy of the code, full type checking, no casts.</p> <p>That is exactly what <strong>generics</strong> are, and you have been using them since Lecture 6 without writing one: <code>ArrayList&lt;String&gt;</code> is the same <code>ArrayList</code> class as <code>ArrayList&lt;Integer&gt;</code>, told to hold a different type. Next lecture you write your own, starting with <code>public class Node&lt;T&gt;</code>.</p> <p><strong>Things to notice across both parts.</strong> Every language feature exists because someone hit a wall without it. You have just hit the wall generics were invented for, which is the best possible moment to learn them.</p> </div></details> </div> </div> </div> <h2 id="prac"><span class="num">&#9733;</span>Practice Problems</h2> <div class="box prac"> <div class="hd">Practice Problems<span class="tag">&mdash; two from her exams, four written for these notes</span></div> <div class="bd"> <p>The first two are output-prediction questions taken straight from the CSCI 212 practice sets and finals, and both use <code>java.util.Stack</code> rather than the one we built &mdash; the behaviour is the same, so the reasoning transfers exactly. The last four ask you to write code against the classes from this lecture, which is what the "write a method" style of exam question looks like when it lands on data structures.</p> <p>Work them on paper first. The exam is closed book and there is no compiler in the room.</p> </div> </div> <h3>Problem 1 &mdash; What is the output? <span class="muted">(from Exam 3 Practice Problems; the same question also appears on the Final Practice Problems)</span></h3> <p>Predict the output generated at the marked <code>println</code> lines in the following program.</p> <p class="filename">Prob1.java</p>
+<pre><code class="language-java">import java.util.Stack;
+
+public class Prob1 {
+    public static int mystery(int m, int n) {
+        if (n == 0) return 0;
+        if (n % 2 == 0) return mystery(m + m, n / 2);
+        return mystery(m + m, n / 2) + m;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(mystery(2, 29));               // line (a)
+        String str = "Harry Potter";
+        str.toLowerCase();
+        str.substring(0, 7);
+        System.out.println(str);                          // line (b)
+        Stack&lt;Integer&gt; stack = new Stack&lt;&gt;();
+        int n = 50;
+        while (n &gt; 0) {
+            stack.push(n % 2);
+            n = n / 2;
+        }
+        while (!stack.isEmpty()) System.out.print(stack.pop());   // line (c)
+        System.out.println();
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> What is printed at line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>58</code>. This is the recursion from Lecture 2, and it is Russian-peasant multiplication: <code>mystery(m, n)</code> computes <em>m</em> &times; <em>n</em>. Check it: 2 &times; 29 = 58.</p> <p>If you do not spot the pattern, unroll it. Each call halves <code>n</code> and doubles <code>m</code>, adding the current <code>m</code> whenever <code>n</code> is odd:</p> <table class="trace"> <tr><th>Call</th><th><code>n</code> odd?</th><th>Adds</th></tr> <tr><td><code>mystery(2, 29)</code></td><td>yes</td><td>2</td></tr> <tr><td><code>mystery(4, 14)</code></td><td>no</td><td>&mdash;</td></tr> <tr><td><code>mystery(8, 7)</code></td><td>yes</td><td>8</td></tr> <tr><td><code>mystery(16, 3)</code></td><td>yes</td><td>16</td></tr> <tr><td><code>mystery(32, 1)</code></td><td>yes</td><td>32</td></tr> <tr><td><code>mystery(64, 0)</code></td><td>&mdash;</td><td>returns 0</td></tr> </table> <p>2 + 8 + 16 + 32 = 58.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What is the output at line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Harry Potter</code>, unchanged. This is the Lecture 4 point about <code>String</code> being <strong>immutable</strong>: <code>toLowerCase()</code> and <code>substring(0, 7)</code> both <em>return</em> a new <code>String</code> and neither modifies <code>str</code>. Both return values are thrown away here, so the two calls accomplish precisely nothing. To keep a result you must assign it: <code>str = str.toLowerCase();</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> What is printed at line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The loop repeatedly pushes <code>n % 2</code> and halves <code>n</code> &mdash; it is producing the binary digits of 50, but from the <em>least</em> significant end. The stack is what puts them back in the right order, because LIFO reverses whatever you feed it.</p> <table class="trace"> <tr><th><code>n</code></th><th><code>n % 2</code> pushed</th><th>Stack, top on the left</th></tr> <tr><td>50</td><td>0</td><td><code>0</code></td></tr> <tr><td>25</td><td>1</td><td><code>1 0</code></td></tr> <tr><td>12</td><td>0</td><td><code>0 1 0</code></td></tr> <tr><td>6</td><td>0</td><td><code>0 0 1 0</code></td></tr> <tr><td>3</td><td>1</td><td><code>1 0 0 1 0</code></td></tr> <tr><td>1</td><td>1</td><td><code>1 1 0 0 1 0</code></td></tr> <tr><td>0</td><td>&mdash;</td><td>loop ends</td></tr> </table> <p>Popping empties the stack from the left, giving <code>110010</code>.</p> <pre class="out"><code>58
+Harry Potter
+110010</code></pre> <p><strong>Things to notice.</strong> Check it: 110010 in binary is 32 + 16 + 2 = 50.</p> <p>This is <em>the</em> classic use of a stack, and it is worth keeping in your head as the one-sentence summary of what a stack is for: <strong>a stack reverses the order of whatever you put into it.</strong> Any time you need "the digits come out backwards" or "undo the last thing first", a stack is the answer.</p> <p>Note also that <code>stack.push(n % 2)</code> pushes an <code>int</code> into a <code>Stack&lt;Integer&gt;</code>. Autoboxing wraps it, exactly as our <code>addTail(10)</code> does.</p> </div></details> </div> <h3>Problem 2 &mdash; What is the output? <span class="muted">(from CSCI 212 Final - Summer 2026, Problem 2, first half)</span></h3> <p>Consider the following Java program. This is the first half of the exam question; the second half continues with <code>Iterator</code> objects, which are the subject of Lecture 23 &mdash; come back to those parts after that lecture.</p> <p class="filename">Output.java</p>
+<pre><code class="language-java">import java.util.*;
+
+public class Output {
+    public static void main(String args[]) {
+        ArrayList&lt;String&gt; a1, a2, a3;
+        Stack&lt;String&gt; s = new Stack&lt;&gt;();
+
+        a1 = new ArrayList&lt;&gt;();
+        a2 = new ArrayList&lt;&gt;();
+        a3 = a2;
+
+        a1.add("red");    a2.add("red");    s.push("red");
+        a1.add("blue");   a2.add("blue");   s.push("blue");
+        a1.add("green");  a2.add("green");  s.push("green");
+
+        System.out.println("" + (a1 == a2) + " " + (a2 == a3));     // line (a)
+        System.out.println("" + a1.equals(a2));                     // line (b)
+
+        a3.add("yellow");
+        a3.add("orange");
+
+        for (String x: a2) System.out.print(x + " ");
+        System.out.println();                                       // line (c)
+
+        for (String x: a3) System.out.print(x + " ");
+        System.out.println();                                       // line (d)
+
+        while (!s.isEmpty()) System.out.print(s.pop() + " ");       // line (e)
+        System.out.println();
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> What is the output from the instruction beginning on line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>false true</code>. <code>==</code> on objects compares references (Lecture 8). <code>a1</code> and <code>a2</code> were each given their own <code>new ArrayList&lt;&gt;()</code>, so they are two different objects and <code>a1 == a2</code> is <code>false</code>. <code>a3 = a2</code> copied a reference, not a list, so <code>a2</code> and <code>a3</code> are aliases for one object and <code>a2 == a3</code> is <code>true</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What is the output from line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>true</code>. <code>equals</code> on a collection compares <em>contents</em>, element by element, using each element's own <code>equals</code>. At this moment both lists hold <code>red</code>, <code>blue</code>, <code>green</code> in that order, so they are equal even though they are not the same object. <code>==</code> and <code>equals</code> asking different questions is the whole of Lecture 9.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> What is the output from line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>red blue green yellow orange</code>. The two <code>a3.add</code> calls went into the one object that <code>a2</code> and <code>a3</code> both point at, so <code>a2</code> sees them. This is aliasing doing what aliasing does: a change made through one name is visible through the other.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> What is the output from line (d)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>red blue green yellow orange</code> &mdash; identical to line (c), and for the same reason. There is only one list here. <code>a1</code>, meanwhile, still holds just the three original colors; it was never touched.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> What is the output from line (e)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>green blue red</code> &mdash; the stack material. <code>red</code>, <code>blue</code>, <code>green</code> were pushed in that order, so <code>green</code> is on top and comes off first. LIFO reverses.</p> <pre class="out"><code>false true
+true
+red blue green yellow orange
+red blue green yellow orange
+green blue red</code></pre> <p><strong>Things to notice across all five parts.</strong> One exam question, three lectures: references and aliasing (Lecture 8), <code>equals</code> versus <code>==</code> (Lecture 9), and LIFO (today). That is deliberate &mdash; the final is cumulative, and the data-structure part is usually the <em>easiest</em> part of a question like this once you can see where it starts.</p> <p>The Spring 2025 final asked the identical question with <code>Integer</code> values 1 through 5 instead of colors: line (a) <code>false true</code>, (c) and (d) <code>1 2 3 4 5 7 9</code>, and (e) <code>5 4 3 2 1</code>. If you can do one you can do the other.</p> <p>The rest of that exam question &mdash; lines (f) through (j) &mdash; asks what happens when you obtain an <code>Iterator</code> from the stack and from the list. Save it for Lecture 23.</p> </div></details> </div> <h3>Problem 3 &mdash; Insert into the middle <span class="muted">(added for these notes)</span></h3> <p>Add a method <code>insertAfter(Integer target, Integer d)</code> to <code>LinkedList</code>. It inserts a new node holding <code>d</code> immediately after the first node holding <code>target</code>, and returns <code>true</code>. If <code>target</code> is not in the list it changes nothing and returns <code>false</code>. Keep <code>size</code> and <code>tail</code> correct. Then write a driver that inserts into the middle, after the last node, and after a value that is not present.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> This is the mirror image of <code>remove</code>, and it is easier, because the node you need to modify is the one you are searching for &mdash; not the one before it. Walk until <code>p</code> holds <code>target</code> or you fall off the end. Then do the two-step splice from &sect;2, in the right order: give the new node its forward link first, then re-point <code>p</code>. The only case needing extra thought is inserting after the <em>last</em> node, which makes the new node the tail.</p> <p class="filename">LinkedList.java</p>
+<pre><code class="language-java">// Insert d immediately after the first node holding target.
+// Returns false (and changes nothing) if target is not in the list.
+public boolean insertAfter(Integer target, Integer d) {
+   Node p = head;
+   while (p != null &amp;&amp; !p.getData().equals(target))
+      p = p.getNext();
+
+   if (p == null) return false;        // target not found
+
+   Node n = new Node(d, p.getNext());  // 1. new node points where p pointed
+   p.setNext(n);                       // 2. p now points at the new node
+   if (p == tail) tail = n;            // inserted after the last node
+   size++;
+   return true;
+}</code></pre> <p class="filename">InsertDemo.java</p>
+<pre><code class="language-java">public class InsertDemo {
+    public static void main(String args[]) {
+        LinkedList list = new LinkedList();
+        list.addTail(10);
+        list.addTail(20);
+        list.addTail(30);
+        System.out.println("start            " + list);
+
+        System.out.println("after 20 put 25  " + list.insertAfter(20, 25) + "   " + list);
+        System.out.println("after 30 put 40  " + list.insertAfter(30, 40) + "   " + list);
+        System.out.println("after 99 put 1   " + list.insertAfter(99, 1) + "   " + list);
+        System.out.println("size " + list.size());
+
+        list.addTail(50);            // proves tail is still correct
+        System.out.println("addTail(50)      " + list);
+    }
+}</code></pre> <pre class="out"><code>start            10--&gt;20--&gt;30--&gt;
+after 20 put 25  true   10--&gt;20--&gt;25--&gt;30--&gt;
+after 30 put 40  true   10--&gt;20--&gt;25--&gt;30--&gt;40--&gt;
+after 99 put 1   false   10--&gt;20--&gt;25--&gt;30--&gt;40--&gt;
+size 5
+addTail(50)      10--&gt;20--&gt;25--&gt;30--&gt;40--&gt;50--&gt;</code></pre> <p><strong>Things to notice.</strong> Swap the two splice lines &mdash; <code>p.setNext(n);</code> before <code>new Node(d, p.getNext())</code> &mdash; and you destroy the list: <code>p.getNext()</code> would then already be <code>n</code>, so the new node would point at itself, and the loop in <code>toString</code> would run forever. Write the new node's link first, every time.</p> <p><code>if (p == tail) tail = n;</code> is the case the final <code>addTail(50)</code> tests. Leave it out and the program still prints the right thing on every line except that last one &mdash; a bug that hides until somebody appends. Compare <code>remove</code>, which needs the same kind of check for the same reason.</p> <p>Notice <code>p == tail</code> uses <code>==</code> deliberately: here we genuinely are asking "is this the same <code>Node</code> object?", which is what <code>==</code> is for. The <code>equals</code> rule applies to comparing the <em>data</em>, not the nodes.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 3</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="18" aria-label="Live coding - Practice Problem 3">public class InsertDemo {
+    public static void main(String args[]) {
+        LinkedList list = new LinkedList();
+        list.addTail(10);
+        list.addTail(20);
+        list.addTail(30);
+
+        // Add insertAfter(Integer target, Integer d) to LinkedList:
+        //   walk p to the node holding target (return false if you fall off the end)
+        //   Node n = new Node(d, p.getNext());
+        //   p.setNext(n);
+        //   fix tail if p was the tail, then size++
+        // Then test it here: middle, end, and a target that is not present.
+
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 4 &mdash; Reverse a linked list in place <span class="muted">(added for these notes)</span></h3> <p>Add a method <code>reverse()</code> to <code>LinkedList</code> that reverses the order of the elements <strong>without creating a single new <code>Node</code></strong> &mdash; only by re-pointing the links that already exist. It must leave <code>head</code>, <code>tail</code> and <code>size</code> all correct, and it must work on a one-element list and on an empty list.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Every node's arrow has to be turned around. Walk the list with three markers: <code>prev</code> (the node behind you, which is where the current node should now point), <code>cur</code> (the node you are flipping) and <code>ahead</code> (where you were going to go next &mdash; you must save it <em>before</em> you overwrite <code>cur</code>'s link, or you lose the rest of the list). When the walk ends, <code>cur</code> is <code>null</code> and <code>prev</code> is sitting on the old last node, which is the new head. The old head becomes the tail, so capture that at the start.</p> <p class="filename">LinkedList.java</p>
+<pre><code class="language-java">// Reverse the list in place: no new nodes, only re-pointed links.
+public void reverse() {
+   Node prev = null;
+   Node cur  = head;
+   tail = head;              // the old first node becomes the last
+   while (cur != null) {
+      Node ahead = cur.getNext();   // remember where we were going
+      cur.setNext(prev);            // flip this link backwards
+      prev = cur;                   // step both markers forward
+      cur  = ahead;
+   }
+   head = prev;              // prev stopped on the old last node
+}</code></pre> <p class="filename">ReverseDemo.java</p>
+<pre><code class="language-java">public class ReverseDemo {
+    public static void main(String args[]) {
+        LinkedList list = new LinkedList();
+        for (int i = 1; i &lt;= 5; i++) list.addTail(i);
+        System.out.println("before   " + list);
+        list.reverse();
+        System.out.println("after    " + list);
+
+        list.addTail(0);                       // proves the tail was fixed too
+        System.out.println("addTail  " + list + "   size " + list.size());
+
+        LinkedList one = new LinkedList();
+        one.addTail(7);
+        one.reverse();
+        System.out.println("one node " + one);
+
+        LinkedList none = new LinkedList();
+        none.reverse();
+        System.out.println("empty    [" + none + "]   size " + none.size());
+    }
+}</code></pre> <pre class="out"><code>before   1--&gt;2--&gt;3--&gt;4--&gt;5--&gt;
+after    5--&gt;4--&gt;3--&gt;2--&gt;1--&gt;
+addTail  5--&gt;4--&gt;3--&gt;2--&gt;1--&gt;0--&gt;   size 6
+one node 7--&gt;
+empty    []   size 0</code></pre> <p>The trace, on <code>1--&gt;2--&gt;3</code>:</p> <table class="trace"> <tr><th>Iteration</th><th><code>prev</code></th><th><code>cur</code></th><th><code>ahead</code></th><th>Links after <code>cur.setNext(prev)</code></th></tr> <tr><td>start</td><td><code>null</code></td><td>1</td><td>&mdash;</td><td><code>1--&gt;2--&gt;3--&gt;null</code></td></tr> <tr><td>1</td><td>1</td><td>2</td><td>2</td><td><code>null&lt;--1   2--&gt;3--&gt;null</code></td></tr> <tr><td>2</td><td>2</td><td>3</td><td>3</td><td><code>null&lt;--1&lt;--2   3--&gt;null</code></td></tr> <tr><td>3</td><td>3</td><td><code>null</code></td><td><code>null</code></td><td><code>null&lt;--1&lt;--2&lt;--3</code></td></tr> <tr><td>after</td><td colspan="4"><code>head = prev</code> = 3, and <code>tail</code> was set to the old head, 1</td></tr> </table> <p><strong>Things to notice.</strong> <code>Node ahead = cur.getNext();</code> must come before <code>cur.setNext(prev);</code>. Reverse those two lines and <code>cur.getNext()</code> already points backwards, so <code>ahead</code> becomes <code>prev</code> and the loop walks back the way it came &mdash; forever. Saving the link you are about to destroy is the single most important habit in linked-list code.</p> <p>The empty and one-node cases need no special handling, which is worth checking rather than assuming. Empty: <code>cur</code> is <code>null</code> immediately, the loop never runs, <code>tail = null</code> and <code>head = prev = null</code>. One node: the loop runs once, that node's <code>next</code> becomes <code>null</code> (it was already), and head and tail both end up on it.</p> <p>The alternative solution &mdash; pop everything into a stack and rebuild the list &mdash; is easier to write and uses <em>n</em> extra references. This version uses three, no matter how long the list is.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 4</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="15" aria-label="Live coding - Practice Problem 4">public class ReverseDemo {
+    public static void main(String args[]) {
+        LinkedList list = new LinkedList();
+        for (int i = 1; i &lt;= 5; i++) list.addTail(i);
+        System.out.println("before   " + list);
+
+        // Add reverse() to LinkedList using three markers: prev, cur, ahead.
+        //   save ahead = cur.getNext()  BEFORE  cur.setNext(prev)
+        //   remember to set tail to the old head, and head to prev at the end.
+        // Then call it and print the list. Test the empty list too.
+
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 5 &mdash; Reverse a queue using a stack <span class="muted">(added for these notes)</span></h3> <p>Write a static method <code>reverse(Queue q)</code> that reverses the contents of a queue, using only a <code>Stack</code> and the public methods of both classes &mdash; no <code>Node</code>, no <code>LinkedList</code>, no array. Then write a <code>main</code> that builds a queue of 1 through 5, prints it, reverses it, and prints it again. Printing a queue is itself part of the exercise: the only way to see the contents is to take them out.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> A queue hands things back oldest-first and a stack hands them back newest-first, so pouring one into the other flips the order. Dequeue everything onto a stack, then pop everything back onto the queue: the item that was at the front went onto the stack first, so it comes off last and ends up at the back.</p> <p>For printing, dequeue each item, print it, and immediately enqueue it again. After <code>size()</code> rounds every item has been round the loop exactly once and the queue is back in its original order &mdash; capture the size <em>before</em> the loop, since the queue is being modified as you go.</p> <p class="filename">ReverseQueue.java</p>
+<pre><code class="language-java">public class ReverseQueue {
+    // Empty the queue into a stack, then pour the stack back into the queue.
+    public static void reverse(Queue q) throws Exception {
+        Stack s = new Stack();
+        while (!q.isEmpty()) s.push(q.dequeue());
+        while (!s.isEmpty()) q.enqueue(s.pop());
+    }
+
+    public static void main(String args[]) throws Exception {
+        Queue q = new Queue();
+        for (int i = 1; i &lt;= 5; i++) q.enqueue(i);
+
+        System.out.print("before: ");
+        show(q);
+
+        reverse(q);
+
+        System.out.print("after:  ");
+        show(q);
+    }
+
+    // Print a queue by emptying it and putting everything back.
+    public static void show(Queue q) throws Exception {
+        int n = q.size();
+        for (int i = 0; i &lt; n; i++) {
+            Integer x = q.dequeue();
+            System.out.print(x + " ");
+            q.enqueue(x);
+        }
+        System.out.println("  (size still " + q.size() + ")");
+    }
+}</code></pre> <pre class="out"><code>before: 1 2 3 4 5   (size still 5)
+after:  5 4 3 2 1   (size still 5)</code></pre> <p><strong>Things to notice.</strong> <code>int n = q.size();</code> before the loop is essential. Write <code>for (int i = 0; i &lt; q.size(); i++)</code> instead and the condition is re-evaluated every iteration against a queue whose size never changes &mdash; you dequeue and enqueue one item each time &mdash; so the loop never ends.</p> <p>Both methods declare <code>throws Exception</code>, because <code>dequeue</code> does and neither of them has anything useful to do about an empty queue. Note that neither can actually throw: both are guarded by <code>isEmpty</code> or by a count. The compiler cannot know that, so the declaration is required anyway &mdash; a routine annoyance of checked exceptions.</p> <p>The <code>reverse</code> method is four lines and touches no nodes at all. That is what a well-designed data structure buys you: the caller works in the vocabulary of the problem (<code>push</code>, <code>pop</code>, <code>enqueue</code>, <code>dequeue</code>) and never has to think about links.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 5</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="18" aria-label="Live coding - Practice Problem 5">public class ReverseQueue {
+    public static void reverse(Queue q) throws Exception {
+        // 1. Dequeue everything onto a Stack.
+        // 2. Pop everything back onto the Queue.
+
+    }
+
+    public static void main(String args[]) throws Exception {
+        Queue q = new Queue();
+        for (int i = 1; i &lt;= 5; i++) q.enqueue(i);
+
+        // Print the queue, reverse it, print it again.
+        // To print: dequeue, print, enqueue — exactly size() times.
+
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 6 &mdash; Decimal to binary, with our own <code>Stack</code> <span class="muted">(added for these notes)</span></h3> <p>Problem 1 converted 50 to binary with <code>java.util.Stack</code>. Do the same job with the <code>Stack</code> we built in &sect;5: write <code>static String toBinary(int n)</code> that returns the binary representation of a positive <code>n</code>, and returns <code>"0"</code> for <code>n</code> equal to 0. Test it on 50, 1, 8 and 255.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Identical algorithm: repeatedly push <code>n % 2</code> and halve <code>n</code>, then pop everything back off. <code>n = 0</code> needs its own answer up front, because the <code>while</code> loop would never run and you would return the empty string.</p> <p class="filename">ToBinary.java</p>
+<pre><code class="language-java">public class ToBinary {
+    public static void main(String args[]) throws Exception {
+        int[] tests = {50, 1, 8, 255};
+        for (int t : tests)
+            System.out.println(t + " in binary is " + toBinary(t));
+    }
+
+    public static String toBinary(int n) throws Exception {
+        if (n == 0) return "0";
+        Stack s = new Stack();
+        while (n &gt; 0) {
+            s.push(n % 2);      // remainders come out least-significant first
+            n = n / 2;
+        }
+        String ans = "";
+        while (!s.isEmpty()) ans += s.pop();   // the stack reverses them
+        return ans;
+    }
+}</code></pre> <pre class="out"><code>50 in binary is 110010
+1 in binary is 1
+8 in binary is 1000
+255 in binary is 11111111</code></pre> <p><strong>Things to notice.</strong> The only differences from the library version are the missing <code>&lt;&gt;</code> on <code>new Stack()</code> &mdash; ours is not generic &mdash; and the <code>throws Exception</code>, because our <code>pop</code> is checked and the library's is not. The algorithm is untouched. That is a good sanity check on an implementation: if swapping in your own class changes nothing but the declarations, you have got the behaviour right.</p> <p><code>s.push(n % 2)</code> autoboxes an <code>int</code> into an <code>Integer</code>, and <code>ans += s.pop()</code> unboxes and then converts to text. Both happen silently. And <code>8</code> giving <code>1000</code> is worth a glance: the loop pushes 0, 0, 0, 1, and the stack turns that into <code>1000</code>.</p> <p>Try running it with a negative <code>n</code>. The <code>while (n &gt; 0)</code> loop never runs, <code>ans</code> stays empty, and you get a blank line &mdash; a reminder that "positive <code>n</code>" in the specification was doing real work, and that a method with a precondition should probably enforce it.</p> </div></details> <div class="box sum" id="summary"> <div class="hd">Lecture Summary</div> <div class="bd"> <ul> <li>An array has a <strong>fixed size</strong> and makes you <strong>shift everything</strong> to insert in the middle. A linked list fixes both, and gives up fast random access in exchange.</li> <li>A <strong><code>Node</code></strong> holds a value and a <strong>reference</strong> to the next node. The last node's <code>next</code> is <code>null</code>, and the list <em>is</em> the reference to its first node.</li> <li>The traversal loop is <code>Node n = head; while (n != null) { ...; n = n.getNext(); }</code>. Every method in the class is a version of it.</li> <li><code>LinkedList</code> keeps three things true at all times: <code>head</code> is the first node, <code>tail</code> is the last, <code>size</code> is the count. Almost every bug is one of the three going false in the empty-list or last-node case.</li> <li>To insert, point the new node forward <em>first</em>, then re-point the node in front of it. To delete, you need <code>prev</code> &mdash; the node before the victim &mdash; because a singly linked node has no way back.</li> <li>A <strong><code>Stack</code></strong> is LIFO: <code>push</code> and <code>pop</code> both act on the head. A <strong><code>Queue</code></strong> is FIFO: <code>enqueue</code> adds at the tail, <code>dequeue</code> removes from the head. Both are one private <code>LinkedList</code> and a handful of one-line methods &mdash; the same storage, different access rules.</li> <li><code>removeHead</code> throws a checked <code>Exception("Empty List")</code>, so <code>pop</code> and <code>dequeue</code> do too, and every caller must catch it or declare it. The library classes differ: <code>java.util.Stack.pop</code> throws an unchecked <code>EmptyStackException</code>, and <code>ArrayDeque.poll</code> returns <code>null</code>.</li> <li>Naming your own class <code>Stack</code>, <code>Queue</code> or <code>LinkedList</code> collides with <code>java.util</code>. A wildcard import loses to your class; a single-type import silently shadows it. Prefer a name the library does not use.</li> <li>Everything we built stores <code>Integer</code> and only <code>Integer</code>. Copying the files per type duplicates code; storing <code>Object</code> throws away type checking.</li> </ul> <p><strong>Coming up in Lecture 22.</strong> Generics &mdash; how to write <code>public class Node&lt;T&gt;</code> once and get <code>Node&lt;Integer&gt;</code>, <code>Node&lt;String&gt;</code> and <code>Node&lt;Point&gt;</code> from it, with the compiler checking every call and not a cast in sight. It is the same <code>Node</code> you wrote today with one letter changed, and it is the reason <code>ArrayList&lt;String&gt;</code> has angle brackets in
+    it.</p>
+  </div>
+</div>
+
+<nav class="pagenav">
+<span class="disabled"><div class="dir">&larr; Previous</div><div class="ttl">Lecture 20 &mdash; Exception Handling</div><div class="pending">posts Tue Nov 24</div></span>
+<span class="disabled next"><div class="dir">Next &rarr;</div><div class="ttl">Lecture 22 &mdash; Generics</div><div class="pending">posts Thu Dec 3</div></span>
+</nav>
+<footer class="pf">CSCI 212 &middot; Object-Oriented Programming in Java &middot; Queens College, CUNY</footer>
+</div>
+<script>
+(()=>{var ut=Object.create;var xe=Object.defineProperty;var ft=Object.getOwnPropertyDescriptor;var gt=Object.getOwnPropertyNames;var ht=Object.getPrototypeOf,dt=Object.prototype.hasOwnProperty;var pt=(e,t)=>()=>{try{return t||e((t={exports:{}}).exports,t),t.exports}catch(n){throw t=0,n}};var Et=(e,t,n,l)=>{if(t&&typeof t=="object"||typeof t=="function")for(let d of gt(t))!dt.call(e,d)&&d!==n&&xe(e,d,{get:()=>t[d],enumerable:!(l=ft(t,d))||l.enumerable});return e};var bt=(e,t,n)=>(n=e!=null?ut(ht(e)):{},Et(t||!e||!e.__esModule?xe(n,"default",{value:e,enumerable:!0}):n,e));var Ke=pt((ln,Ge)=>{function Ie(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(t=>{let n=e[t],l=typeof n;(l==="object"||l==="function")&&!Object.isFrozen(n)&&Ie(n)}),e}var Z=class{constructor(t){t.data===void 0&&(t.data={}),this.data=t.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function Ce(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function k(e,...t){let n=Object.create(null);for(let l in e)n[l]=e[l];return t.forEach(function(l){for(let d in l)n[d]=l[d]}),n}var _t="</span>",Ne=e=>!!e.scope,Mt=(e,{prefix:t})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let n=e.split(".");return[`${t}${n.shift()}`,...n.map((l,d)=>`${l}${"_".repeat(d+1)}`)].join(" ")}return`${t}${e}`},oe=class{constructor(t,n){this.buffer="",this.classPrefix=n.classPrefix,t.walk(this)}addText(t){this.buffer+=Ce(t)}openNode(t){if(!Ne(t))return;let n=Mt(t.scope,{prefix:this.classPrefix});this.span(n)}closeNode(t){Ne(t)&&(this.buffer+=_t)}value(){return this.buffer}span(t){this.buffer+=`<span class="${t}">`}},Re=(e={})=>{let t={children:[]};return Object.assign(t,e),t},ae=class e{constructor(){this.rootNode=Re(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(t){this.top.children.push(t)}openNode(t){let n=Re({scope:t});this.add(n),this.stack.push(n)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(t){return this.constructor._walk(t,this.rootNode)}static _walk(t,n){return typeof n=="string"?t.addText(n):n.children&&(t.openNode(n),n.children.forEach(l=>this._walk(t,l)),t.closeNode(n)),t}static _collapse(t){typeof t!="string"&&t.children&&(t.children.every(n=>typeof n=="string")?t.children=[t.children.join("")]:t.children.forEach(n=>{e._collapse(n)}))}},le=class extends ae{constructor(t){super(),this.options=t}addText(t){t!==""&&this.add(t)}startScope(t){this.openNode(t)}endScope(){this.closeNode()}__addSublanguage(t,n){let l=t.root;n&&(l.scope=`language:${n}`),this.add(l)}toHTML(){return new oe(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function G(e){return e?typeof e=="string"?e:e.source:null}function De(e){return B("(?=",e,")")}function Ot(e){return B("(?:",e,")*")}function wt(e){return B("(?:",e,")?")}function B(...e){return e.map(n=>G(n)).join("")}function xt(e){let t=e[e.length-1];return typeof t=="object"&&t.constructor===Object?(e.splice(e.length-1,1),t):{}}function V(...e){return"("+(xt(e).capture?"":"?:")+e.map(l=>G(l)).join("|")+")"}function ke(e){return new RegExp(e.toString()+"|").exec("").length-1}function Nt(e,t){let n=e&&e.exec(t);return n&&n.index===0}var Rt=new RegExp(V(/\[(?:[^\\\]]|\\.)*\]/,/\(\?<(?![=!])[^>]+>/,/\(\?'[^']+'/,/\(\??/,/\\([1-9][0-9]*)/,/\\./));function fe(e,{joinWith:t}){let n=0;return e.map(l=>{n+=1;let d=n,_=G(l),c="";for(;_.length>0;){let r=Rt.exec(_);if(!r){c+=_;break}c+=_.substring(0,r.index),_=_.substring(r.index+r[0].length),r[0][0]==="\\"&&r[1]?c+="\\"+String(Number(r[1])+d):(c+=r[0],(r[0]==="("||/^\(\?[<']/.test(r[0]))&&n++)}return c}).map(l=>`(${l})`).join(t)}var yt=/\b\B/,ve="[a-zA-Z]\\w*",ge="[a-zA-Z_]\\w*",Le="\\b\\d+(\\.\\d+)?",Be="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Pe="\\b(0b[01]+)",St="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",At=(e={})=>{let t=/^#![ ]*\//;return e.binary&&(e.begin=B(t,/.*\b/,e.binary,/\b.*/)),k({scope:"meta",begin:t,end:/$/,relevance:0,"on:begin":(n,l)=>{n.index!==0&&l.ignoreMatch()}},e)},K={begin:"\\\\[\\s\\S]",relevance:0},Tt={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[K]},It={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[K]},Ct={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},Q=function(e,t,n={}){let l=k({scope:"comment",begin:e,end:t,contains:[]},n);l.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let d=V("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return l.contains.push({begin:B(/[ ]+/,"(",d,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),l},Dt=Q("//","$"),kt=Q("/\\*","\\*/"),vt=Q("#","$"),Lt={scope:"number",begin:Le,relevance:0},Bt={scope:"number",begin:Be,relevance:0},Pt={scope:"number",begin:Pe,relevance:0},$t={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[K,{begin:/\[/,end:/\]/,relevance:0,contains:[K]}]},Ht={scope:"title",begin:ve,relevance:0},Ut={scope:"title",begin:ge,relevance:0},jt={begin:"\\.\\s*"+ge,relevance:0},Gt=function(e){return Object.assign(e,{"on:begin":(t,n)=>{n.data._beginMatch=t[1]},"on:end":(t,n)=>{n.data._beginMatch!==t[1]&&n.ignoreMatch()}})},X=Object.freeze({__proto__:null,APOS_STRING_MODE:Tt,BACKSLASH_ESCAPE:K,BINARY_NUMBER_MODE:Pt,BINARY_NUMBER_RE:Pe,COMMENT:Q,C_BLOCK_COMMENT_MODE:kt,C_LINE_COMMENT_MODE:Dt,C_NUMBER_MODE:Bt,C_NUMBER_RE:Be,END_SAME_AS_BEGIN:Gt,HASH_COMMENT_MODE:vt,IDENT_RE:ve,MATCH_NOTHING_RE:yt,METHOD_GUARD:jt,NUMBER_MODE:Lt,NUMBER_RE:Le,PHRASAL_WORDS_MODE:Ct,QUOTE_STRING_MODE:It,REGEXP_MODE:$t,RE_STARTERS_RE:St,SHEBANG:At,TITLE_MODE:Ht,UNDERSCORE_IDENT_RE:ge,UNDERSCORE_TITLE_MODE:Ut});function Kt(e,t){e.input[e.index-1]==="."&&t.ignoreMatch()}function mt(e,t){e.className!==void 0&&(e.scope=e.className,delete e.className)}function Wt(e,t){t&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=Kt,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function Ft(e,t){Array.isArray(e.illegal)&&(e.illegal=V(...e.illegal))}function zt(e,t){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function Yt(e,t){e.relevance===void 0&&(e.relevance=1)}var Xt=(e,t)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let n=Object.assign({},e);Object.keys(e).forEach(l=>{delete e[l]}),e.keywords=n.keywords,e.begin=B(n.beforeMatch,De(n.begin)),e.starts={relevance:0,contains:[Object.assign(n,{endsParent:!0})]},e.relevance=0,delete n.beforeMatch},Zt=["of","and","for","in","not","or","if","then","parent","list","value"],Jt="keyword";function $e(e,t,n=Jt){let l=Object.create(null);return typeof e=="string"?d(n,e.split(" ")):Array.isArray(e)?d(n,e):Object.keys(e).forEach(function(_){Object.assign(l,$e(e[_],t,_))}),l;function d(_,c){t&&(c=c.map(r=>r.toLowerCase())),c.forEach(function(r){let u=r.split("|");l[u[0]]=[_,Vt(u[0],u[1])]})}}function Vt(e,t){return t?Number(t):Qt(e)?0:1}function Qt(e){return Zt.includes(e.toLowerCase())}var ye={},L=e=>{console.error(e)},Se=(e,...t)=>{console.log(`WARN: ${e}`,...t)},H=(e,t)=>{ye[`${e}/${t}`]||(console.log(`Deprecated as of ${e}. ${t}`),ye[`${e}/${t}`]=!0)},J=new Error;function He(e,t,{key:n}){let l=0,d=e[n],_={},c={};for(let r=1;r<=t.length;r++)c[r+l]=d[r],_[r+l]=!0,l+=ke(t[r-1]);e[n]=c,e[n]._emit=_,e[n]._multi=!0}function qt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw L("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),J;if(typeof e.beginScope!="object"||e.beginScope===null)throw L("beginScope must be object"),J;He(e,e.begin,{key:"beginScope"}),e.begin=fe(e.begin,{joinWith:""})}}function en(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw L("skip, excludeEnd, returnEnd not compatible with endScope: {}"),J;if(typeof e.endScope!="object"||e.endScope===null)throw L("endScope must be object"),J;He(e,e.end,{key:"endScope"}),e.end=fe(e.end,{joinWith:""})}}function tn(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function nn(e){tn(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),qt(e),en(e)}function sn(e){function t(c,r){return new RegExp(G(c),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(r?"g":""))}class n{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(r,u){u.position=this.position++,this.matchIndexes[this.matchAt]=u,this.regexes.push([u,r]),this.matchAt+=ke(r)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let r=this.regexes.map(u=>u[1]);this.matcherRe=t(fe(r,{joinWith:"|"}),!0),this.lastIndex=0}exec(r){this.matcherRe.lastIndex=this.lastIndex;let u=this.matcherRe.exec(r);if(!u)return null;let O=u.findIndex((P,I)=>I>0&&P!==void 0),M=this.matchIndexes[O];return u.splice(0,O),Object.assign(u,M)}}class l{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(r){if(this.multiRegexes[r])return this.multiRegexes[r];let u=new n;return this.rules.slice(r).forEach(([O,M])=>u.addRule(O,M)),u.compile(),this.multiRegexes[r]=u,u}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(r,u){this.rules.push([r,u]),u.type==="begin"&&this.count++}exec(r){let u=this.getMatcher(this.regexIndex);u.lastIndex=this.lastIndex;let O=u.exec(r);if(this.resumingScanAtSamePosition()&&!(O&&O.index===this.lastIndex)){let M=this.getMatcher(0);M.lastIndex=this.lastIndex+1,O=M.exec(r)}return O&&(this.regexIndex+=O.position+1,this.regexIndex===this.count&&this.considerAll()),O}}function d(c){let r=new l;return c.contains.forEach(u=>r.addRule(u.begin,{rule:u,type:"begin"})),c.terminatorEnd&&r.addRule(c.terminatorEnd,{type:"end"}),c.illegal&&r.addRule(c.illegal,{type:"illegal"}),r}function _(c,r){let u=c;if(c.isCompiled)return u;[mt,zt,nn,Xt].forEach(M=>M(c,r)),e.compilerExtensions.forEach(M=>M(c,r)),c.__beforeBegin=null,[Wt,Ft,Yt].forEach(M=>M(c,r)),c.isCompiled=!0;let O=null;return typeof c.keywords=="object"&&c.keywords.$pattern&&(c.keywords=Object.assign({},c.keywords),O=c.keywords.$pattern,delete c.keywords.$pattern),O=O||/\w+/,c.keywords&&(c.keywords=$e(c.keywords,e.case_insensitive)),u.keywordPatternRe=t(O,!0),r&&(c.begin||(c.begin=/\B|\b/),u.beginRe=t(u.begin),!c.end&&!c.endsWithParent&&(c.end=/\B|\b/),c.end&&(u.endRe=t(u.end)),u.terminatorEnd=G(u.end)||"",c.endsWithParent&&r.terminatorEnd&&(u.terminatorEnd+=(c.end?"|":"")+r.terminatorEnd)),c.illegal&&(u.illegalRe=t(c.illegal)),c.contains||(c.contains=[]),c.contains=[].concat(...c.contains.map(function(M){return rn(M==="self"?c:M)})),c.contains.forEach(function(M){_(M,u)}),c.starts&&_(c.starts,r),u.matcher=d(u),u}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=k(e.classNameAliases||{}),_(e)}function Ue(e){return e?e.endsWithParent||Ue(e.starts):!1}function rn(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(t){return k(e,{variants:null},t)})),e.cachedVariants?e.cachedVariants:Ue(e)?k(e,{starts:e.starts?k(e.starts):null}):Object.isFrozen(e)?k(e):e}var cn="11.12.0",ue=class extends Error{constructor(t,n){super(t),this.name="HTMLInjectionError",this.html=n}},ce=Ce,Ae=k,Te=Symbol("nomatch"),on=7,je=function(e){let t=Object.create(null),n=Object.create(null),l=[],d=!0,_="Could not find the language '{}', did you forget to load/include a language module?",c={disableAutodetect:!0,name:"Plain text",contains:[]},r={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:le};function u(i){return r.noHighlightRe.test(i)}function O(i){let a=i.className+" ";a+=i.parentNode?i.parentNode.className:"";let h=r.languageDetectRe.exec(a);if(h){let E=C(h[1]);return E||(Se(_.replace("{}",h[1])),Se("Falling back to no-highlight mode for this block.",i)),E?h[1]:"no-highlight"}return a.split(/\s+/).find(E=>u(E)||C(E))}function M(i,a,h){let E="",w="";typeof a=="object"?(E=i,h=a.ignoreIllegals,w=a.language):(H("10.7.0","highlight(lang, code, ...args) has been deprecated."),H("10.7.0",`Please use highlight(code, options) instead.
+(see the highlight.js issue tracker)`),w=i,E=a),h===void 0&&(h=!0);let y={code:E,language:w};W("before:highlight",y);let D=y.result?y.result:P(y.language,y.code,h);return D.code=y.code,W("after:highlight",D),D}function P(i,a,h,E){let w=Object.create(null);function y(s,o){return s.keywords[o]}function D(){if(!f.keywords){x.addText(b);return}let s=0;f.keywordPatternRe.lastIndex=0;let o=f.keywordPatternRe.exec(b),g="";for(;o;){g+=b.substring(s,o.index);let p=A.case_insensitive?o[0].toLowerCase():o[0],N=y(f,p);if(N){let[T,at]=N;if(x.addText(g),g="",w[p]=(w[p]||0)+1,w[p]<=on&&(Y+=at),T.startsWith("_"))g+=o[0];else{let lt=A.classNameAliases[T]||T;S(o[0],lt)}}else g+=o[0];s=f.keywordPatternRe.lastIndex,o=f.keywordPatternRe.exec(b)}g+=b.substring(s),x.addText(g)}function F(){if(b==="")return;let s=null;if(typeof f.subLanguage=="string"){if(!t[f.subLanguage]){x.addText(b);return}s=P(f.subLanguage,b,!0,we[f.subLanguage]),we[f.subLanguage]=s._top}else s=$(b,f.subLanguage.length?f.subLanguage:null);f.relevance>0&&(Y+=s.relevance),x.__addSublanguage(s._emitter,s.language)}function R(){f.subLanguage!=null?F():D(),b=""}function S(s,o){s!==""&&(x.startScope(o),x.addText(s),x.endScope())}function be(s,o){let g=1,p=o.length-1;for(;g<=p;){if(!s._emit[g]){g++;continue}let N=A.classNameAliases[s[g]]||s[g],T=o[g];N?S(T,N):(b=T,D(),b=""),g++}}function _e(s,o){return s.scope&&typeof s.scope=="string"&&x.openNode(A.classNameAliases[s.scope]||s.scope),s.beginScope&&(s.beginScope._wrap?(S(b,A.classNameAliases[s.beginScope._wrap]||s.beginScope._wrap),b=""):s.beginScope._multi&&(be(s.beginScope,o),b="")),f=Object.create(s,{parent:{value:f}}),f}function Me(s,o,g){let p=Nt(s.endRe,g);if(p){if(s["on:end"]){let N=new Z(s);s["on:end"](o,N),N.isMatchIgnored&&(p=!1)}if(p){for(;s.endsParent&&s.parent;)s=s.parent;return s}}if(s.endsWithParent)return Me(s.parent,o,g)}function it(s){return f.matcher.regexIndex===0?(b+=s[0],1):(re=!0,0)}function st(s){let o=s[0],g=s.rule,p=new Z(g),N=[g.__beforeBegin,g["on:begin"]];for(let T of N)if(T&&(T(s,p),p.isMatchIgnored))return it(o);return g.skip?b+=o:(g.excludeBegin&&(b+=o),R(),!g.returnBegin&&!g.excludeBegin&&(b=o)),_e(g,s),g.returnBegin?0:o.length}function rt(s){let o=s[0],g=a.substring(s.index),p=Me(f,s,g);if(!p)return Te;let N=f;f.endScope&&f.endScope._wrap?(R(),S(o,f.endScope._wrap)):f.endScope&&f.endScope._multi?(R(),be(f.endScope,s)):N.skip?b+=o:(N.returnEnd||N.excludeEnd||(b+=o),R(),N.excludeEnd&&(b=o));do f.scope&&x.closeNode(),!f.skip&&!f.subLanguage&&(Y+=f.relevance),f=f.parent;while(f!==p.parent);return p.starts&&_e(p.starts,s),N.returnEnd?0:o.length}function ct(){let s=[];for(let o=f;o!==A;o=o.parent)o.scope&&s.unshift(o.scope);s.forEach(o=>x.openNode(o))}let z={};function Oe(s,o){let g=o&&o[0];if(b+=s,g==null)return R(),0;if(z.type==="begin"&&o.type==="end"&&z.index===o.index&&g===""){if(b+=a.slice(o.index,o.index+1),!d){let p=new Error(`0 width match regex (${i})`);throw p.languageName=i,p.badRule=z.rule,p}return 1}if(z=o,o.type==="begin")return st(o);if(o.type==="illegal"&&!h){let p=new Error('Illegal lexeme "'+g+'" for mode "'+(f.scope||"<unnamed>")+'"');throw p.mode=f,p}else if(o.type==="end"){let p=rt(o);if(p!==Te)return p}if(o.type==="illegal"&&g==="")return o.index===a.length||(b+=`
+`),1;if(se>1e5&&se>o.index*3)throw new Error("potential infinite loop, way more iterations than matches");return b+=g,g.length}let A=C(i);if(!A)throw L(_.replace("{}",i)),new Error('Unknown language: "'+i+'"');let ot=sn(A),ie="",f=E||ot,we={},x=new r.__emitter(r);ct();let b="",Y=0,v=0,se=0,re=!1;try{if(A.__emitTokens)A.__emitTokens(a,x);else{for(f.matcher.considerAll();;){se++,re?re=!1:f.matcher.considerAll(),f.matcher.lastIndex=v;let s=f.matcher.exec(a);if(!s)break;let o=a.substring(v,s.index),g=Oe(o,s);v=s.index+g}Oe(a.substring(v))}return x.finalize(),ie=x.toHTML(),{language:i,value:ie,relevance:Y,illegal:!1,_emitter:x,_top:f}}catch(s){if(s.message&&s.message.includes("Illegal"))return{language:i,value:ce(a),illegal:!0,relevance:0,_illegalBy:{message:s.message,index:v,context:a.slice(v-100,v+100),mode:s.mode,resultSoFar:ie},_emitter:x};if(d)return{language:i,value:ce(a),illegal:!1,relevance:0,errorRaised:s,_emitter:x,_top:f};throw s}}function I(i){let a={value:ce(i),illegal:!1,relevance:0,_top:c,_emitter:new r.__emitter(r)};return a._emitter.addText(i),a}function $(i,a){a=a||r.languages||Object.keys(t);let h=I(i),E=a.filter(C).filter(Ee).map(R=>P(R,i,!1));E.unshift(h);let w=E.sort((R,S)=>{if(R.relevance!==S.relevance)return S.relevance-R.relevance;if(R.language&&S.language){if(C(R.language).supersetOf===S.language)return 1;if(C(S.language).supersetOf===R.language)return-1}return 0}),[y,D]=w,F=y;return F.secondBest=D,F}function te(i,a,h){let E=a&&n[a]||h;i.classList.add("hljs"),i.classList.add(`language-${E}`)}function ne(i){let a=null,h=O(i);if(u(h))return;if(W("before:highlightElement",{el:i,language:h}),i.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",i);return}if(i.children.length>0&&(r.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("(see the highlight.js security wiki)"),console.warn("The element with unescaped HTML:"),console.warn(i)),r.throwUnescapedHTML))throw new ue("One of your code blocks includes unescaped HTML.",i.innerHTML);a=i;let E=a.textContent,w=h?M(E,{language:h,ignoreIllegals:!0}):$(E);i.innerHTML=w.value,i.dataset.highlighted="yes",te(i,h,w.language),i.result={language:w.language,re:w.relevance,relevance:w.relevance},w.secondBest&&(i.secondBest={language:w.secondBest.language,relevance:w.secondBest.relevance}),W("after:highlightElement",{el:i,result:w,text:E})}function Ye(i){r=Ae(r,i)}let Xe=()=>{m(),H("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function Ze(){m(),H("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let de=!1;function m(){function i(){m()}if(document.readyState==="loading"){de||window.addEventListener("DOMContentLoaded",i,!1),de=!0;return}document.querySelectorAll(r.cssSelector).forEach(ne)}function Je(i,a){let h=null;try{h=a(e)}catch(E){if(L("Language definition for '{}' could not be registered.".replace("{}",i)),d)L(E);else throw E;h=c}h.name||(h.name=i),t[i]=h,h.rawDefinition=a.bind(null,e),h.aliases&&pe(h.aliases,{languageName:i})}function Ve(i){delete t[i];for(let a of Object.keys(n))n[a]===i&&delete n[a]}function Qe(){return Object.keys(t)}function C(i){return i=(i||"").toLowerCase(),t[i]||t[n[i]]}function pe(i,{languageName:a}){typeof i=="string"&&(i=[i]),i.forEach(h=>{n[h.toLowerCase()]=a})}function Ee(i){let a=C(i);return a&&!a.disableAutodetect}function qe(i){i["before:highlightBlock"]&&!i["before:highlightElement"]&&(i["before:highlightElement"]=a=>{i["before:highlightBlock"](Object.assign({block:a.el},a))}),i["after:highlightBlock"]&&!i["after:highlightElement"]&&(i["after:highlightElement"]=a=>{i["after:highlightBlock"](Object.assign({block:a.el},a))})}function et(i){qe(i),l.push(i)}function tt(i){let a=l.indexOf(i);a!==-1&&l.splice(a,1)}function W(i,a){let h=i;l.forEach(function(E){E[h]&&E[h](a)})}function nt(i){return H("10.7.0","highlightBlock will be removed entirely in v12.0"),H("10.7.0","Please use highlightElement now."),ne(i)}Object.assign(e,{highlight:M,highlightAuto:$,highlightAll:m,highlightElement:ne,highlightBlock:nt,configure:Ye,initHighlighting:Xe,initHighlightingOnLoad:Ze,registerLanguage:Je,unregisterLanguage:Ve,listLanguages:Qe,getLanguage:C,registerAliases:pe,autoDetection:Ee,inherit:Ae,addPlugin:et,removePlugin:tt}),e.debugMode=function(){d=!1},e.safeMode=function(){d=!0},e.versionString=cn,e.regex={concat:B,lookahead:De,either:V,optional:wt,anyNumberOfTimes:Ot};for(let i in X)typeof X[i]=="object"&&Ie(X[i]);return Object.assign(e,X),e},U=je({});U.newInstance=()=>je({});Ge.exports=U;U.HighlightJS=U;U.default=U});var me=bt(Ke(),1);var he=me.default;var j="[0-9](_*[0-9])*",q=`\\.(${j})`,ee="[0-9a-fA-F](_*[0-9a-fA-F])*",We={className:"number",variants:[{begin:`(\\b(${j})((${q})|\\.)?|(${q}))[eE][+-]?(${j})[fFdD]?\\b`},{begin:`\\b(${j})((${q})[fFdD]?\\b|\\.([fFdD]\\b)?)`},{begin:`(${q})[fFdD]?\\b`},{begin:`\\b(${j})[fFdD]\\b`},{begin:`\\b0[xX]((${ee})\\.?|(${ee})?\\.(${ee}))[pP][+-]?(${j})[fFdD]?\\b`},{begin:"\\b(0|[1-9](_*[0-9])*)[lL]?\\b"},{begin:`\\b0[xX](${ee})[lL]?\\b`},{begin:"\\b0(_*[0-7])*[lL]?\\b"},{begin:"\\b0[bB][01](_*[01])*[lL]?\\b"}],relevance:0};function Fe(e,t,n){return n===-1?"":e.replace(t,l=>Fe(e,t,n-1))}function ze(e){let t=e.regex,n="[\xC0-\u02B8a-zA-Z_$][\xC0-\u02B8a-zA-Z_$0-9]*",l="(?:(?:\\s*\\[\\s*])+)?",d=n+"<@@@>"+l,c="(?:"+("\\?(?:\\s+(?:extends|super)\\s+"+d+")?")+"|"+d+")",r=Fe("(?:\\s*<\\s*"+c+"(?:\\s*,\\s*"+c+")*\\s*>)?",/<@@@>/g,2),I={keyword:["synchronized","abstract","private","var","static","if","const ","for","while","strictfp","finally","protected","import","native","final","void","enum","else","break","transient","catch","instanceof","volatile","case","assert","package","default","public","try","switch","continue","throws","protected","public","private","module","requires","exports","do","sealed","yield","permits","goto","when"],literal:["false","true","null"],type:["char","boolean","long","float","int","byte","short","double"],built_in:["super","this"]},$={className:"meta",begin:"@"+n,contains:[{begin:/\(/,end:/\)/,contains:["self"]}]},te={className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[e.C_BLOCK_COMMENT_MODE],endsParent:!0};return{name:"Java",aliases:["jsp"],keywords:I,illegal:/<\/|#/,contains:[e.COMMENT("/\\*\\*","\\*/",{relevance:0,contains:[{begin:/\w+@/,relevance:0},{className:"doctag",begin:"@[A-Za-z]+"}]}),{begin:/import java\.[a-z]+\./,keywords:"import",relevance:2},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE,{begin:/"""/,end:/"""/,className:"string",contains:[e.BACKSLASH_ESCAPE]},e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,{match:[/\b(?:class|interface|enum|extends|implements|new)/,/\s+/,n],className:{1:"keyword",3:"title.class"}},{match:/non-sealed/,scope:"keyword"},{beginKeywords:"new throw return else yield assert",relevance:0},{begin:[n,t.concat(r,l,/\s+/),n,l,/\s*/,/=(?!=)/],className:{1:"type",3:"variable",6:"operator"}},{begin:[/record/,/\s+/,n],className:{1:"keyword",3:"title.class"},contains:[te,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},{begin:[n,t.concat(r,l,/\s+/),n,/\s*(?=\()/],className:{1:"type",3:"title.function"},keywords:I,contains:[{className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[$,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,We,e.C_BLOCK_COMMENT_MODE]},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},We,$]}}he.registerLanguage("java",ze);window.hljs=he;})();
+</script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---- 1. syntax highlighting -------------------------------------- */
+  function highlight() {
+    if (!window.hljs) return;
+    var blocks = document.querySelectorAll('pre code.language-java');
+    for (var i = 0; i < blocks.length; i++) {
+      try { window.hljs.highlightElement(blocks[i]); } catch (e) {}
+    }
+  }
+
+  /* ---- 2. every solution / reveal starts closed --------------------- */
+  function closeAll() {
+    var d = document.querySelectorAll('details.soln');
+    for (var i = 0; i < d.length; i++) { d[i].open = false; }
+  }
+
+  /* ---- 3. show all / hide all -------------------------------------- */
+  function wireToolbar() {
+    var show = document.getElementById('showAll');
+    var hide = document.getElementById('hideAll');
+    function setAll(v) {
+      var d = document.querySelectorAll('details.soln');
+      for (var i = 0; i < d.length; i++) { d[i].open = v; }
+    }
+    if (show) show.addEventListener('click', function () { setAll(true); });
+    if (hide) hide.addEventListener('click', function () { setAll(false); });
+  }
+
+  /* ---- 4. live-coding editors -------------------------------------- */
+  var INDENT = '    ';
+
+  function wireEditors() {
+    var eds = document.querySelectorAll('.editor');
+    for (var i = 0; i < eds.length; i++) { wireOne(eds[i]); }
+  }
+
+  function wireOne(box) {
+    var ta = box.querySelector('textarea');
+    if (!ta) return;
+    var starter = ta.value;
+
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Tab' || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+      ev.preventDefault();
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+
+      if (s === e && !ev.shiftKey) {
+        ta.value = v.slice(0, s) + INDENT + v.slice(e);
+        ta.selectionStart = ta.selectionEnd = s + INDENT.length;
+        return;
+      }
+      /* block indent / outdent over the selected lines */
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var le = v.indexOf('\n', e);
+      if (le === -1) le = v.length;
+      var seg = v.slice(ls, le);
+      var lines = seg.split('\n');
+      var delta0 = 0, total = 0;
+
+      for (var i = 0; i < lines.length; i++) {
+        if (ev.shiftKey) {
+          var m = lines[i].match(/^(\t| {1,4})/);
+          if (m) {
+            lines[i] = lines[i].slice(m[0].length);
+            if (i === 0) delta0 = -m[0].length;
+            total -= m[0].length;
+          }
+        } else {
+          lines[i] = INDENT + lines[i];
+          if (i === 0) delta0 = INDENT.length;
+          total += INDENT.length;
+        }
+      }
+      ta.value = v.slice(0, ls) + lines.join('\n') + v.slice(le);
+      ta.selectionStart = Math.max(ls, s + delta0);
+      ta.selectionEnd = Math.max(ta.selectionStart, e + total);
+    });
+
+    /* keep the indent of the current line when Enter is pressed */
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Enter' || ev.shiftKey || ev.ctrlKey || ev.metaKey) return;
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+      if (s !== e) return;
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var lead = (v.slice(ls, s).match(/^[ \t]*/) || [''])[0];
+      var extra = /[{(\[]\s*$/.test(v.slice(ls, s)) ? INDENT : '';
+      if (!lead && !extra) return;
+      ev.preventDefault();
+      var ins = '\n' + lead + extra;
+      ta.value = v.slice(0, s) + ins + v.slice(e);
+      ta.selectionStart = ta.selectionEnd = s + ins.length;
+    });
+
+    var rst = box.querySelector('[data-act="reset"]');
+    if (rst) rst.addEventListener('click', function () {
+      ta.value = starter;
+      ta.focus();
+      flash(box, 'Reset to starter code');
+    });
+
+    var cpy = box.querySelector('[data-act="copy"]');
+    if (cpy) cpy.addEventListener('click', function () {
+      var done = function () { flash(box, 'Copied — paste it into your IDE'); };
+      var fail = function () { flash(box, 'Copy failed — select the text and press Ctrl/Cmd+C'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value).then(done, function () { legacy(ta, done, fail); });
+      } else {
+        legacy(ta, done, fail);
+      }
+    });
+  }
+
+  function legacy(ta, done, fail) {
+    try {
+      var st = ta.selectionStart, en = ta.selectionEnd;
+      ta.select();
+      var ok = document.execCommand('copy');
+      ta.selectionStart = st; ta.selectionEnd = en;
+      ok ? done() : fail();
+    } catch (e) { fail(); }
+  }
+
+  function flash(box, msg) {
+    var f = box.querySelector('.foot');
+    if (!f) return;
+    if (f.getAttribute('data-base') === null || f.getAttribute('data-base') === undefined) {
+      f.setAttribute('data-base', f.textContent);
+    }
+    f.textContent = msg;
+    window.setTimeout(function () { f.textContent = f.getAttribute('data-base'); }, 2200);
+  }
+
+  /* ---- go ----------------------------------------------------------- */
+  function init() {
+    highlight();
+    closeAll();
+    wireToolbar();
+    wireEditors();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  /* belt and braces: some browsers restore <details> state on soft reload */
+  window.addEventListener('pageshow', closeAll);
+})();
+</script>
+</body>
+</html>

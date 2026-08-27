@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class 9 — static Members, equals and toString | CSCI 212</title>
+<style>
+:root{
+  --ink:#0f172a; --ink2:#334155; --muted:#64748b; --line:#e2e8f0;
+  --bg:#ffffff; --bg2:#f8fafc;
+  --obj:#4f46e5; --def:#2563eb; --ex:#059669; --alg:#7c3aed;
+  --key:#b45309; --warn:#dc2626; --qc:#0891b2; --prac:#be185d; --sum:#475569;
+  --edit:#ea580c; --edit-bg:#fff7ed;
+  --code-bg:#0d1117; --code-bd:#000000;   /* read-only listings: black */
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px 80px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:#0f172a;color:#e2e8f0;font-size:13.5px;
+  border-bottom:3px solid var(--obj);
+}
+.topbar .inner{max-width:900px;margin:0 auto;padding:10px 22px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.topbar a{color:#e2e8f0;text-decoration:none;border-bottom:1px solid transparent}
+.topbar a:hover{border-bottom-color:#94a3b8}
+.topbar .course{font-weight:700;letter-spacing:.02em}
+.topbar .sep{color:#475569}
+.topbar .spacer{flex:1}
+
+/* ---------- title block ---------- */
+.titleblock{padding:34px 0 10px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.eyebrow{
+  font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--obj);margin-bottom:8px;
+}
+.titleblock h1{font-size:33px;line-height:1.2;margin:0 0 10px;letter-spacing:-.015em}
+.titleblock .sub{margin:0;color:var(--muted);font-size:17px;line-height:1.5}
+
+h2{
+  font-size:24px;margin:46px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line);letter-spacing:-.01em;scroll-margin-top:14px;
+}
+h2 .num{color:var(--obj);font-weight:800;margin-right:11px}
+h3{font-size:18.5px;margin:30px 0 10px;color:var(--ink)}
+h4{font-size:16px;margin:20px 0 8px;color:var(--ink2)}
+p{margin:12px 0}
+ul,ol{margin:12px 0;padding-left:26px}
+li{margin:6px 0}
+a{color:var(--def)}
+hr{border:0;border-top:1px solid var(--line);margin:30px 0}
+strong{color:var(--ink)}
+.muted{color:var(--muted)}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--bg2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 20px 16px;margin:22px 0;
+}
+.toc .th{
+  font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;
+}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:30px}
+.toc li{margin:3px 0;font-size:14.5px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- show all / hide all ---------- */
+.tools{
+  display:flex;gap:9px;align-items:center;flex-wrap:wrap;
+  padding:11px 15px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:9px;margin:22px 0;font-size:13.5px;
+}
+.tools .lab{font-weight:700;color:var(--ink2)}
+.tools button{
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  background:#fff;color:var(--ink2);border:1px solid #cbd5e1;
+  border-radius:6px;padding:4px 12px;
+}
+.tools button:hover{background:var(--obj);border-color:var(--obj);color:#fff}
+.tools .muted{font-size:12.5px}
+
+/* ---------- boxes ---------- */
+.box{border:1px solid var(--line);border-left:5px solid var(--muted);border-radius:8px;margin:22px 0;overflow:hidden;background:#fff}
+.box>.hd{
+  padding:9px 16px;font-size:12.5px;font-weight:700;
+  letter-spacing:.075em;text-transform:uppercase;color:#fff;background:var(--muted);
+}
+.box>.hd .tag{margin-left:5px;font-weight:500;text-transform:none;letter-spacing:0;opacity:.92;font-size:13px}
+.box>.bd{padding:4px 18px 14px}
+.box>.bd>:first-child{margin-top:12px}
+.box>.bd>:last-child{margin-bottom:2px}
+
+.box.obj{border-left-color:var(--obj)}  .box.obj>.hd{background:var(--obj)}
+.box.def{border-left-color:var(--def)}  .box.def>.hd{background:var(--def)}
+.box.ex{border-left-color:var(--ex)}    .box.ex>.hd{background:var(--ex)}
+.box.alg{border-left-color:var(--alg)}  .box.alg>.hd{background:var(--alg)}
+.box.key{border-left-color:var(--key)}  .box.key>.hd{background:var(--key)}
+.box.warn{border-left-color:var(--warn)}.box.warn>.hd{background:var(--warn)}
+.box.qc{border-left-color:var(--qc)}    .box.qc>.hd{background:var(--qc)}
+.box.prac{border-left-color:var(--prac)}.box.prac>.hd{background:var(--prac)}
+.box.sum{border-left-color:var(--sum)}  .box.sum>.hd{background:var(--sum)}
+
+.box.obj{background:#f5f5ff}
+.box.qc{background:#f0fbfe}
+.box.warn{background:#fff7f7}
+.box.key{background:#fffbf2}
+.box.sum{background:#f8fafc}
+
+/* ---------- code ---------- */
+/* Read-only listings sit on black, matching CSCI 211, so a code block is never
+   mistaken for the editable live-coding box. */
+pre{
+  margin:14px 0;padding:13px 15px;overflow-x:auto;
+  background:var(--code-bg);border:1px solid var(--code-bd);border-radius:8px;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;color:#c9d1d9;
+}
+pre code{font-family:inherit;font-size:inherit;background:none;padding:0;border:0;color:inherit;display:block}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef2f7;
+  border:1px solid #e2e8f0;border-radius:4px;padding:1px 5px;color:#0b3a5b;
+}
+.filename{
+  font-family:var(--mono);font-size:12px;color:#475569;
+  margin:16px 0 -9px;font-weight:600;
+}
+
+/* comparison block: another language, never syntax-highlighted. Dark like the
+   Java listings, but desaturated and dashed so it reads as "not this course". */
+pre.cmp{background:#161b22;border-style:dashed;border-color:#3f4650;color:#9aa4b2}
+pre.cmp code{color:#9aa4b2}
+
+/* shell commands you type */
+pre.sh{background:#1e293b;border-color:#1e293b;color:#e2e8f0;position:relative;padding-top:26px}
+pre.sh code{color:#e2e8f0}
+pre.sh::before{
+  content:"Terminal";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#86efac;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* output / terminal blocks */
+pre.out{background:#111d33;border-color:#111d33;color:#e2e8f0;position:relative;padding-top:26px}
+pre.out code{color:#e2e8f0}
+pre.out::before{
+  content:"Output";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#7dd3fc;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+pre.err{background:#1f1416;border-color:#7f1d1d;color:#fecdd3;padding-top:26px;position:relative}
+pre.err code{color:#fecdd3}
+pre.err::before{
+  content:"Compiler message";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#fda4af;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* ---- highlight.js, GitHub-dark palette (hand-written, no external file) ---- */
+.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-template-tag,
+.hljs-template-variable,.hljs-type,.hljs-variable.language_{color:#ff7b72}
+.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#d2a8ff}
+.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,
+.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable{color:#79c0ff}
+.hljs-meta .hljs-string,.hljs-regexp,.hljs-string{color:#a5d6ff}
+.hljs-built_in,.hljs-symbol{color:#ffa657}
+.hljs-code,.hljs-comment,.hljs-formula{color:#8b949e;font-style:italic}
+.hljs-name,.hljs-quote,.hljs-selector-pseudo,.hljs-selector-tag{color:#7ee787}
+.hljs-subst{color:#c9d1d9}
+.hljs-section{color:#1f6feb;font-weight:700}
+.hljs-bullet{color:#f2cc60}
+.hljs-emphasis{color:#c9d1d9;font-style:italic}
+.hljs-strong{color:#c9d1d9;font-weight:700}
+
+/* ---------- trace tables ---------- */
+table{border-collapse:collapse;margin:16px 0;font-size:14px;width:100%}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg2);font-weight:700;font-size:13px}
+table.trace td:first-child,table.trace th:first-child{white-space:nowrap}
+table code{font-size:.88em}
+
+/* ---------- multi-part questions ---------- */
+.part{margin:16px 0;padding-left:14px;border-left:2px solid #cbd5e1}
+.part .q{margin:0 0 8px}
+.part .pl{font-weight:700;color:var(--qc);margin-right:6px}
+
+/* ---------- collapsible solutions ---------- */
+details.soln{margin:10px 0 4px}
+details.soln>summary{
+  list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  font-size:12.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:#fff;background:var(--sum);border-radius:6px;padding:5px 13px;
+  user-select:none;
+}
+details.soln>summary::-webkit-details-marker{display:none}
+details.soln>summary::before{content:"\25B6";font-size:9px;transition:transform .15s}
+details.soln[open]>summary::before{transform:rotate(90deg)}
+details.soln>summary::after{content:"Show Answer"}
+details.soln[open]>summary::after{content:"Hide Answer"}
+details.soln>summary:hover{filter:brightness(1.18)}
+
+details.soln.reveal>summary{background:var(--ex)}
+details.soln.reveal>summary::after{content:"Show Output & Explanation"}
+details.soln.reveal[open]>summary::after{content:"Hide Output & Explanation"}
+details.soln.reveal.noout>summary::after{content:"Show Explanation"}
+details.soln.reveal.noout[open]>summary::after{content:"Hide Explanation"}
+
+.ans{
+  margin-top:11px;padding:2px 16px 10px;background:#fff;
+  border:1px solid var(--line);border-left:3px solid var(--sum);border-radius:7px;
+}
+details.soln.reveal .ans{border-left-color:var(--ex)}
+.ans>:first-child{margin-top:12px}
+.ans>:last-child{margin-bottom:6px}
+
+/* ---------- live coding editor ---------- */
+.editor{
+  margin:18px 0;border:2px dashed var(--edit);border-radius:9px;
+  background:var(--edit-bg);overflow:hidden;
+}
+.editor .ehd{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:7px 13px;background:var(--edit);color:#fff;
+  font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+}
+.editor .ehd .etitle{flex:1}
+.editor .ehd button{
+  font:inherit;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  cursor:pointer;background:rgba(255,255,255,.16);color:#fff;
+  border:1px solid rgba(255,255,255,.5);border-radius:5px;padding:3px 10px;
+}
+.editor .ehd button:hover{background:#fff;color:var(--edit)}
+.editor textarea{
+  display:block;width:100%;border:0;outline:0;resize:vertical;
+  padding:12px 15px;background:var(--edit-bg);color:#431407;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;
+  tab-size:4;-moz-tab-size:4;min-height:150px;
+}
+.editor textarea:focus{background:#fff}
+.editor .foot{
+  padding:5px 13px 7px;font-size:11.5px;color:#9a3412;background:#ffedd5;
+  border-top:1px solid #fed7aa;
+}
+
+/* ---------- prev/next nav ---------- */
+.pagenav{display:flex;gap:14px;margin:52px 0 0;flex-wrap:wrap}
+.pagenav a,.pagenav span.disabled{
+  flex:1 1 260px;display:block;text-decoration:none;
+  border:1px solid var(--line);border-radius:9px;padding:12px 16px;background:#fff;
+}
+.pagenav a:hover{border-color:var(--obj);background:var(--bg2)}
+.pagenav .dir{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.pagenav .ttl{font-size:15px;font-weight:600;color:var(--ink);margin-top:3px}
+.pagenav .next{text-align:right}
+.pagenav span.disabled{opacity:.4}
+.pagenav span.disabled .ttl{color:var(--muted)}
+
+footer.pf{
+  margin-top:40px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--muted);text-align:center;
+}
+
+/* ---------- index page ---------- */
+table.sched{font-size:14.5px}
+table.sched th{background:#0f172a;color:#fff;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+table.sched td:first-child{white-space:nowrap;font-weight:700;color:var(--muted);width:60px}
+table.sched tr.examrow td{background:#fff1f2}
+table.sched tr.revrow td{background:#fffbeb}
+table.sched a{font-weight:600;text-decoration:none}
+table.sched a:hover{text-decoration:underline}
+
+
+/* ---------- release gating ---------- */
+.pending{
+  margin-top:4px;font-size:11.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:#b45309;
+}
+.pagenav span.disabled .pending{color:#b45309}
+table.sched tr.pendingrow td{background:#fcfcfd}
+table.sched .unrel{color:var(--muted)}
+table.sched .pending{display:block;margin-top:2px}
+table.sched td.cn{white-space:nowrap;width:52px;font-weight:700;color:var(--muted)}
+table.sched td.dt{white-space:nowrap;width:104px;color:var(--muted);font-size:13.5px}
+table.sched tr.offrow td{background:#f1f5f9;color:var(--muted);font-style:italic}
+.refcard{
+  display:block;text-decoration:none;border:1px solid var(--line);
+  border-left:5px solid var(--alg);border-radius:9px;padding:13px 17px;
+  margin:22px 0;background:#faf9ff;
+}
+.refcard:hover{background:#f5f3ff;border-color:var(--alg)}
+.refcard .rl{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--alg)}
+.refcard .rt{font-size:16px;font-weight:600;color:var(--ink);margin-top:3px}
+.refcard .rd{font-size:14px;color:var(--muted);margin-top:4px}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,.tools,.pagenav,.pending{display:none !important}
+  html,body{width:100%;font-size:10pt}
+  .wrap{max-width:100%;width:100%;padding:0}
+  /* a wide <pre> must wrap rather than widen the page and clip every other
+     element at the paper edge */
+  /* Screen shows code on black; paper does not. Restore a dark-on-light palette
+     for print only, or the dark theme's light tokens vanish on white. */
+  pre{white-space:pre-wrap;overflow:visible;overflow-wrap:anywhere;font-size:8.6pt;
+      background:#f8fafc !important;color:#24292e !important;border-color:#cbd5e1 !important;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  pre code{color:#24292e !important}
+  pre.cmp{background:#fff !important;color:#475569 !important;border-color:#94a3b8 !important}
+  pre.cmp code{color:#475569 !important}
+  pre .hljs-doctag,pre .hljs-keyword,pre .hljs-meta .hljs-keyword,pre .hljs-template-tag,
+  pre .hljs-template-variable,pre .hljs-type,pre .hljs-variable.language_{color:#d73a49 !important}
+  pre .hljs-title,pre .hljs-title.class_,pre .hljs-title.class_.inherited__,
+  pre .hljs-title.function_{color:#6f42c1 !important}
+  pre .hljs-attr,pre .hljs-attribute,pre .hljs-literal,pre .hljs-meta,pre .hljs-number,
+  pre .hljs-operator,pre .hljs-selector-attr,pre .hljs-selector-class,pre .hljs-selector-id,
+  pre .hljs-variable{color:#005cc5 !important}
+  pre .hljs-meta .hljs-string,pre .hljs-regexp,pre .hljs-string{color:#032f62 !important}
+  pre .hljs-built_in,pre .hljs-symbol{color:#e36209 !important}
+  pre .hljs-code,pre .hljs-comment,pre .hljs-formula{color:#6a737d !important}
+  pre .hljs-name,pre .hljs-quote,pre .hljs-selector-pseudo,
+  pre .hljs-selector-tag{color:#22863a !important}
+  pre .hljs-subst,pre .hljs-emphasis,pre .hljs-strong{color:#24292e !important}
+  .filename{color:#475569 !important}
+  table{table-layout:fixed;width:100%;word-wrap:break-word;overflow-wrap:anywhere}
+  .box,.toc{max-width:100%}
+  a{color:var(--ink);text-decoration:none}
+  .box,.part,pre,table,.editor{break-inside:avoid;page-break-inside:avoid}
+  h2{break-after:avoid;page-break-after:avoid}
+  details.soln>summary{display:none !important}
+  details.soln:not([open])>.ans{display:none !important}
+  details.soln::before{
+    content:"Answer withheld — see the online notes.";
+    display:block;font-size:9pt;font-style:italic;color:#64748b;margin:6px 0;
+  }
+  details.soln[open]::before{content:""}
+  .editor textarea{display:none !important}
+  .editor{border:1.5px solid #fdba74 !important;background:#fff;border-style:solid}
+  .editor .ehd{background:#fff !important;color:#9a3412 !important;border-bottom:1px solid #fdba74}
+  .editor .ehd button{display:none}
+  .editor .foot{display:none}
+  .editor::after{content:"";display:block;height:2.1in;background:#fff}
+  pre.out,pre.sh{background:#f1f5f9 !important;color:#0f172a !important;border-color:#94a3b8 !important}
+  pre.err{background:#fef2f2 !important;color:#7f1d1d !important;border-color:#fca5a5 !important}
+  pre.out code,pre.sh code{color:#0f172a !important}
+  pre.err code{color:#7f1d1d !important}
+  pre.out::before,pre.sh::before{color:#475569}
+  pre.err::before{color:#b91c1c}
+  .box>.hd{color:#000;background:#fff !important;border-bottom:1px solid #cbd5e1}
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="inner">
+<span class="course">CSCI 212</span>
+<span class="sep">|</span>
+<a href="index.html">Course index</a>
+<span class="sep">|</span>
+<span>Class 9 of 28</span>
+<span class="sep">|</span>
+<span>Tuesday, September 29</span>
+<span class="spacer"></span>
+<span>Queens College, CUNY</span>
+</div></div>
+<div class="wrap">
+<div class="titleblock">
+  <div class="eyebrow">Session 9 &middot; Lecture 9</div>
+  <h1>static Members, equals and toString</h1>
+  <p class="sub">Every object already has an <code>equals</code> and a <code>toString</code> &mdash; today we replace them properly, and then meet the members that belong to the class itself rather than to any one object.</p> </div> <div class="box obj"> <div class="hd">Learning Objectives</div> <div class="bd"> <p>By the end of today's session you should be able to:</p> <ol> <li>State what <code>=</code> and <code>==</code> do for a primitive and for an object, and predict the output of a program that mixes the two.</li> <li>Explain why <code>.equals</code> exists, and what the version you inherit from <code>Object</code> actually does.</li> <li>Write your own <code>equals</code> with the correct signature <code>public boolean equals(Object obj)</code>, using <code>instanceof</code> and a cast.</li> <li>Recognize <code>public boolean equals(Point p)</code> as an <em>overload</em> rather than an <em>override</em>, and describe exactly when it silently gives the wrong answer.</li> <li>Use the <code>@Override</code> annotation so the compiler catches that mistake for you.</li> <li>Explain what <code>System.out.println(obj)</code> prints when the class has no <code>toString</code>, and write a <code>toString</code> that replaces it.</li> <li>Distinguish a <code>static</code> field from an instance field, and write a class that counts how many objects of itself have been created.</li> <li>Read and fix the error <code>non-static variable x cannot be referenced from a static context</code>, and say why <code>main</code> has to be <code>static</code>.</li> <li>Declare constants with <code>final</code> and <code>static final</code>, and say what <code>final</code> does and does not protect.</li> </ol> </div> </div> <div class="toc"> <div class="th">On this page</div> <ol> <li><a href="#s1">Recall: what <code>=</code> and <code>==</code> really do</a></li> <li><a href="#s2"><code>equals</code>: comparing contents instead of addresses</a></li> <li><a href="#s3">Writing your own <code>equals</code>, and the trap that eats it</a></li> <li><a href="#s4"><code>toString</code>, seen properly as an override</a></li> <li><a href="#s5"><code>static</code> fields: one copy for the whole class</a></li> <li><a href="#s6"><code>static</code> methods, <code>main</code>, and <code>this</code></a></li> <li><a href="#s7"><code>final</code> and <code>static final</code></a></li> <li><a href="#prac">Practice Problems</a></li> <li><a href="#summary">Lecture Summary</a></li> </ol> </div> <div class="tools"> <span class="lab">Answers</span> <button id="showAll" type="button">Show all</button> <button id="hideAll" type="button">Hide all</button> <span class="muted">&mdash; every worked-example output and every solution is hidden when the page loads. Work it out first, then reveal.</span> </div> <hr> <h2 id="s1"><span class="num">1.</span>Recall: what <code>=</code> and <code>==</code> really do</h2> <p>Last time we found out that an object variable does not hold an object. It holds a <em>reference</em> to one, and two variables can hold the same reference. Everything in today's lecture grows out of that single fact, so we start by putting it in one table you should be able to reproduce from memory.</p> <table> <tr><th></th><th>Primitive (<code>int</code>, <code>double</code>, <code>char</code>, <code>boolean</code>, &hellip;)</th><th>Object (<code>String</code>, <code>Point</code>, <code>ArrayList</code>, anything you write)</th></tr> <tr><td>What the variable holds</td><td>the value itself</td><td>a reference to an object stored elsewhere</td></tr> <tr><td>Assignment <code>b = a</code></td><td>copies the <strong>value</strong>. Changing <code>b</code> later leaves <code>a</code> alone.</td><td>copies the <strong>reference</strong>. Now <code>a</code> and <code>b</code> are two names for one object &mdash; an <em>alias</em>.</td></tr> <tr><td>Comparison <code>a == b</code></td><td>compares the <strong>values</strong>. <code>1.1 == 1.1</code> is <code>true</code>.</td><td>compares the <strong>references</strong> &mdash; are these the same object? Two objects with identical contents are <em>not</em> <code>==</code>.</td></tr> <tr><td>Comparing contents</td><td><code>==</code> is all you need</td><td><code>a.equals(b)</code> &mdash; which is what &sect;2 and &sect;3 are about</td></tr> <tr><td>Printing</td><td>prints the value</td><td>calls the object's <code>toString()</code> &mdash; &sect;4</td></tr> </table> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; identity and equality</span></div> <div class="bd"> <p><strong>Identity</strong> asks: are these two variables pointing at <em>the very same object</em>? That is what <code>==</code> tests for objects.</p> <p><strong>Equality</strong> asks: do these two objects <em>hold the same information</em>? Java has no operator for that. It is a method call, <code>a.equals(b)</code>, and its behavior is whatever the author of the class decided it should be.</p> <p>Two identical twins are equal but not identical. One person seen in a mirror is identical to himself. Java keeps those two questions strictly separate, and most bugs in this area come from asking one and meaning the other.</p> </div> </div> <p>Here is the instructor's program that puts a primitive and an object side by side. Read it carefully &mdash; the top half is <code>double</code> arithmetic you can already predict, and the bottom half does the syntactically identical thing to a <code>Point</code>.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the same code, twice, on two kinds of variable</span></div> <div class="bd"> <p>The <code>Point</code> class is the one from Lecture 7, with the <code>equals</code> method the instructor adds in her notes. We will come back to that <code>equals</code> in &sect;3, because its signature contains the most important bug on this page.</p> <p class="filename">Point.java</p>
+<pre><code class="language-java">public class Point {
+    private double x, y;
+
+    public Point(double xValue, double yValue) {
+        x = xValue;
+        y = yValue;
+    }
+
+    public double getX() { return x; }
+    public double getY() { return y; }
+    public void setX(double xValue) { x = xValue; }
+    public void setY(double yValue) { y = yValue; }
+
+    public double distanceTo(Point other) {
+        return Math.sqrt((x - other.x)*(x - other.x) + (y - other.y)*(y - other.y));
+    }
+
+    public String toString() {
+        return "(" + x + ", " + y + ")";
+    }
+
+    public boolean equals(Point other) {
+        return x == other.x &amp;&amp; y == other.y;
+    }
+}</code></pre> <p class="filename">Example2.java</p>
+<pre><code class="language-java">public class Example2 {
+    public static void main(String args[]) {
+        double a = 1.1;
+        double b = a;
+        System.out.println("a = " + a);
+        System.out.println("b = " + b);
+        System.out.println("a == b? " + (a == b));
+        b = 3.3;
+        System.out.println("a = " + a);
+        System.out.println("b = " + b);
+        System.out.println("a == b? " + (a == b));
+
+        Point p1 = new Point(a, b);
+        Point p2 = new Point(a, b);
+        Point p3 = p1;
+        System.out.println("p1 = " + p1);
+        System.out.println("p2 = " + p2);
+        System.out.println("p3 = " + p3);
+        System.out.println("p1 == p2? " + (p1 == p2));
+        System.out.println("p1 == p3? " + (p1 == p3));
+        System.out.println("p1.equals(p2)? " + p1.equals(p2));
+
+        p3.setX(2.2);
+        System.out.println("p3 = " + p3);
+        System.out.println("p2 = " + p2);
+        System.out.println("p1 = " + p1);
+    }
+}</code></pre> <p>Two questions before you open the toggle. First: <code>p1</code> and <code>p2</code> were built from the same two numbers &mdash; is <code>p1 == p2</code> true? Second: the program never mentions <code>p1</code> after the call <code>p3.setX(2.2)</code>, so what does the last line print?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>a = 1.1
+b = 1.1
+a == b? true
+a = 1.1
+b = 3.3
+a == b? false
+p1 = (1.1, 3.3)
+p2 = (1.1, 3.3)
+p3 = (1.1, 3.3)
+p1 == p2? false
+p1 == p3? true
+p1.equals(p2)? true
+p3 = (2.2, 3.3)
+p2 = (1.1, 3.3)
+p1 = (2.2, 3.3)</code></pre> <table class="trace"> <tr><th>Statement</th><th>What happens in memory</th></tr> <tr><td><code>double b = a;</code></td><td>The bit pattern of 1.1 is copied into <code>b</code>. Two independent variables.</td></tr> <tr><td><code>b = 3.3;</code></td><td>Only <code>b</code> changes, so <code>a == b</code> flips to <code>false</code>. No surprise here.</td></tr> <tr><td><code>new Point(a, b)</code> twice</td><td>Two separate objects are built on the heap. They happen to contain the same numbers.</td></tr> <tr><td><code>Point p3 = p1;</code></td><td>The <em>reference</em> is copied. No new <code>Point</code> is created &mdash; there are still only two objects, and now three variables.</td></tr> <tr><td><code>p1 == p2</code></td><td><code>false</code>. Different objects, so different references, regardless of contents.</td></tr> <tr><td><code>p1 == p3</code></td><td><code>true</code>. Same reference: one object with two names.</td></tr> <tr><td><code>p3.setX(2.2)</code></td><td>Reaches through the reference and changes the one shared object. <code>p1</code> sees it too.</td></tr> <tr><td><code>p2</code> afterwards</td><td>Untouched &mdash; it was always a different object.</td></tr> </table> <p>The line worth staring at is the last one. Nothing in the source says <code>p1.setX(...)</code>, and yet <code>p1</code> printed <code>(2.2, 3.3)</code>. That is aliasing: a change made through one name is visible through every other name for the same object. It is not a bug in Java, it is the whole point of references &mdash; but it is why a method that takes an object parameter can modify the caller's object, and a method that takes an <code>int</code> cannot.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 9.1</div> <div class="bd"> <p>Write down the three lines this program prints before you look.</p> <pre><code class="language-java">public class Counter {
+    public int value;
+    public Counter(int v) {
+        value = v;
+    }
+}
+public class CopyDemo {
+    public static void main(String args[]) {
+        int m = 7;
+        int n = m;
+        n = 99;
+        System.out.println("m = " + m + ", n = " + n);
+        Counter c1 = new Counter(7);
+        Counter c2 = c1;
+        c2.value = 99;
+        System.out.println("c1.value = " + c1.value + ", c2.value = " + c2.value);
+        c2 = new Counter(0);
+        System.out.println("c1.value = " + c1.value + ", c2.value = " + c2.value);
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Ask at every assignment: is the thing on the right a primitive value or a reference? Then ask whether the statement changes a <em>variable</em> or changes an <em>object</em>.</p> <pre class="out"><code>m = 7, n = 99
+c1.value = 99, c2.value = 99
+c1.value = 99, c2.value = 0</code></pre> <p><strong>Things to notice.</strong> Line 1 and line 2 are written with the same shape and behave completely differently. <code>n = m</code> copied a number, so the later <code>n = 99</code> could not reach <code>m</code>. <code>c2 = c1</code> copied a reference, so the later <code>c2.value = 99</code> reached the one object both names share.</p> <p>Line 3 is the part students get wrong. <code>c2 = new Counter(0)</code> does <em>not</em> set the shared object's <code>value</code> to 0 &mdash; it points <code>c2</code> at a brand-new object and forgets the old one. <code>c1</code> still refers to the object whose <code>value</code> is 99. The distinction is between <code>c2.value = ...</code> (reach through the reference and change the object) and <code>c2 = ...</code> (change which object the variable refers to). One dot makes all the difference.</p> </div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 9.2</div> <div class="bd"> <p>Using the <code>Point</code> class above, suppose a program does this:</p> <pre><code class="language-java">Point a = new Point(3.0, 4.0);
+Point b = new Point(3.0, 4.0);
+Point c = a;</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> How many <code>Point</code> objects exist, and how many <code>Point</code> variables?</p> <details class="soln"><summary></summary><div class="ans"> <p>Two objects, three variables. <code>new</code> is the only thing that creates an object, and <code>new</code> appears twice. The third line creates a variable but no object.</p> <p>Counting the <code>new</code> keywords is the reliable way to answer this on an exam. It is never the number of variable names.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What is the value of <code>a == b</code>, and of <code>a == c</code>?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>a == b</code> is <code>false</code>; <code>a == c</code> is <code>true</code>. <code>a</code> and <code>b</code> refer to two different objects that happen to hold identical coordinates. <code>a</code> and <code>c</code> refer to one object.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> After <code>c.setX(9.0);</code>, what does <code>a.getX()</code> return, and what does <code>b.getX()</code> return?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>a.getX()</code> returns <code>9.0</code> and <code>b.getX()</code> returns <code>3.0</code>.</p> <p><strong>Things to notice across all three parts.</strong> When you are asked to trace a program with objects in it, draw the picture: a box for each <code>new</code>, an arrow from each variable. Every question in this lecture &mdash; and a substantial share of Exam 1 &mdash; becomes bookkeeping once the arrows are on paper. The single most common exam mistake is assuming that because two objects <em>look</em> the same when printed they must be the same object. Printing shows you contents; <code>==</code> asks about addresses.</p> </div></details> </div> </div> </div> <h2 id="s2"><span class="num">2.</span><code>equals</code>: comparing contents instead of addresses</h2> <p>So <code>==</code> on objects is nearly useless for the question you usually want to ask. Java's answer is a method, and it is not a method you have to invent: <em>every</em> object in Java already has one.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the class <code>Object</code>, and inherited methods</span></div> <div class="bd"> <p>Every class in Java, including every class you write, is automatically a descendant of a class called <code>Object</code>. You never write that connection down; it is there whether you want it or not. We study what "descendant" means in Lecture 12, but the consequence matters today: your class starts life already owning the methods <code>Object</code> defines.</p> <p>Two of them are the subject of this lecture:</p> <ul> <li><code>public boolean equals(Object obj)</code> &mdash; asks whether this object equals another.</li> <li><code>public String toString()</code> &mdash; returns a text description of this object.</li> </ul> <p>You get both for free. The trouble is that the free versions do something almost useless, so a well-written class replaces them. Replacing an inherited method with your own is called <strong>overriding</strong> it.</p> </div> </div> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; what the inherited <code>equals</code> does</span></div> <div class="bd"> <p><code>Object</code>'s own <code>equals</code> is written like this:</p> <p><code>public boolean equals(Object obj) { return this == obj; }</code></p> <p>That is, <strong>the default <code>equals</code> is just <code>==</code></strong>. If you do not override it, calling <code>a.equals(b)</code> on your class asks exactly the identity question you were trying to get away from. Nothing about the word "equals" makes it compare contents; a human has to write that.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; a class with neither method written</span></div> <div class="bd"> <p><code>Student</code> here is deliberately bare: two fields, a constructor, nothing else. It still compiles, and <code>println</code> still accepts it, because both methods were inherited.</p> <p class="filename">Student.java</p>
+<pre><code class="language-java">public class Student {
+    private String name;
+    private int id;
+
+    public Student(String name, int id) {
+        this.name = name;
+        this.id = id;
+    }
+}</code></pre> <p class="filename">Defaults.java</p>
+<pre><code class="language-java">public class Defaults {
+    public static void main(String args[]) {
+        Student s1 = new Student("Ada", 101);
+        Student s2 = new Student("Ada", 101);
+        Student s3 = s1;
+
+        System.out.println(s1);
+        System.out.println(s2);
+        System.out.println("s1.toString() = " + s1.toString());
+        System.out.println("hand-built:     "
+            + s1.getClass().getName() + "@" + Integer.toHexString(s1.hashCode()));
+
+        System.out.println("s1 == s2?        " + (s1 == s2));
+        System.out.println("s1.equals(s2)?   " + s1.equals(s2));
+        System.out.println("s1.equals(s3)?   " + s1.equals(s3));
+    }
+}</code></pre> <p><code>s1</code> and <code>s2</code> describe the same student: same name, same id. Predict <code>s1.equals(s2)</code> before you reveal.</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Student@2a139a55 Student@15db9742 s1.toString() = Student@2a139a55 hand-built:     Student@2a139a55 s1 == s2?        false s1.equals(s2)?   false s1.equals(s3)?   true </code></pre> <p><strong>The hexadecimal codes are machine-dependent. Yours will differ, and they may differ from one run to the next.</strong> The values above are representative, not something to memorize. What is fixed is the shape.</p> <ul> <li>The default <code>toString</code> returns the class name, an <code>@</code>, and the object's hash code in hexadecimal. The fourth line of the program builds that string by hand out of <code>getClass().getName()</code> and <code>Integer.toHexString(hashCode())</code> and gets a character-for-character match &mdash; that is literally all the inherited method does.</li> <li><code>s1.equals(s2)</code> is <code>false</code> even though the two students are indistinguishable, because the inherited <code>equals</code> is <code>==</code> wearing a different hat.</li> <li><code>s1.equals(s3)</code> is <code>true</code> for the only reason the default ever says <code>true</code>: they are the same object.</li> </ul> <p>A class in this state is nearly unusable. You cannot print it, you cannot compare it, and if you put it in an <code>ArrayList</code> then <code>contains</code> and <code>indexOf</code> &mdash; which call <code>equals</code> on your behalf &mdash; will never find anything. Writing these two methods is not decoration.</p> 
+</div></details> </div> </div> <p><code>String</code> is the class you have already been relying on to do this correctly. <code>String</code> overrides <code>equals</code> to compare characters, which is exactly why Lecture 4 insisted you write <code>s1.equals(s2)</code> and never <code>s1 == s2</code>. The wrapper classes &mdash; <code>Integer</code>, <code>Double</code>, <code>Character</code>, <code>Boolean</code> &mdash; do the same, and they come with a trap of their own.</p> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; <code>==</code> on <code>Integer</code> is worse than wrong, it is inconsistent</span></div> <div class="bd"> <p>An <code>Integer</code> is an object, so <code>==</code> compares references. But Java keeps a cache of small <code>Integer</code> objects, so small values often <em>are</em> the same object and large ones are not:</p> <p class="filename">IntDemo.java</p>
+<pre><code class="language-java">public class IntDemo {
+    public static void main(String args[]) {
+        Integer a = 100;
+        Integer b = 100;
+        Integer c = 1000;
+        Integer d = 1000;
+        System.out.println("a == b?        " + (a == b));
+        System.out.println("c == d?        " + (c == d));
+        System.out.println("c.equals(d)?   " + c.equals(d));
+    }
+}</code></pre> <pre class="out"><code>a == b?        true
+c == d?        false
+c.equals(d)?   true</code></pre> <p>Same code, same operator, different answer purely because of the size of the number. <code>==</code> on any wrapper type is a bug waiting for a bigger test case. Use <code>.equals</code>, or unbox to a primitive <code>int</code> and compare that.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 9.3</div> <div class="bd"> <p>Give the value of each expression, and say in one phrase why.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> With <code>String x = "java";</code> and <code>String y = "java";</code> &mdash; what is <code>x == y</code>?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>true</code>. Two identical string <em>literals</em> are the same object: Java interns literals in the string pool, so the second <code>"java"</code> reuses the first. This is the one case where <code>==</code> on strings accidentally works, and relying on it is how people get burned.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> With <code>String x = "java";</code> and <code>String z = new String("java");</code> &mdash; what is <code>x == z</code> and what is <code>x.equals(z)</code>?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>x == z</code> is <code>false</code>; <code>x.equals(z)</code> is <code>true</code>. The word <code>new</code> guarantees a fresh object, so the references differ. <code>String</code>'s overridden <code>equals</code> compares the characters and finds them identical.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> With a class <code>Student</code> that does <em>not</em> override <code>equals</code>, and two students built with the same arguments &mdash; what is <code>s1.equals(s2)</code>?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>false</code>. Without an override, <code>equals</code> is inherited from <code>Object</code> and means <code>==</code>. The two students are separate objects.</p> <p><strong>Things to notice across all three parts.</strong> Parts (a) and (c) show the two halves of the same rule. <code>equals</code> does what the class author wrote; if nobody wrote anything, it does <code>==</code>. <code>String</code>'s author wrote a real one, so strings compare by content. Nobody wrote one for <code>Student</code>, so students compare by address. Whenever you meet a new class, the question "does this class override <code>equals</code>?" has a real answer and it changes your code.</p> </div></details> </div> </div> </div> <h2 id="s3"><span class="num">3.</span>Writing your own <code>equals</code>, and the trap that eats it</h2> <p>This is the most important section on the page, and the reason is that the natural way to write <code>equals</code> compiles perfectly, passes a casual test, and is wrong.</p> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; how to write <code>equals</code> for your class</span></div> <div class="bd"> <ol> <li>Use exactly this title line: <code>public boolean equals(Object obj)</code>. The parameter type is <code>Object</code>, not the name of your class. This is not negotiable &mdash; &sect;3 is about what happens if you change it.</li> <li>Check the type: <code>if (!(obj instanceof Point)) return false;</code>. Anything can be passed in, including a <code>String</code> or <code>null</code>, and none of those equal your object.</li> <li>Cast: <code>Point other = (Point) obj;</code>. Step 2 has just proved this cast is safe.</li> <li>Compare the fields that define equality: <code>return x == other.x &amp;&amp; y == other.y;</code>. You decide which fields count. For <code>Point</code> it is both coordinates; for a <code>Book</code> it might be the ISBN alone.</li> <li>Compare object-valued fields with <code>.equals</code>, not <code>==</code>: a <code>String</code> field is compared <code>name.equals(other.name)</code>.</li> </ol> </div> </div> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; <code>instanceof</code></span></div> <div class="bd"> <p><code>obj instanceof Point</code> is a <code>boolean</code> expression that is <code>true</code> when <code>obj</code> refers to a <code>Point</code> object, and <code>false</code> otherwise &mdash; including when <code>obj</code> is <code>null</code>. It is how you ask a reference what it is actually pointing at before you commit to treating it as one.</p> <p>A <strong>cast</strong> <code>(Point) obj</code> does not change the object. It tells the compiler "trust me, this really is a <code>Point</code>, let me call <code>Point</code> methods on it". If you are wrong, the program throws a <code>ClassCastException</code> at run time.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the overload trap, then the fix</span></div> <div class="bd"> <p>Start with the <code>Point</code> from &sect;1, whose <code>equals</code> takes a <code>Point</code>:</p> <pre><code class="language-java">public boolean equals(Point other) {
+    return x == other.x &amp;&amp; y == other.y;
+}</code></pre> <p>Now exercise it four ways. The three variables <code>p1</code>, <code>o1</code> and the <code>ArrayList</code> all end up referring to the same two <code>Point</code> objects; only the <em>declared type</em> of the variable changes. Predict all five lines before you reveal &mdash; and note that <code>ArrayList</code>'s <code>contains</code> method is documented to use <code>equals</code>.</p> <p class="filename">EqualsTrap.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class EqualsTrap {
+    public static void main(String args[]) {
+        Point p1 = new Point(1.1, 3.3);
+        Point p2 = new Point(1.1, 3.3);
+
+        System.out.println("p1.equals(p2)?         " + p1.equals(p2));
+
+        Object o1 = p1;
+        Object o2 = p2;
+        System.out.println("o1.equals(o2)?         " + o1.equals(o2));
+        System.out.println("p1.equals((Object) p2)? " + p1.equals((Object) p2));
+
+        ArrayList&lt;Point&gt; list = new ArrayList&lt;Point&gt;();
+        list.add(p1);
+        System.out.println("list.contains(p2)?     " + list.contains(p2));
+        System.out.println("list.indexOf(p2)?      " + list.indexOf(p2));
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>p1.equals(p2)?         true
+o1.equals(o2)?         false
+p1.equals((Object) p2)? false
+list.contains(p2)?     false
+list.indexOf(p2)?      -1</code></pre> <p>Line 1 works. Everything else fails, and the objects never changed &mdash; only the declared type of the variable holding them did.</p> <p>Here is why. Writing <code>equals(Point other)</code> did not replace <code>Object</code>'s <code>equals(Object obj)</code>; it <em>added a second method with the same name</em>. That is <strong>overloading</strong>, which you met in Lecture 2, and the class now has two <code>equals</code> methods:</p> <table class="trace"> <tr><th>Method</th><th>Where it came from</th><th>What it does</th></tr> <tr><td><code>equals(Point)</code></td><td>you wrote it</td><td>compares coordinates</td></tr> <tr><td><code>equals(Object)</code></td><td>inherited from <code>Object</code></td><td>compares references</td></tr> </table> <p>Java chooses between overloads <strong>at compile time, using the declared type of the argument</strong>. So:</p> <table class="trace"> <tr><th>Call</th><th>Declared type of the argument</th><th>Method chosen</th><th>Result</th></tr> <tr><td><code>p1.equals(p2)</code></td><td><code>Point</code></td><td>yours</td><td><code>true</code></td></tr> <tr><td><code>o1.equals(o2)</code></td><td><code>Object</code></td><td>inherited</td><td><code>false</code></td></tr> <tr><td><code>p1.equals((Object) p2)</code></td><td><code>Object</code></td><td>inherited</td><td><code>false</code></td></tr> <tr><td><code>list.contains(p2)</code></td><td>inside <code>ArrayList</code>, the parameter is <code>Object</code></td><td>inherited</td><td><code>false</code></td></tr> </table> <p>The last row is the one that ruins real programs. You never see the call &mdash; it happens inside the library, where the variable is declared <code>Object</code> &mdash; so your carefully written <code>equals</code> is never reached, and <code>contains</code> quietly answers <code>false</code> forever.</p> 
+</div></details> <p>The fix is to change one word in the title line. Everything else follows from &sect;3's procedure.</p> <p class="filename">Point.java</p>
+<pre><code class="language-java">public class Point {
+    private double x, y;
+
+    public Point(double xValue, double yValue) {
+        x = xValue;
+        y = yValue;
+    }
+
+    public double getX() { return x; }
+    public double getY() { return y; }
+    public void setX(double xValue) { x = xValue; }
+    public void setY(double yValue) { y = yValue; }
+
+    public String toString() {
+        return "(" + x + ", " + y + ")";
+    }
+
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Point)) return false;
+        Point other = (Point) obj;
+        return x == other.x &amp;&amp; y == other.y;
+    }
+}</code></pre> <p class="filename">EqualsFixed.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class EqualsFixed {
+    public static void main(String args[]) {
+        Point p1 = new Point(1.1, 3.3);
+        Point p2 = new Point(1.1, 3.3);
+        Point p3 = p1;
+
+        System.out.println("p1 == p2?              " + (p1 == p2));
+        System.out.println("p1 == p3?              " + (p1 == p3));
+        System.out.println("p1.equals(p2)?         " + p1.equals(p2));
+
+        Object o1 = p1;
+        Object o2 = p2;
+        System.out.println("o1.equals(o2)?         " + o1.equals(o2));
+
+        ArrayList&lt;Point&gt; list = new ArrayList&lt;Point&gt;();
+        list.add(p1);
+        System.out.println("list.contains(p2)?     " + list.contains(p2));
+        System.out.println("list.indexOf(p2)?      " + list.indexOf(p2));
+
+        System.out.println("p1.equals(\"(1.1, 3.3)\")? " + p1.equals("(1.1, 3.3)"));
+        System.out.println("p1.equals(null)?       " + p1.equals(null));
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>p1 == p2?              false
+p1 == p3?              true
+p1.equals(p2)?         true
+o1.equals(o2)?         true
+list.contains(p2)?     true
+list.indexOf(p2)?      0
+p1.equals("(1.1, 3.3)")? false
+p1.equals(null)?       false</code></pre> <p>Every line now says what a reader would expect. Three details are worth naming.</p> <ul> <li><code>o1.equals(o2)</code> is <code>true</code>. Because the parameter type finally matches, your method <em>overrides</em> the inherited one, and an override is chosen at run time from the actual object &mdash; not at compile time from the declared type. That is the difference between overriding and overloading in one line of output, and it is the heart of Lecture 13.</li> <li><code>list.contains(p2)</code> is <code>true</code>. The library call now reaches your method.</li> <li><code>p1.equals("(1.1, 3.3)")</code> and <code>p1.equals(null)</code> both return <code>false</code> instead of crashing, and that is entirely down to the <code>instanceof</code> check. <code>null instanceof Point</code> is <code>false</code>, so the guard catches <code>null</code> without a separate test.</li> </ul> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; skipping the <code>instanceof</code> check</span></div> <div class="bd"> <p>It is tempting to write only the cast, because the cast is what you actually need:</p> <pre><code class="language-java">public boolean equals(Object obj) {
+    Point other = (Point) obj;
+    // no instanceof guard return x == other.x &amp;&amp; y == other.y; }</code></pre> <p>That compiles, and it works for every call where the argument really is a <code>Point</code>. Pass it anything else and it does not return <code>false</code> &mdash; it dies:</p> <pre class="err"><code>Exception in thread "main" java.lang.ClassCastException: class java.lang.String cannot be cast to class Point at Point.equals(Point.java:7) at CastCrash.main(CastCrash.java:5) </code></pre> <p><code>equals</code> is supposed to answer a yes/no question about any object at all. Crashing is not one of the permitted answers. The <code>instanceof</code> line is two seconds of typing and it also handles <code>null</code> for free.</p> </div> </div> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; let the compiler catch it: <code>@Override</code></span></div> <div class="bd"> <p>Write <code>@Override</code> on the line above any method you believe replaces an inherited one:</p> <pre><code class="language-java">@Override public boolean equals(Object obj) { ... } </code></pre> <p>It changes nothing at run time. What it does is instruct the compiler to verify your belief. Put it above the broken version and <code>javac</code> refuses to compile:</p> <pre class="err"><code>Point.java:8: error: method does not override or implement a method from a supertype @Override
+^
+1 error</code></pre> <p>A silent wrong answer has become a compile error, for the cost of nine characters. Use <code>@Override</code> on every <code>equals</code> and every <code>toString</code> you write from now on.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 9.4</div> <div class="bd"> <p>A <code>Money</code> class stores an amount in whole cents and defines <code>equals</code> with a <code>Money</code> parameter. What are the five lines of output?</p> <pre><code class="language-java">public class Money {
+    private int cents;
+    public Money(int cents) {
+        this.cents = cents;
+    }
+    public String toString() {
+        return "$" + cents / 100 + "." + cents % 100;
+    }
+    public boolean equals(Money other) {
+        return cents == other.cents;
+    }
+}
+public class MoneyDemo {
+    public static void main(String args[]) {
+        Money a = new Money(250);
+        Money b = new Money(250);
+        Object x = a;
+        Object y = b;
+        System.out.println(a);
+        // line (a) System.out.println(a == b);            // line (b) System.out.println(a.equals(b));       // line (c) System.out.println(x.equals(y));       // line (d) System.out.println(a.equals(y));       // line (e) } }</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> For each <code>equals</code> call, ignore what the objects are and look only at the <em>declared type</em> of the argument. <code>Money</code> selects the written method; <code>Object</code> selects the inherited one.</p> <pre class="out"><code>$2.50 false true false false </code></pre> <p><strong>Things to notice.</strong> Line (e) is the sharp one. The receiver <code>a</code> is a <code>Money</code>, so surely Java uses <code>Money</code>'s method? No &mdash; the argument <code>y</code> is declared <code>Object</code>, and <code>equals(Money)</code> does not accept an <code>Object</code>, so the only applicable overload is the inherited <code>equals(Object)</code>. Overload selection looks at argument types, and it happens while compiling, long before any object exists.</p> <p>Line (a) prints <code>$2.50</code> because <code>toString</code> <em>was</em> overridden correctly &mdash; the signature <code>public String toString()</code> matches <code>Object</code>'s exactly. One method in this class is overridden and one is merely overloaded, and the output shows you which is which.</p> </div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 9.5</div> <div class="bd"> <p>For each method header written inside a class <code>Widget</code>, say whether it overrides an <code>Object</code> method, overloads one, or fails to compile.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>public boolean equals(Widget w)</code></p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Overloads.</strong> It compiles, it is a second <code>equals</code> alongside the inherited one, and it is the bug from this section. Adding <code>@Override</code> above it turns it into a compile error, which is exactly what you want.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>boolean equals(Object obj)</code> &mdash; note the missing <code>public</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Fails to compile.</strong> An override may not be less visible than the method it replaces, and <code>Object</code>'s <code>equals</code> is <code>public</code>:</p> <pre class="err"><code>A.java:2: error: equals(Object) in A cannot override equals(Object) in Object boolean equals(Object obj) { return true; }
+^
+attempting to assign weaker access privileges; was public
+1 error</code></pre> <p>This is one of the rare cases where getting the signature slightly wrong is caught for you. Getting the <em>parameter type</em> wrong, as in (a), is not.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>public void toString()</code></p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Fails to compile.</strong> The name and parameter list match <code>Object</code>'s <code>toString</code>, so Java treats it as an attempted override, and the return type does not match:</p> <pre class="err"><code>B.java:2: error: toString() in B cannot override toString() in Object public void toString() { System.out.println("hi"); }
+^
+return type void is not compatible with String
+1 error</code></pre> <p>A <code>toString</code> <em>returns</em> a <code>String</code>. It does not print. If you write <code>System.out.println</code> inside it, you have written the wrong method.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>public String toString(int n)</code></p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Overloads.</strong> Different parameter list, so it is simply a new method that happens to share a name. It compiles, and <code>System.out.println(widget)</code> will still call the inherited no-argument <code>toString</code> and print <code>Widget@1a2b3c</code>.</p> <p><strong>Things to notice across all four parts.</strong> Two of these four the compiler catches, and the two it does not catch &mdash; (a) and (d) &mdash; are the two that actually appear in student code. That asymmetry is the argument for <code>@Override</code>: it converts (a) and (d) into compile errors as well, so all four become mistakes you find in ten seconds instead of an hour.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 9.6</div> <div class="bd"> <p>Complete the <code>Book</code> class below. Two books are the same book when their ISBNs match, whatever the title says &mdash; publishers reprint the same book under slightly different titles all the time. Write <code>equals</code> so that it works correctly even when it is called through an <code>Object</code> reference, and write <code>toString</code> so that a book prints as <code>Java: An Introduction [978-0134462035]</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Follow the five-step procedure. The parameter type is <code>Object</code>; guard with <code>instanceof</code>; cast; then compare. The field that decides equality is <code>isbn</code>, and it is a <code>String</code>, so it must be compared with <code>.equals</code> and not <code>==</code> &mdash; comparing two <code>String</code> fields with <code>==</code> reintroduces exactly the bug we are trying to fix, one level down.</p> <p class="filename">Book.java</p>
+<pre><code class="language-java">public class Book {
+    private String title;
+    private String isbn;
+    public Book(String title, String isbn) {
+        this.title = title;
+        this.isbn = isbn;
+    }
+    @Override public String toString() {
+        return title + " [" + isbn + "]";
+    }
+    @Override public boolean equals(Object obj) {
+        if (!(obj instanceof Book)) return false;
+        Book other = (Book) obj;
+        return isbn.equals(other.isbn);
+    }
+}</code></pre> <p class="filename">BookDemo.java</p>
+<pre><code class="language-java">public class BookDemo {
+    public static void main(String args[]) {
+        Book a = new Book("Java: An Introduction", "978-0134462035");
+        Book b = new Book("Java - An Introduction", "978-0134462035");
+        Book c = new Book("Data Structures", "978-0132576277");
+
+        System.out.println(a);
+        System.out.println("a == b?          " + (a == b));
+        System.out.println("a.equals(b)?     " + a.equals(b));
+        System.out.println("a.equals(c)?     " + a.equals(c));
+
+        Object o = b;
+        System.out.println("o.equals(a)?     " + o.equals(a));
+        System.out.println("a.equals(\"x\")?   " + a.equals("x"));
+    }
+}</code></pre> <pre class="out"><code>Java: An Introduction [978-0134462035]
+a == b?          false
+a.equals(b)?     true
+a.equals(c)?     false
+o.equals(a)?     true
+a.equals("x")?   false</code></pre> <p><strong>Things to notice.</strong> <code>a</code> and <code>b</code> have different titles and are still equal, because you decided equality means "same ISBN". That decision is yours to make and it is the interesting part of writing <code>equals</code> &mdash; the <code>instanceof</code> and the cast are boilerplate you will type identically in every class.</p> <p><code>o.equals(a)</code> returning <code>true</code> is the proof that this is a genuine override. Compare that line with the <code>EqualsTrap</code> output above, where the same call returned <code>false</code>.</p> <p>One thing this class still lacks: a real <code>hashCode</code>. Java's rule is that two objects that are <code>equals</code> should return the same <code>hashCode</code>, and hash-based collections rely on it. That matters once you use <code>HashMap</code> and <code>HashSet</code>, which are beyond Exam 1, so we note the rule and move on. In IntelliJ or Eclipse, "Generate <code>equals()</code> and <code>hashCode()</code>" writes both together for exactly this reason.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 9.6</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="10" aria-label="Live coding - Quick Check 9.6">public class Book {
+    private String title;
+    private String isbn;
+    public Book(String title, String isbn) {
+        this.title = title;
+        this.isbn = isbn;
+    }
+    // 1. toString: return  title + " [" + isbn + "]" // 2. equals: two Books are equal when their isbn Strings are equal. //    Use the Object parameter, instanceof, and a cast. }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s4"><span class="num">4.</span><code>toString</code>, seen properly as an override</h2> <p>You wrote a <code>toString</code> in Lecture 7 and saw what happens without one. Now you can say what you were really doing: <code>toString</code> is the second method inherited from <code>Object</code>, and writing your own is an override in exactly the sense of &sect;3.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; <code>toString</code></span></div> <div class="bd"> <p><code>public String toString()</code> returns a <code>String</code> describing the object. Java calls it for you whenever an object turns up where text is needed:</p> <ul> <li><code>System.out.println(obj)</code> &mdash; <code>println</code> has an overload taking an <code>Object</code>, and it calls <code>toString</code>.</li> <li><code>"Result: " + obj</code> &mdash; string concatenation converts the object by calling <code>toString</code>.</li> <li>Printing a collection: <code>System.out.println(list)</code> calls <code>toString</code> on the list, which calls <code>toString</code> on every element.</li> </ul> <p>Its signature is fixed: <code>public</code>, returns <code>String</code>, takes no parameters. Any deviation is an overload, and an overload will never be called by <code>println</code>.</p> </div> </div> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; what you get if you do not write one</span></div> <div class="bd"> <p>The inherited <code>toString</code> returns the class name, <code>@</code>, and the hash code in hexadecimal: <code>Student@2a139a55</code>. The hexadecimal part is <strong>machine-dependent</strong> and varies between machines and between runs &mdash; never write it into an expected-output answer, and never rely on it in a program.</p> <p>It is useless for reading but genuinely useful for one thing while debugging: two objects printing different codes proves they are different objects.</p> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; printing inside <code>toString</code></span></div> <div class="bd"> <p>Two versions that look similar and are not:</p> <pre><code class="language-java">public void toString() {
+    // WRONG - does not compile System.out.println("(" + x + ", " + y + ")"); } public String toString() {                      // right return "(" + x + ", " + y + ")"; }</code></pre> <p><code>toString</code> builds text and hands it back; the caller decides what to do with it. That is why the same method works for <code>println</code>, for concatenation and for writing to a file. A <code>toString</code> that prints can only ever do one of those.</p> <p>One more detail worth knowing: <code>System.out.println(x)</code> where <code>x</code> is a <code>null</code> reference prints <code>null</code> rather than throwing. Java checks for <code>null</code> before it would call <code>toString</code>. But <code>x.toString()</code> written out by hand on a <code>null</code> reference throws a <code>NullPointerException</code> &mdash; the check is in <code>println</code>, not in the language.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 9.7</div> <div class="bd"> <p>A class <code>Temp</code> stores a <code>double</code> field <code>celsius</code> and defines no methods except a constructor. A student adds this method to it:</p> <pre><code class="language-java">public String toString(String unit) {
+    return celsius + " " + unit;
+}</code></pre> <p>They then write <code>System.out.println(t);</code> for a <code>Temp t</code> and are surprised. What is printed, and what is the one-word fix?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Ask which method <code>println</code> can call. <code>println</code> receives the object as an <code>Object</code> and calls the no-argument <code>toString</code>. Does the class have one?</p> <p>It prints something of the form <code>Temp@2a139a55</code> &mdash; the inherited default, with a machine-dependent hexadecimal code. The student's method takes a <code>String</code> parameter, so it is a different method that merely shares a name. It overloads <code>toString</code>; it does not override it, and <code>println</code> has no way to supply the <code>unit</code> argument.</p> <p>The fix is to remove the parameter: <code>public String toString()</code>. If the unit is genuinely needed, keep both &mdash; a no-argument <code>toString()</code> for printing and a separate method with a name of its own, say <code>format(String unit)</code>. Overloading <code>toString</code> is legal but almost always a sign that the second method wanted a different name.</p> <p><strong>Things to notice.</strong> This is the <code>equals</code> trap again in a different costume. The pattern to internalize: <em>Java calls inherited methods by their exact signature. If your signature is not identical, Java calls the inherited one and your method never runs.</em> Writing <code>@Override</code> above the method makes the compiler say so.</p> </div></details> </div> </div> <h2 id="s5"><span class="num">5.</span><code>static</code> fields: one copy for the whole class</h2> <p>Everything we have written inside a class so far belongs to an <em>object</em>. Each <code>Point</code> has its own <code>x</code>. Each <code>Student</code> has its own <code>name</code>. Some information does not fit that shape at all: how many students have been created is a fact about the class, not about any one student. That is what <code>static</code> is for.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; static and instance members</span></div> <div class="bd"> <p>A member declared <code>static</code> belongs to the <strong>class</strong>. There is exactly one copy of it, created when the class is first loaded, and it exists whether or not a single object has ever been made. It is also called a <em>class variable</em> or <em>class method</em>.</p> <p>A member declared without <code>static</code> belongs to an <strong>object</strong>. Every object gets its own copy, created by <code>new</code>. It is also called an <em>instance variable</em> or <em>instance method</em>.</p> <p>The word appears in the declaration and nowhere else: <code>static int count;</code> versus <code>int size;</code>.</p> </div> </div> <table> <tr><th></th><th><code>static</code> member</th><th>Instance member</th></tr> <tr><td>How many copies</td><td>one, for the whole class</td><td>one per object</td></tr> <tr><td>Created when</td><td>the class is loaded</td><td><code>new</code> runs</td></tr> <tr><td>Normally accessed as</td><td><code>ClassName.member</code></td><td><code>object.member</code></td></tr> <tr><td>Can it use <code>this</code>?</td><td>no &mdash; there is no object</td><td>yes</td></tr> <tr><td>Can it read instance fields directly?</td><td>no</td><td>yes</td></tr> <tr><td>Can it read static fields directly?</td><td>yes</td><td>yes</td></tr> <tr><td>Examples you already use</td><td><code>Math.sqrt</code>, <code>Math.PI</code>, <code>Integer.parseInt</code>, <code>Integer.MAX_VALUE</code>, <code>main</code></td><td><code>s.length()</code>, <code>s.charAt(i)</code>, <code>list.add(x)</code>, <code>p.getX()</code></td></tr> </table> <p>That last row is worth pausing on, because it explains a piece of syntax you have been typing without thinking. You write <code>Math.sqrt(2)</code> and never <code>new Math()</code>, but you write <code>s.length()</code> and never <code>String.length()</code>. The difference is not arbitrary: <code>sqrt</code> needs no object, and <code>length</code> needs to know <em>which</em> string.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; counting the objects a class has created</span></div> <div class="bd"> <p>This is the canonical use of a static field and you should be able to write it from memory. One shared counter, incremented by the constructor; one per-object <code>id</code> that records the value the counter had when that object was built.</p> <p class="filename">Student.java</p>
+<pre><code class="language-java">public class Student {
+    private static int count = 0;     // ONE copy, shared by the whole class
+    private String name;              // one copy PER OBJECT
+    private int id;
+
+    public Student(String name) {
+        this.name = name;
+        count++;                      // every construction bumps the shared counter
+        this.id = count;              // ... and this object keeps the number it got
+    }
+
+    public String getName() { return name; }
+    public int getId() { return id; }
+
+    public static int getCount() { return count; }
+
+    public String toString() {
+        return "Student #" + id + " " + name;
+    }
+}</code></pre> <p class="filename">StaticDemo.java</p>
+<pre><code class="language-java">public class StaticDemo {
+    public static void main(String args[]) {
+        System.out.println("Students so far: " + Student.getCount());
+
+        Student a = new Student("Ada");
+        Student b = new Student("Grace");
+        Student c = new Student("Alan");
+
+        System.out.println(a);
+        System.out.println(b);
+        System.out.println(c);
+
+        System.out.println("Students so far: " + Student.getCount());
+        System.out.println("a.getId() = " + a.getId() + ", c.getId() = " + c.getId());
+        System.out.println("via an object:   " + a.getCount());
+    }
+}</code></pre> <p>Before you reveal: the very first <code>println</code> runs before any <code>Student</code> exists. Does it compile, and if so what does it print?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Students so far: 0
+Student #1 Ada
+Student #2 Grace
+Student #3 Alan
+Students so far: 3
+a.getId() = 1, c.getId() = 3
+via an object:   3</code></pre> <p>It compiles and prints <code>0</code>. That is the defining property of a static member: it exists before any object does, so <code>Student.getCount()</code> is a legal thing to say to a class with no instances.</p> <table class="trace"> <tr><th>After&hellip;</th><th><code>count</code> (one copy)</th><th><code>a.id</code></th><th><code>b.id</code></th><th><code>c.id</code></th></tr> <tr><td>class loaded</td><td>0</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr> <tr><td><code>new Student("Ada")</code></td><td>1</td><td>1</td><td>&mdash;</td><td>&mdash;</td></tr> <tr><td><code>new Student("Grace")</code></td><td>2</td><td>1</td><td>2</td><td>&mdash;</td></tr> <tr><td><code>new Student("Alan")</code></td><td>3</td><td>1</td><td>2</td><td>3</td></tr> </table> <p>Read the <code>count</code> column downward and the <code>id</code> columns across: the static field keeps moving, and each instance field freezes the value it was given. <code>a.id</code> is still 1 at the end even though the counter reached 3. If <code>id</code> had been declared <code>static</code> too, all three students would share one <code>id</code> and it would read 3 &mdash; a bug that turns three students into one.</p> <p>The last line, <code>a.getCount()</code>, deserves a comment. It is legal: Java lets you reach a static member through an object reference. It is also bad style, because it looks like it is asking <code>a</code> a question about itself when it is really asking the class. The compiler agrees &mdash; <code>javac -Xlint</code> reports</p> <pre class="err"><code>StaticDemo.java:15: warning: [static] static method should be qualified by type name, Student, instead of by an expression System.out.println("via an object:
+        " + a.getCount());
+^
+1 warning</code></pre> <p>Write <code>Student.getCount()</code>. Remember that <code>object.staticMember</code> compiles, though &mdash; exam questions rely on you knowing it is legal.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 9.8</div> <div class="bd"> <p>What are the three lines of output?</p> <pre><code class="language-java">public class Robot {
+    static int built = 0;
+    int serial;
+
+    public Robot() {
+        built++;
+        serial = built;
+    }
+
+    public static void main(String args[]) {
+        Robot r1 = new Robot();
+        Robot r2 = new Robot();
+        System.out.println(r1.serial + " " + r2.serial);
+        System.out.println(r1.built + " " + r2.built + " " + Robot.built);
+        Robot r3 = new Robot();
+        System.out.println(r1.serial + " " + Robot.built);
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Keep two columns on paper: one shared <code>built</code>, and one <code>serial</code> per robot. Only the constructor changes either.</p> <pre class="out"><code>1 2 2 2 2 1 3 </code></pre> <p><strong>Things to notice.</strong> Line 2 prints the same number three times, and that is the whole lesson: <code>r1.built</code>, <code>r2.built</code> and <code>Robot.built</code> are three ways of writing the name of <em>one</em> variable. There is no such thing as "r1's built".</p> <p>Line 3 shows the two kinds of field moving apart. Building <code>r3</code> pushed the shared counter to 3, and <code>r1.serial</code> did not budge &mdash; it was set once, during <code>r1</code>'s construction, and belongs to <code>r1</code> alone.</p> <p>Note also that <code>main</code> is inside <code>Robot</code> here and creates <code>Robot</code> objects. That is perfectly normal and is exactly how the practice problems on Exam 1 are laid out.</p> </div></details> </div> </div> <h2 id="s6"><span class="num">6.</span><code>static</code> methods, <code>main</code>, and <code>this</code></h2> <p>A static method follows the same rule as a static field, and the rule has one consequence that generates more compiler errors than anything else in this lecture.</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; a static method has no object</span></div> <div class="bd"> <p>When a static method runs, there is no "current object". Nobody called it <em>on</em> anything. Therefore:</p> <ul> <li>It cannot read or write an instance field, because it would have no way to know whose.</li> <li>It cannot call an instance method, for the same reason.</li> <li>It cannot use <code>this</code>.</li> <li>It <em>can</em> use static fields and call static methods freely.</li> <li>It <em>can</em> use an object it is given as a parameter, or one it creates itself: <code>n.x</code> is fine inside a static method, because <code>n</code> names a specific object.</li> </ul> <p>The reverse direction has no restriction at all. An instance method may use static members whenever it likes, because by then an object certainly exists.</p> </div> </div> <p>Try to break the rule and <code>javac</code> says so in one of two nearly identical sentences. Learn to read both; you will meet them repeatedly.</p> <pre class="err"><code>Counter.java:7: error: non-static variable x cannot be referenced from a static context System.out.println(x);
+^
+1 error</code></pre> <pre class="err"><code>Widget.java:9: error: non-static method growSize() cannot be referenced from a static context static void callGrow()
+        { growSize(); }
+^
+2 errors</code></pre> <p>"A static context" means "inside a <code>static</code> method" &mdash; and <code>main</code> is a static method, so most of the times you will see this message, the static context is <code>main</code>.</p> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; fixing "cannot be referenced from a static context"</span></div> <div class="bd"> <p>You have three choices, and which one is right depends on what the member <em>means</em>.</p> <ol> <li><strong>Give the method an object to work on.</strong> If the method genuinely acts on one object, either drop <code>static</code> from the method and call it as <code>obj.method()</code>, or keep <code>static</code> and pass the object in, then say <code>n.field</code> instead of <code>field</code>. This is the fix the exam problem in &sect;Practice wants.</li> <li><strong>Make the field static.</strong> Correct only if the data really is one-per-class &mdash; a counter, a shared constant. Do not reach for this just to silence the compiler: making an instance field <code>static</code> means every object now shares it, which is usually a much worse bug than the one you started with.</li> <li><strong>Create an object in <code>main</code>.</strong> The everyday fix. <code>main</code> cannot touch your instance members, so <code>main</code> does <code>Thing t = new Thing();</code> and then talks to <code>t</code>.</li> </ol> </div> </div> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; why <code>main</code> is static</span></div> <div class="bd"> <p>Read the chicken-and-egg problem: the JVM has just started your program. No objects exist, because your code is what creates objects, and none of your code has run yet. The JVM must call something, and it has nothing to call it <em>on</em>.</p> <p>Declaring <code>main</code> static solves it. A static method can be called using only the class name &mdash; <code>java Robot</code> means "load the class <code>Robot</code> and call <code>Robot.main</code>" &mdash; and no object is required.</p> <p>Remove the word and the program still compiles. It just will not start:</p> <pre class="err"><code>Error: Main method is not static in class NotStatic, please define the main method as: public static void main(String[] args) </code></pre> <p>That is the same category of failure as the wrong <code>main</code> signature in Lecture 1: a clean compile is not proof that a program runs.</p> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; <code>this</code> inside a static method</span></div> <div class="bd"> <pre><code class="language-java">public class NoThis {
+    int x = 5;
+
+    public static void show() {
+        System.out.println(this.x);
+    }
+}</code></pre> <pre class="err"><code>NoThis.java:5: error: non-static variable this cannot be referenced from a static context
+        System.out.println(this.x);
+                           ^
+1 error</code></pre> <p>Notice how the compiler phrases it: <code>this</code> <em>is</em> a non-static variable. It is the hidden reference to the current object that every instance method receives. A static method does not receive one, so the name is not in scope, and the error you get is the ordinary non-static-variable error with <code>this</code> as the variable.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 9.9</div> <div class="bd"> <p>Here is a class with two fields and five methods. For each method, say whether it compiles.</p> <pre><code class="language-java">public class Widget {
+    static int count = 0;
+    int size = 1;
+
+    static void bumpCount()  { count++; }
+    static void bumpSize()   { size++; }
+    void growCount()         { count++; }
+    void growSize()          { size++; }
+    static void callGrow()   { growSize(); }
+    void callBump()          { bumpCount(); }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>bumpCount</code> and <code>bumpSize</code> &mdash; static methods touching a static field and an instance field.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>bumpCount</code> compiles: a static method reading a static field is the normal case. <code>bumpSize</code> does not:</p> <pre class="err"><code>Widget.java:6: error: non-static variable size cannot be referenced from a static context static void bumpSize()
+        { size++; }
+^</code></pre> <p>Whose <code>size</code> would it increment? There might be a thousand <code>Widget</code> objects or none. The question has no answer, so the compiler refuses the question.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>growCount</code> and <code>growSize</code> &mdash; instance methods touching a static field and an instance field.</p> <details class="soln"><summary></summary><div class="ans"> <p>Both compile. An instance method has an object, so <code>size</code> means "this object's size", and <code>count</code> means the one shared copy. Instance methods may use anything.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>callGrow</code> and <code>callBump</code> &mdash; the two method-calling directions.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>callBump</code> compiles: instance calling static, always fine. <code>callGrow</code> does not:</p> <pre class="err"><code>Widget.java:9: error: non-static method growSize() cannot be referenced from a static context static void callGrow()
+        { growSize(); }
+^</code></pre> <p><strong>Things to notice across all three parts.</strong> One rule generates all four results: <em>static code has no object; instance code has one.</em> Draw the arrow one way &mdash; instance can reach static &mdash; and note that the arrow does not run backwards.</p> <p>Both failing methods can be fixed by giving them an object. <code>static void bumpSize(Widget w) { w.size++; }</code> compiles, and so does <code>static void callGrow(Widget w) { w.growSize(); }</code>. That is the trick Exam 1's Problem 4 turns on, so make sure you can produce it.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 9.10</div> <div class="bd"> <p>This class does not compile. Find every error, fix it, and say what the corrected program prints. The static counter <code>itemsAdded</code> is correct as written and should stay <code>static</code>.</p> <p class="filename">Inventory.java</p>
+<pre><code class="language-java">public class Inventory {
+    static int itemsAdded = 0;
+    String name;
+    int quantity;
+
+    public Inventory(String name, int quantity) {
+        this.name = name;
+        this.quantity = quantity;
+        itemsAdded++;
+    }
+
+    public static void restock() {
+        quantity = quantity + 10;
+    }
+
+    public static void main(String args[]) {
+        Inventory bolts = new Inventory("bolts", 5);
+        restock();
+        System.out.println(name + " " + quantity);
+        System.out.println("items added: " + itemsAdded);
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Look at every use of <code>name</code> and <code>quantity</code> and ask whether the code around it has an object. <code>restock</code> is <code>static</code> but restocks one particular item's quantity, so the method is the thing that is wrong, not the field. In <code>main</code>, the object exists &mdash; it is called <code>bolts</code> &mdash; it is just not being mentioned.</p> <p><code>javac</code> reports four errors, all the same one:</p> <pre class="err"><code>Inventory.java:13: error: non-static variable quantity cannot be referenced from a static context
+        quantity = quantity + 10;
+        ^
+Inventory.java:13: error: non-static variable quantity cannot be referenced from a static context
+        quantity = quantity + 10;
+                   ^
+Inventory.java:19: error: non-static variable name cannot be referenced from a static context
+        System.out.println(name + " " + quantity);
+                           ^
+Inventory.java:19: error: non-static variable quantity cannot be referenced from a static context
+        System.out.println(name + " " + quantity);
+                                        ^
+4 errors</code></pre> <p>Two fixes. Drop <code>static</code> from <code>restock</code> and call it on the object; and qualify the two fields in <code>main</code> with <code>bolts.</code></p> <p class="filename">Inventory.java</p>
+<pre><code class="language-java">public class Inventory {
+    static int itemsAdded = 0;
+    String name;
+    int quantity;
+
+    public Inventory(String name, int quantity) {
+        this.name = name;
+        this.quantity = quantity;
+        itemsAdded++;
+    }
+
+    public void restock() {
+        quantity = quantity + 10;
+    }
+
+    public static void main(String args[]) {
+        Inventory bolts = new Inventory("bolts", 5);
+        bolts.restock();
+        System.out.println(bolts.name + " " + bolts.quantity);
+        System.out.println("items added: " + itemsAdded);
+    }
+}</code></pre> <pre class="out"><code>bolts 15 items added: 1 </code></pre> <p><strong>Things to notice.</strong> <code>itemsAdded</code> needed no change and no qualification. <code>main</code> is static and <code>itemsAdded</code> is static, so they see each other directly &mdash; and that contrast, one field working and two failing on the very same line, is the clearest demonstration of the rule you will get.</p> <p>The alternative fix of declaring <code>quantity</code> static would silence the compiler and ruin the program: every item in the inventory would share one quantity. When you choose between "add <code>static</code>" and "add an object", ask what the data means, not what makes the red underline go away.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 9.10</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="12" aria-label="Live coding - Quick Check 9.10">public class Inventory {
+    static int itemsAdded = 0;
+    String name;
+    int quantity;
+    public Inventory(String name, int quantity) {
+        this.name = name;
+        this.quantity = quantity;
+        itemsAdded++;
+    }
+    // Fix restock so that it restocks ONE item's quantity. public static void restock() { quantity = quantity + 10; } public static void main(String args[]) { Inventory bolts = new Inventory("bolts", 5); // Fix the three lines below. restock(); System.out.println(name + " " + quantity); System.out.println("items added: " + itemsAdded); } }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s7"><span class="num">7.</span><code>final</code> and <code>static final</code></h2> <p>One keyword left, and it is the smallest idea in the lecture. <code>static</code> says how many copies there are; <code>final</code> says whether the value may change.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; <code>final</code></span></div> <div class="bd"> <p>A variable declared <code>final</code> may be assigned <strong>once</strong> and never again. A local <code>final</code> is assigned where it is declared. A <code>final</code> instance field may be left unassigned in the declaration and set by the constructor, which is how you write a field that is fixed for an object's whole lifetime.</p> <p><code>static final</code> together means <strong>one copy, never changes</strong> &mdash; a constant. By universal Java convention constants are named in <code>UPPER_CASE_WITH_UNDERSCORES</code>, which is why <code>Math.PI</code> and <code>Integer.MAX_VALUE</code> are shouted.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; a constant, and a field fixed at construction</span></div> <div class="bd"> <p><code>PI</code> is <code>static final</code>: one value for the program. <code>radius</code> is <code>final</code> but not <code>static</code>: each circle has its own, assigned by the constructor and unchangeable afterwards.</p> <p class="filename">Circle.java</p>
+<pre><code class="language-java">public class Circle {
+    public static final double PI = 3.14159;
+    private final double radius;      // set once, in the constructor
+
+    public Circle(double r) {
+        radius = r;
+    }
+
+    public double area() { return PI * radius * radius; }
+    public double getRadius() { return radius; }
+}</code></pre> <p class="filename">FinalDemo.java</p>
+<pre><code class="language-java">public class FinalDemo {
+    public static void main(String args[]) {
+        Circle c = new Circle(2.0);
+        System.out.println("radius = " + c.getRadius());
+        System.out.println("area   = " + c.area());
+        System.out.println("Circle.PI       = " + Circle.PI);
+        System.out.println("Math.PI         = " + Math.PI);
+        System.out.println("Integer.MAX_VALUE = " + Integer.MAX_VALUE);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>radius = 2.0
+area   = 12.56636
+Circle.PI       = 3.14159
+Math.PI         = 3.141592653589793
+Integer.MAX_VALUE = 2147483647</code></pre> <p><code>Circle.PI</code> and <code>Math.PI</code> are the same kind of thing &mdash; a <code>public static final double</code> &mdash; and are read the same way, <code>ClassName.NAME</code>, with no object anywhere. <code>Math.PI</code> is simply more accurate, and in real code you would use it rather than typing your own.</p> <p>Try to reassign either kind and the compiler stops you:</p> <pre class="err"><code>Bad.java:8: error: cannot assign a value to final variable radius radius = radius * 2;
+^
+Bad.java:12: error: cannot assign a value to static final variable PI PI = 3.0;
+^
+2 errors</code></pre> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Warning<span class="tag">&mdash; <code>final</code> freezes the variable, not the object</span></div> <div class="bd"> <p>For an object-valued variable, <code>final</code> means the <em>reference</em> cannot be repointed. The object it points at is as mutable as it ever was:</p> <p class="filename">FinalRef.java</p>
+<pre><code class="language-java">public class FinalRef {
+    public static void main(String args[]) {
+        final int limit = 10;
+        System.out.println("limit = " + limit);
+
+        final int[] scores = {1, 2, 3};
+        scores[0] = 99;                 // allowed: the array object changed, not the reference
+        System.out.println("scores[0] = " + scores[0]);
+
+        final StringBuilder sb = new StringBuilder("abc");
+        sb.append("def");               // allowed for the same reason
+        System.out.println("sb = " + sb);
+    }
+}</code></pre> <pre class="out"><code>limit = 10 scores[0] = 99 sb = abcdef </code></pre> <p>But repointing the variable itself is rejected:</p> <pre class="err"><code>FinalBad.java:4: error: cannot assign a value to final variable scores scores = new int[5];
+^
+1 error</code></pre> <p>This is the same distinction as Quick Check 9.1's <code>c2.value = 99</code> versus <code>c2 = ...</code>, seen from the compiler's side. <code>final</code> controls the arrow, not the box the arrow points to.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 9.11</div> <div class="bd"> <p>You are writing a class <code>Distance</code> that stores <code>feet</code> and <code>inches</code> as <code>int</code> fields, and you need a private constant <code>INCHES_IN_A_FOOT</code> whose value is 12.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Write the declaration. Should it be <code>static</code>?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>private static final int INCHES_IN_A_FOOT = 12;</code></p> <p>Yes, <code>static</code>. Twelve inches in a foot is a fact about the world, not about one <code>Distance</code> object. Writing it without <code>static</code> would give every <code>Distance</code> its own private copy of the number 12 &mdash; harmless but wasteful and misleading. Constants are almost always <code>static final</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> A classmate writes <code>private static final int inchesInAFoot = 12;</code>. Does it compile, and is it right?</p> <details class="soln"><summary></summary><div class="ans"> <p>It compiles perfectly &mdash; naming is convention, not syntax. It is still worth fixing. <code>UPPER_CASE</code> on a constant tells every reader at a glance that the value never changes, and Java programmers rely on that signal so heavily that a lowercase constant genuinely slows people down.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>Distance</code> also has a method <code>add(Distance other)</code> that changes this object's <code>feet</code> and <code>inches</code>. Can <code>feet</code> be declared <code>final</code>?</p> <details class="soln"><summary></summary><div class="ans"> <p>No. <code>final</code> allows exactly one assignment, and the constructor already used it. The first <code>feet = ...</code> inside <code>add</code> would be rejected with <code>cannot assign a value to final variable feet</code>.</p> <p><strong>Things to notice across all three parts.</strong> <code>final</code> and mutability are a design decision, not a decoration. A class whose fields are all <code>final</code> is <em>immutable</em> &mdash; like <code>String</code> &mdash; and immutable objects are immune to the aliasing surprise in &sect;1, because there is no way for one alias to change anything. That is exactly why the instructor's notes point out that <code>String</code> avoids aliasing side-effects: not magic, just <code>final</code> fields.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 9.12</div> <div class="bd"> <p>Put the whole lecture in one class. Write <code>Course</code> with a private <code>String code</code> and a private <code>int seats</code>, plus:</p> <ul> <li>a private static counter of how many <code>Course</code> objects have been created, and a public static method <code>getOffered()</code> returning it;</li> <li>a <code>toString</code> that produces <code>CSCI 212 (30 seats)</code>;</li> <li>an <code>equals</code> that treats two courses as equal when their codes match, and that works when called through an <code>Object</code> reference.</li> </ul> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Three separate decisions. The counter is class-level data, so it is <code>static</code>, it is incremented in the constructor, and the method that reports it is <code>static</code> too &mdash; you want to be able to ask before any course exists. <code>toString</code> and <code>equals</code> are per-object, so neither is <code>static</code>. <code>equals</code> takes <code>Object</code>, guards with <code>instanceof</code>, casts, and compares the <code>String</code> field with <code>.equals</code>.</p> <p class="filename">Course.java</p>
+<pre><code class="language-java">public class Course {
+    private static int offered = 0;
+    private String code;
+    private int seats;
+    public Course(String code, int seats) {
+        this.code = code;
+        this.seats = seats;
+        offered++;
+    }
+    public static int getOffered() {
+        return offered;
+    }
+    @Override public String toString() {
+        return code + " (" + seats + " seats)";
+    }
+    @Override public boolean equals(Object obj) {
+        if (!(obj instanceof Course)) return false;
+        Course other = (Course) obj;
+        return code.equals(other.code);
+    }
+}</code></pre> <p class="filename">CourseDemo.java</p>
+<pre><code class="language-java">public class CourseDemo {
+    public static void main(String args[]) {
+        System.out.println("offered = " + Course.getOffered());
+
+        Course c1 = new Course("CSCI 212", 30);
+        Course c2 = new Course("CSCI 212", 25);
+        Course c3 = new Course("CSCI 111", 40);
+
+        System.out.println(c1);
+        System.out.println(c2);
+        System.out.println("c1 == c2?      " + (c1 == c2));
+        System.out.println("c1.equals(c2)? " + c1.equals(c2));
+        System.out.println("c1.equals(c3)? " + c1.equals(c3));
+        System.out.println("offered = " + Course.getOffered());
+    }
+}</code></pre> <pre class="out"><code>offered = 0
+CSCI 212 (30 seats)
+CSCI 212 (25 seats)
+c1 == c2?      false
+c1.equals(c2)? true
+c1.equals(c3)? false
+offered = 3</code></pre> <p><strong>Things to notice.</strong> <code>c1</code> and <code>c2</code> have different <code>seats</code> and are still equal, because you chose <code>code</code> as the identity of a course. Whether that is the right choice depends on what the program is for &mdash; a registration system would say yes, a room-scheduling system might say no. Writing <code>equals</code> always means answering a domain question, and the syntax is the easy half.</p> <p><code>getOffered()</code> is <code>static</code> and reads a <code>static</code> field, so it obeys the rule of &sect;6 without effort. Had you accidentally written <code>public int getOffered()</code>, the call <code>Course.getOffered()</code> in <code>main</code> would fail with <code>non-static method getOffered() cannot be referenced from a static context</code> &mdash; the error read from the other side.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 9.12</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="6" aria-label="Live coding - Quick Check 9.12">public class Course {
+    // 1. a private static counter, starting at 0 private String code; private int seats; public Course(String code, int seats) { this.code = code; this.seats = seats; // 2. bump the counter } // 3. public static int getOffered() // 4. toString  -&gt;  "CSCI 212 (30 seats)" // 5. equals(Object obj) -&gt; equal when the codes are equal }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="prac"><span class="num">&#9733;</span>Practice Problems</h2> <div class="box prac"> <div class="hd">Practice Problems<span class="tag">&mdash; the heaviest-tested material on Exam 1</span></div> <div class="bd"> <p>Problem 1 is the static-versus-instance question from the actual Spring 2025 Exam 1, and it is worth working until you can do it without hesitating &mdash; a question of this exact shape has appeared on every version of this exam. Problem 2 is the identity-versus-content question from the Summer 2026 midterm. Problems 3 to 5 are here to drill the two ideas the first two only touch.</p> <p>Work them on paper. The exam is closed book and there is no compiler in the room.</p> </div> </div> <h3>Problem 1 &mdash; Find the three errors <span class="muted">(from CSCI 212 Exam 1, Spring 2025)</span></h3> <p>Consider the following Java code. Exactly 3 of the numbered lines have errors. Identify the 3 different errors by giving the numbers of the incorrect lines. For each error also give a corrected version of the line. Any line without a number is correct as written and is not to be changed. Make sure that your corrections lead to the indicated output. (You can give the 3 answers in any order.)</p> <p class="filename">MyNumbers.java</p>
+<pre><code class="language-java">public class MyNumbers {
+    static int a;
+    int x, y;
+    public MyNumbers() {
+        a = 111;
+        // line 1 x = 211;                        // line 2 y = 212;                        // line 3 } public static void fix(MyNumbers n) { x = a;                          // line 4 } public int fix(MyNumbers n, MyNumbers m) { x = n.x;                        // line 5 y = m.y;                        // line 6 return n.a;                     // line 7 } public static void main(String args[]) { System.out.println(a);          // line 8 // The output from the last line should be 0 MyNumbers k = new MyNumbers();  // line 9 k = fix(k);                     // line 10 fix(k, k);                      // line 11 System.out.println(a);          // line 12 // The output from the last line should be 111 } }</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Mark every member as static or instance before reading a single line. <code>a</code> is static; <code>x</code> and <code>y</code> are instance fields; <code>fix(MyNumbers)</code> is a static method; <code>fix(MyNumbers, MyNumbers)</code> is an instance method; <code>main</code> is static. Now walk the numbered lines and, at each one, ask: does the code here have an object, and does it need one?</p> <p>Do not be distracted by lines 1, 2, 3, 5, 6 and 7. Lines 1&ndash;3 are inside a <em>constructor</em>, which always runs on a brand-new object, so bare <code>x</code> and <code>y</code> are fine and so is the static <code>a</code>. Lines 5 and 6 are inside an <em>instance</em> method, which also has an object. Line 7 looks suspicious &mdash; <code>n.a</code> reaches a static field through an object reference &mdash; but that is legal Java, as &sect;5 noted, so it is not one of the three errors.</p> <p><strong>Error 1 &mdash; line 4.</strong> <code>fix(MyNumbers n)</code> is <code>static</code>, and <code>x</code> is an instance field. Whose <code>x</code>?</p> <pre class="err"><code>MyNumbers.java:12: error: non-static variable x cannot be referenced from a static context x = a;
+        // line 4
+^</code></pre> <p>Corrected: <code>n.x = a;</code> &mdash; the method was handed an object, so name it. (Deleting <code>static</code> from the method header would also compile, but it would then break line 10's call from <code>main</code>, so it is not the fix the problem wants.)</p> <p><strong>Error 2 &mdash; line 10.</strong> <code>fix(MyNumbers n)</code> is declared <code>void</code>. It returns nothing, so there is nothing to assign to <code>k</code>.</p> <pre class="err"><code>MyNumbers.java:24: error: incompatible types: void cannot be converted to MyNumbers k = fix(k);
+        // line 10
+^</code></pre> <p>Corrected: <code>fix(k);</code></p> <p><strong>Error 3 &mdash; line 11.</strong> The two-parameter <code>fix</code> has no <code>static</code>, so it is an instance method, and <code>main</code> is calling it with no object.</p> <pre class="err"><code>MyNumbers.java:25: error: non-static method fix(MyNumbers,MyNumbers) cannot be referenced from a static context fix(k, k);
+        // line 11
+^</code></pre> <p>Corrected: <code>k.fix(k, k);</code></p> <p>With all three fixed:</p> <p class="filename">MyNumbers.java</p>
+<pre><code class="language-java">public class MyNumbers {
+    static int a;
+    int x, y;
+
+    public MyNumbers() {
+        a = 111;                        // line 1
+        x = 211;                        // line 2
+        y = 212;                        // line 3
+    }
+
+    public static void fix(MyNumbers n) {
+        n.x = a;                        // line 4  FIXED
+    }
+
+    public int fix(MyNumbers n, MyNumbers m) {
+        x = n.x;                        // line 5
+        y = m.y;                        // line 6
+        return n.a;                     // line 7
+    }
+
+    public static void main(String args[]) {
+        System.out.println(a);          // line 8
+        MyNumbers k = new MyNumbers();  // line 9
+        fix(k);                         // line 10 FIXED
+        k.fix(k, k);                    // line 11 FIXED
+        System.out.println(a);          // line 12
+    }
+}</code></pre> <pre class="out"><code>0 111 </code></pre> <p><strong>Things to notice.</strong> Line 8 prints <code>0</code> and that is not an accident of the exercise &mdash; it is the definition of a static field. <code>a</code> is declared <code>static int a;</code> with no initializer, so it exists from the moment the class loads, holding the default <code>int</code> value 0. No <code>MyNumbers</code> object has been created at that point, and none is needed. An instance field could not have been printed there at all.</p> <p>Line 12 prints <code>111</code> because the constructor on line 9 assigned to the shared <code>a</code>. Every <code>MyNumbers</code> you construct sets the one copy of <code>a</code> to 111; construct a thousand and it is still 111. Contrast that with <code>x</code> and <code>y</code>, which are re-created fresh for every object.</p> <p>Notice too that <code>javac</code> reports all three errors in one run here. That is because they are <em>semantic</em> errors &mdash; the file parsed cleanly &mdash; unlike a missing semicolon, which stops the parser and hides everything after it.</p> <p>Finally, the two methods called <code>fix</code> are an overload, and they coexist happily because their parameter lists differ. Overloading is not the bug in this problem; <code>static</code> is.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 1</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="8" aria-label="Live coding - Practice Problem 1">public class MyNumbers {
+    static int a;
+    int x, y;
+    public MyNumbers() {
+        a = 111;
+        // line 1 x = 211;                        // line 2 y = 212;                        // line 3 } public static void fix(MyNumbers n) { x = a;                          // line 4 } public int fix(MyNumbers n, MyNumbers m) { x = n.x;                        // line 5 y = m.y;                        // line 6 return n.a;                     // line 7 } public static void main(String args[]) { System.out.println(a);          // line 8   should print 0 MyNumbers k = new MyNumbers();  // line 9 k = fix(k);                     // line 10 fix(k, k);                      // line 11 System.out.println(a);          // line 12  should print 111 } }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 2 &mdash; Identity versus content <span class="muted">(from CSCI 212 Midterm, Summer 2026)</span></h3> <p>Consider the following Java program. The five lines below ask only about object identity and content. (The full eight-part version of this problem, which also covers <code>equalsIgnoreCase</code> and case sensitivity, is in the Lecture 4 practice set.)</p> <p class="filename">Output.java</p>
+<pre><code class="language-java">public class Output {
+    public static void main(String args[]) {
+        String a = "java";
+        String b = "java";
+        String c = new String("java");
+        String d = c;
+        String e = "Java";
+        String words[] = {
+            a, c, e}
+        ;
+        System.out.println(a == b);
+        // line (a) System.out.println(a == c);                  // line (b) System.out.println(c == d);                  // line (c) System.out.println(a.equals(c));             // line (d) words[1] = b; c = "CSCI"; System.out.println(words[1] == a);           // line (g) } }</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> What is the output at line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>true</code>. Both are string <em>literals</em> with the same characters, and Java interns literals: the second <code>"java"</code> reuses the object created for the first. Same object, so <code>==</code> is <code>true</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What is the output at line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>false</code>. <code>new String("java")</code> is an explicit instruction to build a new object. It has the same characters and a different address, and <code>==</code> asks about the address.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> What is the output at line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>true</code>. <code>String d = c;</code> copied the reference, so <code>c</code> and <code>d</code> are aliases for the one object built by <code>new</code>. This is <code>p1 == p3</code> from &sect;1 wearing different letters.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> What is the output at line (d)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>true</code>. <code>String</code> overrides <code>equals</code> to compare characters, and both hold <code>java</code>. Compare with line (b): same two variables, different question, different answer.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(g)</span> What is the output at line (g)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>true</code>. Read the two lines above it carefully.</p> <p><code>words[1] = b;</code> stores <em>the reference held by <code>b</code></em> into slot 1 of the array. <code>b</code> refers to the interned literal <code>"java"</code>, and so does <code>a</code>. So <code>words[1]</code> and <code>a</code> are the same object.</p> <p><code>c = "CSCI";</code> then repoints the variable <code>c</code>. It does not touch the array at all &mdash; the array is holding a reference it was given a moment ago, not a link to the variable <code>c</code>. This is the <code>c2 = new Counter(0)</code> distinction from Quick Check 9.1 for the third time.</p> <p><strong>Things to notice across all five parts.</strong> One program, one pair of variables, and the answer flips depending on whether you asked <code>==</code> or <code>.equals</code>. Every exam this course has ever set contains a question of this shape, and the technique is always the same: draw the objects as boxes, the variables and array slots as arrows, and redraw the arrows after every assignment. Then read the answer off the picture instead of off the text.</p> </div></details> </div> <h3>Problem 3 &mdash; Give <code>Fraction</code> an <code>equals</code> and a <code>toString</code> <span class="muted">(added for these notes)</span></h3> <p>Write a complete class <code>Fraction</code> with private <code>int</code> fields <code>numerator</code> and <code>denominator</code>, a two-parameter constructor, getters for both fields, a <code>toString</code> that prints a fraction as <code>3/4</code>, and an <code>equals</code> that treats two fractions as equal when they represent the same value &mdash; so <code>1/2</code> must equal <code>2/4</code>. Your <code>equals</code> must work when it is called through an <code>Object</code> reference and when it is called by <code>ArrayList.contains</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The signature and the guard are the same boilerplate as always. The interesting decision is the comparison. Reducing both fractions to lowest terms would work but needs a greatest-common-divisor loop; cross-multiplying is one line and exactly equivalent: <code>a/b</code> equals <code>c/d</code> precisely when <code>a*d == c*b</code>. Do not compare <code>numerator</code> to <code>other.numerator</code> and <code>denominator</code> to <code>other.denominator</code> &mdash; that is the "same <em>written form</em>" test, not the "same value" test, and it would call <code>1/2</code> and <code>2/4</code> different.</p> <p class="filename">Fraction.java</p>
+<pre><code class="language-java">public class Fraction {
+    private int numerator;
+    private int denominator;
+    public Fraction(int n, int d) {
+        numerator = n;
+        denominator = d;
+    }
+    public int getNumerator() {
+        return numerator;
+    }
+    public int getDenominator() {
+        return denominator;
+    }
+    @Override public String toString() {
+        return numerator + "/" + denominator;
+    }
+    @Override public boolean equals(Object obj) {
+        if (!(obj instanceof Fraction)) return false;
+        Fraction other = (Fraction) obj;
+        return numerator * other.denominator == other.numerator * denominator;
+    }
+}</code></pre> <p class="filename">FractionDemo.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class FractionDemo {
+    public static void main(String args[]) {
+        Fraction half = new Fraction(1, 2);
+        Fraction twoQuarters = new Fraction(2, 4);
+        Fraction third = new Fraction(1, 3);
+
+        System.out.println(half);
+        System.out.println(twoQuarters);
+        System.out.println("half == twoQuarters?      " + (half == twoQuarters));
+        System.out.println("half.equals(twoQuarters)? " + half.equals(twoQuarters));
+        System.out.println("half.equals(third)?       " + half.equals(third));
+        System.out.println("half.equals(\"1/2\")?       " + half.equals("1/2"));
+
+        ArrayList&lt;Fraction&gt; list = new ArrayList&lt;Fraction&gt;();
+        list.add(half);
+        list.add(third);
+        System.out.println("list = " + list);
+        System.out.println("list.contains(twoQuarters)? " + list.contains(twoQuarters));
+    }
+}</code></pre> <pre class="out"><code>1/2
+2/4
+half == twoQuarters?      false
+half.equals(twoQuarters)? true
+half.equals(third)?       false
+half.equals("1/2")?       false
+list = [1/2, 1/3]
+list.contains(twoQuarters)? true</code></pre> <p><strong>Things to notice.</strong> <code>System.out.println(list)</code> prints <code>[1/2, 1/3]</code>. <code>ArrayList</code> has its own <code>toString</code> that walks the elements and calls <code>toString</code> on each &mdash; so writing one method on <code>Fraction</code> made printing a whole collection work. That is the compounding benefit of overriding the standard methods rather than inventing your own <code>display()</code>.</p> <p><code>list.contains(twoQuarters)</code> is <code>true</code> even though no <code>Fraction</code> object with numerator 2 is in the list. <code>contains</code> calls <code>equals</code>, <code>equals</code> says a half is a half, and the library agrees. Every collection method that searches &mdash; <code>contains</code>, <code>indexOf</code>, <code>remove(Object)</code> &mdash; behaves according to the <code>equals</code> you wrote.</p> <p>Two limitations worth being honest about. Cross-multiplication can overflow <code>int</code> for very large numerators; and negative denominators make <code>1/2</code> and <code>-1/-2</code> compare equal, which is arguably correct. Neither is on Exam 1, but both are the kind of thing to mention if you are asked to critique your own code.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 3</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="16" aria-label="Live coding - Practice Problem 3">public class Fraction {
+    private int numerator;
+    private int denominator;
+    public Fraction(int n, int d) {
+        numerator = n;
+        denominator = d;
+    }
+    public int getNumerator() {
+        return numerator;
+    }
+    public int getDenominator() {
+        return denominator;
+    }
+    // 1. toString  -&gt;  "3/4" // 2. equals(Object obj): 1/2 must equal 2/4. //    Hint: a/b equals c/d exactly when a*d == c*b }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 4 &mdash; A class that counts itself <span class="muted">(added for these notes)</span></h3> <p>Write a complete class <code>Ticket</code> for a parking-violation system.</p> <ul> <li>Two public constants: <code>FIRST_HOUR_FINE</code>, worth 25.0, and <code>EXTRA_HOUR_FINE</code>, worth 10.0. They must be readable as <code>Ticket.FIRST_HOUR_FINE</code> without creating an object, and must not be assignable.</li> <li>A private static counter of tickets issued, with a public static <code>getIssued()</code>.</li> <li>Private instance fields: a ticket <code>number</code> that is fixed once the ticket exists, a <code>String plate</code>, and an <code>int hoursExpired</code>.</li> <li>A constructor taking the plate and the hours expired. It must assign this ticket the next number in sequence: the first ticket built is #1, the second #2.</li> <li>A method <code>fine()</code> returning the amount owed: 0 if no hours have expired, otherwise 25 for the first hour plus 10 for each additional hour.</li> <li>A <code>toString</code> producing <code>Ticket #1 plate ABC1234 fine $25.0</code>.</li> </ul> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Sort the members into the two piles before writing anything. The two fine amounts and the issued counter are facts about the whole system: <code>static</code>. The number, plate and hours belong to one ticket: instance. The two fine amounts never change: <code>static final</code>. The ticket number is fixed for the life of the object but different for every object, which is precisely a <code>final</code> instance field &mdash; assigned in the constructor, never again.</p> <p>The numbering trick is the one from &sect;5: increment the shared counter first, then copy its new value into this object's field.</p> <p class="filename">Ticket.java</p>
+<pre><code class="language-java">public class Ticket {
+    public static final double FIRST_HOUR_FINE = 25.0;
+    public static final double EXTRA_HOUR_FINE = 10.0;
+    private static int issued = 0;
+    private final int number;
+    private String plate;
+    private int hoursExpired;
+    public Ticket(String plate, int hoursExpired) {
+        this.plate = plate;
+        this.hoursExpired = hoursExpired;
+        issued++;
+        number = issued;
+    }
+    public static int getIssued() {
+        return issued;
+    }
+    public double fine() {
+        if (hoursExpired &lt;= 0) return 0.0;
+        return FIRST_HOUR_FINE + (hoursExpired - 1) * EXTRA_HOUR_FINE;
+    }
+    @Override public String toString() {
+        return "Ticket #" + number + " plate " + plate + " fine $" + fine();
+    }
+}</code></pre> <p class="filename">TicketDemo.java</p>
+<pre><code class="language-java">public class TicketDemo {
+    public static void main(String args[]) {
+        System.out.println("Tickets issued: " + Ticket.getIssued());
+        System.out.println("First hour fine: $" + Ticket.FIRST_HOUR_FINE);
+
+        Ticket t1 = new Ticket("ABC1234", 1);
+        Ticket t2 = new Ticket("XYZ9876", 3);
+
+        System.out.println(t1);
+        System.out.println(t2);
+        System.out.println("Tickets issued: " + Ticket.getIssued());
+    }
+}</code></pre> <pre class="out"><code>Tickets issued: 0
+First hour fine: $25.0
+Ticket #1 plate ABC1234 fine $25.0
+Ticket #2 plate XYZ9876 fine $45.0
+Tickets issued: 2</code></pre> <p><strong>Things to notice.</strong> The first two lines of <code>main</code> run before any ticket exists, and both work. That is the practical meaning of "belongs to the class": <code>Ticket.getIssued()</code> and <code>Ticket.FIRST_HOUR_FINE</code> are questions you can ask an empty system.</p> <p><code>fine()</code> uses <code>FIRST_HOUR_FINE</code> with no qualification at all. An instance method may read a static field directly &mdash; the arrow runs that way &mdash; and writing <code>Ticket.FIRST_HOUR_FINE</code> inside the class would be correct but noisy.</p> <p><code>number</code> being <code>final</code> is not decoration. It documents that a ticket number is issued once and never edited, and it makes any later <code>number = ...</code> a compile error rather than a subtle accounting bug. Meanwhile <code>hoursExpired</code> is deliberately not <code>final</code>, because an officer might correct it.</p> <p>The three-hour ticket costs 45.0: 25 for the first hour plus 10 for each of the two extra hours. If your answer came out 55, you charged the first hour twice &mdash; the <code>hoursExpired - 1</code> is the whole content of that formula.</p> <p>We will build a much larger version of this system in Lectures 10 and 11, with cars, parking spaces, meters and officers. Everything above will still be in it.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 4</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="6" aria-label="Live coding - Practice Problem 4">public class Ticket {
+    // 1. two public constants: FIRST_HOUR_FINE = 25.0, EXTRA_HOUR_FINE = 10.0 // 2. a private static counter of tickets issued // 3. instance fields: a final int number, a String plate, an int hoursExpired public Ticket(String plate, int hoursExpired) { // 4. store the plate and hours, bump the counter, take the next number } // 5. public static int getIssued() // 6. public double fine() // 7. toString -&gt; "Ticket #1 plate ABC1234 fine $25.0" }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 5 &mdash; What is the output? <span class="muted">(added for these notes)</span></h3> <p>Consider the following Java program.</p> <p class="filename">Gadget.java</p>
+<pre><code class="language-java">public class Gadget {
+    static int made = 0;
+    static String label = "none";
+    int id;
+    String name;
+
+    public Gadget(String name) {
+        made++;
+        id = made;
+        this.name = name;
+        label = name;
+    }
+
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Gadget)) return false;
+        Gadget g = (Gadget) obj;
+        return name.equals(g.name);
+    }
+
+    public String toString() { return "Gadget " + id + ":" + name; }
+
+    public static void main(String args[]) {
+        Gadget a = new Gadget("bolt");
+        Gadget b = new Gadget("bolt");
+        Gadget c = a;
+
+        System.out.println(a);                          // line (a)
+        System.out.println(a == b);                     // line (b)
+        System.out.println(a.equals(b));                // line (c)
+        System.out.println(a == c);                     // line (d)
+        System.out.println(made + " " + a.made);        // line (e)
+        System.out.println(label);                      // line (f)
+        Gadget d = new Gadget("nut");
+        System.out.println(a.label + " " + b.label);    // line (g)
+        System.out.println(a.id + " " + d.id);          // line (h)
+        Object o = b;
+        System.out.println(o.equals(a));                // line (i)
+        System.out.println(o);                          // line (j)
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> What is the output at line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Gadget 1:bolt</code>. <code>println</code> calls the overridden <code>toString</code>. <code>a</code> was the first object built, so the constructor took <code>made</code> from 0 to 1 and copied 1 into <code>a.id</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What is the output at line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>false</code>. Two <code>new</code> calls means two objects, so the references differ.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> What is the output at line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>true</code>. <code>equals</code> was overridden correctly &mdash; the parameter is <code>Object</code> &mdash; and it compares <code>name</code>, which is <code>"bolt"</code> on both.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> What is the output at line (d)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>true</code>. <code>Gadget c = a;</code> copied the reference; <code>a</code> and <code>c</code> are one object.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> What is the output at line (e)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>2 2</code>. <code>made</code> is static, so <code>made</code> and <code>a.made</code> are two spellings of the same variable, and two gadgets have been built. Reading a static field through an object reference is legal &mdash; and it is exactly what an exam question is testing when it writes <code>a.made</code> instead of <code>Gadget.made</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(f)</span> What is the output at line (f)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>bolt</code>. <code>label</code> starts as <code>"none"</code>, but every constructor call overwrites the one shared copy. Two gadgets have been built, both named <code>bolt</code>, so it holds <code>"bolt"</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(g)</span> What is the output at line (g)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>nut nut</code>. Building <code>d</code> ran the constructor again, which set the shared <code>label</code> to <code>"nut"</code>. There is only one <code>label</code>, so <code>a.label</code> and <code>b.label</code> both report it &mdash; even though neither <code>a</code> nor <code>b</code> is a nut. This is the classic argument against mutable static state: an object's own name field says <code>bolt</code> while the class-level <code>label</code> says <code>nut</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(h)</span> What is the output at line (h)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>1 3</code>. <code>id</code> is an instance field, frozen at construction. <code>a</code> got 1 and kept it; <code>d</code> was the third object and got 3. Compare this line with (g): same program, one field per object versus one field per class.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(i)</span> What is the output at line (i)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>true</code>. <code>o</code> is declared <code>Object</code>, so at compile time Java selects <code>equals(Object)</code> &mdash; and because this class genuinely <em>overrides</em> that method, the call is dispatched at run time to <code>Gadget</code>'s version. Had the class written <code>equals(Gadget g)</code> instead, this line would print <code>false</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(j)</span> What is the output at line (j)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Gadget 2:bolt</code>. Same reasoning: <code>o</code> is declared <code>Object</code>, but <code>toString</code> is a real override, so the object's own version runs. Declaring a variable <code>Object</code> changes which methods you may <em>call</em>; it never changes which version of an overridden method <em>runs</em>.</p> <p><strong>Things to notice across the whole problem.</strong> Lines (e)&ndash;(h) are the static story: one <code>made</code>, one <code>label</code>, but a separate <code>id</code> and <code>name</code> in every object. Lines (i)&ndash;(j) are the override story: correct signatures survive being called through an <code>Object</code> reference. Get both of those and you have the whole lecture.</p> <p>If you want to feel the difference, change the header of <code>equals</code> to <code>public boolean equals(Gadget g)</code>, delete the <code>instanceof</code> and the cast, and re-run. Lines (a) to (h) are unchanged and line (i) flips to <code>false</code>. One word in one header, and a method that looked fine in testing stops being called by anything that holds your object as an <code>Object</code> &mdash; which includes every collection in the standard library.</p> </div></details> </div> <div class="box sum" id="summary"> <div class="hd">Lecture Summary</div> <div class="bd"> <ul> <li>For objects, <code>=</code> copies a <strong>reference</strong> and <code>==</code> compares <strong>references</strong>. For primitives both work on the value. Two objects with identical contents are never <code>==</code>.</li> <li>Every class inherits <code>equals</code> and <code>toString</code> from <code>Object</code>. The inherited <code>equals</code> is just <code>==</code>; the inherited <code>toString</code> returns <code>ClassName@hashcode</code>, which is machine-dependent and useless for reading. A serious class overrides both.</li> <li>The signature of <code>equals</code> is <code>public boolean equals(Object obj)</code> &mdash; the parameter is <code>Object</code>, always. Guard with <code>instanceof</code>, cast, then compare the fields that matter, using <code>.equals</code> for object-valued fields.</li> <li>Writing <code>equals(MyType t)</code> <strong>overloads</strong> instead of overriding. It works when you test it directly and silently fails through an <code>Object</code> reference &mdash; including inside <code>ArrayList.contains</code>. Write <code>@Override</code> and the compiler catches it.</li> <li><code>toString</code> returns a <code>String</code>; it does not print. Any change to the signature turns it into an overload that <code>println</code> will never call.</li> <li>A <code>static</code> member belongs to the class: one copy, alive before any object exists, normally named <code>ClassName.member</code>. An instance member belongs to an object: one copy per <code>new</code>. A counter of objects created is the standard example.</li> <li>A static method has no object, so it cannot touch instance fields or instance methods and cannot use <code>this</code> &mdash; hence <code>non-static variable x cannot be referenced from a static context</code>. Fix it by passing an object in, creating one, or (only if the data really is class-wide) making the field static. <code>main</code> is static because the JVM has no object to call it on.</li> <li><code>final</code> allows one assignment. <code>static final</code> is how you write a constant, named in <code>UPPER_CASE</code>. On an object variable, <code>final</code> freezes the reference, not the object.</li> </ul> <p><strong>Coming up in Lecture 10 &mdash; OOP Case Study I: Designing the Parking Ticket System.</strong> You now have every piece of the language you need to build something real: classes, objects, references, <code>static</code>, <code>equals</code> and <code>toString</code>. Next session we stop learning new syntax and use it &mdash; we take a page of plain English about a street full of parking meters and turn it into a set of classes, deciding what each one knows and what it can do. It is the last class before the review, and it is the one that shows you what all of this was for.</p>
+  </div>
+</div>
+
+<nav class="pagenav">
+<span class="disabled"><div class="dir">&larr; Previous</div><div class="ttl">Lecture 8 &mdash; Object References and Aliasing</div><div class="pending">posts Thu Sep 24</div></span>
+<span class="disabled next"><div class="dir">Next &rarr;</div><div class="ttl">Lecture 10 &mdash; OOP Case Study I: Designing the Parking Ticket System</div><div class="pending">posts Thu Oct 1</div></span>
+</nav>
+<footer class="pf">CSCI 212 &middot; Object-Oriented Programming in Java &middot; Queens College, CUNY</footer>
+</div>
+<script>
+(()=>{var ut=Object.create;var xe=Object.defineProperty;var ft=Object.getOwnPropertyDescriptor;var gt=Object.getOwnPropertyNames;var ht=Object.getPrototypeOf,dt=Object.prototype.hasOwnProperty;var pt=(e,t)=>()=>{try{return t||e((t={exports:{}}).exports,t),t.exports}catch(n){throw t=0,n}};var Et=(e,t,n,l)=>{if(t&&typeof t=="object"||typeof t=="function")for(let d of gt(t))!dt.call(e,d)&&d!==n&&xe(e,d,{get:()=>t[d],enumerable:!(l=ft(t,d))||l.enumerable});return e};var bt=(e,t,n)=>(n=e!=null?ut(ht(e)):{},Et(t||!e||!e.__esModule?xe(n,"default",{value:e,enumerable:!0}):n,e));var Ke=pt((ln,Ge)=>{function Ie(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(t=>{let n=e[t],l=typeof n;(l==="object"||l==="function")&&!Object.isFrozen(n)&&Ie(n)}),e}var Z=class{constructor(t){t.data===void 0&&(t.data={}),this.data=t.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function Ce(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function k(e,...t){let n=Object.create(null);for(let l in e)n[l]=e[l];return t.forEach(function(l){for(let d in l)n[d]=l[d]}),n}var _t="</span>",Ne=e=>!!e.scope,Mt=(e,{prefix:t})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let n=e.split(".");return[`${t}${n.shift()}`,...n.map((l,d)=>`${l}${"_".repeat(d+1)}`)].join(" ")}return`${t}${e}`},oe=class{constructor(t,n){this.buffer="",this.classPrefix=n.classPrefix,t.walk(this)}addText(t){this.buffer+=Ce(t)}openNode(t){if(!Ne(t))return;let n=Mt(t.scope,{prefix:this.classPrefix});this.span(n)}closeNode(t){Ne(t)&&(this.buffer+=_t)}value(){return this.buffer}span(t){this.buffer+=`<span class="${t}">`}},Re=(e={})=>{let t={children:[]};return Object.assign(t,e),t},ae=class e{constructor(){this.rootNode=Re(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(t){this.top.children.push(t)}openNode(t){let n=Re({scope:t});this.add(n),this.stack.push(n)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(t){return this.constructor._walk(t,this.rootNode)}static _walk(t,n){return typeof n=="string"?t.addText(n):n.children&&(t.openNode(n),n.children.forEach(l=>this._walk(t,l)),t.closeNode(n)),t}static _collapse(t){typeof t!="string"&&t.children&&(t.children.every(n=>typeof n=="string")?t.children=[t.children.join("")]:t.children.forEach(n=>{e._collapse(n)}))}},le=class extends ae{constructor(t){super(),this.options=t}addText(t){t!==""&&this.add(t)}startScope(t){this.openNode(t)}endScope(){this.closeNode()}__addSublanguage(t,n){let l=t.root;n&&(l.scope=`language:${n}`),this.add(l)}toHTML(){return new oe(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function G(e){return e?typeof e=="string"?e:e.source:null}function De(e){return B("(?=",e,")")}function Ot(e){return B("(?:",e,")*")}function wt(e){return B("(?:",e,")?")}function B(...e){return e.map(n=>G(n)).join("")}function xt(e){let t=e[e.length-1];return typeof t=="object"&&t.constructor===Object?(e.splice(e.length-1,1),t):{}}function V(...e){return"("+(xt(e).capture?"":"?:")+e.map(l=>G(l)).join("|")+")"}function ke(e){return new RegExp(e.toString()+"|").exec("").length-1}function Nt(e,t){let n=e&&e.exec(t);return n&&n.index===0}var Rt=new RegExp(V(/\[(?:[^\\\]]|\\.)*\]/,/\(\?<(?![=!])[^>]+>/,/\(\?'[^']+'/,/\(\??/,/\\([1-9][0-9]*)/,/\\./));function fe(e,{joinWith:t}){let n=0;return e.map(l=>{n+=1;let d=n,_=G(l),c="";for(;_.length>0;){let r=Rt.exec(_);if(!r){c+=_;break}c+=_.substring(0,r.index),_=_.substring(r.index+r[0].length),r[0][0]==="\\"&&r[1]?c+="\\"+String(Number(r[1])+d):(c+=r[0],(r[0]==="("||/^\(\?[<']/.test(r[0]))&&n++)}return c}).map(l=>`(${l})`).join(t)}var yt=/\b\B/,ve="[a-zA-Z]\\w*",ge="[a-zA-Z_]\\w*",Le="\\b\\d+(\\.\\d+)?",Be="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Pe="\\b(0b[01]+)",St="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",At=(e={})=>{let t=/^#![ ]*\//;return e.binary&&(e.begin=B(t,/.*\b/,e.binary,/\b.*/)),k({scope:"meta",begin:t,end:/$/,relevance:0,"on:begin":(n,l)=>{n.index!==0&&l.ignoreMatch()}},e)},K={begin:"\\\\[\\s\\S]",relevance:0},Tt={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[K]},It={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[K]},Ct={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},Q=function(e,t,n={}){let l=k({scope:"comment",begin:e,end:t,contains:[]},n);l.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let d=V("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return l.contains.push({begin:B(/[ ]+/,"(",d,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),l},Dt=Q("//","$"),kt=Q("/\\*","\\*/"),vt=Q("#","$"),Lt={scope:"number",begin:Le,relevance:0},Bt={scope:"number",begin:Be,relevance:0},Pt={scope:"number",begin:Pe,relevance:0},$t={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[K,{begin:/\[/,end:/\]/,relevance:0,contains:[K]}]},Ht={scope:"title",begin:ve,relevance:0},Ut={scope:"title",begin:ge,relevance:0},jt={begin:"\\.\\s*"+ge,relevance:0},Gt=function(e){return Object.assign(e,{"on:begin":(t,n)=>{n.data._beginMatch=t[1]},"on:end":(t,n)=>{n.data._beginMatch!==t[1]&&n.ignoreMatch()}})},X=Object.freeze({__proto__:null,APOS_STRING_MODE:Tt,BACKSLASH_ESCAPE:K,BINARY_NUMBER_MODE:Pt,BINARY_NUMBER_RE:Pe,COMMENT:Q,C_BLOCK_COMMENT_MODE:kt,C_LINE_COMMENT_MODE:Dt,C_NUMBER_MODE:Bt,C_NUMBER_RE:Be,END_SAME_AS_BEGIN:Gt,HASH_COMMENT_MODE:vt,IDENT_RE:ve,MATCH_NOTHING_RE:yt,METHOD_GUARD:jt,NUMBER_MODE:Lt,NUMBER_RE:Le,PHRASAL_WORDS_MODE:Ct,QUOTE_STRING_MODE:It,REGEXP_MODE:$t,RE_STARTERS_RE:St,SHEBANG:At,TITLE_MODE:Ht,UNDERSCORE_IDENT_RE:ge,UNDERSCORE_TITLE_MODE:Ut});function Kt(e,t){e.input[e.index-1]==="."&&t.ignoreMatch()}function mt(e,t){e.className!==void 0&&(e.scope=e.className,delete e.className)}function Wt(e,t){t&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=Kt,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function Ft(e,t){Array.isArray(e.illegal)&&(e.illegal=V(...e.illegal))}function zt(e,t){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function Yt(e,t){e.relevance===void 0&&(e.relevance=1)}var Xt=(e,t)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let n=Object.assign({},e);Object.keys(e).forEach(l=>{delete e[l]}),e.keywords=n.keywords,e.begin=B(n.beforeMatch,De(n.begin)),e.starts={relevance:0,contains:[Object.assign(n,{endsParent:!0})]},e.relevance=0,delete n.beforeMatch},Zt=["of","and","for","in","not","or","if","then","parent","list","value"],Jt="keyword";function $e(e,t,n=Jt){let l=Object.create(null);return typeof e=="string"?d(n,e.split(" ")):Array.isArray(e)?d(n,e):Object.keys(e).forEach(function(_){Object.assign(l,$e(e[_],t,_))}),l;function d(_,c){t&&(c=c.map(r=>r.toLowerCase())),c.forEach(function(r){let u=r.split("|");l[u[0]]=[_,Vt(u[0],u[1])]})}}function Vt(e,t){return t?Number(t):Qt(e)?0:1}function Qt(e){return Zt.includes(e.toLowerCase())}var ye={},L=e=>{console.error(e)},Se=(e,...t)=>{console.log(`WARN: ${e}`,...t)},H=(e,t)=>{ye[`${e}/${t}`]||(console.log(`Deprecated as of ${e}. ${t}`),ye[`${e}/${t}`]=!0)},J=new Error;function He(e,t,{key:n}){let l=0,d=e[n],_={},c={};for(let r=1;r<=t.length;r++)c[r+l]=d[r],_[r+l]=!0,l+=ke(t[r-1]);e[n]=c,e[n]._emit=_,e[n]._multi=!0}function qt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw L("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),J;if(typeof e.beginScope!="object"||e.beginScope===null)throw L("beginScope must be object"),J;He(e,e.begin,{key:"beginScope"}),e.begin=fe(e.begin,{joinWith:""})}}function en(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw L("skip, excludeEnd, returnEnd not compatible with endScope: {}"),J;if(typeof e.endScope!="object"||e.endScope===null)throw L("endScope must be object"),J;He(e,e.end,{key:"endScope"}),e.end=fe(e.end,{joinWith:""})}}function tn(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function nn(e){tn(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),qt(e),en(e)}function sn(e){function t(c,r){return new RegExp(G(c),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(r?"g":""))}class n{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(r,u){u.position=this.position++,this.matchIndexes[this.matchAt]=u,this.regexes.push([u,r]),this.matchAt+=ke(r)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let r=this.regexes.map(u=>u[1]);this.matcherRe=t(fe(r,{joinWith:"|"}),!0),this.lastIndex=0}exec(r){this.matcherRe.lastIndex=this.lastIndex;let u=this.matcherRe.exec(r);if(!u)return null;let O=u.findIndex((P,I)=>I>0&&P!==void 0),M=this.matchIndexes[O];return u.splice(0,O),Object.assign(u,M)}}class l{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(r){if(this.multiRegexes[r])return this.multiRegexes[r];let u=new n;return this.rules.slice(r).forEach(([O,M])=>u.addRule(O,M)),u.compile(),this.multiRegexes[r]=u,u}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(r,u){this.rules.push([r,u]),u.type==="begin"&&this.count++}exec(r){let u=this.getMatcher(this.regexIndex);u.lastIndex=this.lastIndex;let O=u.exec(r);if(this.resumingScanAtSamePosition()&&!(O&&O.index===this.lastIndex)){let M=this.getMatcher(0);M.lastIndex=this.lastIndex+1,O=M.exec(r)}return O&&(this.regexIndex+=O.position+1,this.regexIndex===this.count&&this.considerAll()),O}}function d(c){let r=new l;return c.contains.forEach(u=>r.addRule(u.begin,{rule:u,type:"begin"})),c.terminatorEnd&&r.addRule(c.terminatorEnd,{type:"end"}),c.illegal&&r.addRule(c.illegal,{type:"illegal"}),r}function _(c,r){let u=c;if(c.isCompiled)return u;[mt,zt,nn,Xt].forEach(M=>M(c,r)),e.compilerExtensions.forEach(M=>M(c,r)),c.__beforeBegin=null,[Wt,Ft,Yt].forEach(M=>M(c,r)),c.isCompiled=!0;let O=null;return typeof c.keywords=="object"&&c.keywords.$pattern&&(c.keywords=Object.assign({},c.keywords),O=c.keywords.$pattern,delete c.keywords.$pattern),O=O||/\w+/,c.keywords&&(c.keywords=$e(c.keywords,e.case_insensitive)),u.keywordPatternRe=t(O,!0),r&&(c.begin||(c.begin=/\B|\b/),u.beginRe=t(u.begin),!c.end&&!c.endsWithParent&&(c.end=/\B|\b/),c.end&&(u.endRe=t(u.end)),u.terminatorEnd=G(u.end)||"",c.endsWithParent&&r.terminatorEnd&&(u.terminatorEnd+=(c.end?"|":"")+r.terminatorEnd)),c.illegal&&(u.illegalRe=t(c.illegal)),c.contains||(c.contains=[]),c.contains=[].concat(...c.contains.map(function(M){return rn(M==="self"?c:M)})),c.contains.forEach(function(M){_(M,u)}),c.starts&&_(c.starts,r),u.matcher=d(u),u}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=k(e.classNameAliases||{}),_(e)}function Ue(e){return e?e.endsWithParent||Ue(e.starts):!1}function rn(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(t){return k(e,{variants:null},t)})),e.cachedVariants?e.cachedVariants:Ue(e)?k(e,{starts:e.starts?k(e.starts):null}):Object.isFrozen(e)?k(e):e}var cn="11.12.0",ue=class extends Error{constructor(t,n){super(t),this.name="HTMLInjectionError",this.html=n}},ce=Ce,Ae=k,Te=Symbol("nomatch"),on=7,je=function(e){let t=Object.create(null),n=Object.create(null),l=[],d=!0,_="Could not find the language '{}', did you forget to load/include a language module?",c={disableAutodetect:!0,name:"Plain text",contains:[]},r={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:le};function u(i){return r.noHighlightRe.test(i)}function O(i){let a=i.className+" ";a+=i.parentNode?i.parentNode.className:"";let h=r.languageDetectRe.exec(a);if(h){let E=C(h[1]);return E||(Se(_.replace("{}",h[1])),Se("Falling back to no-highlight mode for this block.",i)),E?h[1]:"no-highlight"}return a.split(/\s+/).find(E=>u(E)||C(E))}function M(i,a,h){let E="",w="";typeof a=="object"?(E=i,h=a.ignoreIllegals,w=a.language):(H("10.7.0","highlight(lang, code, ...args) has been deprecated."),H("10.7.0",`Please use highlight(code, options) instead.
+(see the highlight.js issue tracker)`),w=i,E=a),h===void 0&&(h=!0);let y={code:E,language:w};W("before:highlight",y);let D=y.result?y.result:P(y.language,y.code,h);return D.code=y.code,W("after:highlight",D),D}function P(i,a,h,E){let w=Object.create(null);function y(s,o){return s.keywords[o]}function D(){if(!f.keywords){x.addText(b);return}let s=0;f.keywordPatternRe.lastIndex=0;let o=f.keywordPatternRe.exec(b),g="";for(;o;){g+=b.substring(s,o.index);let p=A.case_insensitive?o[0].toLowerCase():o[0],N=y(f,p);if(N){let[T,at]=N;if(x.addText(g),g="",w[p]=(w[p]||0)+1,w[p]<=on&&(Y+=at),T.startsWith("_"))g+=o[0];else{let lt=A.classNameAliases[T]||T;S(o[0],lt)}}else g+=o[0];s=f.keywordPatternRe.lastIndex,o=f.keywordPatternRe.exec(b)}g+=b.substring(s),x.addText(g)}function F(){if(b==="")return;let s=null;if(typeof f.subLanguage=="string"){if(!t[f.subLanguage]){x.addText(b);return}s=P(f.subLanguage,b,!0,we[f.subLanguage]),we[f.subLanguage]=s._top}else s=$(b,f.subLanguage.length?f.subLanguage:null);f.relevance>0&&(Y+=s.relevance),x.__addSublanguage(s._emitter,s.language)}function R(){f.subLanguage!=null?F():D(),b=""}function S(s,o){s!==""&&(x.startScope(o),x.addText(s),x.endScope())}function be(s,o){let g=1,p=o.length-1;for(;g<=p;){if(!s._emit[g]){g++;continue}let N=A.classNameAliases[s[g]]||s[g],T=o[g];N?S(T,N):(b=T,D(),b=""),g++}}function _e(s,o){return s.scope&&typeof s.scope=="string"&&x.openNode(A.classNameAliases[s.scope]||s.scope),s.beginScope&&(s.beginScope._wrap?(S(b,A.classNameAliases[s.beginScope._wrap]||s.beginScope._wrap),b=""):s.beginScope._multi&&(be(s.beginScope,o),b="")),f=Object.create(s,{parent:{value:f}}),f}function Me(s,o,g){let p=Nt(s.endRe,g);if(p){if(s["on:end"]){let N=new Z(s);s["on:end"](o,N),N.isMatchIgnored&&(p=!1)}if(p){for(;s.endsParent&&s.parent;)s=s.parent;return s}}if(s.endsWithParent)return Me(s.parent,o,g)}function it(s){return f.matcher.regexIndex===0?(b+=s[0],1):(re=!0,0)}function st(s){let o=s[0],g=s.rule,p=new Z(g),N=[g.__beforeBegin,g["on:begin"]];for(let T of N)if(T&&(T(s,p),p.isMatchIgnored))return it(o);return g.skip?b+=o:(g.excludeBegin&&(b+=o),R(),!g.returnBegin&&!g.excludeBegin&&(b=o)),_e(g,s),g.returnBegin?0:o.length}function rt(s){let o=s[0],g=a.substring(s.index),p=Me(f,s,g);if(!p)return Te;let N=f;f.endScope&&f.endScope._wrap?(R(),S(o,f.endScope._wrap)):f.endScope&&f.endScope._multi?(R(),be(f.endScope,s)):N.skip?b+=o:(N.returnEnd||N.excludeEnd||(b+=o),R(),N.excludeEnd&&(b=o));do f.scope&&x.closeNode(),!f.skip&&!f.subLanguage&&(Y+=f.relevance),f=f.parent;while(f!==p.parent);return p.starts&&_e(p.starts,s),N.returnEnd?0:o.length}function ct(){let s=[];for(let o=f;o!==A;o=o.parent)o.scope&&s.unshift(o.scope);s.forEach(o=>x.openNode(o))}let z={};function Oe(s,o){let g=o&&o[0];if(b+=s,g==null)return R(),0;if(z.type==="begin"&&o.type==="end"&&z.index===o.index&&g===""){if(b+=a.slice(o.index,o.index+1),!d){let p=new Error(`0 width match regex (${i})`);throw p.languageName=i,p.badRule=z.rule,p}return 1}if(z=o,o.type==="begin")return st(o);if(o.type==="illegal"&&!h){let p=new Error('Illegal lexeme "'+g+'" for mode "'+(f.scope||"<unnamed>")+'"');throw p.mode=f,p}else if(o.type==="end"){let p=rt(o);if(p!==Te)return p}if(o.type==="illegal"&&g==="")return o.index===a.length||(b+=`
+`),1;if(se>1e5&&se>o.index*3)throw new Error("potential infinite loop, way more iterations than matches");return b+=g,g.length}let A=C(i);if(!A)throw L(_.replace("{}",i)),new Error('Unknown language: "'+i+'"');let ot=sn(A),ie="",f=E||ot,we={},x=new r.__emitter(r);ct();let b="",Y=0,v=0,se=0,re=!1;try{if(A.__emitTokens)A.__emitTokens(a,x);else{for(f.matcher.considerAll();;){se++,re?re=!1:f.matcher.considerAll(),f.matcher.lastIndex=v;let s=f.matcher.exec(a);if(!s)break;let o=a.substring(v,s.index),g=Oe(o,s);v=s.index+g}Oe(a.substring(v))}return x.finalize(),ie=x.toHTML(),{language:i,value:ie,relevance:Y,illegal:!1,_emitter:x,_top:f}}catch(s){if(s.message&&s.message.includes("Illegal"))return{language:i,value:ce(a),illegal:!0,relevance:0,_illegalBy:{message:s.message,index:v,context:a.slice(v-100,v+100),mode:s.mode,resultSoFar:ie},_emitter:x};if(d)return{language:i,value:ce(a),illegal:!1,relevance:0,errorRaised:s,_emitter:x,_top:f};throw s}}function I(i){let a={value:ce(i),illegal:!1,relevance:0,_top:c,_emitter:new r.__emitter(r)};return a._emitter.addText(i),a}function $(i,a){a=a||r.languages||Object.keys(t);let h=I(i),E=a.filter(C).filter(Ee).map(R=>P(R,i,!1));E.unshift(h);let w=E.sort((R,S)=>{if(R.relevance!==S.relevance)return S.relevance-R.relevance;if(R.language&&S.language){if(C(R.language).supersetOf===S.language)return 1;if(C(S.language).supersetOf===R.language)return-1}return 0}),[y,D]=w,F=y;return F.secondBest=D,F}function te(i,a,h){let E=a&&n[a]||h;i.classList.add("hljs"),i.classList.add(`language-${E}`)}function ne(i){let a=null,h=O(i);if(u(h))return;if(W("before:highlightElement",{el:i,language:h}),i.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",i);return}if(i.children.length>0&&(r.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("(see the highlight.js security wiki)"),console.warn("The element with unescaped HTML:"),console.warn(i)),r.throwUnescapedHTML))throw new ue("One of your code blocks includes unescaped HTML.",i.innerHTML);a=i;let E=a.textContent,w=h?M(E,{language:h,ignoreIllegals:!0}):$(E);i.innerHTML=w.value,i.dataset.highlighted="yes",te(i,h,w.language),i.result={language:w.language,re:w.relevance,relevance:w.relevance},w.secondBest&&(i.secondBest={language:w.secondBest.language,relevance:w.secondBest.relevance}),W("after:highlightElement",{el:i,result:w,text:E})}function Ye(i){r=Ae(r,i)}let Xe=()=>{m(),H("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function Ze(){m(),H("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let de=!1;function m(){function i(){m()}if(document.readyState==="loading"){de||window.addEventListener("DOMContentLoaded",i,!1),de=!0;return}document.querySelectorAll(r.cssSelector).forEach(ne)}function Je(i,a){let h=null;try{h=a(e)}catch(E){if(L("Language definition for '{}' could not be registered.".replace("{}",i)),d)L(E);else throw E;h=c}h.name||(h.name=i),t[i]=h,h.rawDefinition=a.bind(null,e),h.aliases&&pe(h.aliases,{languageName:i})}function Ve(i){delete t[i];for(let a of Object.keys(n))n[a]===i&&delete n[a]}function Qe(){return Object.keys(t)}function C(i){return i=(i||"").toLowerCase(),t[i]||t[n[i]]}function pe(i,{languageName:a}){typeof i=="string"&&(i=[i]),i.forEach(h=>{n[h.toLowerCase()]=a})}function Ee(i){let a=C(i);return a&&!a.disableAutodetect}function qe(i){i["before:highlightBlock"]&&!i["before:highlightElement"]&&(i["before:highlightElement"]=a=>{i["before:highlightBlock"](Object.assign({block:a.el},a))}),i["after:highlightBlock"]&&!i["after:highlightElement"]&&(i["after:highlightElement"]=a=>{i["after:highlightBlock"](Object.assign({block:a.el},a))})}function et(i){qe(i),l.push(i)}function tt(i){let a=l.indexOf(i);a!==-1&&l.splice(a,1)}function W(i,a){let h=i;l.forEach(function(E){E[h]&&E[h](a)})}function nt(i){return H("10.7.0","highlightBlock will be removed entirely in v12.0"),H("10.7.0","Please use highlightElement now."),ne(i)}Object.assign(e,{highlight:M,highlightAuto:$,highlightAll:m,highlightElement:ne,highlightBlock:nt,configure:Ye,initHighlighting:Xe,initHighlightingOnLoad:Ze,registerLanguage:Je,unregisterLanguage:Ve,listLanguages:Qe,getLanguage:C,registerAliases:pe,autoDetection:Ee,inherit:Ae,addPlugin:et,removePlugin:tt}),e.debugMode=function(){d=!1},e.safeMode=function(){d=!0},e.versionString=cn,e.regex={concat:B,lookahead:De,either:V,optional:wt,anyNumberOfTimes:Ot};for(let i in X)typeof X[i]=="object"&&Ie(X[i]);return Object.assign(e,X),e},U=je({});U.newInstance=()=>je({});Ge.exports=U;U.HighlightJS=U;U.default=U});var me=bt(Ke(),1);var he=me.default;var j="[0-9](_*[0-9])*",q=`\\.(${j})`,ee="[0-9a-fA-F](_*[0-9a-fA-F])*",We={className:"number",variants:[{begin:`(\\b(${j})((${q})|\\.)?|(${q}))[eE][+-]?(${j})[fFdD]?\\b`},{begin:`\\b(${j})((${q})[fFdD]?\\b|\\.([fFdD]\\b)?)`},{begin:`(${q})[fFdD]?\\b`},{begin:`\\b(${j})[fFdD]\\b`},{begin:`\\b0[xX]((${ee})\\.?|(${ee})?\\.(${ee}))[pP][+-]?(${j})[fFdD]?\\b`},{begin:"\\b(0|[1-9](_*[0-9])*)[lL]?\\b"},{begin:`\\b0[xX](${ee})[lL]?\\b`},{begin:"\\b0(_*[0-7])*[lL]?\\b"},{begin:"\\b0[bB][01](_*[01])*[lL]?\\b"}],relevance:0};function Fe(e,t,n){return n===-1?"":e.replace(t,l=>Fe(e,t,n-1))}function ze(e){let t=e.regex,n="[\xC0-\u02B8a-zA-Z_$][\xC0-\u02B8a-zA-Z_$0-9]*",l="(?:(?:\\s*\\[\\s*])+)?",d=n+"<@@@>"+l,c="(?:"+("\\?(?:\\s+(?:extends|super)\\s+"+d+")?")+"|"+d+")",r=Fe("(?:\\s*<\\s*"+c+"(?:\\s*,\\s*"+c+")*\\s*>)?",/<@@@>/g,2),I={keyword:["synchronized","abstract","private","var","static","if","const ","for","while","strictfp","finally","protected","import","native","final","void","enum","else","break","transient","catch","instanceof","volatile","case","assert","package","default","public","try","switch","continue","throws","protected","public","private","module","requires","exports","do","sealed","yield","permits","goto","when"],literal:["false","true","null"],type:["char","boolean","long","float","int","byte","short","double"],built_in:["super","this"]},$={className:"meta",begin:"@"+n,contains:[{begin:/\(/,end:/\)/,contains:["self"]}]},te={className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[e.C_BLOCK_COMMENT_MODE],endsParent:!0};return{name:"Java",aliases:["jsp"],keywords:I,illegal:/<\/|#/,contains:[e.COMMENT("/\\*\\*","\\*/",{relevance:0,contains:[{begin:/\w+@/,relevance:0},{className:"doctag",begin:"@[A-Za-z]+"}]}),{begin:/import java\.[a-z]+\./,keywords:"import",relevance:2},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE,{begin:/"""/,end:/"""/,className:"string",contains:[e.BACKSLASH_ESCAPE]},e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,{match:[/\b(?:class|interface|enum|extends|implements|new)/,/\s+/,n],className:{1:"keyword",3:"title.class"}},{match:/non-sealed/,scope:"keyword"},{beginKeywords:"new throw return else yield assert",relevance:0},{begin:[n,t.concat(r,l,/\s+/),n,l,/\s*/,/=(?!=)/],className:{1:"type",3:"variable",6:"operator"}},{begin:[/record/,/\s+/,n],className:{1:"keyword",3:"title.class"},contains:[te,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},{begin:[n,t.concat(r,l,/\s+/),n,/\s*(?=\()/],className:{1:"type",3:"title.function"},keywords:I,contains:[{className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[$,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,We,e.C_BLOCK_COMMENT_MODE]},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},We,$]}}he.registerLanguage("java",ze);window.hljs=he;})();
+</script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---- 1. syntax highlighting -------------------------------------- */
+  function highlight() {
+    if (!window.hljs) return;
+    var blocks = document.querySelectorAll('pre code.language-java');
+    for (var i = 0; i < blocks.length; i++) {
+      try { window.hljs.highlightElement(blocks[i]); } catch (e) {}
+    }
+  }
+
+  /* ---- 2. every solution / reveal starts closed --------------------- */
+  function closeAll() {
+    var d = document.querySelectorAll('details.soln');
+    for (var i = 0; i < d.length; i++) { d[i].open = false; }
+  }
+
+  /* ---- 3. show all / hide all -------------------------------------- */
+  function wireToolbar() {
+    var show = document.getElementById('showAll');
+    var hide = document.getElementById('hideAll');
+    function setAll(v) {
+      var d = document.querySelectorAll('details.soln');
+      for (var i = 0; i < d.length; i++) { d[i].open = v; }
+    }
+    if (show) show.addEventListener('click', function () { setAll(true); });
+    if (hide) hide.addEventListener('click', function () { setAll(false); });
+  }
+
+  /* ---- 4. live-coding editors -------------------------------------- */
+  var INDENT = '    ';
+
+  function wireEditors() {
+    var eds = document.querySelectorAll('.editor');
+    for (var i = 0; i < eds.length; i++) { wireOne(eds[i]); }
+  }
+
+  function wireOne(box) {
+    var ta = box.querySelector('textarea');
+    if (!ta) return;
+    var starter = ta.value;
+
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Tab' || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+      ev.preventDefault();
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+
+      if (s === e && !ev.shiftKey) {
+        ta.value = v.slice(0, s) + INDENT + v.slice(e);
+        ta.selectionStart = ta.selectionEnd = s + INDENT.length;
+        return;
+      }
+      /* block indent / outdent over the selected lines */
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var le = v.indexOf('\n', e);
+      if (le === -1) le = v.length;
+      var seg = v.slice(ls, le);
+      var lines = seg.split('\n');
+      var delta0 = 0, total = 0;
+
+      for (var i = 0; i < lines.length; i++) {
+        if (ev.shiftKey) {
+          var m = lines[i].match(/^(\t| {1,4})/);
+          if (m) {
+            lines[i] = lines[i].slice(m[0].length);
+            if (i === 0) delta0 = -m[0].length;
+            total -= m[0].length;
+          }
+        } else {
+          lines[i] = INDENT + lines[i];
+          if (i === 0) delta0 = INDENT.length;
+          total += INDENT.length;
+        }
+      }
+      ta.value = v.slice(0, ls) + lines.join('\n') + v.slice(le);
+      ta.selectionStart = Math.max(ls, s + delta0);
+      ta.selectionEnd = Math.max(ta.selectionStart, e + total);
+    });
+
+    /* keep the indent of the current line when Enter is pressed */
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Enter' || ev.shiftKey || ev.ctrlKey || ev.metaKey) return;
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+      if (s !== e) return;
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var lead = (v.slice(ls, s).match(/^[ \t]*/) || [''])[0];
+      var extra = /[{(\[]\s*$/.test(v.slice(ls, s)) ? INDENT : '';
+      if (!lead && !extra) return;
+      ev.preventDefault();
+      var ins = '\n' + lead + extra;
+      ta.value = v.slice(0, s) + ins + v.slice(e);
+      ta.selectionStart = ta.selectionEnd = s + ins.length;
+    });
+
+    var rst = box.querySelector('[data-act="reset"]');
+    if (rst) rst.addEventListener('click', function () {
+      ta.value = starter;
+      ta.focus();
+      flash(box, 'Reset to starter code');
+    });
+
+    var cpy = box.querySelector('[data-act="copy"]');
+    if (cpy) cpy.addEventListener('click', function () {
+      var done = function () { flash(box, 'Copied — paste it into your IDE'); };
+      var fail = function () { flash(box, 'Copy failed — select the text and press Ctrl/Cmd+C'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value).then(done, function () { legacy(ta, done, fail); });
+      } else {
+        legacy(ta, done, fail);
+      }
+    });
+  }
+
+  function legacy(ta, done, fail) {
+    try {
+      var st = ta.selectionStart, en = ta.selectionEnd;
+      ta.select();
+      var ok = document.execCommand('copy');
+      ta.selectionStart = st; ta.selectionEnd = en;
+      ok ? done() : fail();
+    } catch (e) { fail(); }
+  }
+
+  function flash(box, msg) {
+    var f = box.querySelector('.foot');
+    if (!f) return;
+    if (f.getAttribute('data-base') === null || f.getAttribute('data-base') === undefined) {
+      f.setAttribute('data-base', f.textContent);
+    }
+    f.textContent = msg;
+    window.setTimeout(function () { f.textContent = f.getAttribute('data-base'); }, 2200);
+  }
+
+  /* ---- go ----------------------------------------------------------- */
+  function init() {
+    highlight();
+    closeAll();
+    wireToolbar();
+    wireEditors();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  /* belt and braces: some browsers restore <details> state on soft reload */
+  window.addEventListener('pageshow', closeAll);
+})();
+</script>
+</body>
+</html>

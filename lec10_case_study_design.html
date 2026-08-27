@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class 10 — OOP Case Study I: Designing the Parking Ticket System | CSCI 212</title>
+<style>
+:root{
+  --ink:#0f172a; --ink2:#334155; --muted:#64748b; --line:#e2e8f0;
+  --bg:#ffffff; --bg2:#f8fafc;
+  --obj:#4f46e5; --def:#2563eb; --ex:#059669; --alg:#7c3aed;
+  --key:#b45309; --warn:#dc2626; --qc:#0891b2; --prac:#be185d; --sum:#475569;
+  --edit:#ea580c; --edit-bg:#fff7ed;
+  --code-bg:#0d1117; --code-bd:#000000;   /* read-only listings: black */
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px 80px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:#0f172a;color:#e2e8f0;font-size:13.5px;
+  border-bottom:3px solid var(--obj);
+}
+.topbar .inner{max-width:900px;margin:0 auto;padding:10px 22px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.topbar a{color:#e2e8f0;text-decoration:none;border-bottom:1px solid transparent}
+.topbar a:hover{border-bottom-color:#94a3b8}
+.topbar .course{font-weight:700;letter-spacing:.02em}
+.topbar .sep{color:#475569}
+.topbar .spacer{flex:1}
+
+/* ---------- title block ---------- */
+.titleblock{padding:34px 0 10px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.eyebrow{
+  font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--obj);margin-bottom:8px;
+}
+.titleblock h1{font-size:33px;line-height:1.2;margin:0 0 10px;letter-spacing:-.015em}
+.titleblock .sub{margin:0;color:var(--muted);font-size:17px;line-height:1.5}
+
+h2{
+  font-size:24px;margin:46px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line);letter-spacing:-.01em;scroll-margin-top:14px;
+}
+h2 .num{color:var(--obj);font-weight:800;margin-right:11px}
+h3{font-size:18.5px;margin:30px 0 10px;color:var(--ink)}
+h4{font-size:16px;margin:20px 0 8px;color:var(--ink2)}
+p{margin:12px 0}
+ul,ol{margin:12px 0;padding-left:26px}
+li{margin:6px 0}
+a{color:var(--def)}
+hr{border:0;border-top:1px solid var(--line);margin:30px 0}
+strong{color:var(--ink)}
+.muted{color:var(--muted)}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--bg2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 20px 16px;margin:22px 0;
+}
+.toc .th{
+  font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;
+}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:30px}
+.toc li{margin:3px 0;font-size:14.5px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- show all / hide all ---------- */
+.tools{
+  display:flex;gap:9px;align-items:center;flex-wrap:wrap;
+  padding:11px 15px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:9px;margin:22px 0;font-size:13.5px;
+}
+.tools .lab{font-weight:700;color:var(--ink2)}
+.tools button{
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  background:#fff;color:var(--ink2);border:1px solid #cbd5e1;
+  border-radius:6px;padding:4px 12px;
+}
+.tools button:hover{background:var(--obj);border-color:var(--obj);color:#fff}
+.tools .muted{font-size:12.5px}
+
+/* ---------- boxes ---------- */
+.box{border:1px solid var(--line);border-left:5px solid var(--muted);border-radius:8px;margin:22px 0;overflow:hidden;background:#fff}
+.box>.hd{
+  padding:9px 16px;font-size:12.5px;font-weight:700;
+  letter-spacing:.075em;text-transform:uppercase;color:#fff;background:var(--muted);
+}
+.box>.hd .tag{margin-left:5px;font-weight:500;text-transform:none;letter-spacing:0;opacity:.92;font-size:13px}
+.box>.bd{padding:4px 18px 14px}
+.box>.bd>:first-child{margin-top:12px}
+.box>.bd>:last-child{margin-bottom:2px}
+
+.box.obj{border-left-color:var(--obj)}  .box.obj>.hd{background:var(--obj)}
+.box.def{border-left-color:var(--def)}  .box.def>.hd{background:var(--def)}
+.box.ex{border-left-color:var(--ex)}    .box.ex>.hd{background:var(--ex)}
+.box.alg{border-left-color:var(--alg)}  .box.alg>.hd{background:var(--alg)}
+.box.key{border-left-color:var(--key)}  .box.key>.hd{background:var(--key)}
+.box.warn{border-left-color:var(--warn)}.box.warn>.hd{background:var(--warn)}
+.box.qc{border-left-color:var(--qc)}    .box.qc>.hd{background:var(--qc)}
+.box.prac{border-left-color:var(--prac)}.box.prac>.hd{background:var(--prac)}
+.box.sum{border-left-color:var(--sum)}  .box.sum>.hd{background:var(--sum)}
+
+.box.obj{background:#f5f5ff}
+.box.qc{background:#f0fbfe}
+.box.warn{background:#fff7f7}
+.box.key{background:#fffbf2}
+.box.sum{background:#f8fafc}
+
+/* ---------- code ---------- */
+/* Read-only listings sit on black, matching CSCI 211, so a code block is never
+   mistaken for the editable live-coding box. */
+pre{
+  margin:14px 0;padding:13px 15px;overflow-x:auto;
+  background:var(--code-bg);border:1px solid var(--code-bd);border-radius:8px;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;color:#c9d1d9;
+}
+pre code{font-family:inherit;font-size:inherit;background:none;padding:0;border:0;color:inherit;display:block}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef2f7;
+  border:1px solid #e2e8f0;border-radius:4px;padding:1px 5px;color:#0b3a5b;
+}
+.filename{
+  font-family:var(--mono);font-size:12px;color:#475569;
+  margin:16px 0 -9px;font-weight:600;
+}
+
+/* comparison block: another language, never syntax-highlighted. Dark like the
+   Java listings, but desaturated and dashed so it reads as "not this course". */
+pre.cmp{background:#161b22;border-style:dashed;border-color:#3f4650;color:#9aa4b2}
+pre.cmp code{color:#9aa4b2}
+
+/* shell commands you type */
+pre.sh{background:#1e293b;border-color:#1e293b;color:#e2e8f0;position:relative;padding-top:26px}
+pre.sh code{color:#e2e8f0}
+pre.sh::before{
+  content:"Terminal";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#86efac;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* output / terminal blocks */
+pre.out{background:#111d33;border-color:#111d33;color:#e2e8f0;position:relative;padding-top:26px}
+pre.out code{color:#e2e8f0}
+pre.out::before{
+  content:"Output";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#7dd3fc;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+pre.err{background:#1f1416;border-color:#7f1d1d;color:#fecdd3;padding-top:26px;position:relative}
+pre.err code{color:#fecdd3}
+pre.err::before{
+  content:"Compiler message";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#fda4af;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* ---- highlight.js, GitHub-dark palette (hand-written, no external file) ---- */
+.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-template-tag,
+.hljs-template-variable,.hljs-type,.hljs-variable.language_{color:#ff7b72}
+.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#d2a8ff}
+.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,
+.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable{color:#79c0ff}
+.hljs-meta .hljs-string,.hljs-regexp,.hljs-string{color:#a5d6ff}
+.hljs-built_in,.hljs-symbol{color:#ffa657}
+.hljs-code,.hljs-comment,.hljs-formula{color:#8b949e;font-style:italic}
+.hljs-name,.hljs-quote,.hljs-selector-pseudo,.hljs-selector-tag{color:#7ee787}
+.hljs-subst{color:#c9d1d9}
+.hljs-section{color:#1f6feb;font-weight:700}
+.hljs-bullet{color:#f2cc60}
+.hljs-emphasis{color:#c9d1d9;font-style:italic}
+.hljs-strong{color:#c9d1d9;font-weight:700}
+
+/* ---------- trace tables ---------- */
+table{border-collapse:collapse;margin:16px 0;font-size:14px;width:100%}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg2);font-weight:700;font-size:13px}
+table.trace td:first-child,table.trace th:first-child{white-space:nowrap}
+table code{font-size:.88em}
+
+/* ---------- multi-part questions ---------- */
+.part{margin:16px 0;padding-left:14px;border-left:2px solid #cbd5e1}
+.part .q{margin:0 0 8px}
+.part .pl{font-weight:700;color:var(--qc);margin-right:6px}
+
+/* ---------- collapsible solutions ---------- */
+details.soln{margin:10px 0 4px}
+details.soln>summary{
+  list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  font-size:12.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:#fff;background:var(--sum);border-radius:6px;padding:5px 13px;
+  user-select:none;
+}
+details.soln>summary::-webkit-details-marker{display:none}
+details.soln>summary::before{content:"\25B6";font-size:9px;transition:transform .15s}
+details.soln[open]>summary::before{transform:rotate(90deg)}
+details.soln>summary::after{content:"Show Answer"}
+details.soln[open]>summary::after{content:"Hide Answer"}
+details.soln>summary:hover{filter:brightness(1.18)}
+
+details.soln.reveal>summary{background:var(--ex)}
+details.soln.reveal>summary::after{content:"Show Output & Explanation"}
+details.soln.reveal[open]>summary::after{content:"Hide Output & Explanation"}
+details.soln.reveal.noout>summary::after{content:"Show Explanation"}
+details.soln.reveal.noout[open]>summary::after{content:"Hide Explanation"}
+
+.ans{
+  margin-top:11px;padding:2px 16px 10px;background:#fff;
+  border:1px solid var(--line);border-left:3px solid var(--sum);border-radius:7px;
+}
+details.soln.reveal .ans{border-left-color:var(--ex)}
+.ans>:first-child{margin-top:12px}
+.ans>:last-child{margin-bottom:6px}
+
+/* ---------- live coding editor ---------- */
+.editor{
+  margin:18px 0;border:2px dashed var(--edit);border-radius:9px;
+  background:var(--edit-bg);overflow:hidden;
+}
+.editor .ehd{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:7px 13px;background:var(--edit);color:#fff;
+  font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+}
+.editor .ehd .etitle{flex:1}
+.editor .ehd button{
+  font:inherit;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  cursor:pointer;background:rgba(255,255,255,.16);color:#fff;
+  border:1px solid rgba(255,255,255,.5);border-radius:5px;padding:3px 10px;
+}
+.editor .ehd button:hover{background:#fff;color:var(--edit)}
+.editor textarea{
+  display:block;width:100%;border:0;outline:0;resize:vertical;
+  padding:12px 15px;background:var(--edit-bg);color:#431407;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;
+  tab-size:4;-moz-tab-size:4;min-height:150px;
+}
+.editor textarea:focus{background:#fff}
+.editor .foot{
+  padding:5px 13px 7px;font-size:11.5px;color:#9a3412;background:#ffedd5;
+  border-top:1px solid #fed7aa;
+}
+
+/* ---------- prev/next nav ---------- */
+.pagenav{display:flex;gap:14px;margin:52px 0 0;flex-wrap:wrap}
+.pagenav a,.pagenav span.disabled{
+  flex:1 1 260px;display:block;text-decoration:none;
+  border:1px solid var(--line);border-radius:9px;padding:12px 16px;background:#fff;
+}
+.pagenav a:hover{border-color:var(--obj);background:var(--bg2)}
+.pagenav .dir{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.pagenav .ttl{font-size:15px;font-weight:600;color:var(--ink);margin-top:3px}
+.pagenav .next{text-align:right}
+.pagenav span.disabled{opacity:.4}
+.pagenav span.disabled .ttl{color:var(--muted)}
+
+footer.pf{
+  margin-top:40px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--muted);text-align:center;
+}
+
+/* ---------- index page ---------- */
+table.sched{font-size:14.5px}
+table.sched th{background:#0f172a;color:#fff;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+table.sched td:first-child{white-space:nowrap;font-weight:700;color:var(--muted);width:60px}
+table.sched tr.examrow td{background:#fff1f2}
+table.sched tr.revrow td{background:#fffbeb}
+table.sched a{font-weight:600;text-decoration:none}
+table.sched a:hover{text-decoration:underline}
+
+
+/* ---------- release gating ---------- */
+.pending{
+  margin-top:4px;font-size:11.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:#b45309;
+}
+.pagenav span.disabled .pending{color:#b45309}
+table.sched tr.pendingrow td{background:#fcfcfd}
+table.sched .unrel{color:var(--muted)}
+table.sched .pending{display:block;margin-top:2px}
+table.sched td.cn{white-space:nowrap;width:52px;font-weight:700;color:var(--muted)}
+table.sched td.dt{white-space:nowrap;width:104px;color:var(--muted);font-size:13.5px}
+table.sched tr.offrow td{background:#f1f5f9;color:var(--muted);font-style:italic}
+.refcard{
+  display:block;text-decoration:none;border:1px solid var(--line);
+  border-left:5px solid var(--alg);border-radius:9px;padding:13px 17px;
+  margin:22px 0;background:#faf9ff;
+}
+.refcard:hover{background:#f5f3ff;border-color:var(--alg)}
+.refcard .rl{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--alg)}
+.refcard .rt{font-size:16px;font-weight:600;color:var(--ink);margin-top:3px}
+.refcard .rd{font-size:14px;color:var(--muted);margin-top:4px}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,.tools,.pagenav,.pending{display:none !important}
+  html,body{width:100%;font-size:10pt}
+  .wrap{max-width:100%;width:100%;padding:0}
+  /* a wide <pre> must wrap rather than widen the page and clip every other
+     element at the paper edge */
+  /* Screen shows code on black; paper does not. Restore a dark-on-light palette
+     for print only, or the dark theme's light tokens vanish on white. */
+  pre{white-space:pre-wrap;overflow:visible;overflow-wrap:anywhere;font-size:8.6pt;
+      background:#f8fafc !important;color:#24292e !important;border-color:#cbd5e1 !important;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  pre code{color:#24292e !important}
+  pre.cmp{background:#fff !important;color:#475569 !important;border-color:#94a3b8 !important}
+  pre.cmp code{color:#475569 !important}
+  pre .hljs-doctag,pre .hljs-keyword,pre .hljs-meta .hljs-keyword,pre .hljs-template-tag,
+  pre .hljs-template-variable,pre .hljs-type,pre .hljs-variable.language_{color:#d73a49 !important}
+  pre .hljs-title,pre .hljs-title.class_,pre .hljs-title.class_.inherited__,
+  pre .hljs-title.function_{color:#6f42c1 !important}
+  pre .hljs-attr,pre .hljs-attribute,pre .hljs-literal,pre .hljs-meta,pre .hljs-number,
+  pre .hljs-operator,pre .hljs-selector-attr,pre .hljs-selector-class,pre .hljs-selector-id,
+  pre .hljs-variable{color:#005cc5 !important}
+  pre .hljs-meta .hljs-string,pre .hljs-regexp,pre .hljs-string{color:#032f62 !important}
+  pre .hljs-built_in,pre .hljs-symbol{color:#e36209 !important}
+  pre .hljs-code,pre .hljs-comment,pre .hljs-formula{color:#6a737d !important}
+  pre .hljs-name,pre .hljs-quote,pre .hljs-selector-pseudo,
+  pre .hljs-selector-tag{color:#22863a !important}
+  pre .hljs-subst,pre .hljs-emphasis,pre .hljs-strong{color:#24292e !important}
+  .filename{color:#475569 !important}
+  table{table-layout:fixed;width:100%;word-wrap:break-word;overflow-wrap:anywhere}
+  .box,.toc{max-width:100%}
+  a{color:var(--ink);text-decoration:none}
+  .box,.part,pre,table,.editor{break-inside:avoid;page-break-inside:avoid}
+  h2{break-after:avoid;page-break-after:avoid}
+  details.soln>summary{display:none !important}
+  details.soln:not([open])>.ans{display:none !important}
+  details.soln::before{
+    content:"Answer withheld — see the online notes.";
+    display:block;font-size:9pt;font-style:italic;color:#64748b;margin:6px 0;
+  }
+  details.soln[open]::before{content:""}
+  .editor textarea{display:none !important}
+  .editor{border:1.5px solid #fdba74 !important;background:#fff;border-style:solid}
+  .editor .ehd{background:#fff !important;color:#9a3412 !important;border-bottom:1px solid #fdba74}
+  .editor .ehd button{display:none}
+  .editor .foot{display:none}
+  .editor::after{content:"";display:block;height:2.1in;background:#fff}
+  pre.out,pre.sh{background:#f1f5f9 !important;color:#0f172a !important;border-color:#94a3b8 !important}
+  pre.err{background:#fef2f2 !important;color:#7f1d1d !important;border-color:#fca5a5 !important}
+  pre.out code,pre.sh code{color:#0f172a !important}
+  pre.err code{color:#7f1d1d !important}
+  pre.out::before,pre.sh::before{color:#475569}
+  pre.err::before{color:#b91c1c}
+  .box>.hd{color:#000;background:#fff !important;border-bottom:1px solid #cbd5e1}
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="inner">
+<span class="course">CSCI 212</span>
+<span class="sep">|</span>
+<a href="index.html">Course index</a>
+<span class="sep">|</span>
+<span>Class 10 of 28</span>
+<span class="sep">|</span>
+<span>Thursday, October 1</span>
+<span class="spacer"></span>
+<span>Queens College, CUNY</span>
+</div></div>
+<div class="wrap">
+<div class="titleblock">
+  <div class="eyebrow">Session 10 &middot; Lecture 10</div>
+  <h1>OOP Case Study I: Designing the Parking Ticket System</h1>
+  <p class="sub">Now we put the first nine lectures together on one real problem: reading an English description and deciding what the classes are.</p>
+</div>
+
+<div class="box obj">
+  <div class="hd">Learning Objectives</div>
+  <div class="bd">
+    <p>By the end of today's session you should be able to:</p>
+    <ol>
+      <li>Take an English description of a system and produce a candidate list of classes from the nouns in it.</li>
+      <li>Decide, for each noun, whether it should become a class or should stay a field inside some other class &mdash; and defend the choice.</li>
+      <li>Separate what a class <em>knows</em> (its instance variables) from what it <em>does</em> (its methods), and write both down before typing any code.</li>
+      <li>Read and write a UML-style listing of a class: field names with types, method names with parameter types and return types.</li>
+      <li>Identify a <strong>has-a</strong> relationship in a design and implement it as an instance variable whose type is another class.</li>
+      <li>Explain <em>delegation</em>: why <code>ParkedCar.expiredMeter()</code> is one line that hands the question to its <code>ParkingMeter</code>.</li> <li>Say what <code>private</code> buys you here, and what job the getters are actually doing.</li> <li>Compute the fine for an expired meter by hand, and check the boundary at exactly one hour over.</li> <li>Draw the object graph produced by one <code>issueTicket</code> call and say which object holds a reference to which.</li> </ol> </div> </div> <div class="toc"> <div class="th">On this page</div> <ol> <li><a href="#s1">From an English problem to a list of classes</a></li> <li><a href="#s2">What each class knows and what it does</a></li> <li><a href="#s3"><code>ParkedCar</code> has a <code>ParkingMeter</code></a></li> <li><a href="#s4">Encapsulation: <code>private</code> fields and what the getters are for</a></li> <li><a href="#s5">The fine calculation</a></li> <li><a href="#s6"><code>PoliceOfficer</code>, <code>ParkingTicket</code>, and the object graph</a></li> <li><a href="#s7">Design decisions you could have made differently</a></li> <li><a href="#prac">Practice Problems</a></li> <li><a href="#summary">Lecture Summary</a></li> </ol> </div> <div class="tools"> <span class="lab">Answers</span> <button id="showAll" type="button">Show all</button> <button id="hideAll" type="button">Hide all</button> <span class="muted">&mdash; every worked-example output and every solution is hidden when the page loads. Work it out first, then reveal.</span> </div> <hr> <h2 id="s1"><span class="num">1.</span>From an English problem to a list of classes</h2> <p>Exam 1 is behind you. Everything on it &mdash; primitives, loops, arrays, <code>String</code>, <code>Scanner</code>, files, <code>ArrayList</code>, and then classes, objects, references and <code>static</code> &mdash; was taught one idea at a time, with a small example built to show off that one idea. Real programs are not like that. Today we take a single problem, in English, and turn it into a working design that uses almost all of it at once.</p> <p>This is the problem, exactly as it was posed:</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the parking ticket problem</span></div> <div class="bd"> <p>A street contains 20 parking spaces where various vehicles come and go throughout the day. Each space can either be empty or occupied by a car with specific characteristics &mdash; make, model, color, and license plate number.</p> <p><strong>The players.</strong> Cars randomly arrive and depart, representing different manufacturers (Toyota, Honda, BMW, etc.) and styles (Sedan, SUV, Station Wagon). Police officers patrol irregularly, checking for parking violations. Each parking space has a meter that counts down paid time.</p> <p><strong>The rules.</strong> Every 5 minutes, the following events may occur: a 5% chance a police officer appears to check vehicles; a 9% chance a parked car leaves; a 20% chance an empty space gets filled.</p> <p><strong>The violations.</strong> When a meter expires: first hour, a $25 fine; additional hours, $10 extra per hour.</p> <p><strong>The documentation.</strong> Each parking ticket includes the vehicle information (color, make, model, license), the fine amount, and the officer's badge number.</p> </div> </div> <p>Notice what that description does <em>not</em> contain. There is no mention of a loop, an array, an <code>if</code>, or a variable. It is written entirely in terms of <em>things</em> &mdash; cars, officers, meters, tickets &mdash; and what those things do. That is the whole reason object-oriented design exists: if the problem is described in terms of things, a program made of things will be shorter, and it will survive the customer changing their mind.</p> <p>So the first job is not typing. It is deciding what the things are.</p> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; from a problem statement to a set of classes</span></div> <div class="bd"> <ol> <li><strong>Underline every noun.</strong> Go through the description with a pen and mark each noun and noun phrase. Do not judge them yet. For our problem that gives: <em>street, parking space, vehicle/car, make, model, color, license plate number, police officer, violation, meter, paid time, ticket, fine, hour, badge number, day</em>.</li> <li><strong>Cross out the ones that are not part of the program.</strong> <em>Day</em> and <em>hour</em> are units of time; they will be loop counters, not objects. <em>Violation</em> is not a thing you can hold &mdash; it is the <em>situation</em> that causes a ticket to exist, and the ticket is the thing.</li> <li><strong>For each survivor ask: does it have data of its own <em>and</em> behavior of its own?</strong> If it has both, it wants to be a class. If it is a single value that just sits there, it wants to be a field inside some other class. A <code>license</code> is a piece of text that does nothing &mdash; field. A <code>meter</code> holds a number <em>and</em> counts down <em>and</em> knows the fine schedule &mdash; class.</li> <li><strong>Ask: will there be many of them at once?</strong> Twenty cars, several officers over a day, dozens of tickets. Many-of-them is a strong signal for a class, because a class is a blueprint you stamp out copies from.</li> <li><strong>For each class, list what it KNOWS.</strong> Those become the instance variables. Write the type next to each one.</li> <li><strong>For each class, list what it DOES.</strong> Those become the methods. Write the parameter types and the return type next to each one. A constructor counts.</li> <li><strong>Decide who holds a reference to whom.</strong> Whenever a sentence in the problem says "an X has a Y", the class <code>X</code> gets an instance variable of type <code>Y</code>. This is the step that turns a list of classes into a design.</li> <li><strong>Only now start typing.</strong> Fields first, then the constructor, then the methods, one at a time.</li> </ol> </div> </div> <p>Run steps 1 through 4 on the parking problem and you get exactly four classes.</p> <table> <tr><th>Noun</th><th>Class or field?</th><th>Why</th></tr> <tr><td>car</td><td><strong>class <code>ParkedCar</code></strong></td><td>Has four pieces of data of its own, and there are twenty of them.</td></tr> <tr><td>make, model, color, license</td><td>fields of <code>ParkedCar</code></td><td>Each is one piece of text with no behavior. Nothing to ask them.</td></tr> <tr><td>meter</td><td><strong>class <code>ParkingMeter</code></strong></td><td>Holds the time left, counts it down, decides "expired", knows the fine schedule. Data plus behavior.</td></tr> <tr><td>paid time</td><td>field <code>timeLeft</code> of <code>ParkingMeter</code></td><td>One <code>int</code>.</td></tr> <tr><td>police officer</td><td><strong>class <code>PoliceOfficer</code></strong></td><td>Has a badge number, and does something: writes tickets.</td></tr> <tr><td>badge number</td><td>field of <code>PoliceOfficer</code></td><td>One <code>int</code>.</td></tr> <tr><td>ticket</td><td><strong>class <code>ParkingTicket</code></strong></td><td>The document. It records three things and prints itself.</td></tr> <tr><td>fine</td><td>computed, then stored on the ticket</td><td>It is a dollar amount the meter works out. A number, not a thing.</td></tr> <tr><td>street, parking space</td><td>an array in <code>main</code> &mdash; not a class</td><td>See &sect;7. This is the one genuinely arguable call in the whole design.</td></tr> </table> <div class="box key"> <div class="hd">Key Idea</div> <div class="bd"> <p>A noun becomes a <strong>class</strong> when it has state <em>and</em> behavior. A noun becomes a <strong>field</strong> when it is a single value that only ever gets stored and read. Ask "would I ever want to call a method on this?" &mdash; if the answer is no, it is a field.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 10.1</div> <div class="bd"> <p>Here is a different one-paragraph problem. "A library owns many books. Each book has a title, an author, an ISBN, and a due date, and can be checked out or returned. A member has a name, a card number, and a list of the books they currently have out. A member may not check out more than five books at a time."</p> <div class="part"> <p class="q"><span class="pl">(a)</span> List the nouns and classify each one as a class or a field.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Underline every noun, then apply the test: data plus behavior, and many of them.</p> <table class="trace"> <tr><th>Noun</th><th>Verdict</th><th>Why</th></tr> <tr><td>library</td><td>class (or just <code>main</code>)</td><td>There is exactly one of it. Borderline &mdash; see part (b).</td></tr> <tr><td>book</td><td><strong>class <code>Book</code></strong></td><td>Four pieces of data, and it can be checked out and returned. Many of them.</td></tr> <tr><td>title, author, ISBN</td><td>fields of <code>Book</code></td><td>Plain text, no behavior.</td></tr> <tr><td>due date</td><td>field of <code>Book</code></td><td>A value. (In a bigger program a <code>Date</code> class would earn its keep; here it is one field.)</td></tr> <tr><td>member</td><td><strong>class <code>Member</code></strong></td><td>Data plus behavior: checking out is something a member does.</td></tr> <tr><td>name, card number</td><td>fields of <code>Member</code></td><td>Single values.</td></tr> <tr><td>list of books out</td><td>field of <code>Member</code>, type <code>ArrayList&lt;Book&gt;</code></td><td>A collection of objects &mdash; still a field, but its type is another class.</td></tr> </table> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Where does the rule "no more than five books at a time" live?</p> <details class="soln"><summary></summary><div class="ans"> <p>Inside <code>Member</code>, in the method that checks a book out. The member is the object that knows how many books it currently holds, so it is the only object in a position to enforce the rule. A method like</p> <pre><code class="language-java">public boolean checkOut(Book b) {
+    if (booksOut.size() &gt;= 5) return false;
+    booksOut.add(b);
+    return true;
+}</code></pre> <p>keeps the rule next to the data it constrains.</p> <p><strong>Things to notice across both parts.</strong> The rule is the interesting part of the design, and notice where it did <em>not</em> go: not in <code>main</code>, not in <code>Book</code>. Putting a rule about a member's books anywhere except <code>Member</code> means some other piece of code has to reach in and count them &mdash; and then a second piece of code will forget to. The general principle is "put the behavior with the data it needs", and it is the reason <code>ParkingMeter</code> and not <code>PoliceOfficer</code> computes the fine.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 10.2</div> <div class="bd"> <p>In the parking problem, the fine is described as "$25 for the first hour, $10 extra per hour after that". Three classes could plausibly own that calculation: <code>ParkingMeter</code>, <code>PoliceOfficer</code>, or <code>ParkingTicket</code>. Which one should, and why?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Ask which object already has the data the calculation needs.</p> <p>The fine depends on exactly one number: how far past zero the meter has gone. The only object that knows that number is the <code>ParkingMeter</code>, because <code>timeLeft</code> is its instance variable. So <code>ParkingMeter</code> owns <code>getFine</code>.</p> <p>Putting it in <code>PoliceOfficer</code> would mean the officer has to read <code>timeLeft</code> out of the meter first &mdash; which means <code>timeLeft</code> would have to stop being <code>private</code>, and now every class in the program can see it. Putting it in <code>ParkingTicket</code> is the same problem one step later.</p> <p><strong>Things to notice.</strong> This is the single most useful design question you can ask: <em>who already has the data?</em> Behavior goes where the data is. When you find yourself adding a getter only so that some other class can do a calculation, that is a signal the calculation is in the wrong class.</p> </div></details> </div> </div> <h2 id="s2"><span class="num">2.</span>What each class knows and what it does</h2> <p>Step 5 and step 6 of the procedure are the ones people skip, and they are the ones that make the typing easy. Written out for all four classes, they look like this.</p> <table> <tr><th>Class</th><th>What it KNOWS (fields)</th><th>What it DOES (methods)</th></tr> <tr> <td><code>ParkedCar</code></td> <td>make, model, color, license, and its own meter</td> <td>report each of those; say whether its meter has expired; let time pass on its meter; report the fine; print itself</td> </tr> <tr> <td><code>ParkingMeter</code></td> <td>timeLeft &mdash; minutes still paid for</td> <td>say whether it has expired; remove minutes; compute the fine</td> </tr> <tr> <td><code>PoliceOfficer</code></td> <td>badgeNumber</td> <td>report the badge number; issue a ticket for a car</td> </tr> <tr> <td><code>ParkingTicket</code></td> <td>the officer line, the car line, the fine line</td> <td>print itself</td> </tr> </table> <p>Turning that table into type-annotated signatures gives a <strong>UML-style class diagram</strong>. It is worth learning to read one, because it is how designs are communicated before any code exists &mdash; and it is how one of your exam questions supplies a class you are told to use but not to write.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; UML class listing</span></div> <div class="bd"> <p>A <strong>UML class listing</strong> is a box with three compartments: the class name, then the fields, then the methods. A leading <code>-</code> means <code>private</code>; a leading <code>+</code> means <code>public</code>. Each field is written <code>name : Type</code>, and each method <code>name(parameterTypes) : ReturnType</code>. An arrow from one box to another means "this class has an instance variable of that type" &mdash; a <strong>has-a</strong> relationship.</p> <p>Notice what a UML listing deliberately leaves out: method bodies. It shows the <em>interface</em> &mdash; what you can call and what you get back &mdash; and says nothing about how any of it is done. That is exactly the level at which you make design decisions.</p> </div> </div> <p class="filename">The car and its meter</p>
+<pre class="cmp"><code>+-----------------------------------+           +----------------------------+
+|             ParkedCar             |           |        ParkingMeter        |
++-----------------------------------+           +----------------------------+
+| - make    : String                |           | - timeLeft : int           |
+| - model   : String                |           +----------------------------+
+| - color   : String                |   has-a   | + ParkingMeter()           |
+| - license : String                |           | + isExpired()  : boolean   |
+| - meter   : ParkingMeter  --------|----------&gt;| + remove(int)  : void      |
++-----------------------------------+           | + getFine()    : String    |
+| + ParkedCar()                     |           +----------------------------+
+| + getMake()          : String     |
+| + getModel()         : String     |
+| + getColor()         : String     |
+| + getLicense()       : String     |
+| + expiredMeter()     : boolean    |
+| + adjustMeter(int)   : void       |
+| + getFine()          : String     |
+| + toString()         : String     |
++-----------------------------------+</code></pre> <p class="filename">The officer and the ticket</p>
+<pre class="cmp"><code>+-----------------------------------+           +--------------------------------+
+|           PoliceOfficer           |           |         ParkingTicket          |
++-----------------------------------+           +--------------------------------+
+| - badgeNumber : int               |           | - officer : String             |
++-----------------------------------+  creates  | - car     : String             |
+| + PoliceOfficer()                 |           | - fine    : String             |
+| + getBadgeNumber()   : int        |----------&gt;+--------------------------------+
+| + issueTicket(ParkedCar)          |           | + ParkingTicket(PoliceOfficer, |
+|                   : ParkingTicket |           |                  ParkedCar)    |
++-----------------------------------+           | + toString()   : String        |
+                                                +--------------------------------+</code></pre> <p>Two things in those boxes are worth stopping on before we write any code.</p> <ul> <li><strong><code>getFine</code> returns a <code>String</code>, not a number.</strong> It hands back <code>"$25"</code>, dollar sign included. That is a design decision, and not an obviously good one &mdash; you cannot add up a day's fines without parsing the text back into a number. We keep it, because it is what the rest of the program expects, and we revisit it in &sect;7 and again in Practice Problem 6.</li> <li><strong><code>ParkedCar</code> has no setters.</strong> There is <code>getMake</code> but no <code>setMake</code>. That is deliberate: a car's make never changes after it is built. A field you never need to change gets a getter and no setter, and that is the normal case, not the exception.</li> </ul> <div class="box qc"> <div class="hd">Quick Check 10.3</div> <div class="bd"> <p>Answer each of these from the UML listings alone, without looking at any code.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>ParkingMeter</code> has no getter for <code>timeLeft</code>. Given the listing, how would a <code>PoliceOfficer</code> find out whether a car is over its time?</p> <details class="soln"><summary></summary><div class="ans"> <p>It cannot ask for the number, and it does not need to. It asks the car the yes-or-no question instead: <code>car.expiredMeter()</code> returns a <code>boolean</code>. The car passes the question on to its meter's <code>isExpired()</code>.</p> <p>This is the design working as intended. The officer needs an answer, not a measurement, and the class that owns the measurement is the one that turns it into an answer.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What is the return type of <code>issueTicket</code>, and what does that tell you about who creates <code>ParkingTicket</code> objects?</p> <details class="soln"><summary></summary><div class="ans"> <p>It returns a <code>ParkingTicket</code>. So the officer is the object that calls <code>new ParkingTicket(...)</code> &mdash; tickets are created by officers, not by <code>main</code> and not by cars. That matches the real world, which is a good sign about the design.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>adjustMeter(int)</code> returns <code>void</code>. What does a <code>void</code> return type usually tell you about a method?</p> <details class="soln"><summary></summary><div class="ans"> <p>That the method exists for its <em>effect</em>, not for its answer. <code>adjustMeter</code> changes the state of the object it is called on and hands nothing back. Methods split fairly cleanly into these two kinds: <em>queries</em> that return a value and change nothing (<code>getMake</code>, <code>isExpired</code>, <code>getFine</code>), and <em>commands</em> that change something and return <code>void</code> (<code>remove</code>, <code>adjustMeter</code>).</p> <p><strong>Things to notice across all three parts.</strong> Every one of these questions was answerable from the box alone. That is what the diagram is for: you can review a design, spot a missing method, or spot a field that everybody needs and nobody can reach, before a single line has been written.</p> </div></details> </div> </div> </div> <h2 id="s3"><span class="num">3.</span><code>ParkedCar</code> has a <code>ParkingMeter</code></h2> <p>Step 7 of the procedure was: decide who holds a reference to whom. The problem statement says <em>"each parking space has a meter that counts down paid time"</em>, and in this design the meter travels with the car that is parked in the space. That single sentence produces one line of Java.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; has-a, and composition</span></div> <div class="bd"> <p>A <strong>has-a relationship</strong> between two classes is implemented by giving one of them an instance variable whose type is the other. Building an object out of other objects this way is called <strong>composition</strong>.</p> <p>Composition is the ordinary way that big designs are built out of small ones. You already used it without naming it: an object with a <code>String</code> field or an <code>ArrayList</code> field is composed of those objects. The only new thing here is that the part is a class <em>you</em> wrote.</p> </div> </div> <p>Here is <code>ParkingMeter</code> in full &mdash; it is the smallest class in the system, and the only one that stores a number.</p> <p class="filename">ParkingMeter.java</p>
+<pre><code class="language-java">import java.util.Random;
+
+public class ParkingMeter {
+    private int timeLeft;
+
+    public ParkingMeter() {
+        timeLeft = (((new Random()).nextInt(20)) + 1) * 5;
+        // pay for up to 100 minutes. (multiple of 5)
+    }
+
+    public boolean isExpired() {
+        return timeLeft &lt; 0;
+    }
+
+    public String getFine() {
+        if (timeLeft &gt; -60) return "$25";
+        int fine = 25 + (-10) * ((timeLeft + 5) / 60);
+        return "$" + fine;
+    }
+
+    public void remove(int x) {
+        timeLeft -= x;
+    }
+}</code></pre> <p>The constructor draws <code>nextInt(20)</code>, which gives 0 through 19, adds 1 to get 1 through 20, and multiplies by 5. So a new meter always starts somewhere between 5 and 100 minutes, always a multiple of 5. That "always a multiple of 5" is not decoration &mdash; the whole simulation advances in 5-minute steps, and we will lean on it in &sect;5.</p> <p>And here is <code>ParkedCar</code>, whose fifth field is the interesting one.</p> <p class="filename">ParkedCar.java</p>
+<pre><code class="language-java">import java.util.Random;
+
+public class ParkedCar {
+    static String makes[] = {"Toyota", "Honda", "Hyundai", "BMW",
+                             "Porsche", "Maserati", "Ford", "Chevrolet"};
+    static String models[] = {"Sedan", "Station Wagon", "SUV", "Light Truck"};
+    static String colors[] = {"Red", "Orange", "Yellow", "Green",
+                              "Blue", "White", "Silver"};
+
+    private String make;
+    private String model;
+    private String color;
+    private String license;
+    private ParkingMeter meter;
+
+    public ParkedCar() {
+        make = pickOne(makes);
+        model = pickOne(models);
+        color = pickOne(colors);
+        license = generateLicense();
+        meter = new ParkingMeter();
+    }
+
+    private String generateLicense() {
+        Random x = new Random();
+        String answer = "";
+        for (int i = 0; i &lt; 3; i++)
+            answer += (char) ('A' + x.nextInt(26));
+        for (int i = 0; i &lt; 4; i++)
+            answer += (char) ('0' + x.nextInt(10));
+        return answer;
+    }
+
+    private String pickOne(String[] choices) {
+        Random x = new Random();
+        return choices[x.nextInt(choices.length)];
+    }
+
+    public boolean expiredMeter() {
+        return meter.isExpired();
+    }
+
+    public void adjustMeter(int x) {
+        meter.remove(x);
+    }
+
+    public String getMake()    { return make;    }
+    public String getModel()   { return model;   }
+    public String getColor()   { return color;   }
+    public String getLicense() { return license; }
+
+    public String toString() {
+        return getColor() + " " + getMake() + " " + getModel() +
+               " License number: " + getLicense();
+    }
+
+    public String getFine() {
+        return meter.getFine();
+    }
+}</code></pre> <p>Read the three arrays first. They are <code>static</code>, which from Lecture 9 you know means <em>one copy for the whole class, not one copy per object</em>. There are eight makes in the world regardless of how many cars are parked, so a per-object copy would be eight wasted <code>String</code> references per car. This is the textbook use of <code>static</code> data.</p> <p>Now read the constructor. Four of its five lines fill in a piece of text. The fifth, <code>meter = new ParkingMeter();</code>, creates a whole second object and stores a reference to it. After that line runs there are two objects on the heap, and one of them holds the other.</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; delegation</span></div> <div class="bd"> <p>Look at three of <code>ParkedCar</code>'s methods:</p> <ul> <li><code>expiredMeter()</code> returns <code>meter.isExpired()</code></li> <li><code>adjustMeter(x)</code> calls <code>meter.remove(x)</code></li> <li><code>getFine()</code> returns <code>meter.getFine()</code></li> </ul> <p>Each is one line, and each one does nothing but pass the request on to the meter. That pattern is called <strong>delegation</strong>: the object that receives the message is not the object that answers it. <code>ParkedCar</code> does not know what "expired" means and does not want to &mdash; it knows who does.</p> </div> </div> <p>Delegation looks like pointless typing until you ask what the alternative is. Without it, the simulation loop would have to reach through the car to get at the meter: <code>street[i].getMeter().isExpired()</code>. Now <code>ParkedCar</code> needs a <code>getMeter()</code> that hands out its private meter, and the loop needs to know that a car even <em>has</em> a meter. Delegating keeps that fact private.</p> <div class="box qc"> <div class="hd">Quick Check 10.4</div> <div class="bd"> <p>The city adds a rule: a car may top up its meter, buying more time without leaving. Add a method <code>addTime(int minutes)</code> to <code>ParkedCar</code> and whatever it needs in <code>ParkingMeter</code>. Write both, in the style of the delegating methods above.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The field being changed is <code>timeLeft</code>, and it lives in <code>ParkingMeter</code>, so the real work is a method there. <code>ParkedCar</code> gets a one-line delegator, exactly like <code>adjustMeter</code>. Buying time is the opposite of <code>remove</code>, so in <code>ParkingMeter</code> it is an addition.</p> <pre><code class="language-java">// in ParkingMeter
+public void add(int x) {
+    timeLeft += x;
+}
+
+// in ParkedCar
+public void addTime(int minutes) {
+    meter.add(minutes);
+}</code></pre> <p><strong>Things to notice.</strong> There was a shortcut available: <code>ParkingMeter</code> already has <code>remove</code>, and <code>meter.remove(-minutes)</code> would add time. Resist it. A method named <code>remove</code> that is routinely called with a negative number to mean "add" is a method whose name lies, and the next person to read the simulation loop will misread it. Two clearly named methods cost four lines.</p> <p>Notice also that <code>ParkedCar.addTime</code> does not touch <code>timeLeft</code>. It cannot &mdash; <code>timeLeft</code> is <code>private</code> to <code>ParkingMeter</code>, and &sect;4 shows exactly what the compiler says if you try.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 10.4</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="17" aria-label="Live coding - Quick Check 10.4">public class ParkingMeter {
+    private int timeLeft;
+
+    // ... constructor, isExpired, getFine, remove as before ...
+
+    // 1. Add a method that puts minutes back onto the meter.
+
+}
+
+class ParkedCar {
+    private ParkingMeter meter;
+
+    // 2. Add addTime(int minutes) that delegates to the meter.
+
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the car answers a question it cannot answer itself</span></div> <div class="bd"> <p>This program creates one car, asks whether its meter has expired, runs 105 minutes of simulated time through it in 5-minute ticks, and asks again. The car's meter starts somewhere between 5 and 100 minutes, so both answers are the same on every run &mdash; work out what they are before you open the toggle, and be ready to say <em>why</em> 105 was chosen rather than 100.</p> <p class="filename">MeterDemo.java</p>
+<pre><code class="language-java">public class MeterDemo {
+    public static void main(String args[]) {
+        ParkedCar car = new ParkedCar();
+
+        System.out.println("Expired the moment the car arrives? " + car.expiredMeter());
+
+        // The meter is bought with at most 100 minutes, so 105 minutes of
+        // simulated time is guaranteed to run it out.
+        for (int tick = 0; tick &lt; 21; tick++) car.adjustMeter(5);
+
+        System.out.println("Expired 105 minutes later?          " + car.expiredMeter());
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Expired the moment the car arrives? false
+Expired 105 minutes later?          true</code></pre> <p>The first answer is <code>false</code> on every run because the constructor's smallest possible value is 5, and <code>isExpired</code> asks <code>timeLeft &lt; 0</code>.</p> <p>The second is <code>true</code> on every run because the largest possible starting value is 100, and 21 ticks remove 105 minutes, so <code>timeLeft</code> finishes somewhere between &minus;100 and &minus;5. Stopping at 100 minutes would not have been safe: a meter that started at exactly 100 would land on <code>timeLeft == 0</code>, and <code>0 &lt; 0</code> is <code>false</code>. The meter would read "no time left" and still not count as expired.</p> <p>Now follow one of those <code>adjustMeter(5)</code> calls all the way down. It is three objects and two hops:</p> <table class="trace"> <tr><th>Step</th><th>Who is running</th><th>What happens</th></tr> <tr><td>1</td><td><code>main</code></td><td><code>car.adjustMeter(5)</code> &mdash; <code>main</code> holds a reference to a <code>ParkedCar</code> and sends it a message.</td></tr> <tr><td>2</td><td><code>ParkedCar</code></td><td>The body is <code>meter.remove(x)</code>. <code>meter</code> is this car's own instance variable, so the call goes to <em>that</em> meter and no other.</td></tr> <tr><td>3</td><td><code>ParkingMeter</code></td><td><code>timeLeft -= x</code> &mdash; the only line in the whole program that changes a meter's time.</td></tr> </table> <p>Step 3 is the payoff. There is exactly one place in the system where <code>timeLeft</code> changes. If the meter ever ends up with a wrong value, there is one method to look at.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 10.5</div> <div class="bd"> <p>Suppose <code>main</code> does this:</p> <pre><code class="language-java">ParkedCar a = new ParkedCar();
+ParkedCar b = new ParkedCar();
+a.adjustMeter(60);</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> How many <code>ParkingMeter</code> objects exist, and is <code>b</code>'s meter affected by the call?</p> <details class="soln"><summary></summary><div class="ans"> <p>Two meters exist, one per car, because each <code>ParkedCar</code> constructor ran <code>meter = new ParkingMeter();</code> and <code>new</code> always makes a fresh object. <code>b</code>'s meter is untouched: <code>a.adjustMeter(60)</code> runs <code>meter.remove(60)</code> where <code>meter</code> is <code>a</code>'s field.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Now suppose someone writes <code>b = a;</code> instead of creating <code>b</code> with <code>new</code>. How many cars and how many meters are there then?</p> <details class="soln"><summary></summary><div class="ans"> <p>One car and one meter. <code>b = a;</code> copies a <em>reference</em>, not an object &mdash; this is Lecture 8's aliasing, and it does not become any less true because the objects are now ones you designed. <code>a</code> and <code>b</code> are two names for the same <code>ParkedCar</code>, and that one car has one meter. <code>a.adjustMeter(60)</code> and <code>b.adjustMeter(60)</code> would take 120 minutes off the same meter.</p> <p><strong>Things to notice across both parts.</strong> <code>new</code> is the only thing that ever creates an object. Counting <code>new</code> calls is how you count objects &mdash; here, two per <code>new ParkedCar()</code>, because its constructor performs a <code>new</code> of its own. Assignment between object variables never copies anything but an arrow.</p> </div></details> </div> </div> </div> <h2 id="s4"><span class="num">4.</span>Encapsulation: <code>private</code> fields and what the getters are for</h2> <p>Every instance variable in this design is <code>private</code>, and every one of them is reachable from outside only through a method. That is not a stylistic habit; it is what makes the design hold together when the program grows.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; encapsulation</span></div> <div class="bd"> <p><strong>Encapsulation</strong> means keeping an object's data private and exposing only a chosen set of methods. Code outside the class can ask questions and issue commands; it cannot reach in and change a field.</p> <p>The benefit is not secrecy. It is that the class gets to keep a promise. <code>ParkingMeter</code> promises that <code>timeLeft</code> is only ever changed by <code>remove</code>. It can only keep that promise if nobody else can assign to <code>timeLeft</code>.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; what the compiler says when you reach in</span></div> <div class="bd"> <p>Here is a program that tries to cheat the meter by writing to it directly. Before you open the toggle: does this fail at compile time or at run time, and how many errors is <code>javac</code> going to report?</p> <p class="filename">Peek2.java</p>
+<pre><code class="language-java">public class Peek2 {
+    public static void main(String args[]) {
+        ParkingMeter meter = new ParkingMeter();
+        meter.timeLeft = 999999;
+        System.out.println(meter.timeLeft);
+    }
+}</code></pre> <details class="soln reveal noout"><summary></summary><div class="ans">
+ <pre class="err"><code>Peek2.java:4: error: timeLeft has private access in ParkingMeter
+        meter.timeLeft = 999999;
+             ^
+Peek2.java:5: error: timeLeft has private access in ParkingMeter
+        System.out.println(meter.timeLeft);
+                                ^
+2 errors</code></pre> <p>Two errors, both at compile time, and the caret points at the dot rather than at the field name &mdash; it is the <em>access</em> through the dot that is illegal. The program never runs, which is the entire point: this is a bug that can never reach a user.</p> <p>Trying the same thing one level up gives the same treatment. <code>car.license</code> is also <code>private</code>:</p> <pre class="err"><code>Peek.java:4: error: license has private access in ParkedCar
+        System.out.println(car.license);
+                              ^
+1 error</code></pre> <p>The fix for the second one is <code>car.getLicense()</code>. There is no fix for the first one, and that is deliberate &mdash; there is no legal way to set a meter to 999999 minutes, because the class never offered one.</p> 
+</div></details> </div> </div> <p>Which brings us to the question students reasonably ask the first time they meet getters: <em>if <code>getLicense()</code> just returns <code>license</code>, what was the point of making it private?</em> Three answers, in increasing order of importance.</p> <ul> <li><strong>Read-only is a real thing.</strong> <code>getLicense()</code> lets you read the plate. There is no <code>setLicense</code>, so you cannot change it. A public field gives you both or neither; a getter with no setter gives you exactly one.</li> <li><strong>The getter can do work later.</strong> Today it returns the field. Tomorrow it can normalize the format, log the access, or compute the value instead of storing it &mdash; and no calling code changes. <code>ParkedCar.getFine()</code> is already like this: it looks like a getter, but there is no <code>fine</code> field anywhere in <code>ParkedCar</code>. It asks the meter.</li> <li><strong>The class controls its own invariants.</strong> <code>ParkingMeter</code> can guarantee <code>timeLeft</code> is always a multiple of 5, because the only two ways it ever changes are its own constructor and its own <code>remove</code>. The moment the field is public, that guarantee is a hope.</li> </ul> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; a getter that hands out the object itself</span></div> <div class="bd"> <p>Suppose you added this to <code>ParkedCar</code>, thinking it was harmless:</p> <pre><code class="language-java">public ParkingMeter getMeter() {     // dangerous
+    return meter;
+}</code></pre> <p><code>meter</code> is <code>private</code>, so this compiles, and it looks like every other getter on the class. But the value it returns is a <em>reference</em> to the car's actual meter, not a copy of it. Any caller can now write <code>car.getMeter().remove(500)</code> and take eight hours off a meter the car was supposed to be protecting.</p> <p>Making a field <code>private</code> protects the <em>field</em>, not the object it points at. This is why the design has <code>expiredMeter()</code>, <code>adjustMeter(int)</code> and <code>getFine()</code> instead: each hands back a <code>boolean</code> or a <code>String</code>, never the meter.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 10.6</div> <div class="bd"> <p><code>ParkedCar</code> declares its three arrays as <code>static String makes[]</code>, with no <code>private</code>.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Given that, is <code>ParkedCar.makes[0] = "Yugo";</code> legal in another class in the same folder?</p> <details class="soln"><summary></summary><div class="ans"> <p>Yes. Leaving off <code>private</code> gives a field <em>package</em> access: any class in the same package can see it. Since the array is also <code>static</code>, the assignment reaches it through the class name and permanently changes the list of makes for every car created afterwards.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Would writing <code>private static String makes[]</code> make the array's <em>contents</em> safe from outside change?</p> <details class="soln"><summary></summary><div class="ans"> <p>Yes, in this case &mdash; but only because no method hands the array out. The rule from the Common Mistake box applies to arrays too: an array variable is a reference, so a method like <code>public static String[] getMakes() { return makes; }</code> would let a caller write <code>ParkedCar.getMakes()[0] = "Yugo";</code> right past the <code>private</code>.</p> <p><strong>Things to notice across both parts.</strong> <code>private</code> is about who can name the variable, not about who can modify what it points to. For a design that wants a genuinely fixed list, mark it <code>private static final</code> and never return it &mdash; <code>final</code> stops the variable being reassigned, and <code>private</code> stops anyone else naming it. Practice Problem 3's <code>COLORS</code> array is written exactly that way.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 10.7</div> <div class="bd"> <p>Write a class <code>ParkingSpace</code> that represents one of the twenty spaces on the street. It knows its number and which car is in it (or <code>null</code> if the space is empty). Give it a constructor taking the space number, plus <code>isEmpty</code>, <code>park</code>, <code>vacate</code> and <code>toString</code>. Keep both fields private.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Two fields: an <code>int number</code> and a <code>ParkedCar occupant</code>. The second is another has-a relationship, and the interesting part is that it is allowed to be <code>null</code> &mdash; "empty" is represented by the absence of an object. That makes <code>isEmpty()</code> a one-line <code>null</code> test, and <code>vacate()</code> a one-line assignment of <code>null</code>.</p> <p class="filename">ParkingSpace.java</p>
+<pre><code class="language-java">public class ParkingSpace {
+    private int number;
+    private ParkedCar occupant;
+
+    public ParkingSpace(int number) {
+        this.number = number;
+        occupant = null;              // a new space starts out empty
+    }
+
+    public int getNumber() {
+        return number;
+    }
+
+    public boolean isEmpty() {
+        return occupant == null;
+    }
+
+    public ParkedCar getOccupant() {
+        return occupant;
+    }
+
+    public void park(ParkedCar car) {
+        occupant = car;
+    }
+
+    public void vacate() {
+        occupant = null;
+    }
+
+    public String toString() {
+        if (isEmpty()) return "Space " + number + ": empty";
+        return "Space " + number + ": " + occupant.getLicense();
+    }
+}</code></pre> <p>Exercised with a street of five spaces:</p> <p class="filename">StreetDemo.java</p>
+<pre><code class="language-java">public class StreetDemo {
+    public static void main(String args[]) {
+        ParkingSpace street[] = new ParkingSpace[5];
+        for (int i = 0; i &lt; street.length; i++)
+            street[i] = new ParkingSpace(i + 1);
+
+        street[1].park(new ParkedCar());
+        street[3].park(new ParkedCar());
+
+        for (int i = 0; i &lt; street.length; i++)
+            System.out.println(street[i]);
+
+        street[1].vacate();
+        System.out.println("After the car in space 2 drives away:");
+        System.out.println(street[1]);
+        System.out.println("Space 2 empty? " + street[1].isEmpty());
+    }
+}</code></pre> <pre class="out"><code>Space 1: empty
+Space 2: AKH7313
+Space 3: empty
+Space 4: KNJ5722
+Space 5: empty
+After the car in space 2 drives away:
+Space 2: empty
+Space 2 empty? true</code></pre> <p>The two license plates are randomly generated, so yours will differ; everything else is the same on every run.</p> <p><strong>Things to notice.</strong> <code>new ParkingSpace[5]</code> creates five slots holding <code>null</code>, and the loop then fills them with actual objects &mdash; two separate steps, and forgetting the second is the most common cause of a <code>NullPointerException</code> in a program shaped like this one.</p> <p><code>getOccupant()</code> is exactly the "getter that hands out the object itself" the warning box described. Here it is defensible, because the caller genuinely needs the car in order to ticket it. Defensible is not the same as free: it means <code>ParkingSpace</code> cannot promise anything about the car it holds.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 10.7</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="12" aria-label="Live coding - Quick Check 10.7">public class ParkingSpace {
+    // 1. Two private fields: the space number, and the car parked in it.
+
+    // 2. Constructor taking the space number. An empty space holds null.
+
+    // 3. isEmpty(), park(ParkedCar), vacate()
+
+    // 4. toString(): "Space 3: empty" or "Space 3: ABC1234"
+
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s5"><span class="num">5.</span>The fine calculation</h2> <p>Everything so far has been structure. This section is the one piece of genuine, testable logic in the design, and it repays being taken slowly.</p> <p>The rule in English: <strong>first hour, $25; each additional hour, $10 more</strong>. The rule in Java, from <code>ParkingMeter</code>:</p> <pre><code class="language-java">public String getFine() {
+    if (timeLeft &gt; -60) return "$25";
+    int fine = 25 + (-10) * ((timeLeft + 5) / 60);
+    return "$" + fine;
+}</code></pre> <p>Three facts make that line work, and none of them are obvious.</p> <ul> <li><strong><code>timeLeft</code> is negative when the meter is expired</strong>, and the amount it is overdue by is <code>-timeLeft</code>. A meter reading &minus;65 is 65 minutes past its time.</li> <li><strong><code>timeLeft</code> is always a multiple of 5</strong>, because it started as a multiple of 5 and only ever loses 5 at a time. So the values that can actually occur are &minus;5, &minus;10, &minus;15, and so on &mdash; never &minus;7.</li> <li><strong>Java's integer division truncates toward zero.</strong> From Lecture 1: <code>-55 / 60</code> is <code>0</code>, not &minus;1, because the true answer &minus;0.9166 is chopped toward zero. That is what turns a division into a "how many complete hours" counter here, and it is also what makes the <code>+ 5</code> necessary.</li> </ul> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; where does the fine step up?</span></div> <div class="bd"> <p>Rather than reason about that expression, test it. This program lifts the rule out of <code>ParkingMeter</code> into a <code>static</code> method so we can feed it any meter reading we like, then walks <code>timeLeft</code> down in 5-minute steps and prints a line only when the answer changes.</p> <p class="filename">FineDemo.java</p>
+<pre><code class="language-java">public class FineDemo {
+    // Exactly the rule ParkingMeter uses, pulled out so we can test it on its own.
+    public static String getFine(int timeLeft) {
+        if (timeLeft &gt; -60) return "$25";
+        int fine = 25 + (-10) * ((timeLeft + 5) / 60);
+        return "$" + fine;
+    }
+
+    public static void main(String args[]) {
+        String previous = "";
+        for (int timeLeft = -5; timeLeft &gt;= -245; timeLeft -= 5) {
+            String fine = getFine(timeLeft);
+            if (!fine.equals(previous)) {
+                System.out.println("timeLeft = " + timeLeft +
+                                   "  (" + (-timeLeft) + " minutes overdue)" +
+                                   " -&gt; fine is now " + fine);
+                previous = fine;
+            }
+        }
+    }
+}</code></pre> <p>Before you reveal: at how many minutes overdue should the fine first rise above $25?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>timeLeft = -5  (5 minutes overdue) -&gt; fine is now $25
+timeLeft = -65  (65 minutes overdue) -&gt; fine is now $35
+timeLeft = -125  (125 minutes overdue) -&gt; fine is now $45
+timeLeft = -185  (185 minutes overdue) -&gt; fine is now $55
+timeLeft = -245  (245 minutes overdue) -&gt; fine is now $65</code></pre> <p>The steps land 60 minutes apart, starting at 65. Read that as: everything from 5 through 60 minutes overdue is "the first hour" and costs $25; 65 through 120 is the second hour and costs $35; and so on. That is precisely the English rule.</p> <p>Here is the arithmetic on four representative readings:</p> <table class="trace"> <tr><th><code>timeLeft</code></th><th>Overdue</th><th><code>timeLeft + 5</code></th><th><code>(timeLeft+5)/60</code></th><th><code>25 + (-10) * that</code></th></tr> <tr><td>&minus;55</td><td>55 min</td><td colspan="3">Caught by the <code>if</code> &mdash; <code>-55 &gt; -60</code> &mdash; so <code>$25</code> without any arithmetic.</td></tr> <tr><td>&minus;60</td><td>60 min</td><td>&minus;55</td><td><code>0</code> &mdash; truncation toward zero</td><td>25 + 0 = <strong>25</strong></td></tr> <tr><td>&minus;65</td><td>65 min</td><td>&minus;60</td><td><code>-1</code> &mdash; exactly</td><td>25 + 10 = <strong>35</strong></td></tr> <tr><td>&minus;120</td><td>120 min</td><td>&minus;115</td><td><code>-1</code> &mdash; &minus;1.91 chopped</td><td>25 + 10 = <strong>35</strong></td></tr> <tr><td>&minus;125</td><td>125 min</td><td>&minus;120</td><td><code>-2</code> &mdash; exactly</td><td>25 + 20 = <strong>45</strong></td></tr> </table> <p>So what is the <code>+ 5</code> doing? It shifts the whole scale by one 5-minute tick, so that a reading of exactly &minus;60 still counts as the first hour instead of tipping over into the second. Without it, a driver 60 minutes over &mdash; exactly one hour &mdash; would be charged the two-hour rate.</p> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; the off-by-one-tick version</span></div> <div class="bd"> <p>The version of <code>getFine</code> that first went up on the board in class was this, without the <code>+ 5</code>:</p> <pre><code class="language-java">public String getFine() {
+    if (timeLeft &gt; -60) return "$25";
+    int fine = 25 + (-10) * (timeLeft / 60);      // one tick too eager
+    return "$" + fine;
+}</code></pre> <p>It is right almost everywhere and wrong at every hour boundary. Compare the two directly:</p> <p class="filename">FineCompare.java</p>
+<pre><code class="language-java">public class FineCompare {
+    // Version A: without the + 5.
+    public static String versionA(int timeLeft) {
+        if (timeLeft &gt; -60) return "$25";
+        return "$" + (25 + (-10) * (timeLeft / 60));
+    }
+
+    // Version B: what the finished ParkingMeter.java uses.
+    public static String versionB(int timeLeft) {
+        if (timeLeft &gt; -60) return "$25";
+        return "$" + (25 + (-10) * ((timeLeft + 5) / 60));
+    }
+
+    public static void main(String args[]) {
+        int tests[] = {-55, -60, -65, -115, -120, -125};
+        for (int i = 0; i &lt; tests.length; i++) {
+            int t = tests[i];
+            System.out.println((-t) + " min overdue:  A gives " + versionA(t)
+                               + ",  B gives " + versionB(t));
+        }
+    }
+}</code></pre> <pre class="out"><code>55 min overdue:  A gives $25,  B gives $25
+60 min overdue:  A gives $35,  B gives $25
+65 min overdue:  A gives $35,  B gives $35
+115 min overdue:  A gives $35,  B gives $35
+120 min overdue:  A gives $45,  B gives $35
+125 min overdue:  A gives $45,  B gives $45</code></pre> <p>Two rows out of six differ, and they are exactly the rows at 60 and 120 minutes. Version A charges the next hour's rate the instant the clock touches the hour; version B waits until you are past it. The finished <code>ParkingMeter.java</code> uses version B, and it is the one these notes show.</p> <p>The lesson generalizes well beyond parking: <strong>when a rule changes at a boundary, the test cases you need are the boundary itself and one tick on each side of it</strong>. Testing 30 and 90 minutes would have found nothing wrong with either version.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 10.8</div> <div class="bd"> <p>Work these out on paper, using version B of the rule.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> A meter reads <code>timeLeft = -95</code>. What does <code>getFine()</code> return?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>-95</code> is not greater than <code>-60</code>, so the <code>if</code> does not fire. <code>(-95 + 5) / 60</code> is <code>-90 / 60</code>, which truncates toward zero to <code>-1</code>. Then <code>25 + (-10) * (-1)</code> is <code>35</code>, so the method returns <code>"$35"</code>. Sanity check: 95 minutes overdue is into the second hour, so $25 plus one $10 &mdash; correct.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> A meter reads <code>timeLeft = 15</code>. What does <code>getFine()</code> return, and is that a problem?</p> <details class="soln"><summary></summary><div class="ans"> <p>It returns <code>"$25"</code>. <code>15 &gt; -60</code> is true, so the <code>if</code> fires immediately.</p> <p>Whether that is a problem depends on who calls it. In this program <code>getFine</code> is only ever reached after <code>expiredMeter()</code> came back <code>true</code>, so a meter with time still on it is never asked. But nothing in the class <em>enforces</em> that, and a method that cheerfully reports a $25 fine on a perfectly legal car is a trap for whoever next uses the class. Returning <code>"$0"</code> when <code>timeLeft &gt;= 0</code> would cost one line.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>isExpired()</code> is <code>timeLeft &lt; 0</code>. Why does it not matter here that a meter reading exactly <code>0</code> counts as not expired?</p> <details class="soln"><summary></summary><div class="ans"> <p>Because time only ever moves in 5-minute steps. A meter sitting at <code>0</code> will be at <code>-5</code> five minutes later and will be flagged then. The driver gets at most one extra 5-minute tick of grace.</p> <p><strong>Things to notice across all three parts.</strong> All three answers turned on the same fact: <code>timeLeft</code> is always a multiple of 5. That invariant is what makes the class simple &mdash; and it is only true because <code>timeLeft</code> is <code>private</code> and the only thing that ever changes it is <code>remove</code>, which the simulation always calls with 5. Change the simulation to tick every 3 minutes and parts (a) and (c) both need rechecking.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 10.9</div> <div class="bd"> <p>The city switches to a cleaner rule: <strong>$25 for the first hour and $10 for every additional hour, where any part of an hour counts as a whole hour</strong>. Write two <code>static</code> methods, <code>hoursOverdue(int timeLeft)</code> returning the number of hours the meter is over (rounded up), and <code>fineFor(int timeLeft)</code> returning the fine as an <code>int</code> number of dollars &mdash; <code>0</code> if the meter is not expired at all.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Work in positive numbers as early as possible; the negative <code>timeLeft</code> is what made the original hard to read. Let <code>minutesOver = -timeLeft</code>. Rounding a positive integer division up is the standard trick: <code>(a + b - 1) / b</code>. With <code>b = 60</code> that is <code>(minutesOver + 59) / 60</code>, which sends 1&ndash;60 to 1, 61&ndash;120 to 2, and 0 to 0. Then the fine is <code>25</code> for the first hour plus <code>10</code> for each hour after it.</p> <p class="filename">FineRules.java</p>
+<pre><code class="language-java">public class FineRules {
+    // How many whole hours late is a meter whose counter reads timeLeft?
+    // timeLeft is 0 or negative here, and always a multiple of 5.
+    public static int hoursOverdue(int timeLeft) {
+        int minutesOver = -timeLeft;
+        return (minutesOver + 59) / 60;        // round up: 1..60 -&gt; 1, 61..120 -&gt; 2
+    }
+
+    // $25 for the first hour, $10 more for every hour after that.
+    public static int fineFor(int timeLeft) {
+        int hours = hoursOverdue(timeLeft);
+        if (hours &lt;= 0) return 0;
+        return 25 + 10 * (hours - 1);
+    }
+
+    public static void main(String args[]) {
+        int tests[] = {0, -5, -55, -60, -65, -120, -125, -185};
+        for (int i = 0; i &lt; tests.length; i++) {
+            int t = tests[i];
+            System.out.println("timeLeft " + t + ":  " + hoursOverdue(t)
+                               + " hour(s) over, fine $" + fineFor(t));
+        }
+    }
+}</code></pre> <pre class="out"><code>timeLeft 0:  0 hour(s) over, fine $0
+timeLeft -5:  1 hour(s) over, fine $25
+timeLeft -55:  1 hour(s) over, fine $25
+timeLeft -60:  1 hour(s) over, fine $25
+timeLeft -65:  2 hour(s) over, fine $35
+timeLeft -120:  2 hour(s) over, fine $35
+timeLeft -125:  3 hour(s) over, fine $45
+timeLeft -185:  4 hour(s) over, fine $55</code></pre> <p><strong>Things to notice.</strong> Every dollar figure agrees with version B of the original, so this is a genuine rewrite and not a change of policy &mdash; and the test list is deliberately the boundaries, 60 and 120, plus one tick either side.</p> <p>Two things improved. <code>fineFor</code> returns an <code>int</code>, so a caller can total up a day's fines with <code>+</code>; formatting a dollar sign onto it is the printing code's job, not the meter's. And the two-hour case is now visible in the name <code>hoursOverdue</code> rather than hidden in an integer division of a negative number.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 10.9</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="16" aria-label="Live coding - Quick Check 10.9">public class FineRules {
+
+    // 1. hoursOverdue(int timeLeft): minutes over, rounded up to whole hours.
+    //    timeLeft is 0 or negative. 0 -&gt; 0, -5 -&gt; 1, -60 -&gt; 1, -65 -&gt; 2.
+
+    // 2. fineFor(int timeLeft): 0 if not overdue, else $25 for the first hour
+    //    plus $10 for each hour after that. Return an int.
+
+    public static void main(String args[]) {
+        int tests[] = {0, -5, -55, -60, -65, -120, -125, -185};
+        // 3. Print the hours and the fine for each test value.
+
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s6"><span class="num">6.</span><code>PoliceOfficer</code>, <code>ParkingTicket</code>, and the object graph</h2> <p>The last two classes are the smallest, and between them they show the second half of step 7: an object can hold a reference to another object without <em>owning</em> it.</p> <p class="filename">PoliceOfficer.java</p>
+<pre><code class="language-java">import java.util.Random;
+
+public class PoliceOfficer {
+    private int badgeNumber;
+
+    public PoliceOfficer() {
+        badgeNumber = (new Random()).nextInt(20) + 1;
+    }
+
+    public int getBadgeNumber() {
+        return badgeNumber;
+    }
+
+    public ParkingTicket issueTicket(ParkedCar parkedCar) {
+        return new ParkingTicket(this, parkedCar);
+    }
+}</code></pre> <p><code>issueTicket</code> is four words long and it is the most interesting method in the system. It takes a <code>ParkedCar</code> as a parameter &mdash; the officer does not own the car, it is just handed one to look at &mdash; and it passes <code>this</code> as the first argument to the ticket's constructor.</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; <code>this</code> as an argument</span></div> <div class="bd"> <p>You met <code>this</code> in Lecture 7 as a way to say "the field, not the parameter": <code>this.name = name</code>. Here it is doing something different and more literal. <code>this</code> is a reference to the object the method was called on, so <code>new ParkingTicket(this, parkedCar)</code> means <em>build a ticket that knows about me</em>.</p> <p>Whenever an object needs to hand itself to something else &mdash; a ticket, a list, a callback &mdash; <code>this</code> is how it does it.</p> </div> </div> <p class="filename">ParkingTicket.java</p>
+<pre><code class="language-java">public class ParkingTicket {
+    private String officer = "Officer badge number: ";
+    private String car = "Parked Car information: ";
+    private String fine = "Fine: ";
+
+    public ParkingTicket(PoliceOfficer policeOfficer, ParkedCar parkedCar) {
+        officer += policeOfficer.getBadgeNumber();
+        car += parkedCar.toString();
+        fine += parkedCar.getFine();
+    }
+
+    public String toString() {
+        return car + " | " + fine + " | " + officer;
+    }
+}</code></pre> <p>Look carefully at what the constructor stores. It receives two object references, and it keeps <em>neither</em> of them. It asks each object a question, turns the answer into text, and stores the text. The ticket that comes out is a <strong>snapshot</strong>: a printed document, not a live link back to the car.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the ticket does not change when the car does</span></div> <div class="bd"> <p>This program issues a ticket, then lets two more hours run on the same car's meter, then prints the same ticket object again. The licence plate, the colour and the officer's badge are all randomly generated, so those parts will differ on your machine &mdash; the run below is representative. What matters is the last two lines, which are the same on every run.</p> <p class="filename">SnapshotDemo.java</p>
+<pre><code class="language-java">public class SnapshotDemo {
+    public static void main(String args[]) {
+        ParkedCar car = new ParkedCar();
+        PoliceOfficer officer = new PoliceOfficer();
+
+        for (int tick = 0; tick &lt; 21; tick++) car.adjustMeter(5);   // 105 minutes
+        ParkingTicket ticket = officer.issueTicket(car);
+
+        String atIssueTime = ticket.toString();
+        System.out.println("Ticket as issued:");
+        System.out.println("  " + atIssueTime);
+
+        for (int tick = 0; tick &lt; 24; tick++) car.adjustMeter(5);   // 2 more hours
+
+        System.out.println("Two hours later the same ticket object prints:");
+        System.out.println("  " + ticket);
+        System.out.println("Identical to the original? " + atIssueTime.equals(ticket.toString()));
+        System.out.println("But the car's meter now says the fine would be " + car.getFine());
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Ticket as issued:
+  Parked Car information: Yellow Porsche Light Truck License number: OTV6614 | Fine: $35 | Officer badge number: 15
+Two hours later the same ticket object prints:
+  Parked Car information: Yellow Porsche Light Truck License number: OTV6614 | Fine: $35 | Officer badge number: 15
+Identical to the original? true
+But the car's meter now says the fine would be $55</code></pre> <p>The car has moved on &mdash; its meter is now two hours further into the red and would earn a $55 fine &mdash; and the ticket has not noticed, because the ticket never had a reference to the car in the first place. It has a <code>String</code> that was built once, in the constructor, out of what the car said at that moment.</p> <p>Here is the object graph immediately after <code>issueTicket</code> returns. Solid arrows are references that are stored in a field; the dotted ones existed only while the constructor was running.</p> <p class="filename">After one issueTicket call</p>
+<pre class="cmp"><code>main
+  |-- car ------&gt; ParkedCar #1 ------&gt; ParkingMeter #1
+  |                    :                 (timeLeft is negative: expired)
+  |                    :
+  |-- officer -&gt; PoliceOfficer #1
+  |                    :
+  |                    :  both were passed to the constructor,
+  |                    :  asked a question, then let go
+  |                    v
+  |-- ticket ---&gt; ParkingTicket #1
+                    officer = "Officer badge number: 15"
+                    car     = "Parked Car information: Yellow Porsche ..."
+                    fine    = "Fine: $35"</code></pre> <p>Four objects exist and <code>main</code> can reach three of them. Only one arrow in the whole picture is stored in a field of another object: <code>ParkedCar</code> to <code>ParkingMeter</code>. That is what makes the meter part of the car and the ticket independent of it.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 10.10</div> <div class="bd"> <p>Suppose <code>ParkingTicket</code> were rewritten to store the objects instead of the text:</p> <pre><code class="language-java">public class ParkingTicket {
+    private PoliceOfficer officer;
+    private ParkedCar car;
+
+    public ParkingTicket(PoliceOfficer policeOfficer, ParkedCar parkedCar) {
+        officer = policeOfficer;
+        car = parkedCar;
+    }
+
+    public String toString() {
+        return "Parked Car information: " + car +
+               " | Fine: " + car.getFine() +
+               " | Officer badge number: " + officer.getBadgeNumber();
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> Rerun <code>SnapshotDemo</code> in your head with this version. What would the last two lines print?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Identical to the original? false</code>, and then the fine line as before. The ticket now computes its text every time <code>toString</code> is called, and it computes it by asking the live car &mdash; whose meter has moved. The second printout would show <code>$55</code> where the first showed <code>$35</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Which version is right?</p> <details class="soln"><summary></summary><div class="ans"> <p>The snapshot version, for this problem. A parking ticket in the real world records what was true when it was written; a fine does not go up because the officer walked away slowly. Storing the references would give you a document that quietly rewrites itself.</p> <p>But the reference version has a real advantage too: the ticket could then answer questions the snapshot cannot, such as "which car is this?" for a lookup, or "has this car been ticketed before today?" A design that needed those would store the references <em>and</em> a separately recorded fine amount fixed at issue time.</p> <p><strong>Things to notice across both parts.</strong> This is Lecture 8's aliasing question wearing a suit. "Do I store the object or a copy of what it told me?" is the same question as "do these two variables point at the same thing?", and it has the same consequence: if you store the reference, somebody else's later change is visible to you. Sometimes that is the feature and sometimes it is the bug &mdash; but it is never an accident you can afford to leave undecided.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 10.11</div> <div class="bd"> <p>Inside <code>PoliceOfficer.issueTicket</code>, could you replace <code>new ParkingTicket(this, parkedCar)</code> with <code>new ParkingTicket(badgeNumber, parkedCar)</code> and change the ticket's constructor to take an <code>int</code>? What would you gain and what would you lose?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Ask what <code>ParkingTicket</code> actually uses the officer for.</p> <p>It compiles and it works. The constructor only ever calls <code>getBadgeNumber()</code>, so the badge number is all it needs, and passing an <code>int</code> makes <code>ParkingTicket</code> independent of <code>PoliceOfficer</code> altogether &mdash; the two classes would no longer be coupled at all.</p> <p>What you lose is room to grow. The moment a ticket needs the officer's name, precinct or shift, you are back to changing the constructor signature and every call to it. Passing <code>this</code> says "here is who I am, ask me what you need"; passing <code>badgeNumber</code> says "here is one number, and I have decided in advance that it is all you will ever want".</p> <p><strong>Things to notice.</strong> Neither choice is wrong, and being able to argue both sides in a sentence each is the actual skill. As a rule of thumb: pass the object when the receiver is a peer that may need more later, pass the plain value when the receiver is a simple record. A ticket is arguably a simple record &mdash; which is exactly why this design already reduces the officer to a <code>String</code> one line later.</p> </div></details> </div> </div> <h2 id="s7"><span class="num">7.</span>Design decisions you could have made differently</h2> <p>A finished design looks inevitable. It never is. Four places in this one could reasonably have gone the other way, and being able to say why is worth more than being able to type the code.</p> <p><strong>1. Where does the meter live?</strong> The problem says "each parking space has a meter", which reads like <code>ParkingSpace</code> should own the <code>ParkingMeter</code>. This design puts the meter inside <code>ParkedCar</code> instead. That is a simplification with a consequence: when a car drives away, its meter goes with it, and the next car gets a brand-new meter with fresh random time. Physically wrong &mdash; a real meter keeps whatever the last driver paid for. It is a fair trade for a first version, and it is the first thing to fix if the simulation is ever meant to be realistic.</p> <p><strong>2. Is there a <code>ParkingSpace</code> class at all?</strong> In this design, no. The street is just <code>ParkedCar street[] = new ParkedCar[20];</code> and an empty space is a <code>null</code> entry. That is compact and it works. It also means the space number is an array index rather than something a space knows about itself, and there is nowhere to hang "this space is a loading zone" when that requirement arrives. Quick Check 10.7 wrote the class that would fix it.</p> <p><strong>3. Should <code>getFine</code> return a <code>String</code>?</strong> Returning <code>"$25"</code> means the fine is formatted at the moment it is computed, deep inside the meter. Anything that later wants to total the day's fines has to take the <code>"$"</code> back off and parse the number. Returning an <code>int</code> and formatting at the point of printing &mdash; Quick Check 10.9 &mdash; is the more flexible choice, and it costs nothing.</p> <p><strong>4. Should each object build its own <code>Random</code>?</strong> <code>ParkedCar</code> creates a new <code>Random</code> inside <code>pickOne</code>, and another inside <code>generateLicense</code>, every time either is called. It works, but a single shared generator is both cheaper and more conventional:</p> <pre><code class="language-java">private static Random rng = new Random();     // one per class, not one per call</code></pre> <p>That is the same <code>static</code> reasoning as the <code>makes</code> array. There is one source of randomness in the program conceptually, so there should be one object for it.</p> <div class="box qc"> <div class="hd">Quick Check 10.12</div> <div class="bd"> <p>The city adds a new requirement: <em>some cars have a disabled-parking permit, and a car with a valid permit is never ticketed</em>. Decide where this belongs in the design, then write the changes. You should be able to do it without touching <code>ParkingMeter</code>, <code>PoliceOfficer</code> or <code>ParkingTicket</code> at all.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Run the procedure from &sect;1 on the new sentence. The nouns are "car" (already a class) and "permit". Does a permit have data plus behavior? A full version would &mdash; a permit number, a holder, an expiry date. The requirement as stated needs only "does this car have one", so it is a <code>boolean</code> field on <code>ParkedCar</code>. Start there; promote it to a class the day the permit gets an expiry date.</p> <p>Then ask who decides not to ticket. The condition the simulation already tests is <code>street[i].expiredMeter()</code>, and <code>expiredMeter</code> is a method on <code>ParkedCar</code> &mdash; which is also the object that knows about the permit. So the rule goes inside <code>expiredMeter</code>, and no other class changes.</p> <pre><code class="language-java">// new field, alongside make, model, color, license, meter
+private boolean hasPermit;
+
+// in the constructor: roughly one car in ten
+public ParkedCar() {
+    make = pickOne(makes);
+    model = pickOne(models);
+    color = pickOne(colors);
+    license = generateLicense();
+    meter = new ParkingMeter();
+    hasPermit = (new Random()).nextInt(10) == 0;
+}
+
+public boolean hasPermit() {
+    return hasPermit;
+}
+
+// the one behavioral change in the whole system
+public boolean expiredMeter() {
+    if (hasPermit) return false;
+    return meter.isExpired();
+}</code></pre> <p><strong>Things to notice.</strong> One new field, one getter, one extra line of logic, and the simulation loop, the officer and the ticket are all untouched. That is what a design is <em>for</em>. Compare it with the version of this program you would have written in Lecture 3, where the street was six parallel arrays and this change meant a seventh array plus an edit at every place that tested a meter.</p> <p>There is a judgment call hidden in it, though. Making <code>expiredMeter()</code> return <code>false</code> for a permit holder means the method now answers "is this car in violation?" rather than "has this meter expired?" &mdash; the name is slightly wrong afterwards. The honest alternative is to leave <code>expiredMeter</code> alone, add <code>inViolation()</code>, and have the officer call that instead. On a real team you would rename. Notice the pressure the name is putting on the design; that pressure is information.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 10.12</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="22" aria-label="Live coding - Quick Check 10.12">public class ParkedCar {
+    private String make, model, color, license;
+    private ParkingMeter meter;
+
+    // 1. Add a field recording whether this car has a disabled-parking permit.
+
+    public ParkedCar() {
+        // ... the existing four lines plus the meter ...
+
+        // 2. Set the permit field. About one car in ten should have one.
+
+    }
+
+    // 3. Add a getter for the permit.
+
+    public boolean expiredMeter() {
+        // 4. A car with a permit is never in violation.
+        return meter.isExpired();
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="prac"><span class="num">&#9733;</span>Practice Problems</h2> <div class="box prac"> <div class="hd">Practice Problems<span class="tag">&mdash; turning a description into a class</span></div> <div class="bd"> <p>Every CSCI 212 exam has a "here is a description, write the class" problem, and it is usually the largest single block of points on the paper. The first four below are those problems, taken from the real exams and practice sets. The last two are new, on the parking domain, and go after the two ideas most likely to cost you marks: a field whose type is another class, and a rule that changes at a boundary.</p> <p>Work them on paper first. The exam is closed book and there is no compiler in the room.</p> </div> </div> <h3>Problem 1 &mdash; The <code>Circle</code> class <span class="muted">(from CSCI 212 Exam 1, Spring 2025)</span></h3> <p>Write complete Java code for the class <code>Circle</code>. You should use exactly two instance variables <code>radius</code> and <code>center</code> that have types <code>double</code> and <code>Point</code>. You do not need to implement the class <code>Point</code>, but you could use its methods as specified by the following UML diagram.</p> <p class="filename">Given class &mdash; do not write it</p>
+<pre class="cmp"><code>+---------------------------------+
+|              Point              |
++---------------------------------+
+| double x, y                     |
++---------------------------------+
+| double distanceTo(Point p)      |
++---------------------------------+</code></pre> <p>Your class <code>Circle</code> must have exactly four methods. The methods are a constructor (with 2 parameters) and methods called <code>area</code>, <code>circumference</code> and <code>isOutside</code>. The area and circumference are calculated with the usual formulas &pi;r<sup>2</sup> and 2&pi;r, where r is the radius. (The value of &pi; is written <code>Math.PI</code> in Java.) The method <code>isOutside</code> tests whether a point is outside the circle &mdash; this happens when its distance from the center is larger than the radius.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> This is &sect;3 of today's lecture with different nouns: <code>Circle</code> <em>has a</em> <code>Point</code>. So <code>center</code> is an instance variable whose type is another class, and the constructor takes one in and stores it &mdash; exactly like <code>ParkedCar</code> and its meter, except that the <code>Point</code> is handed in rather than created inside.</p> <p><code>isOutside</code> is the interesting method, and the trap is trying to compute the distance yourself. You were given <code>distanceTo</code>; use it. Delegation again: the circle does not know how to measure a distance between two points, and does not need to.</p> <p>"Exactly four methods" is part of the specification, so no getters, no <code>toString</code>.</p> <p class="filename">Circle.java</p>
+<pre><code class="language-java">public class Circle {
+    private double radius;
+    private Point center;
+
+    public Circle(double radius, Point center) {
+        this.radius = radius;
+        this.center = center;
+    }
+
+    public double area() {
+        return Math.PI * radius * radius;
+    }
+
+    public double circumference() {
+        return 2 * Math.PI * radius;
+    }
+
+    public boolean isOutside(Point p) {
+        return center.distanceTo(p) &gt; radius;
+    }
+}</code></pre> <p>Tested against a <code>Point</code> written for the purpose &mdash; on the exam you would not write this class, but the code has to run somewhere:</p> <p class="filename">Point.java</p>
+<pre><code class="language-java">public class Point {
+    double x, y;
+
+    public Point(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public double distanceTo(Point p) {
+        return Math.sqrt((x - p.x) * (x - p.x) + (y - p.y) * (y - p.y));
+    }
+}</code></pre> <p class="filename">CircleDemo.java</p>
+<pre><code class="language-java">public class CircleDemo {
+    public static void main(String args[]) {
+        Circle c = new Circle(5.0, new Point(0, 0));
+        System.out.println("Area:          " + c.area());
+        System.out.println("Circumference: " + c.circumference());
+        System.out.println("Is (3,4) outside?  " + c.isOutside(new Point(3, 4)));
+        System.out.println("Is (10,0) outside? " + c.isOutside(new Point(10, 0)));
+    }
+}</code></pre> <pre class="out"><code>Area:          78.53981633974483
+Circumference: 31.41592653589793
+Is (3,4) outside?  false
+Is (10,0) outside? true</code></pre> <p><strong>Things to notice.</strong> The point (3,4) is at distance exactly 5 from the origin, which is exactly the radius &mdash; and <code>isOutside</code> says <code>false</code>, because the specification said "larger than the radius", not "at least". Boundary cases again: a point on the circumference is not outside. If the exam had said "outside or on", the operator would be <code>&gt;=</code>, and that one character is the whole answer to that part.</p> <p><code>this.radius = radius;</code> is needed because the parameter has the same name as the field. <code>center = center;</code> without <code>this</code> would assign the parameter to itself and leave the field <code>null</code>, and the first call to <code>isOutside</code> would throw a <code>NullPointerException</code>.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 1</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="12" aria-label="Live coding - Practice Problem 1">public class Circle {
+    // 1. Exactly two instance variables: radius (double) and center (Point).
+
+    // 2. A constructor with two parameters.
+
+    // 3. area() and circumference().
+
+    // 4. isOutside(Point p) -- use center.distanceTo(p).
+
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 2 &mdash; The <code>BankAccount</code> class <span class="muted">(from CSCI 212 Midterm, Summer 2026)</span></h3> <p>Write complete Java code for the class <code>BankAccount</code>. Your class should use exactly two private instance variables: <code>owner</code> and <code>balance</code>, of types <code>String</code> and <code>double</code>. Your class must have exactly six methods: a constructor with two parameters, <code>getOwner</code>, <code>getBalance</code>, <code>deposit</code>, <code>withdraw</code> and <code>toString</code>.</p> <p>The <code>deposit</code> method takes a <code>double</code> amount and adds it to the balance. The <code>withdraw</code> method takes a <code>double</code> amount and subtracts it from the balance <em>only if there is enough money in the account</em>. The <code>toString</code> method should return a <code>String</code> in the form <code>owner + " has balance " + balance</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Count the methods against the specification before writing anything: constructor, two getters, two commands, one <code>toString</code> &mdash; six, and no setters. That is the shape of nearly every class-design question on these exams.</p> <p>The only decision is what <code>withdraw</code> does when the money is not there. The specification says subtract "only if there is enough", so the natural reading is: silently do nothing otherwise. An <code>if</code> with no <code>else</code>.</p> <p class="filename">BankAccount.java</p>
+<pre><code class="language-java">public class BankAccount {
+    private String owner;
+    private double balance;
+
+    public BankAccount(String owner, double balance) {
+        this.owner = owner;
+        this.balance = balance;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void deposit(double amount) {
+        balance += amount;
+    }
+
+    public void withdraw(double amount) {
+        if (amount &lt;= balance) balance -= amount;
+    }
+
+    public String toString() {
+        return owner + " has balance " + balance;
+    }
+}</code></pre> <p class="filename">BankDemo.java</p>
+<pre><code class="language-java">public class BankDemo {
+    public static void main(String args[]) {
+        BankAccount a = new BankAccount("Maria", 500.0);
+        System.out.println(a);
+        a.deposit(250.0);
+        System.out.println(a);
+        a.withdraw(1000.0);
+        System.out.println(a);
+        a.withdraw(300.0);
+        System.out.println(a);
+        System.out.println(a.getOwner() + " / " + a.getBalance());
+    }
+}</code></pre> <pre class="out"><code>Maria has balance 500.0
+Maria has balance 750.0
+Maria has balance 750.0
+Maria has balance 450.0
+Maria / 450.0</code></pre> <p><strong>Things to notice.</strong> The third line is the same as the second: withdrawing 1000 from 750 did nothing at all. That is the specification working, and it is also the thing to test &mdash; a <code>withdraw</code> that always subtracts passes every test where the account has enough money.</p> <p><code>balance</code> is a <code>double</code>, so it prints as <code>500.0</code> rather than <code>500</code>. The specification demanded exactly that format, so leave it. Real money should not be a <code>double</code> at all &mdash; binary fractions cannot represent 0.10 exactly, and repeated deposits drift &mdash; but that is a conversation for a course with more time.</p> <p>The <code>System.out.println(a)</code> calls print the account without naming <code>toString</code>. That is Lecture 9's rule: <code>println</code> of an object calls its <code>toString</code> for you.</p> </div></details> <h3>Problem 3 &mdash; The <code>TrafficSignal</code> class <span class="muted">(from Exam 1 Practice Problems)</span></h3> <p>Write complete code for a class called <code>TrafficSignal</code>. The class represents a traffic signal that cycles through four states: green, yellow, red and leftTurn, in this order &mdash; meaning leftTurn comes just after red and before green.</p> <p>The class should have only one attribute, <code>light</code>, of type <code>int</code>. The value of this attribute determines the state of the signal; for example, if <code>light</code> has value 0 the signal shows green. The class should have one (default) constructor and only three additional methods. The default color of the light should be red. The three methods are <code>currentLight()</code>, which returns the integer corresponding to the current state, <code>changeLight()</code>, which changes <code>light</code> from the current state to the next state, and <code>toString()</code>, which returns the state as green, yellow and so on.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Only one instance variable is allowed, so the four color names cannot be fields. They are the same for every signal ever created, which is the definition of <code>static</code> &mdash; put them in a <code>private static final</code> array and let the index do the work. That array is not an "attribute" in the sense the question means; the object's state is still the single <code>int</code>.</p> <p>"Cycles" is the word that tells you the operator: wrapping 3 back round to 0 is <code>%</code>. Write <code>(light + 1) % COLORS.length</code> rather than <code>% 4</code>, so that adding a fifth state later means editing one line instead of two.</p> <p>Red is index 2, so the default constructor sets <code>light = 2</code>.</p> <p class="filename">TrafficSignal.java</p>
+<pre><code class="language-java">public class TrafficSignal {
+    private int light;
+    private static final String COLORS[] = {"green", "yellow", "red", "leftTurn"};
+
+    public TrafficSignal() {
+        light = 2;                       // the default color is red
+    }
+
+    public int currentLight() {
+        return light;
+    }
+
+    public void changeLight() {
+        light = (light + 1) % COLORS.length;
+    }
+
+    public String toString() {
+        return COLORS[light];
+    }
+}</code></pre> <p class="filename">SignalDemo.java</p>
+<pre><code class="language-java">public class SignalDemo {
+    public static void main(String args[]) {
+        TrafficSignal s = new TrafficSignal();
+        for (int i = 0; i &lt; 6; i++) {
+            System.out.println(s.currentLight() + "  " + s);
+            s.changeLight();
+        }
+    }
+}</code></pre> <pre class="out"><code>2  red
+3  leftTurn
+0  green
+1  yellow
+2  red
+3  leftTurn</code></pre> <p><strong>Things to notice.</strong> Six steps through a four-state cycle gets you back where you started plus two, which is exactly what the output shows &mdash; a cheap way to check that the wraparound is right. Testing only four steps would not have exercised the wrap at all.</p> <p>The array is <code>private static final</code>: <code>static</code> because there is one set of color names for the whole class, <code>final</code> because the variable must never be pointed at a different array, and <code>private</code> because nobody outside needs it. That is the combination &sect;4 recommended.</p> <p><code>toString</code> returning <code>COLORS[light]</code> is a good illustration of why encapsulation pays. The outside world sees the word "red"; whether that is stored as an <code>int</code>, a <code>String</code> or an <code>enum</code> is nobody's business but the class's.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 3</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="14" aria-label="Live coding - Practice Problem 3">public class TrafficSignal {
+    // 1. Exactly one attribute: light, an int. Plus a static array of names.
+
+    // 2. Default constructor -- the light starts red.
+
+    // 3. currentLight() returns the int.
+
+    // 4. changeLight() advances to the next state and wraps around.
+
+    // 5. toString() returns "green", "yellow", "red" or "leftTurn".
+
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 4 &mdash; The <code>Distance</code> class <span class="muted">(from Exam 1 Practice Problems)</span></h3> <p>Answer the parts in order; each builds on the last.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Write a class <code>Distance</code> with the following specification. There are two instance variables, <code>feet</code> and <code>inches</code>, stored as integers; a private constant called <code>INCHES_IN_A_FOOT</code> with value 12; and a no-argument constructor to initialize a <code>Distance</code> as zero feet, zero inches.</p> <details class="soln"><summary></summary><div class="ans"> <pre><code class="language-java">public class Distance {
+    private int feet;
+    private int inches;
+    private static final int INCHES_IN_A_FOOT = 12;
+
+    public Distance() {
+        feet = 0;
+        inches = 0;
+    }
+}</code></pre> <p><code>private static final</code> is how Java writes a named constant: <code>final</code> so it cannot be reassigned, <code>static</code> because 12 inches to the foot is a fact about the world rather than about any one <code>Distance</code>, and the ALL_CAPS name is the universal convention for a constant.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Write a two-argument constructor for <code>Distance</code> that accepts two positive integers for feet and inches. Write an access (get) method for <code>feet</code> and a mutator (set) method for <code>inches</code>.</p> <details class="soln"><summary></summary><div class="ans"> <pre><code class="language-java">public Distance(int feet, int inches) {
+    this.feet = feet;
+    this.inches = inches;
+}
+
+public int getFeet() {
+    return feet;
+}
+
+public void setInches(int inches) {
+    this.inches = inches;
+}</code></pre> <p>Both parameters shadow their fields, so both assignments need <code>this.</code>. Note the class now has two constructors &mdash; that is overloading, and it is legal because their parameter lists differ.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Write a public method <code>add</code> that accepts another <code>Distance</code> object as a parameter and adds that distance to the current one. For example, if <code>x1</code> is 5 feet 8 inches and <code>x2</code> is 2 feet 7 inches, then after <code>x1.add(x2)</code> the object <code>x1</code> is 8 feet 3 inches.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> 8 + 7 is 15 inches, which is 1 foot 3 inches. So total the inches first, carry <code>total / 12</code> into the feet, and keep <code>total % 12</code> as the inches &mdash; the same integer division and remainder pair from Lecture 1, doing exactly the job they are for.</p> <pre><code class="language-java">public void add(Distance other) {
+    int total = inches + other.inches;
+    feet = feet + other.feet + total / INCHES_IN_A_FOOT;
+    inches = total % INCHES_IN_A_FOOT;
+}</code></pre> <p><code>other.inches</code> reads a private field of a <em>different object</em>, and that is legal: <code>private</code> is per class, not per object, so any <code>Distance</code> may read any other <code>Distance</code>'s fields. That is what makes methods like this one writable at all.</p> <p>The order matters. Compute <code>total</code> before overwriting <code>inches</code>, or the carry is computed from the value you just destroyed.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> Write a public method <code>metricDistance</code> that returns, as a <code>double</code>, the number of meters in the distance. The method should contain a private variable for the number of meters in a foot (1 foot = 0.3048 meters).</p> <details class="soln"><summary></summary><div class="ans"> <pre><code class="language-java">public double metricDistance() {
+    final double METERS_IN_A_FOOT = 0.3048;
+    return (feet + inches * 1.0 / INCHES_IN_A_FOOT) * METERS_IN_A_FOOT;
+}</code></pre> <p>The <code>* 1.0</code> is the whole problem. <code>inches / INCHES_IN_A_FOOT</code> is <code>int / int</code>, so 3 inches would become 0 feet and the method would silently lose up to eleven inches on every call. Multiplying by <code>1.0</code> first promotes the division to <code>double</code>. Writing <code>inches / 12.0</code> would do the same job, but then the named constant is no longer being used.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> Modify the constructor from part (b) so that if the number of inches is greater than 11, it prints <code>Illegal number of inches</code> and sets <code>inches</code> to 11.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> This is Lecture 7's validating setter idea moved into a constructor: the object refuses to be built in an impossible state.</p> <p class="filename">Distance.java</p>
+<pre><code class="language-java">public class Distance {
+    private int feet;
+    private int inches;
+    private static final int INCHES_IN_A_FOOT = 12;
+
+    public Distance() {
+        feet = 0;
+        inches = 0;
+    }
+
+    public Distance(int feet, int inches) {
+        this.feet = feet;
+        if (inches &gt; INCHES_IN_A_FOOT - 1) {
+            System.out.println("Illegal number of inches");
+            this.inches = INCHES_IN_A_FOOT - 1;
+        } else {
+            this.inches = inches;
+        }
+    }
+
+    public int getFeet() {
+        return feet;
+    }
+
+    public void setInches(int inches) {
+        this.inches = inches;
+    }
+
+    public void add(Distance other) {
+        int total = inches + other.inches;
+        feet = feet + other.feet + total / INCHES_IN_A_FOOT;
+        inches = total % INCHES_IN_A_FOOT;
+    }
+
+    public double metricDistance() {
+        final double METERS_IN_A_FOOT = 0.3048;
+        return (feet + inches * 1.0 / INCHES_IN_A_FOOT) * METERS_IN_A_FOOT;
+    }
+
+    public String toString() {
+        return feet + " feet, " + inches + " inches";
+    }
+}</code></pre> <p class="filename">DistanceDemo.java</p>
+<pre><code class="language-java">public class DistanceDemo {
+    public static void main(String args[]) {
+        Distance x1 = new Distance(5, 8);
+        Distance x2 = new Distance(2, 7);
+        x1.add(x2);
+        System.out.println("x1 is now " + x1);
+        System.out.println("x1 in meters: " + x1.metricDistance());
+
+        Distance bad = new Distance(3, 15);
+        System.out.println("bad is " + bad);
+
+        Distance zero = new Distance();
+        System.out.println("zero is " + zero);
+    }
+}</code></pre> <pre class="out"><code>x1 is now 8 feet, 3 inches
+x1 in meters: 2.5146
+Illegal number of inches
+bad is 3 feet, 11 inches
+zero is 0 feet, 0 inches</code></pre> <p><strong>Things to notice across all five parts.</strong> The class was built the way &sect;1's procedure says to build one: fields and the constant, then the constructors, then the accessors, then the real behavior, then the validation. Each part compiled and ran before the next was added.</p> <p>A <code>toString</code> was added so the demo could print a <code>Distance</code> &mdash; the exam question does not ask for one, and on the exam you should not write code you were not asked for. Outside an exam, a class you intend to debug should always have one.</p> <p>Notice the hole the specification leaves: <code>setInches</code> does no validation at all, so <code>x1.setInches(99)</code> walks straight past the check the constructor makes. A class that validates on the way in and not afterwards has not really validated anything. The fix is to have the constructor call <code>setInches</code> and put the check there, once.</p> </div></details> </div> <h3>Problem 5 &mdash; Design the classes for a laundromat <span class="muted">(added for these notes)</span></h3> <p>Read this description and produce a design &mdash; no method bodies, just the classes, their fields with types, and their method signatures with parameter and return types. Say for each class why it is a class rather than a field, and draw the has-a arrows.</p> <p><em>A laundromat has 12 washing machines and 8 dryers. Each machine has a number, is either free or running, and if it is running it has a number of minutes left on its cycle. A customer has a name and a loyalty-card number, and may be using several machines at once. A wash costs $3.50 and a dry costs $2.00 for a 30-minute cycle; a customer's running total is the sum of what they have started.</em></p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Nouns: laundromat, washing machine, dryer, machine, number, minutes left, customer, name, loyalty-card number, cycle, wash, dry, cost, running total. Cross out the units and the money amounts &mdash; <code>cost</code> is a number, not a thing. What is left with both data and behavior is: machine, and customer. Washer and dryer differ only in price and in what they are called, so one <code>Machine</code> class with a type field will do for now; when they start behaving differently, that is what inheritance is for, and it is Lecture 12.</p> <p class="filename">A reasonable design</p>
+<pre class="cmp"><code>+-------------------------------------+        +------------------------------------+
+|              Machine                |        |             Customer               |
++-------------------------------------+        +------------------------------------+
+| - number      : int                 |        | - name       : String              |
+| - isWasher    : boolean             |        | - cardNumber : int                 |
+| - minutesLeft : int                 |        | - machines   : ArrayList&lt;Machine&gt;  |
++-------------------------------------+ has-a  | - total      : double              |
+| + Machine(int number, boolean wash) |&lt;-------+------------------------------------+
+| + getNumber()     : int             |        | + Customer(String name, int card)  |
+| + isFree()        : boolean         |        | + getName()      : String          |
+| + start()         : void            |        | + getTotal()     : double          |
+| + tick(int mins)  : void            |        | + use(Machine m) : void            |
+| + getMinutesLeft(): int             |        | + toString()     : String          |
+| + getPrice()      : double          |        +------------------------------------+
+| + toString()      : String          |
++-------------------------------------+</code></pre> <p><strong>Why each is a class.</strong> A machine holds three pieces of data and answers real questions about itself (<code>isFree</code>, <code>getMinutesLeft</code>), and there are twenty of them &mdash; class. A customer holds data and does something (<code>use</code>) &mdash; class. The name, the card number and the minute count are single values with no behavior &mdash; fields.</p> <p><strong>Where the has-a arrow goes.</strong> <code>Customer</code> has an <code>ArrayList&lt;Machine&gt;</code>, because the description says a customer may be using several machines. The arrow points from <code>Customer</code> to <code>Machine</code>, not the other way: a machine has no reason to know who is using it, and adding a back-reference would mean keeping two things in step instead of one.</p> <p><strong>Where the rules live.</strong> <code>getPrice()</code> is on <code>Machine</code>, because the price depends on <code>isWasher</code>, which is the machine's own data &mdash; that is Quick Check 10.2's test. <code>use(Machine m)</code> is on <code>Customer</code> because it does two things at once: it starts the machine and it adds the price to that customer's total, and only the customer knows the total.</p> <p><strong>Things to notice.</strong> The laundromat itself did not become a class. There is exactly one of it, it has no behavior beyond holding the arrays, and an array of machines in <code>main</code> covers it &mdash; the same call this lecture's design made about the street. Two fields deliberately have collection or object types, and one <code>int</code> (<code>number</code>) is doing a job an array index could do; both of those are the arguable parts, and an answer that made the other choice and said why is just as good.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 5</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="19" aria-label="Live coding - Practice Problem 5">public class Machine {
+    // Fields: number, isWasher, minutesLeft. All private.
+
+    // Constructor(int number, boolean isWasher)
+
+    // isFree(), start(), tick(int mins), getMinutesLeft(), getPrice(), toString()
+
+}
+
+class Customer {
+    // Fields: name, cardNumber, machines (ArrayList&lt;Machine&gt;), total
+
+    // Constructor(String name, int cardNumber)
+
+    // getName(), getTotal(), use(Machine m), toString()
+
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 6 &mdash; A daily fine report <span class="muted">(added for these notes)</span></h3> <p>The city wants a summary at the end of each day: the total dollars collected, and how many tickets were written at each rate. Using the <code>fineFor</code> and <code>hoursOverdue</code> methods from Quick Check 10.9, write a program that takes an array of meter readings (the <code>timeLeft</code> values at the moment each car was ticketed) and prints the total and a breakdown by number of hours overdue.</p> <p>Use this test data:</p> <pre><code class="language-java">int readings[] = {
+    -5, -65, -20, -125, -60, -70, -185, -35, -120, -125}
+;</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> This is the concrete reason &sect;7 argued that <code>getFine</code> should return an <code>int</code>: you cannot add up <code>"$25"</code> and <code>"$35"</code>. With <code>fineFor</code> returning a number, the total is a one-line accumulation.</p> <p>For the breakdown, <code>hoursOverdue</code> already turns a reading into a small positive integer, so it can be used directly as an index into a counting array &mdash; the same tallying pattern as counting letter frequencies. Size the array from the largest value present rather than guessing, and remember that hour 1 lands in slot 1, so the array needs one extra slot.</p> <p class="filename">FineReport.java</p>
+<pre><code class="language-java">public class FineReport {
+    public static int hoursOverdue(int timeLeft) {
+        int minutesOver = -timeLeft;
+        return (minutesOver + 59) / 60;
+    }
+
+    public static int fineFor(int timeLeft) {
+        int hours = hoursOverdue(timeLeft);
+        if (hours &lt;= 0) return 0;
+        return 25 + 10 * (hours - 1);
+    }
+
+    public static void main(String args[]) {
+        int readings[] = {-5, -65, -20, -125, -60, -70, -185, -35, -120, -125};
+
+        int worst = 0;
+        for (int i = 0; i &lt; readings.length; i++)
+            if (hoursOverdue(readings[i]) &gt; worst) worst = hoursOverdue(readings[i]);
+
+        int counts[] = new int[worst + 1];
+        int total = 0;
+        for (int i = 0; i &lt; readings.length; i++) {
+            total += fineFor(readings[i]);
+            counts[hoursOverdue(readings[i])]++;
+        }
+
+        System.out.println("Tickets written: " + readings.length);
+        System.out.println("Total collected: $" + total);
+        System.out.println("Breakdown:");
+        for (int h = 1; h &lt; counts.length; h++)
+            if (counts[h] &gt; 0)
+                System.out.println("  " + h + " hour(s) over, $" + fineFor(-60 * h)
+                                   + " each: " + counts[h] + " ticket(s)");
+    }
+}</code></pre> <pre class="out"><code>Tickets written: 10
+Total collected: $350
+Breakdown:
+  1 hour(s) over, $25 each: 4 ticket(s)
+  2 hour(s) over, $35 each: 3 ticket(s)
+  3 hour(s) over, $45 each: 2 ticket(s)
+  4 hour(s) over, $55 each: 1 ticket(s)</code></pre> <p>Check it by hand: four $25s is 100, three $35s is 105, two $45s is 90, and one $55 &mdash; and 100 + 105 + 90 + 55 is 350. The report agrees with itself.</p> <p><strong>Things to notice.</strong> <code>fineFor(-60 * h)</code> in the last loop is a small trick: to print the rate for "h hours over" it feeds the method a reading that is exactly h hours over. It works only because <code>hoursOverdue</code> rounds up and 60&times;h maps to h &mdash; check the Quick Check 10.9 output, where &minus;60 gives 1 hour and &minus;120 gives 2. Reusing the rule instead of writing <code>25 + 10 * (h - 1)</code> a second time means there is still only one place the fine schedule is defined.</p> <p><code>counts</code> is sized from the data, not from a guess. Writing <code>new int[5]</code> would work today and break the first time a car sits for six hours &mdash; the kind of assumption that survives every test you thought to run.</p> <p>Slot <code>counts[0]</code> is allocated and never printed, because the loop starts at <code>h = 1</code>. Wasting one array element to keep the index and the meaning identical is almost always the right trade; the alternative, storing hour h at index h&minus;1, saves four bytes and costs you an off-by-one every time you touch the code.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 6</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="26" aria-label="Live coding - Practice Problem 6">public class FineReport {
+    // Reuse these two from Quick Check 10.9.
+    public static int hoursOverdue(int timeLeft) {
+        int minutesOver = -timeLeft;
+        return (minutesOver + 59) / 60;
+    }
+
+    public static int fineFor(int timeLeft) {
+        int hours = hoursOverdue(timeLeft);
+        if (hours &lt;= 0) return 0;
+        return 25 + 10 * (hours - 1);
+    }
+
+    public static void main(String args[]) {
+        int readings[] = {-5, -65, -20, -125, -60, -70, -185, -35, -120, -125};
+
+        // 1. Total the fines.
+
+        // 2. Count how many tickets fell at each number of hours overdue.
+
+        // 3. Print the total and the breakdown.
+
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <div class="box sum" id="summary"> <div class="hd">Lecture Summary</div> <div class="bd"> <ul> <li>Design starts with <strong>nouns</strong>. Underline them, throw away the ones that are not part of the program, and for each survivor ask: does it have data <em>and</em> behavior, and will there be many of them? Yes to both means a class; otherwise it is a field.</li> <li>For every class, write down what it <strong>knows</strong> (fields, with types) and what it <strong>does</strong> (methods, with parameter and return types) before typing anything. A UML-style listing is exactly that information and nothing else.</li> <li>The four classes here are <code>ParkedCar</code>, <code>ParkingMeter</code>, <code>PoliceOfficer</code> and <code>ParkingTicket</code>. Each exists because it has state of its own that no other class should be poking at.</li> <li><strong>Has-a becomes a field whose type is another class.</strong> <code>ParkedCar</code> has a <code>ParkingMeter</code> &mdash; that is composition, and it is the reason Lecture 7 spent time on objects as instance variables.</li> <li><strong>Delegation</strong> keeps the has-a private: <code>expiredMeter()</code>, <code>adjustMeter()</code> and <code>getFine()</code> are one-liners that forward to the meter, so nothing outside <code>ParkedCar</code> needs to know a meter exists.</li> <li>Fields are <code>private</code> so the class can keep a promise &mdash; <code>timeLeft</code> is only ever changed by <code>remove</code>. Getters are not ceremony: they make a field read-only, they can do work later, and they let the class protect its invariants. A getter that returns the object itself gives all that away.</li> <li>The fine is $25 for the first hour and $10 more for each additional hour. Getting the hour boundary right is the whole difficulty, and the way you get it right is to test at 60 minutes and one tick on either side.</li> <li><code>issueTicket</code> passes <code>this</code> so the ticket knows who wrote it. The ticket stores <em>text</em>, not the car &mdash; a snapshot, not a live link &mdash; and that choice is the same reference-versus-copy question as Lecture 8's aliasing.</li> </ul> <p><strong>Coming up next &mdash; the Exam 1 Review, then Exam 1.</strong> The design is finished, but we do not build it yet: the next session is the review for Exam 1, and the session after that is the exam itself. Exam 1 covers Lectures 1 through 10, and today's material is fair game &mdash; not as code to write, but as the reasoning behind the classes you will be asked to write.</p>
+    <p><strong>Then, in Lecture 11 &mdash; OOP Case Study II.</strong> Once the exam is behind you we come straight back to this street: we fill in the method bodies we skipped, write the 24-hour simulation loop with its <code>ArrayList</code> of tickets and its array of twenty spaces, run the whole day, and read the end-of-day report it prints. Keep this page &mdash; the design table at the top of it is where Lecture 11 begins.</p>
+  </div>
+</div>
+
+<nav class="pagenav">
+<span class="disabled"><div class="dir">&larr; Previous</div><div class="ttl">Lecture 9 &mdash; static Members, equals and toString</div><div class="pending">posts Tue Sep 29</div></span>
+<span class="disabled next"><div class="dir">Next &rarr;</div><div class="ttl">Review 1 &mdash; Exam 1 Review</div><div class="pending">posts Tue Oct 6</div></span>
+</nav>
+<footer class="pf">CSCI 212 &middot; Object-Oriented Programming in Java &middot; Queens College, CUNY</footer>
+</div>
+<script>
+(()=>{var ut=Object.create;var xe=Object.defineProperty;var ft=Object.getOwnPropertyDescriptor;var gt=Object.getOwnPropertyNames;var ht=Object.getPrototypeOf,dt=Object.prototype.hasOwnProperty;var pt=(e,t)=>()=>{try{return t||e((t={exports:{}}).exports,t),t.exports}catch(n){throw t=0,n}};var Et=(e,t,n,l)=>{if(t&&typeof t=="object"||typeof t=="function")for(let d of gt(t))!dt.call(e,d)&&d!==n&&xe(e,d,{get:()=>t[d],enumerable:!(l=ft(t,d))||l.enumerable});return e};var bt=(e,t,n)=>(n=e!=null?ut(ht(e)):{},Et(t||!e||!e.__esModule?xe(n,"default",{value:e,enumerable:!0}):n,e));var Ke=pt((ln,Ge)=>{function Ie(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(t=>{let n=e[t],l=typeof n;(l==="object"||l==="function")&&!Object.isFrozen(n)&&Ie(n)}),e}var Z=class{constructor(t){t.data===void 0&&(t.data={}),this.data=t.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function Ce(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function k(e,...t){let n=Object.create(null);for(let l in e)n[l]=e[l];return t.forEach(function(l){for(let d in l)n[d]=l[d]}),n}var _t="</span>",Ne=e=>!!e.scope,Mt=(e,{prefix:t})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let n=e.split(".");return[`${t}${n.shift()}`,...n.map((l,d)=>`${l}${"_".repeat(d+1)}`)].join(" ")}return`${t}${e}`},oe=class{constructor(t,n){this.buffer="",this.classPrefix=n.classPrefix,t.walk(this)}addText(t){this.buffer+=Ce(t)}openNode(t){if(!Ne(t))return;let n=Mt(t.scope,{prefix:this.classPrefix});this.span(n)}closeNode(t){Ne(t)&&(this.buffer+=_t)}value(){return this.buffer}span(t){this.buffer+=`<span class="${t}">`}},Re=(e={})=>{let t={children:[]};return Object.assign(t,e),t},ae=class e{constructor(){this.rootNode=Re(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(t){this.top.children.push(t)}openNode(t){let n=Re({scope:t});this.add(n),this.stack.push(n)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(t){return this.constructor._walk(t,this.rootNode)}static _walk(t,n){return typeof n=="string"?t.addText(n):n.children&&(t.openNode(n),n.children.forEach(l=>this._walk(t,l)),t.closeNode(n)),t}static _collapse(t){typeof t!="string"&&t.children&&(t.children.every(n=>typeof n=="string")?t.children=[t.children.join("")]:t.children.forEach(n=>{e._collapse(n)}))}},le=class extends ae{constructor(t){super(),this.options=t}addText(t){t!==""&&this.add(t)}startScope(t){this.openNode(t)}endScope(){this.closeNode()}__addSublanguage(t,n){let l=t.root;n&&(l.scope=`language:${n}`),this.add(l)}toHTML(){return new oe(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function G(e){return e?typeof e=="string"?e:e.source:null}function De(e){return B("(?=",e,")")}function Ot(e){return B("(?:",e,")*")}function wt(e){return B("(?:",e,")?")}function B(...e){return e.map(n=>G(n)).join("")}function xt(e){let t=e[e.length-1];return typeof t=="object"&&t.constructor===Object?(e.splice(e.length-1,1),t):{}}function V(...e){return"("+(xt(e).capture?"":"?:")+e.map(l=>G(l)).join("|")+")"}function ke(e){return new RegExp(e.toString()+"|").exec("").length-1}function Nt(e,t){let n=e&&e.exec(t);return n&&n.index===0}var Rt=new RegExp(V(/\[(?:[^\\\]]|\\.)*\]/,/\(\?<(?![=!])[^>]+>/,/\(\?'[^']+'/,/\(\??/,/\\([1-9][0-9]*)/,/\\./));function fe(e,{joinWith:t}){let n=0;return e.map(l=>{n+=1;let d=n,_=G(l),c="";for(;_.length>0;){let r=Rt.exec(_);if(!r){c+=_;break}c+=_.substring(0,r.index),_=_.substring(r.index+r[0].length),r[0][0]==="\\"&&r[1]?c+="\\"+String(Number(r[1])+d):(c+=r[0],(r[0]==="("||/^\(\?[<']/.test(r[0]))&&n++)}return c}).map(l=>`(${l})`).join(t)}var yt=/\b\B/,ve="[a-zA-Z]\\w*",ge="[a-zA-Z_]\\w*",Le="\\b\\d+(\\.\\d+)?",Be="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Pe="\\b(0b[01]+)",St="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",At=(e={})=>{let t=/^#![ ]*\//;return e.binary&&(e.begin=B(t,/.*\b/,e.binary,/\b.*/)),k({scope:"meta",begin:t,end:/$/,relevance:0,"on:begin":(n,l)=>{n.index!==0&&l.ignoreMatch()}},e)},K={begin:"\\\\[\\s\\S]",relevance:0},Tt={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[K]},It={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[K]},Ct={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},Q=function(e,t,n={}){let l=k({scope:"comment",begin:e,end:t,contains:[]},n);l.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let d=V("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return l.contains.push({begin:B(/[ ]+/,"(",d,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),l},Dt=Q("//","$"),kt=Q("/\\*","\\*/"),vt=Q("#","$"),Lt={scope:"number",begin:Le,relevance:0},Bt={scope:"number",begin:Be,relevance:0},Pt={scope:"number",begin:Pe,relevance:0},$t={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[K,{begin:/\[/,end:/\]/,relevance:0,contains:[K]}]},Ht={scope:"title",begin:ve,relevance:0},Ut={scope:"title",begin:ge,relevance:0},jt={begin:"\\.\\s*"+ge,relevance:0},Gt=function(e){return Object.assign(e,{"on:begin":(t,n)=>{n.data._beginMatch=t[1]},"on:end":(t,n)=>{n.data._beginMatch!==t[1]&&n.ignoreMatch()}})},X=Object.freeze({__proto__:null,APOS_STRING_MODE:Tt,BACKSLASH_ESCAPE:K,BINARY_NUMBER_MODE:Pt,BINARY_NUMBER_RE:Pe,COMMENT:Q,C_BLOCK_COMMENT_MODE:kt,C_LINE_COMMENT_MODE:Dt,C_NUMBER_MODE:Bt,C_NUMBER_RE:Be,END_SAME_AS_BEGIN:Gt,HASH_COMMENT_MODE:vt,IDENT_RE:ve,MATCH_NOTHING_RE:yt,METHOD_GUARD:jt,NUMBER_MODE:Lt,NUMBER_RE:Le,PHRASAL_WORDS_MODE:Ct,QUOTE_STRING_MODE:It,REGEXP_MODE:$t,RE_STARTERS_RE:St,SHEBANG:At,TITLE_MODE:Ht,UNDERSCORE_IDENT_RE:ge,UNDERSCORE_TITLE_MODE:Ut});function Kt(e,t){e.input[e.index-1]==="."&&t.ignoreMatch()}function mt(e,t){e.className!==void 0&&(e.scope=e.className,delete e.className)}function Wt(e,t){t&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=Kt,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function Ft(e,t){Array.isArray(e.illegal)&&(e.illegal=V(...e.illegal))}function zt(e,t){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function Yt(e,t){e.relevance===void 0&&(e.relevance=1)}var Xt=(e,t)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let n=Object.assign({},e);Object.keys(e).forEach(l=>{delete e[l]}),e.keywords=n.keywords,e.begin=B(n.beforeMatch,De(n.begin)),e.starts={relevance:0,contains:[Object.assign(n,{endsParent:!0})]},e.relevance=0,delete n.beforeMatch},Zt=["of","and","for","in","not","or","if","then","parent","list","value"],Jt="keyword";function $e(e,t,n=Jt){let l=Object.create(null);return typeof e=="string"?d(n,e.split(" ")):Array.isArray(e)?d(n,e):Object.keys(e).forEach(function(_){Object.assign(l,$e(e[_],t,_))}),l;function d(_,c){t&&(c=c.map(r=>r.toLowerCase())),c.forEach(function(r){let u=r.split("|");l[u[0]]=[_,Vt(u[0],u[1])]})}}function Vt(e,t){return t?Number(t):Qt(e)?0:1}function Qt(e){return Zt.includes(e.toLowerCase())}var ye={},L=e=>{console.error(e)},Se=(e,...t)=>{console.log(`WARN: ${e}`,...t)},H=(e,t)=>{ye[`${e}/${t}`]||(console.log(`Deprecated as of ${e}. ${t}`),ye[`${e}/${t}`]=!0)},J=new Error;function He(e,t,{key:n}){let l=0,d=e[n],_={},c={};for(let r=1;r<=t.length;r++)c[r+l]=d[r],_[r+l]=!0,l+=ke(t[r-1]);e[n]=c,e[n]._emit=_,e[n]._multi=!0}function qt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw L("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),J;if(typeof e.beginScope!="object"||e.beginScope===null)throw L("beginScope must be object"),J;He(e,e.begin,{key:"beginScope"}),e.begin=fe(e.begin,{joinWith:""})}}function en(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw L("skip, excludeEnd, returnEnd not compatible with endScope: {}"),J;if(typeof e.endScope!="object"||e.endScope===null)throw L("endScope must be object"),J;He(e,e.end,{key:"endScope"}),e.end=fe(e.end,{joinWith:""})}}function tn(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function nn(e){tn(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),qt(e),en(e)}function sn(e){function t(c,r){return new RegExp(G(c),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(r?"g":""))}class n{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(r,u){u.position=this.position++,this.matchIndexes[this.matchAt]=u,this.regexes.push([u,r]),this.matchAt+=ke(r)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let r=this.regexes.map(u=>u[1]);this.matcherRe=t(fe(r,{joinWith:"|"}),!0),this.lastIndex=0}exec(r){this.matcherRe.lastIndex=this.lastIndex;let u=this.matcherRe.exec(r);if(!u)return null;let O=u.findIndex((P,I)=>I>0&&P!==void 0),M=this.matchIndexes[O];return u.splice(0,O),Object.assign(u,M)}}class l{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(r){if(this.multiRegexes[r])return this.multiRegexes[r];let u=new n;return this.rules.slice(r).forEach(([O,M])=>u.addRule(O,M)),u.compile(),this.multiRegexes[r]=u,u}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(r,u){this.rules.push([r,u]),u.type==="begin"&&this.count++}exec(r){let u=this.getMatcher(this.regexIndex);u.lastIndex=this.lastIndex;let O=u.exec(r);if(this.resumingScanAtSamePosition()&&!(O&&O.index===this.lastIndex)){let M=this.getMatcher(0);M.lastIndex=this.lastIndex+1,O=M.exec(r)}return O&&(this.regexIndex+=O.position+1,this.regexIndex===this.count&&this.considerAll()),O}}function d(c){let r=new l;return c.contains.forEach(u=>r.addRule(u.begin,{rule:u,type:"begin"})),c.terminatorEnd&&r.addRule(c.terminatorEnd,{type:"end"}),c.illegal&&r.addRule(c.illegal,{type:"illegal"}),r}function _(c,r){let u=c;if(c.isCompiled)return u;[mt,zt,nn,Xt].forEach(M=>M(c,r)),e.compilerExtensions.forEach(M=>M(c,r)),c.__beforeBegin=null,[Wt,Ft,Yt].forEach(M=>M(c,r)),c.isCompiled=!0;let O=null;return typeof c.keywords=="object"&&c.keywords.$pattern&&(c.keywords=Object.assign({},c.keywords),O=c.keywords.$pattern,delete c.keywords.$pattern),O=O||/\w+/,c.keywords&&(c.keywords=$e(c.keywords,e.case_insensitive)),u.keywordPatternRe=t(O,!0),r&&(c.begin||(c.begin=/\B|\b/),u.beginRe=t(u.begin),!c.end&&!c.endsWithParent&&(c.end=/\B|\b/),c.end&&(u.endRe=t(u.end)),u.terminatorEnd=G(u.end)||"",c.endsWithParent&&r.terminatorEnd&&(u.terminatorEnd+=(c.end?"|":"")+r.terminatorEnd)),c.illegal&&(u.illegalRe=t(c.illegal)),c.contains||(c.contains=[]),c.contains=[].concat(...c.contains.map(function(M){return rn(M==="self"?c:M)})),c.contains.forEach(function(M){_(M,u)}),c.starts&&_(c.starts,r),u.matcher=d(u),u}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=k(e.classNameAliases||{}),_(e)}function Ue(e){return e?e.endsWithParent||Ue(e.starts):!1}function rn(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(t){return k(e,{variants:null},t)})),e.cachedVariants?e.cachedVariants:Ue(e)?k(e,{starts:e.starts?k(e.starts):null}):Object.isFrozen(e)?k(e):e}var cn="11.12.0",ue=class extends Error{constructor(t,n){super(t),this.name="HTMLInjectionError",this.html=n}},ce=Ce,Ae=k,Te=Symbol("nomatch"),on=7,je=function(e){let t=Object.create(null),n=Object.create(null),l=[],d=!0,_="Could not find the language '{}', did you forget to load/include a language module?",c={disableAutodetect:!0,name:"Plain text",contains:[]},r={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:le};function u(i){return r.noHighlightRe.test(i)}function O(i){let a=i.className+" ";a+=i.parentNode?i.parentNode.className:"";let h=r.languageDetectRe.exec(a);if(h){let E=C(h[1]);return E||(Se(_.replace("{}",h[1])),Se("Falling back to no-highlight mode for this block.",i)),E?h[1]:"no-highlight"}return a.split(/\s+/).find(E=>u(E)||C(E))}function M(i,a,h){let E="",w="";typeof a=="object"?(E=i,h=a.ignoreIllegals,w=a.language):(H("10.7.0","highlight(lang, code, ...args) has been deprecated."),H("10.7.0",`Please use highlight(code, options) instead.
+(see the highlight.js issue tracker)`),w=i,E=a),h===void 0&&(h=!0);let y={code:E,language:w};W("before:highlight",y);let D=y.result?y.result:P(y.language,y.code,h);return D.code=y.code,W("after:highlight",D),D}function P(i,a,h,E){let w=Object.create(null);function y(s,o){return s.keywords[o]}function D(){if(!f.keywords){x.addText(b);return}let s=0;f.keywordPatternRe.lastIndex=0;let o=f.keywordPatternRe.exec(b),g="";for(;o;){g+=b.substring(s,o.index);let p=A.case_insensitive?o[0].toLowerCase():o[0],N=y(f,p);if(N){let[T,at]=N;if(x.addText(g),g="",w[p]=(w[p]||0)+1,w[p]<=on&&(Y+=at),T.startsWith("_"))g+=o[0];else{let lt=A.classNameAliases[T]||T;S(o[0],lt)}}else g+=o[0];s=f.keywordPatternRe.lastIndex,o=f.keywordPatternRe.exec(b)}g+=b.substring(s),x.addText(g)}function F(){if(b==="")return;let s=null;if(typeof f.subLanguage=="string"){if(!t[f.subLanguage]){x.addText(b);return}s=P(f.subLanguage,b,!0,we[f.subLanguage]),we[f.subLanguage]=s._top}else s=$(b,f.subLanguage.length?f.subLanguage:null);f.relevance>0&&(Y+=s.relevance),x.__addSublanguage(s._emitter,s.language)}function R(){f.subLanguage!=null?F():D(),b=""}function S(s,o){s!==""&&(x.startScope(o),x.addText(s),x.endScope())}function be(s,o){let g=1,p=o.length-1;for(;g<=p;){if(!s._emit[g]){g++;continue}let N=A.classNameAliases[s[g]]||s[g],T=o[g];N?S(T,N):(b=T,D(),b=""),g++}}function _e(s,o){return s.scope&&typeof s.scope=="string"&&x.openNode(A.classNameAliases[s.scope]||s.scope),s.beginScope&&(s.beginScope._wrap?(S(b,A.classNameAliases[s.beginScope._wrap]||s.beginScope._wrap),b=""):s.beginScope._multi&&(be(s.beginScope,o),b="")),f=Object.create(s,{parent:{value:f}}),f}function Me(s,o,g){let p=Nt(s.endRe,g);if(p){if(s["on:end"]){let N=new Z(s);s["on:end"](o,N),N.isMatchIgnored&&(p=!1)}if(p){for(;s.endsParent&&s.parent;)s=s.parent;return s}}if(s.endsWithParent)return Me(s.parent,o,g)}function it(s){return f.matcher.regexIndex===0?(b+=s[0],1):(re=!0,0)}function st(s){let o=s[0],g=s.rule,p=new Z(g),N=[g.__beforeBegin,g["on:begin"]];for(let T of N)if(T&&(T(s,p),p.isMatchIgnored))return it(o);return g.skip?b+=o:(g.excludeBegin&&(b+=o),R(),!g.returnBegin&&!g.excludeBegin&&(b=o)),_e(g,s),g.returnBegin?0:o.length}function rt(s){let o=s[0],g=a.substring(s.index),p=Me(f,s,g);if(!p)return Te;let N=f;f.endScope&&f.endScope._wrap?(R(),S(o,f.endScope._wrap)):f.endScope&&f.endScope._multi?(R(),be(f.endScope,s)):N.skip?b+=o:(N.returnEnd||N.excludeEnd||(b+=o),R(),N.excludeEnd&&(b=o));do f.scope&&x.closeNode(),!f.skip&&!f.subLanguage&&(Y+=f.relevance),f=f.parent;while(f!==p.parent);return p.starts&&_e(p.starts,s),N.returnEnd?0:o.length}function ct(){let s=[];for(let o=f;o!==A;o=o.parent)o.scope&&s.unshift(o.scope);s.forEach(o=>x.openNode(o))}let z={};function Oe(s,o){let g=o&&o[0];if(b+=s,g==null)return R(),0;if(z.type==="begin"&&o.type==="end"&&z.index===o.index&&g===""){if(b+=a.slice(o.index,o.index+1),!d){let p=new Error(`0 width match regex (${i})`);throw p.languageName=i,p.badRule=z.rule,p}return 1}if(z=o,o.type==="begin")return st(o);if(o.type==="illegal"&&!h){let p=new Error('Illegal lexeme "'+g+'" for mode "'+(f.scope||"<unnamed>")+'"');throw p.mode=f,p}else if(o.type==="end"){let p=rt(o);if(p!==Te)return p}if(o.type==="illegal"&&g==="")return o.index===a.length||(b+=`
+`),1;if(se>1e5&&se>o.index*3)throw new Error("potential infinite loop, way more iterations than matches");return b+=g,g.length}let A=C(i);if(!A)throw L(_.replace("{}",i)),new Error('Unknown language: "'+i+'"');let ot=sn(A),ie="",f=E||ot,we={},x=new r.__emitter(r);ct();let b="",Y=0,v=0,se=0,re=!1;try{if(A.__emitTokens)A.__emitTokens(a,x);else{for(f.matcher.considerAll();;){se++,re?re=!1:f.matcher.considerAll(),f.matcher.lastIndex=v;let s=f.matcher.exec(a);if(!s)break;let o=a.substring(v,s.index),g=Oe(o,s);v=s.index+g}Oe(a.substring(v))}return x.finalize(),ie=x.toHTML(),{language:i,value:ie,relevance:Y,illegal:!1,_emitter:x,_top:f}}catch(s){if(s.message&&s.message.includes("Illegal"))return{language:i,value:ce(a),illegal:!0,relevance:0,_illegalBy:{message:s.message,index:v,context:a.slice(v-100,v+100),mode:s.mode,resultSoFar:ie},_emitter:x};if(d)return{language:i,value:ce(a),illegal:!1,relevance:0,errorRaised:s,_emitter:x,_top:f};throw s}}function I(i){let a={value:ce(i),illegal:!1,relevance:0,_top:c,_emitter:new r.__emitter(r)};return a._emitter.addText(i),a}function $(i,a){a=a||r.languages||Object.keys(t);let h=I(i),E=a.filter(C).filter(Ee).map(R=>P(R,i,!1));E.unshift(h);let w=E.sort((R,S)=>{if(R.relevance!==S.relevance)return S.relevance-R.relevance;if(R.language&&S.language){if(C(R.language).supersetOf===S.language)return 1;if(C(S.language).supersetOf===R.language)return-1}return 0}),[y,D]=w,F=y;return F.secondBest=D,F}function te(i,a,h){let E=a&&n[a]||h;i.classList.add("hljs"),i.classList.add(`language-${E}`)}function ne(i){let a=null,h=O(i);if(u(h))return;if(W("before:highlightElement",{el:i,language:h}),i.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",i);return}if(i.children.length>0&&(r.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("(see the highlight.js security wiki)"),console.warn("The element with unescaped HTML:"),console.warn(i)),r.throwUnescapedHTML))throw new ue("One of your code blocks includes unescaped HTML.",i.innerHTML);a=i;let E=a.textContent,w=h?M(E,{language:h,ignoreIllegals:!0}):$(E);i.innerHTML=w.value,i.dataset.highlighted="yes",te(i,h,w.language),i.result={language:w.language,re:w.relevance,relevance:w.relevance},w.secondBest&&(i.secondBest={language:w.secondBest.language,relevance:w.secondBest.relevance}),W("after:highlightElement",{el:i,result:w,text:E})}function Ye(i){r=Ae(r,i)}let Xe=()=>{m(),H("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function Ze(){m(),H("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let de=!1;function m(){function i(){m()}if(document.readyState==="loading"){de||window.addEventListener("DOMContentLoaded",i,!1),de=!0;return}document.querySelectorAll(r.cssSelector).forEach(ne)}function Je(i,a){let h=null;try{h=a(e)}catch(E){if(L("Language definition for '{}' could not be registered.".replace("{}",i)),d)L(E);else throw E;h=c}h.name||(h.name=i),t[i]=h,h.rawDefinition=a.bind(null,e),h.aliases&&pe(h.aliases,{languageName:i})}function Ve(i){delete t[i];for(let a of Object.keys(n))n[a]===i&&delete n[a]}function Qe(){return Object.keys(t)}function C(i){return i=(i||"").toLowerCase(),t[i]||t[n[i]]}function pe(i,{languageName:a}){typeof i=="string"&&(i=[i]),i.forEach(h=>{n[h.toLowerCase()]=a})}function Ee(i){let a=C(i);return a&&!a.disableAutodetect}function qe(i){i["before:highlightBlock"]&&!i["before:highlightElement"]&&(i["before:highlightElement"]=a=>{i["before:highlightBlock"](Object.assign({block:a.el},a))}),i["after:highlightBlock"]&&!i["after:highlightElement"]&&(i["after:highlightElement"]=a=>{i["after:highlightBlock"](Object.assign({block:a.el},a))})}function et(i){qe(i),l.push(i)}function tt(i){let a=l.indexOf(i);a!==-1&&l.splice(a,1)}function W(i,a){let h=i;l.forEach(function(E){E[h]&&E[h](a)})}function nt(i){return H("10.7.0","highlightBlock will be removed entirely in v12.0"),H("10.7.0","Please use highlightElement now."),ne(i)}Object.assign(e,{highlight:M,highlightAuto:$,highlightAll:m,highlightElement:ne,highlightBlock:nt,configure:Ye,initHighlighting:Xe,initHighlightingOnLoad:Ze,registerLanguage:Je,unregisterLanguage:Ve,listLanguages:Qe,getLanguage:C,registerAliases:pe,autoDetection:Ee,inherit:Ae,addPlugin:et,removePlugin:tt}),e.debugMode=function(){d=!1},e.safeMode=function(){d=!0},e.versionString=cn,e.regex={concat:B,lookahead:De,either:V,optional:wt,anyNumberOfTimes:Ot};for(let i in X)typeof X[i]=="object"&&Ie(X[i]);return Object.assign(e,X),e},U=je({});U.newInstance=()=>je({});Ge.exports=U;U.HighlightJS=U;U.default=U});var me=bt(Ke(),1);var he=me.default;var j="[0-9](_*[0-9])*",q=`\\.(${j})`,ee="[0-9a-fA-F](_*[0-9a-fA-F])*",We={className:"number",variants:[{begin:`(\\b(${j})((${q})|\\.)?|(${q}))[eE][+-]?(${j})[fFdD]?\\b`},{begin:`\\b(${j})((${q})[fFdD]?\\b|\\.([fFdD]\\b)?)`},{begin:`(${q})[fFdD]?\\b`},{begin:`\\b(${j})[fFdD]\\b`},{begin:`\\b0[xX]((${ee})\\.?|(${ee})?\\.(${ee}))[pP][+-]?(${j})[fFdD]?\\b`},{begin:"\\b(0|[1-9](_*[0-9])*)[lL]?\\b"},{begin:`\\b0[xX](${ee})[lL]?\\b`},{begin:"\\b0(_*[0-7])*[lL]?\\b"},{begin:"\\b0[bB][01](_*[01])*[lL]?\\b"}],relevance:0};function Fe(e,t,n){return n===-1?"":e.replace(t,l=>Fe(e,t,n-1))}function ze(e){let t=e.regex,n="[\xC0-\u02B8a-zA-Z_$][\xC0-\u02B8a-zA-Z_$0-9]*",l="(?:(?:\\s*\\[\\s*])+)?",d=n+"<@@@>"+l,c="(?:"+("\\?(?:\\s+(?:extends|super)\\s+"+d+")?")+"|"+d+")",r=Fe("(?:\\s*<\\s*"+c+"(?:\\s*,\\s*"+c+")*\\s*>)?",/<@@@>/g,2),I={keyword:["synchronized","abstract","private","var","static","if","const ","for","while","strictfp","finally","protected","import","native","final","void","enum","else","break","transient","catch","instanceof","volatile","case","assert","package","default","public","try","switch","continue","throws","protected","public","private","module","requires","exports","do","sealed","yield","permits","goto","when"],literal:["false","true","null"],type:["char","boolean","long","float","int","byte","short","double"],built_in:["super","this"]},$={className:"meta",begin:"@"+n,contains:[{begin:/\(/,end:/\)/,contains:["self"]}]},te={className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[e.C_BLOCK_COMMENT_MODE],endsParent:!0};return{name:"Java",aliases:["jsp"],keywords:I,illegal:/<\/|#/,contains:[e.COMMENT("/\\*\\*","\\*/",{relevance:0,contains:[{begin:/\w+@/,relevance:0},{className:"doctag",begin:"@[A-Za-z]+"}]}),{begin:/import java\.[a-z]+\./,keywords:"import",relevance:2},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE,{begin:/"""/,end:/"""/,className:"string",contains:[e.BACKSLASH_ESCAPE]},e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,{match:[/\b(?:class|interface|enum|extends|implements|new)/,/\s+/,n],className:{1:"keyword",3:"title.class"}},{match:/non-sealed/,scope:"keyword"},{beginKeywords:"new throw return else yield assert",relevance:0},{begin:[n,t.concat(r,l,/\s+/),n,l,/\s*/,/=(?!=)/],className:{1:"type",3:"variable",6:"operator"}},{begin:[/record/,/\s+/,n],className:{1:"keyword",3:"title.class"},contains:[te,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},{begin:[n,t.concat(r,l,/\s+/),n,/\s*(?=\()/],className:{1:"type",3:"title.function"},keywords:I,contains:[{className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[$,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,We,e.C_BLOCK_COMMENT_MODE]},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},We,$]}}he.registerLanguage("java",ze);window.hljs=he;})();
+</script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---- 1. syntax highlighting -------------------------------------- */
+  function highlight() {
+    if (!window.hljs) return;
+    var blocks = document.querySelectorAll('pre code.language-java');
+    for (var i = 0; i < blocks.length; i++) {
+      try { window.hljs.highlightElement(blocks[i]); } catch (e) {}
+    }
+  }
+
+  /* ---- 2. every solution / reveal starts closed --------------------- */
+  function closeAll() {
+    var d = document.querySelectorAll('details.soln');
+    for (var i = 0; i < d.length; i++) { d[i].open = false; }
+  }
+
+  /* ---- 3. show all / hide all -------------------------------------- */
+  function wireToolbar() {
+    var show = document.getElementById('showAll');
+    var hide = document.getElementById('hideAll');
+    function setAll(v) {
+      var d = document.querySelectorAll('details.soln');
+      for (var i = 0; i < d.length; i++) { d[i].open = v; }
+    }
+    if (show) show.addEventListener('click', function () { setAll(true); });
+    if (hide) hide.addEventListener('click', function () { setAll(false); });
+  }
+
+  /* ---- 4. live-coding editors -------------------------------------- */
+  var INDENT = '    ';
+
+  function wireEditors() {
+    var eds = document.querySelectorAll('.editor');
+    for (var i = 0; i < eds.length; i++) { wireOne(eds[i]); }
+  }
+
+  function wireOne(box) {
+    var ta = box.querySelector('textarea');
+    if (!ta) return;
+    var starter = ta.value;
+
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Tab' || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+      ev.preventDefault();
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+
+      if (s === e && !ev.shiftKey) {
+        ta.value = v.slice(0, s) + INDENT + v.slice(e);
+        ta.selectionStart = ta.selectionEnd = s + INDENT.length;
+        return;
+      }
+      /* block indent / outdent over the selected lines */
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var le = v.indexOf('\n', e);
+      if (le === -1) le = v.length;
+      var seg = v.slice(ls, le);
+      var lines = seg.split('\n');
+      var delta0 = 0, total = 0;
+
+      for (var i = 0; i < lines.length; i++) {
+        if (ev.shiftKey) {
+          var m = lines[i].match(/^(\t| {1,4})/);
+          if (m) {
+            lines[i] = lines[i].slice(m[0].length);
+            if (i === 0) delta0 = -m[0].length;
+            total -= m[0].length;
+          }
+        } else {
+          lines[i] = INDENT + lines[i];
+          if (i === 0) delta0 = INDENT.length;
+          total += INDENT.length;
+        }
+      }
+      ta.value = v.slice(0, ls) + lines.join('\n') + v.slice(le);
+      ta.selectionStart = Math.max(ls, s + delta0);
+      ta.selectionEnd = Math.max(ta.selectionStart, e + total);
+    });
+
+    /* keep the indent of the current line when Enter is pressed */
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Enter' || ev.shiftKey || ev.ctrlKey || ev.metaKey) return;
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+      if (s !== e) return;
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var lead = (v.slice(ls, s).match(/^[ \t]*/) || [''])[0];
+      var extra = /[{(\[]\s*$/.test(v.slice(ls, s)) ? INDENT : '';
+      if (!lead && !extra) return;
+      ev.preventDefault();
+      var ins = '\n' + lead + extra;
+      ta.value = v.slice(0, s) + ins + v.slice(e);
+      ta.selectionStart = ta.selectionEnd = s + ins.length;
+    });
+
+    var rst = box.querySelector('[data-act="reset"]');
+    if (rst) rst.addEventListener('click', function () {
+      ta.value = starter;
+      ta.focus();
+      flash(box, 'Reset to starter code');
+    });
+
+    var cpy = box.querySelector('[data-act="copy"]');
+    if (cpy) cpy.addEventListener('click', function () {
+      var done = function () { flash(box, 'Copied — paste it into your IDE'); };
+      var fail = function () { flash(box, 'Copy failed — select the text and press Ctrl/Cmd+C'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value).then(done, function () { legacy(ta, done, fail); });
+      } else {
+        legacy(ta, done, fail);
+      }
+    });
+  }
+
+  function legacy(ta, done, fail) {
+    try {
+      var st = ta.selectionStart, en = ta.selectionEnd;
+      ta.select();
+      var ok = document.execCommand('copy');
+      ta.selectionStart = st; ta.selectionEnd = en;
+      ok ? done() : fail();
+    } catch (e) { fail(); }
+  }
+
+  function flash(box, msg) {
+    var f = box.querySelector('.foot');
+    if (!f) return;
+    if (f.getAttribute('data-base') === null || f.getAttribute('data-base') === undefined) {
+      f.setAttribute('data-base', f.textContent);
+    }
+    f.textContent = msg;
+    window.setTimeout(function () { f.textContent = f.getAttribute('data-base'); }, 2200);
+  }
+
+  /* ---- go ----------------------------------------------------------- */
+  function init() {
+    highlight();
+    closeAll();
+    wireToolbar();
+    wireEditors();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  /* belt and braces: some browsers restore <details> state on soft reload */
+  window.addEventListener('pageshow', closeAll);
+})();
+</script>
+</body>
+</html>

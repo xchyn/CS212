@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class 14 — Inheritance | CSCI 212</title>
+<style>
+:root{
+  --ink:#0f172a; --ink2:#334155; --muted:#64748b; --line:#e2e8f0;
+  --bg:#ffffff; --bg2:#f8fafc;
+  --obj:#4f46e5; --def:#2563eb; --ex:#059669; --alg:#7c3aed;
+  --key:#b45309; --warn:#dc2626; --qc:#0891b2; --prac:#be185d; --sum:#475569;
+  --edit:#ea580c; --edit-bg:#fff7ed;
+  --code-bg:#0d1117; --code-bd:#000000;   /* read-only listings: black */
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px 80px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:#0f172a;color:#e2e8f0;font-size:13.5px;
+  border-bottom:3px solid var(--obj);
+}
+.topbar .inner{max-width:900px;margin:0 auto;padding:10px 22px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.topbar a{color:#e2e8f0;text-decoration:none;border-bottom:1px solid transparent}
+.topbar a:hover{border-bottom-color:#94a3b8}
+.topbar .course{font-weight:700;letter-spacing:.02em}
+.topbar .sep{color:#475569}
+.topbar .spacer{flex:1}
+
+/* ---------- title block ---------- */
+.titleblock{padding:34px 0 10px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.eyebrow{
+  font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--obj);margin-bottom:8px;
+}
+.titleblock h1{font-size:33px;line-height:1.2;margin:0 0 10px;letter-spacing:-.015em}
+.titleblock .sub{margin:0;color:var(--muted);font-size:17px;line-height:1.5}
+
+h2{
+  font-size:24px;margin:46px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line);letter-spacing:-.01em;scroll-margin-top:14px;
+}
+h2 .num{color:var(--obj);font-weight:800;margin-right:11px}
+h3{font-size:18.5px;margin:30px 0 10px;color:var(--ink)}
+h4{font-size:16px;margin:20px 0 8px;color:var(--ink2)}
+p{margin:12px 0}
+ul,ol{margin:12px 0;padding-left:26px}
+li{margin:6px 0}
+a{color:var(--def)}
+hr{border:0;border-top:1px solid var(--line);margin:30px 0}
+strong{color:var(--ink)}
+.muted{color:var(--muted)}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--bg2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 20px 16px;margin:22px 0;
+}
+.toc .th{
+  font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;
+}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:30px}
+.toc li{margin:3px 0;font-size:14.5px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- show all / hide all ---------- */
+.tools{
+  display:flex;gap:9px;align-items:center;flex-wrap:wrap;
+  padding:11px 15px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:9px;margin:22px 0;font-size:13.5px;
+}
+.tools .lab{font-weight:700;color:var(--ink2)}
+.tools button{
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  background:#fff;color:var(--ink2);border:1px solid #cbd5e1;
+  border-radius:6px;padding:4px 12px;
+}
+.tools button:hover{background:var(--obj);border-color:var(--obj);color:#fff}
+.tools .muted{font-size:12.5px}
+
+/* ---------- boxes ---------- */
+.box{border:1px solid var(--line);border-left:5px solid var(--muted);border-radius:8px;margin:22px 0;overflow:hidden;background:#fff}
+.box>.hd{
+  padding:9px 16px;font-size:12.5px;font-weight:700;
+  letter-spacing:.075em;text-transform:uppercase;color:#fff;background:var(--muted);
+}
+.box>.hd .tag{margin-left:5px;font-weight:500;text-transform:none;letter-spacing:0;opacity:.92;font-size:13px}
+.box>.bd{padding:4px 18px 14px}
+.box>.bd>:first-child{margin-top:12px}
+.box>.bd>:last-child{margin-bottom:2px}
+
+.box.obj{border-left-color:var(--obj)}  .box.obj>.hd{background:var(--obj)}
+.box.def{border-left-color:var(--def)}  .box.def>.hd{background:var(--def)}
+.box.ex{border-left-color:var(--ex)}    .box.ex>.hd{background:var(--ex)}
+.box.alg{border-left-color:var(--alg)}  .box.alg>.hd{background:var(--alg)}
+.box.key{border-left-color:var(--key)}  .box.key>.hd{background:var(--key)}
+.box.warn{border-left-color:var(--warn)}.box.warn>.hd{background:var(--warn)}
+.box.qc{border-left-color:var(--qc)}    .box.qc>.hd{background:var(--qc)}
+.box.prac{border-left-color:var(--prac)}.box.prac>.hd{background:var(--prac)}
+.box.sum{border-left-color:var(--sum)}  .box.sum>.hd{background:var(--sum)}
+
+.box.obj{background:#f5f5ff}
+.box.qc{background:#f0fbfe}
+.box.warn{background:#fff7f7}
+.box.key{background:#fffbf2}
+.box.sum{background:#f8fafc}
+
+/* ---------- code ---------- */
+/* Read-only listings sit on black, matching CSCI 211, so a code block is never
+   mistaken for the editable live-coding box. */
+pre{
+  margin:14px 0;padding:13px 15px;overflow-x:auto;
+  background:var(--code-bg);border:1px solid var(--code-bd);border-radius:8px;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;color:#c9d1d9;
+}
+pre code{font-family:inherit;font-size:inherit;background:none;padding:0;border:0;color:inherit;display:block}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef2f7;
+  border:1px solid #e2e8f0;border-radius:4px;padding:1px 5px;color:#0b3a5b;
+}
+.filename{
+  font-family:var(--mono);font-size:12px;color:#475569;
+  margin:16px 0 -9px;font-weight:600;
+}
+
+/* comparison block: another language, never syntax-highlighted. Dark like the
+   Java listings, but desaturated and dashed so it reads as "not this course". */
+pre.cmp{background:#161b22;border-style:dashed;border-color:#3f4650;color:#9aa4b2}
+pre.cmp code{color:#9aa4b2}
+
+/* shell commands you type */
+pre.sh{background:#1e293b;border-color:#1e293b;color:#e2e8f0;position:relative;padding-top:26px}
+pre.sh code{color:#e2e8f0}
+pre.sh::before{
+  content:"Terminal";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#86efac;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* output / terminal blocks */
+pre.out{background:#111d33;border-color:#111d33;color:#e2e8f0;position:relative;padding-top:26px}
+pre.out code{color:#e2e8f0}
+pre.out::before{
+  content:"Output";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#7dd3fc;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+pre.err{background:#1f1416;border-color:#7f1d1d;color:#fecdd3;padding-top:26px;position:relative}
+pre.err code{color:#fecdd3}
+pre.err::before{
+  content:"Compiler message";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#fda4af;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* ---- highlight.js, GitHub-dark palette (hand-written, no external file) ---- */
+.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-template-tag,
+.hljs-template-variable,.hljs-type,.hljs-variable.language_{color:#ff7b72}
+.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#d2a8ff}
+.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,
+.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable{color:#79c0ff}
+.hljs-meta .hljs-string,.hljs-regexp,.hljs-string{color:#a5d6ff}
+.hljs-built_in,.hljs-symbol{color:#ffa657}
+.hljs-code,.hljs-comment,.hljs-formula{color:#8b949e;font-style:italic}
+.hljs-name,.hljs-quote,.hljs-selector-pseudo,.hljs-selector-tag{color:#7ee787}
+.hljs-subst{color:#c9d1d9}
+.hljs-section{color:#1f6feb;font-weight:700}
+.hljs-bullet{color:#f2cc60}
+.hljs-emphasis{color:#c9d1d9;font-style:italic}
+.hljs-strong{color:#c9d1d9;font-weight:700}
+
+/* ---------- trace tables ---------- */
+table{border-collapse:collapse;margin:16px 0;font-size:14px;width:100%}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg2);font-weight:700;font-size:13px}
+table.trace td:first-child,table.trace th:first-child{white-space:nowrap}
+table code{font-size:.88em}
+
+/* ---------- multi-part questions ---------- */
+.part{margin:16px 0;padding-left:14px;border-left:2px solid #cbd5e1}
+.part .q{margin:0 0 8px}
+.part .pl{font-weight:700;color:var(--qc);margin-right:6px}
+
+/* ---------- collapsible solutions ---------- */
+details.soln{margin:10px 0 4px}
+details.soln>summary{
+  list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  font-size:12.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:#fff;background:var(--sum);border-radius:6px;padding:5px 13px;
+  user-select:none;
+}
+details.soln>summary::-webkit-details-marker{display:none}
+details.soln>summary::before{content:"\25B6";font-size:9px;transition:transform .15s}
+details.soln[open]>summary::before{transform:rotate(90deg)}
+details.soln>summary::after{content:"Show Answer"}
+details.soln[open]>summary::after{content:"Hide Answer"}
+details.soln>summary:hover{filter:brightness(1.18)}
+
+details.soln.reveal>summary{background:var(--ex)}
+details.soln.reveal>summary::after{content:"Show Output & Explanation"}
+details.soln.reveal[open]>summary::after{content:"Hide Output & Explanation"}
+details.soln.reveal.noout>summary::after{content:"Show Explanation"}
+details.soln.reveal.noout[open]>summary::after{content:"Hide Explanation"}
+
+.ans{
+  margin-top:11px;padding:2px 16px 10px;background:#fff;
+  border:1px solid var(--line);border-left:3px solid var(--sum);border-radius:7px;
+}
+details.soln.reveal .ans{border-left-color:var(--ex)}
+.ans>:first-child{margin-top:12px}
+.ans>:last-child{margin-bottom:6px}
+
+/* ---------- live coding editor ---------- */
+.editor{
+  margin:18px 0;border:2px dashed var(--edit);border-radius:9px;
+  background:var(--edit-bg);overflow:hidden;
+}
+.editor .ehd{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:7px 13px;background:var(--edit);color:#fff;
+  font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+}
+.editor .ehd .etitle{flex:1}
+.editor .ehd button{
+  font:inherit;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  cursor:pointer;background:rgba(255,255,255,.16);color:#fff;
+  border:1px solid rgba(255,255,255,.5);border-radius:5px;padding:3px 10px;
+}
+.editor .ehd button:hover{background:#fff;color:var(--edit)}
+.editor textarea{
+  display:block;width:100%;border:0;outline:0;resize:vertical;
+  padding:12px 15px;background:var(--edit-bg);color:#431407;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;
+  tab-size:4;-moz-tab-size:4;min-height:150px;
+}
+.editor textarea:focus{background:#fff}
+.editor .foot{
+  padding:5px 13px 7px;font-size:11.5px;color:#9a3412;background:#ffedd5;
+  border-top:1px solid #fed7aa;
+}
+
+/* ---------- prev/next nav ---------- */
+.pagenav{display:flex;gap:14px;margin:52px 0 0;flex-wrap:wrap}
+.pagenav a,.pagenav span.disabled{
+  flex:1 1 260px;display:block;text-decoration:none;
+  border:1px solid var(--line);border-radius:9px;padding:12px 16px;background:#fff;
+}
+.pagenav a:hover{border-color:var(--obj);background:var(--bg2)}
+.pagenav .dir{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.pagenav .ttl{font-size:15px;font-weight:600;color:var(--ink);margin-top:3px}
+.pagenav .next{text-align:right}
+.pagenav span.disabled{opacity:.4}
+.pagenav span.disabled .ttl{color:var(--muted)}
+
+footer.pf{
+  margin-top:40px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--muted);text-align:center;
+}
+
+/* ---------- index page ---------- */
+table.sched{font-size:14.5px}
+table.sched th{background:#0f172a;color:#fff;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+table.sched td:first-child{white-space:nowrap;font-weight:700;color:var(--muted);width:60px}
+table.sched tr.examrow td{background:#fff1f2}
+table.sched tr.revrow td{background:#fffbeb}
+table.sched a{font-weight:600;text-decoration:none}
+table.sched a:hover{text-decoration:underline}
+
+
+/* ---------- release gating ---------- */
+.pending{
+  margin-top:4px;font-size:11.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:#b45309;
+}
+.pagenav span.disabled .pending{color:#b45309}
+table.sched tr.pendingrow td{background:#fcfcfd}
+table.sched .unrel{color:var(--muted)}
+table.sched .pending{display:block;margin-top:2px}
+table.sched td.cn{white-space:nowrap;width:52px;font-weight:700;color:var(--muted)}
+table.sched td.dt{white-space:nowrap;width:104px;color:var(--muted);font-size:13.5px}
+table.sched tr.offrow td{background:#f1f5f9;color:var(--muted);font-style:italic}
+.refcard{
+  display:block;text-decoration:none;border:1px solid var(--line);
+  border-left:5px solid var(--alg);border-radius:9px;padding:13px 17px;
+  margin:22px 0;background:#faf9ff;
+}
+.refcard:hover{background:#f5f3ff;border-color:var(--alg)}
+.refcard .rl{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--alg)}
+.refcard .rt{font-size:16px;font-weight:600;color:var(--ink);margin-top:3px}
+.refcard .rd{font-size:14px;color:var(--muted);margin-top:4px}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,.tools,.pagenav,.pending{display:none !important}
+  html,body{width:100%;font-size:10pt}
+  .wrap{max-width:100%;width:100%;padding:0}
+  /* a wide <pre> must wrap rather than widen the page and clip every other
+     element at the paper edge */
+  /* Screen shows code on black; paper does not. Restore a dark-on-light palette
+     for print only, or the dark theme's light tokens vanish on white. */
+  pre{white-space:pre-wrap;overflow:visible;overflow-wrap:anywhere;font-size:8.6pt;
+      background:#f8fafc !important;color:#24292e !important;border-color:#cbd5e1 !important;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  pre code{color:#24292e !important}
+  pre.cmp{background:#fff !important;color:#475569 !important;border-color:#94a3b8 !important}
+  pre.cmp code{color:#475569 !important}
+  pre .hljs-doctag,pre .hljs-keyword,pre .hljs-meta .hljs-keyword,pre .hljs-template-tag,
+  pre .hljs-template-variable,pre .hljs-type,pre .hljs-variable.language_{color:#d73a49 !important}
+  pre .hljs-title,pre .hljs-title.class_,pre .hljs-title.class_.inherited__,
+  pre .hljs-title.function_{color:#6f42c1 !important}
+  pre .hljs-attr,pre .hljs-attribute,pre .hljs-literal,pre .hljs-meta,pre .hljs-number,
+  pre .hljs-operator,pre .hljs-selector-attr,pre .hljs-selector-class,pre .hljs-selector-id,
+  pre .hljs-variable{color:#005cc5 !important}
+  pre .hljs-meta .hljs-string,pre .hljs-regexp,pre .hljs-string{color:#032f62 !important}
+  pre .hljs-built_in,pre .hljs-symbol{color:#e36209 !important}
+  pre .hljs-code,pre .hljs-comment,pre .hljs-formula{color:#6a737d !important}
+  pre .hljs-name,pre .hljs-quote,pre .hljs-selector-pseudo,
+  pre .hljs-selector-tag{color:#22863a !important}
+  pre .hljs-subst,pre .hljs-emphasis,pre .hljs-strong{color:#24292e !important}
+  .filename{color:#475569 !important}
+  table{table-layout:fixed;width:100%;word-wrap:break-word;overflow-wrap:anywhere}
+  .box,.toc{max-width:100%}
+  a{color:var(--ink);text-decoration:none}
+  .box,.part,pre,table,.editor{break-inside:avoid;page-break-inside:avoid}
+  h2{break-after:avoid;page-break-after:avoid}
+  details.soln>summary{display:none !important}
+  details.soln:not([open])>.ans{display:none !important}
+  details.soln::before{
+    content:"Answer withheld — see the online notes.";
+    display:block;font-size:9pt;font-style:italic;color:#64748b;margin:6px 0;
+  }
+  details.soln[open]::before{content:""}
+  .editor textarea{display:none !important}
+  .editor{border:1.5px solid #fdba74 !important;background:#fff;border-style:solid}
+  .editor .ehd{background:#fff !important;color:#9a3412 !important;border-bottom:1px solid #fdba74}
+  .editor .ehd button{display:none}
+  .editor .foot{display:none}
+  .editor::after{content:"";display:block;height:2.1in;background:#fff}
+  pre.out,pre.sh{background:#f1f5f9 !important;color:#0f172a !important;border-color:#94a3b8 !important}
+  pre.err{background:#fef2f2 !important;color:#7f1d1d !important;border-color:#fca5a5 !important}
+  pre.out code,pre.sh code{color:#0f172a !important}
+  pre.err code{color:#7f1d1d !important}
+  pre.out::before,pre.sh::before{color:#475569}
+  pre.err::before{color:#b91c1c}
+  .box>.hd{color:#000;background:#fff !important;border-bottom:1px solid #cbd5e1}
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="inner">
+<span class="course">CSCI 212</span>
+<span class="sep">|</span>
+<a href="index.html">Course index</a>
+<span class="sep">|</span>
+<span>Class 14 of 28</span>
+<span class="sep">|</span>
+<span>Tuesday, October 20</span>
+<span class="spacer"></span>
+<span>Queens College, CUNY</span>
+</div></div>
+<div class="wrap">
+<div class="titleblock">
+  <div class="eyebrow">Session 14 &middot; Lecture 12</div>
+  <h1>Inheritance</h1>
+  <p class="sub">How one class can be built on top of another &mdash; the third of the four pillars of object-oriented programming, and the one that finally lets you stop copying code between classes.</p>
+</div>
+
+<div class="box obj">
+  <div class="hd">Learning Objectives</div>
+  <div class="bd">
+    <p>By the end of today's session you should be able to:</p>
+    <ol>
+      <li>Apply the <em>"is-a"</em> test to a pair of classes and say whether inheritance or the <em>"has-a"</em> composition of Lectures 7 and 10&ndash;11 is the right tool.</li>
+      <li>Write a subclass with <code>extends</code>, and name exactly which fields and methods it gets from each of its ancestors.</li> <li>Say which members a subclass inherits and which it does not &mdash; in particular, why constructors are never inherited and why a <code>private</code> field is inherited but unusable.</li> <li>Choose correctly among <code>private</code>, package-private, <code>protected</code> and <code>public</code>, and recognize the <code>javac</code> error each wrong choice produces.</li> <li>Call a superclass constructor with <code>super(...)</code>, and explain why it must be the very first statement in the subclass constructor.</li> <li>Predict the exact order in which constructors run when you create an object three levels down a hierarchy.</li> <li>Override a method, protect the override with <code>@Override</code>, and reuse the superclass version with <code>super.method()</code>.</li> <li>Distinguish overriding from overloading, and say which one the compiler decides and which one is decided while the program runs.</li> <li>Explain why every class you will ever write ultimately extends <code>Object</code>, and what you inherit from it for free.</li> </ol> </div> </div> <div class="toc"> <div class="th">On this page</div> <ol> <li><a href="#s1">"is-a" and "has-a": two ways one class can use another</a></li> <li><a href="#s2">The <code>extends</code> keyword</a></li> <li><a href="#s3">What a subclass inherits &mdash; and the access modifiers</a></li> <li><a href="#s4"><code>super(...)</code> and the constructor chain</a></li> <li><a href="#s5">Overriding, <code>@Override</code> and <code>super.method()</code></a></li> <li><a href="#s6">Overriding is not overloading</a></li> <li><a href="#s7"><code>Object</code>, the root of everything &mdash; and one design question</a></li> <li><a href="#prac">Practice Problems</a></li> <li><a href="#summary">Lecture Summary</a></li> </ol> </div> <div class="tools"> <span class="lab">Answers</span> <button id="showAll" type="button">Show all</button> <button id="hideAll" type="button">Hide all</button> <span class="muted">&mdash; every worked-example output and every solution is hidden when the page loads. Work it out first, then reveal.</span> </div> <hr> <h2 id="s1"><span class="num">1.</span>"is-a" and "has-a": two ways one class can use another</h2> <p>For the last two lectures you built the parking-ticket system, and every relationship in it had the same shape. A <code>ParkedCar</code> <em>contained</em> a <code>ParkingMeter</code>. A <code>ParkingTicket</code> <em>contained</em> a <code>PoliceOfficer</code> and a <code>ParkedCar</code>. You wrote that relationship by declaring an instance variable whose type was another one of your classes:</p> <pre><code class="language-java">public class ParkedCar {
+    private String make, model, color, license;
+    private ParkingMeter meter;
+    // a ParkedCar HAS-A ParkingMeter ... }</code></pre> <p>That is one of the two ways classes relate to each other, and it is the only one you have had so far. Today we add the other one.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; "has-a" and "is-a"</span></div> <div class="bd"> <p>A <strong>"has-a" relationship</strong> &mdash; also called <em>composition</em> &mdash; means one object contains another as a part. A car <em>has a</em> meter. You express it with an instance variable. This is what Lectures 7 and 10&ndash;11 were about.</p> <p>An <strong>"is-a" relationship</strong> means one class is a more specific <em>kind</em> of another. A square <em>is a</em> rectangle. A savings account <em>is a</em> bank account. You express it with <strong>inheritance</strong>, and that is what today is about.</p> </div> </div> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; inheritance, superclass, subclass</span></div> <div class="bd"> <p><strong>Inheritance</strong> is one of the fundamental principles of object-oriented programming, alongside encapsulation, abstraction and polymorphism. It allows a class to inherit properties and methods from another class, establishing an "is-a" relationship.</p> <ul> <li>The <strong>superclass</strong> (also called the <em>parent</em> class, or the <em>base</em> class) is the class whose features are inherited.</li> <li>The <strong>subclass</strong> (also called the <em>child</em> class, or the <em>derived</em> class) is the class that inherits those features.</li> </ul> <p>The subclass gets everything the superclass has, without your typing it again, and then adds whatever makes it more specific.</p> </div> </div> <p>The word "inherit" is doing real work here. When <code>Rectangle</code> inherits from <code>Shape</code>, no code is copied. There is exactly one copy of <code>getArea</code> in the whole program, written once in <code>Shape</code>, and every <code>Rectangle</code> object can use it. If you later fix a bug in <code>getArea</code>, every subclass is fixed at the same instant.</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; the test that decides which one you need</span></div> <div class="bd"> <p>Read the relationship out loud in English.</p> <p>If <em>"a Square is a Rectangle"</em> sounds true, you want <strong>inheritance</strong>.<br> If <em>"a ParkedCar is a ParkingMeter"</em> sounds absurd &mdash; and it does, a car is not a meter, it <em>has</em> one &mdash; you want a <strong>field</strong>.</p> <p>This sounds too simple to be a real engineering rule. It is a real engineering rule. Almost every bad inheritance hierarchy you will ever meet failed this one sentence.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 12.1</div> <div class="bd"> <p>For each pair, decide whether the relationship is "is-a" (use inheritance) or "has-a" (use an instance variable), and say what the code would look like.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>ParkingTicket</code> and <code>PoliceOfficer</code>, from the parking-ticket system.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>has-a.</strong> A ticket is not a kind of officer &mdash; it <em>records</em> which officer wrote it. So <code>ParkingTicket</code> gets a field: <code>private PoliceOfficer officer;</code>. That is exactly what you wrote in Lecture 11.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>SavingsAccount</code> and <code>BankAccount</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>is-a.</strong> A savings account is a bank account, with an extra interest rate on top. So <code>public class SavingsAccount extends BankAccount</code>. Everything a bank account can do &mdash; deposit, withdraw, report its balance &mdash; a savings account can do too, unchanged. You will write exactly this class in Practice Problem 1.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>Circle</code> and <code>Shape</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>is-a.</strong> A circle is a shape. <code>public class Circle extends Shape</code>. This is the hierarchy we build for the rest of the lecture.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>Circle</code> and <code>double radius</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p>Neither, and that is the point of including it. <code>radius</code> is not a class at all, it is a plain <code>double</code>. Not every relationship in a program is between two classes; most of the data in your objects is still primitives and <code>String</code>s.</p> <p><strong>Things to notice across all four parts.</strong> The two mechanisms are not in competition &mdash; a realistic program uses both, often in the same class. Your <code>SavingsAccount</code> will <em>be</em> a <code>BankAccount</code> (inheritance) and could perfectly well <em>have</em> a <code>Customer</code> (a field) at the same time. What matters is that you never reach for inheritance just because two classes happen to share a few lines of code. Shared code is not a reason; being a more specific kind of the same thing is.</p> </div></details> </div> </div> </div> <h2 id="s2"><span class="num">2.</span>The <code>extends</code> keyword</h2> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; <code>extends</code></span></div> <div class="bd"> <p><code>extends</code> is the Java keyword that creates an inheritance relationship. It goes in the class header:</p> <p style="text-align:center"><code>public class <em>Subclass</em> extends <em>Superclass</em> { ... }</code></p> <p>Read it as "<code>Subclass</code> is a <code>Superclass</code>, plus more". A class may extend <strong>exactly one</strong> superclass &mdash; Java has no multiple inheritance of classes. (C++ does; Java deliberately dropped it, and Lecture 14 shows what replaced it.)</p> </div> </div> <p>Our running example for this lecture is a small hierarchy of shapes. Here is the superclass. It is an ordinary class of the kind you have been writing since Lecture 7 &mdash; two private fields, a constructor, two getters and a <code>toString</code>. Nothing about it announces that it is going to be a superclass, and that is normal: any class can be extended.</p> <p class="filename">Shape.java</p>
+<pre><code class="language-java">public class Shape {
+    private final double perimeter;
+    private final double area;
+
+    public Shape(double perimeter, double area) {
+        this.perimeter = perimeter;
+        this.area = area;
+    }
+
+    public double getPerimeter() {
+        return perimeter;
+    }
+
+    public double getArea() {
+        return area;
+    }
+
+    public String toString() {
+        return "Shape with area: " + area + " and perimeter: " + perimeter;
+    }
+}</code></pre> <p>The <code>final</code> on those two fields is worth a note in passing, because it comes up again at the end of the lecture.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the <code>final</code> keyword</span></div> <div class="bd"> <p><code>final</code> is a <em>non-access</em> modifier that can be applied to variables, methods and classes. It indicates that something cannot be changed or extended further.</p> <ul> <li>A <code>final</code> <strong>variable</strong> can be assigned once and never reassigned. A <code>final</code> instance variable must be given its value by the time the constructor finishes.</li> <li>A <code>final</code> <strong>method</strong> cannot be overridden by a subclass.</li> <li>A <code>final</code> <strong>class</strong> cannot be extended at all. <code>String</code> is <code>final</code>, which is why you cannot write <code>class MyString extends String</code>.</li> </ul> <p><code>Shape</code>'s <code>perimeter</code> and <code>area</code> are <code>final</code> because a shape's size never changes after it is built. That is a deliberate design choice, and &sect;7 shows what it buys us.</p> </div> </div> <p>Now the subclass. A rectangle is a shape, so <code>Rectangle extends Shape</code>. It adds two fields of its own &mdash; <code>base</code> and <code>height</code> &mdash; and it does <em>not</em> re-declare <code>perimeter</code> or <code>area</code>, because it already has them.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the first subclass</span></div> <div class="bd"> <p>Read the header line first, then the constructor. The line <code>super(2 * base + 2 * height, base * height);</code> is new; it is the subject of &sect;4. For now read it as "run the <code>Shape</code> constructor with these two numbers."</p> <p class="filename">Rectangle.java</p>
+<pre><code class="language-java">public class Rectangle extends Shape {
+    private final double base;
+    private final double height;
+
+    public Rectangle(double base, double height) {
+        super(2 * base + 2 * height, base * height);
+        this.base = base;
+        this.height = height;
+    }
+
+    public double getBase() {
+        return base;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    @Override
+    public String toString() {
+        return "Rectangle with base: " + base + ", height: " + height +
+               ", area: " + getArea() + ", perimeter: " + getPerimeter();
+    }
+}</code></pre> <p>A square is a rectangle whose base and height happen to be equal, so <code>Square</code> extends <code>Rectangle</code> &mdash; not <code>Shape</code>. Look at how little there is in it.</p> <p class="filename">Square.java</p>
+<pre><code class="language-java">public class Square extends Rectangle {
+
+    public Square(double sideLength) {
+        super(sideLength, sideLength);
+    }
+
+    @Override
+    public String toString() {
+        return "Square with side length: " + getBase() +
+               ", area: " + getArea() + ", perimeter: " + getPerimeter();
+    }
+}</code></pre> <p><code>Square</code> declares no fields and no getters at all. Before you open the toggle: this program calls four getters on a <code>Square</code>. Which of them compile, and where is each one actually written?</p> <p class="filename">InheritDemo.java</p>
+<pre><code class="language-java">public class InheritDemo {
+    public static void main(String args[]) {
+        Square square = new Square(6);
+
+        System.out.println(square.getBase());        // declared in Rectangle
+        System.out.println(square.getHeight());      // declared in Rectangle
+        System.out.println(square.getArea());        // declared in Shape
+        System.out.println(square.getPerimeter());   // declared in Shape
+        System.out.println(square.toString());       // declared in Square
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>6.0
+6.0
+36.0
+24.0
+Square with side length: 6.0, area: 36.0, perimeter: 24.0</code></pre> <p>All five compile and run, and only the last one is written in <code>Square</code>. Inheritance is transitive: <code>Square</code> inherits from <code>Rectangle</code>, which inherits from <code>Shape</code>, so a <code>Square</code> object has everything from both. This is the payoff. <code>Square.java</code> is eleven lines long and the object it produces knows its base, its height, its area and its perimeter.</p> <table class="trace"> <tr><th>Call on a <code>Square</code></th><th>Method found in</th><th>Why</th></tr> <tr><td><code>getBase()</code></td><td><code>Rectangle</code></td><td><code>Square</code> has none, so Java looks one level up.</td></tr> <tr><td><code>getHeight()</code></td><td><code>Rectangle</code></td><td>Same. Returns 6.0, because the constructor passed the side length as both arguments.</td></tr> <tr><td><code>getArea()</code></td><td><code>Shape</code></td><td>Not in <code>Square</code>, not in <code>Rectangle</code> &mdash; found two levels up.</td></tr> <tr><td><code>getPerimeter()</code></td><td><code>Shape</code></td><td>Same.</td></tr> <tr><td><code>toString()</code></td><td><code>Square</code></td><td><code>Square</code> has its own, so the search stops immediately.</td></tr> </table> <p>That last row is the rule for the whole search: <em>start at the class of the object and walk upward, stopping at the first match.</em> Hold on to it &mdash; it is the entire explanation of method overriding in &sect;5.</p> 
+</div></details> </div> </div> <p>Drawn as a picture, the hierarchy we are building looks like this. <code>Circle</code> is the exercise you will write in Quick Check 12.3.</p> <p class="filename">The Shape hierarchy</p>
+<pre class="cmp"><code>Object | Shape           perimeter, area getPerimeter(), getArea(), toString() /     \ Rectangle      Circle    base, height        |  radius getBase(),          |  getRadius() getHeight(),        |  toString() toString()          | | Square                  (no new fields) toString() </code></pre> <div class="box qc"> <div class="hd">Quick Check 12.2</div> <div class="bd"> <p>Using the three classes above, decide whether each statement compiles. If it does not, say why.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>Shape s = new Square(6);</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compiles. A <code>Square</code> is a <code>Rectangle</code>, and a <code>Rectangle</code> is a <code>Shape</code>, so a <code>Square</code> object may be stored in a <code>Shape</code> variable. This is the assignment direction inheritance gives you for free, and Lecture 13 makes a whole topic out of it.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>Rectangle r = new Shape(10, 25);</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Does not compile. The other direction is not automatic: a plain <code>Shape</code> is not a <code>Rectangle</code> &mdash; it has no base and no height &mdash; so Java refuses.</p> <pre class="err"><code>UpDemo.java:3: error: incompatible types: Shape cannot be converted to Rectangle Rectangle r = new Shape(10, 25);
+^
+1 error</code></pre> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>Square square = new Square(6);</code> followed by <code>Shape shape = square;</code> and then <code>System.out.println(shape.getBase());</code></p> <details class="soln"><summary></summary><div class="ans"> <p>The first two lines compile; the third does not. <code>shape</code> and <code>square</code> refer to the same object, but the compiler only lets you call what the <em>declared type</em> promises, and <code>Shape</code> promises no <code>getBase</code>.</p> <pre class="err"><code>RefDemo.java:5: error: cannot find symbol System.out.println(shape.getBase());
+^
+  symbol:   method getBase()
+  location: variable shape of type Shape
+1 error</code></pre> <p>The object has not lost anything &mdash; <code>square.getBase()</code> on the very next line still works. It is the <em>variable</em> that is narrow, not the object.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>Square square = new Square(4, 5);</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Does not compile. <code>Rectangle</code> has a two-argument constructor, but <code>Square</code> does not, and constructors are <strong>not inherited</strong>. <code>Square</code> has exactly the one constructor its own file declares.</p> <pre class="err"><code>CtorDemo.java:3: error: constructor Square in class Square cannot be applied to given types; Square square = new Square(4, 5);
+^
+  required: double
+  found:    int,int
+  reason: actual and formal argument lists differ in length
+1 error</code></pre> <p><strong>Things to notice across all four parts.</strong> Parts (a) and (b) are about which way assignment flows; parts (c) and (d) are about what the compiler can see. All four are decided entirely by the <em>declared types</em> in your source code, before the program ever runs. That is a theme you will meet again in &sect;6.</p> </div></details> </div> </div> </div> <h2 id="s3"><span class="num">3.</span>What a subclass inherits &mdash; and the access modifiers</h2> <p>"A subclass gets everything" was a useful first approximation. Now the exact rules, because two of the exceptions produce compiler errors that confuse people for an entire semester.</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; the inheritance rules, precisely</span></div> <div class="bd"> <p>A subclass <strong>inherits</strong>:</p> <ul> <li>every <code>public</code> and <code>protected</code> field and method of its superclass;</li> <li>every package-private field and method, <em>if</em> the subclass is in the same package.</li> </ul> <p>A subclass <strong>does not inherit</strong>:</p> <ul> <li><strong>constructors.</strong> Ever. A constructor builds one specific class; it makes no sense to hand it to another. This is why Quick Check 12.2(d) failed.</li> </ul> <p>And the case that trips everyone:</p> <ul> <li>A <code>private</code> field <em>is</em> part of the subclass object &mdash; the memory is there, the data is real &mdash; but the subclass's <strong>code cannot name it</strong>.</li> </ul> </div> </div> <p>That last point deserves a demonstration, because "the data is there but you cannot touch it" sounds contradictory until you see it.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; a private field the subclass cannot reach</span></div> <div class="bd"> <p><code>Shape</code> stores <code>area</code> in a <code>private</code> field. <code>Rectangle</code> extends <code>Shape</code>, so every <code>Rectangle</code> object contains that <code>area</code>. Here is a <code>Rectangle</code> whose <code>toString</code> tries to print it directly instead of going through <code>getArea()</code>. Does it compile?</p> <p class="filename">Rectangle.java</p>
+<pre><code class="language-java">public class Rectangle extends Shape {
+    private final double base;
+    private final double height;
+
+    public Rectangle(double base, double height) {
+        super(2 * base + 2 * height, base * height);
+        this.base = base;
+        this.height = height;
+    }
+
+    @Override
+    public String toString() {
+        return "Rectangle with base: " + base + ", height: " + height +
+               ", area: " + area;
+    }
+}</code></pre> <details class="soln reveal noout"><summary></summary><div class="ans">
+ <pre class="err"><code>Rectangle.java:14: error: area has private access in Shape ", area: " + area;
+^
+1 error</code></pre> <p>Read the message literally: <code>area</code> exists (the compiler found it, in <code>Shape</code>), it simply has <em>private access</em> there. <code>private</code> means "visible inside this class body only", and a subclass is a different class body.</p> <p>The fix is the one <code>Shape</code> already provides: call the public getter. <code>", area: " + getArea()</code> compiles, because <code>getArea</code> is <code>public</code> and <code>getArea</code>'s own code <em>is</em> inside <code>Shape</code>, where <code>area</code> is visible. That is the version in her notes and the version we use for the rest of the lecture.</p> <p>This is encapsulation working exactly as designed, not a limitation to route around. The superclass author decided that the outside world &mdash; including subclasses &mdash; reads <code>area</code> through a method. If you want to relax that, you change the modifier deliberately, and the next box says how.</p> 
+</div></details> </div> </div> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; <code>protected</code></span></div> <div class="bd"> <p><strong><code>protected</code></strong> is the access modifier invented for inheritance. A <code>protected</code> member is visible inside its own class, inside every class in the same package, and inside every <em>subclass</em> &mdash; even a subclass in a different package.</p> <p>It sits between <code>private</code> (nobody else) and <code>public</code> (everybody), and it says: <em>my descendants may use this; strangers may not.</em></p> </div> </div> <p>Here is the full table. There are four levels, and the third one has no keyword at all &mdash; you get it by writing no modifier, which is why it is easy to produce by accident.</p> <table> <tr><th>Modifier</th><th>Same class</th><th>Same package</th><th>Subclass, other package</th><th>Anywhere</th></tr> <tr><td><code>private</code></td><td>yes</td><td>no</td><td>no</td><td>no</td></tr> <tr><td><em>(none)</em> &mdash; "package-private"</td><td>yes</td><td>yes</td><td>no</td><td>no</td></tr> <tr><td><code>protected</code></td><td>yes</td><td>yes</td><td>yes</td><td>no</td></tr> <tr><td><code>public</code></td><td>yes</td><td>yes</td><td>yes</td><td>yes</td></tr> </table> <p>Change <code>Shape</code>'s two fields from <code>private final</code> to <code>protected final</code> and the <code>Rectangle</code> above compiles unchanged, printing <code>Rectangle with base: 5.0, height: 4.0, area: 20.0, perimeter: 18.0</code>. Nothing else in the program has to change.</p> <div class="box warn"> <div class="hd">Warning<span class="tag">&mdash; <code>protected</code> is not free</span></div> <div class="bd"> <p>It is tempting to make every field <code>protected</code> so subclasses never hit that error. Resist it. A <code>protected</code> field is a promise to every future subclass that the field exists with that name and that type, forever &mdash; you can no longer rename it, change its type, or compute it on demand without breaking code you may not even be able to see.</p> <p>The usual advice, and the advice this course follows: keep fields <code>private</code>, give subclasses <code>protected</code> <em>methods</em> when they need privileged access, and use <code>public</code> only for the interface you genuinely want the whole world to call. Notice that her <code>Shape</code> keeps its fields <code>private</code> and hands subclasses <code>getArea()</code> and <code>getPerimeter()</code> instead.</p> </div> </div> <p>The package-private row is the one you can trip over without meaning to. If <code>Shape</code> declares a field with no modifier at all, a subclass in the <em>same</em> package can read it happily &mdash; and the same subclass moved to a different package suddenly cannot:</p> <pre class="err"><code>app/Rectangle.java:11: error: area is not public in Shape; cannot be accessed from outside package return "perimeter " + perimeter + ", area " + area;
+^
+1 error</code></pre> <p>The <code>protected</code> field on the same line compiled fine; only the one with no modifier failed. If you ever see "is not public in ...; cannot be accessed from outside package", you have found a field somebody forgot to put a modifier on.</p> <div class="box qc"> <div class="hd">Quick Check 12.3</div> <div class="bd"> <p>This is the exercise from her class notes: <em>implement the <code>Circle</code> class that inherits from the <code>Shape</code> class.</em> It should store a <code>radius</code>, pass the right perimeter and area up to <code>Shape</code>, provide <code>getRadius()</code>, and override <code>toString()</code> in the same style as <code>Rectangle</code>. The circumference of a circle is <code>2 * Math.PI * radius</code> and its area is <code>Math.PI * radius * radius</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> <code>Circle</code> is a <code>Shape</code>, so <code>extends Shape</code>. <code>Shape</code>'s constructor demands a perimeter and an area, and it is the only constructor <code>Shape</code> has &mdash; so the first thing <code>Circle</code>'s constructor must do is compute both from the radius and pass them up. After that, store the radius in <code>Circle</code>'s own field. Because <code>area</code> and <code>perimeter</code> are <code>private</code> in <code>Shape</code>, <code>toString</code> reads them through <code>getArea()</code> and <code>getPerimeter()</code>, exactly as <code>Rectangle</code> does.</p> <p class="filename">Circle.java</p>
+<pre><code class="language-java">public class Circle extends Shape {
+    private final double radius;
+
+    public Circle(double radius) {
+        super(2 * Math.PI * radius, Math.PI * radius * radius);
+        this.radius = radius;
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+
+    @Override
+    public String toString() {
+        return "Circle with radius: " + radius +
+               ", area: " + getArea() + ", perimeter: " + getPerimeter();
+    }
+}</code></pre> <p>With the four classes together, her <code>ShapeTest</code> from the class notes runs:</p> <p class="filename">ShapeTest.java</p>
+<pre><code class="language-java">public class ShapeTest {
+    public static void main(String args[]) {
+        Shape genericShape = new Shape(10, 25);
+        Rectangle rectangle = new Rectangle(5, 4);
+        Square square = new Square(6);
+        Circle circle = new Circle(3);
+
+        System.out.println(genericShape);
+        System.out.println(rectangle);
+        System.out.println(square);
+        System.out.println(circle);
+
+        Shape[] shapes = {genericShape, rectangle, square, circle};
+
+        System.out.println("\nPrinting all shapes in array:");
+        for (Shape shape : shapes) {
+            System.out.println(shape);
+        }
+    }
+}</code></pre> <pre class="out"><code>Shape with area: 25.0 and perimeter: 10.0
+Rectangle with base: 5.0, height: 4.0, area: 20.0, perimeter: 18.0
+Square with side length: 6.0, area: 36.0, perimeter: 24.0
+Circle with radius: 3.0, area: 28.274333882308138, perimeter: 18.84955592153876
+
+Printing all shapes in array:
+Shape with area: 25.0 and perimeter: 10.0
+Rectangle with base: 5.0, height: 4.0, area: 20.0, perimeter: 18.0
+Square with side length: 6.0, area: 36.0, perimeter: 24.0
+Circle with radius: 3.0, area: 28.274333882308138, perimeter: 18.84955592153876</code></pre> <p><strong>Things to notice.</strong> <code>Circle</code> never stores an area or a perimeter of its own; it computes them once, in the <code>super(...)</code> call, and <code>Shape</code> keeps them. That is a design decision with a real consequence: because the fields are <code>final</code> and there is no <code>setRadius</code>, a <code>Circle</code> can never get out of step with its own area. If you added a <code>setRadius</code> you would have to recompute the inherited values too, and <code>final</code> would stop you &mdash; which is the compiler telling you the design was mutable-or-final, pick one.</p> <p>The second half of the output is the same four lines again, this time produced by walking a <code>Shape[]</code> array. Every element is declared as a <code>Shape</code>, yet each one printed <em>its own</em> <code>toString</code>. That is not an accident and it is not obvious; it is polymorphism, and it is the whole of Lecture 13.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 12.3</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="6" aria-label="Live coding - Quick Check 12.3">public class Circle extends Shape { // 1. One private final field: the radius. // 2. A constructor taking the radius. Its FIRST statement must pass //    the circumference and the area up to Shape with super(...). // 3. getRadius() // 4. toString(), in the style of Rectangle's, using getArea() //    and getPerimeter() -- the fields in Shape are private. } </textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s4"><span class="num">4.</span><code>super(...)</code> and the constructor chain</h2> <p>You have now written <code>super(...)</code> three times without a definition. Here it is.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; <code>super</code></span></div> <div class="bd"> <p>The <code>super</code> keyword refers to the superclass part of the current object. It has two distinct uses, and they look different:</p> <ul> <li><code>super(arguments);</code> &mdash; written as a <em>statement inside a constructor</em>, calls the superclass <strong>constructor</strong>. This is &sect;4.</li> <li><code>super.methodName(arguments)</code> &mdash; written anywhere in the class, calls the superclass's <strong>version of a method</strong>. This is &sect;5.</li> </ul> </div> </div> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; writing a subclass constructor</span></div> <div class="bd"> <ol> <li>Decide what the subclass constructor needs from the caller. <code>Square</code> needs one number; <code>Rectangle</code> needs two.</li> <li>From those parameters, work out what the <em>superclass</em> constructor needs. For <code>Rectangle(base, height)</code> the superclass wants a perimeter and an area, so compute <code>2 * base + 2 * height</code> and <code>base * height</code>.</li> <li>Write <code>super(...)</code> with those values as the <strong>first statement</strong> of the constructor.</li> <li>Only then assign the subclass's own fields.</li> </ol> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; <code>super(...)</code> must come first</span></div> <div class="bd"> <p>It is natural to want to store your own fields before calling up. Java does not allow it:</p> <pre><code class="language-java">public Rectangle(double base, double height) {
+    this.base = base;
+    this.height = height;
+    super(2 * base + 2 * height, base * height);
+    // too late }</code></pre> <pre class="err"><code>Rectangle.java:8: error: call to super must be first statement in constructor super(2 * base + 2 * height, base * height);
+^
+1 error</code></pre> <p>The reason is not arbitrary. Until the superclass constructor has run, the superclass part of the object is not initialized &mdash; <code>area</code> and <code>perimeter</code> are still zero. Java refuses to let any of your code run on a half-built object, so it insists the foundation is poured before you start on the walls.</p> <p>The same rule produces a second, much more confusing error when you forget <code>super(...)</code> altogether. If the superclass has no no-argument constructor, Java's attempt to insert an invisible <code>super()</code> for you fails:</p> <pre class="err"><code>Circle.java:4: error: constructor Shape in class Shape cannot be applied to given types; public Circle(double radius) {
+^
+  required: double,double
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+1 error</code></pre> <p>The caret points at your <em>own</em> constructor's closing parenthesis, and the message talks about "no arguments" even though you passed one. Translate it as: <em>you did not call <code>super(...)</code>, so I tried <code>super()</code>, and <code>Shape</code> has no such constructor.</em></p> </div> </div> <p>So a subclass constructor always begins by running its superclass's constructor. Apply that rule to <code>Square</code>, which is two levels down, and something worth seeing happens.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; in what order do three constructors run?</span></div> <div class="bd"> <p>These are the same three classes as before, with one <code>println</code> added to each constructor body. Nothing else has changed. The <code>main</code> method creates a single <code>Square</code>.</p> <p>Before you reveal: <code>main</code> calls the <code>Square</code> constructor. Write down the order you expect the three lines to appear in.</p> <p class="filename">Shape.java</p>
+<pre><code class="language-java">public class Shape {
+    private final double perimeter;
+    private final double area;
+
+    public Shape(double perimeter, double area) {
+        System.out.println("  Shape constructor body runs");
+        this.perimeter = perimeter;
+        this.area = area;
+    }
+
+    public double getPerimeter() { return perimeter; }
+    public double getArea()      { return area; }
+
+    public String toString() {
+        return "Shape with area: " + area + " and perimeter: " + perimeter;
+    }
+}</code></pre> <p class="filename">Rectangle.java</p>
+<pre><code class="language-java">public class Rectangle extends Shape {
+    private final double base;
+    private final double height;
+
+    public Rectangle(double base, double height) {
+        super(2 * base + 2 * height, base * height);
+        System.out.println("  Rectangle constructor body runs");
+        this.base = base;
+        this.height = height;
+    }
+
+    public double getBase()   { return base; }
+    public double getHeight() { return height; }
+
+    @Override
+    public String toString() {
+        return "Rectangle with base: " + base + ", height: " + height +
+               ", area: " + getArea() + ", perimeter: " + getPerimeter();
+    }
+}</code></pre> <p class="filename">Square.java</p>
+<pre><code class="language-java">public class Square extends Rectangle {
+
+    public Square(double sideLength) {
+        super(sideLength, sideLength);
+        System.out.println("  Square constructor body runs");
+    }
+
+    @Override
+    public String toString() {
+        return "Square with side length: " + getBase() +
+               ", area: " + getArea() + ", perimeter: " + getPerimeter();
+    }
+}</code></pre> <p class="filename">ChainDemo.java</p>
+<pre><code class="language-java">public class ChainDemo {
+    public static void main(String args[]) {
+        System.out.println("About to write: new Square(6)");
+        Square square = new Square(6);
+        System.out.println("Done. The object is: " + square);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>About to write: new Square(6)
+  Shape constructor body runs
+  Rectangle constructor body runs
+  Square constructor body runs
+Done. The object is: Square with side length: 6.0, area: 36.0, perimeter: 24.0</code></pre> <p>Exactly backwards from the order you wrote them. You called <code>Square</code>, and <code>Shape</code> printed first.</p> <table class="trace"> <tr><th>Step</th><th>What happens</th></tr> <tr><td>1</td><td><code>new Square(6)</code> enters the <code>Square</code> constructor.</td></tr> <tr><td>2</td><td>Its first statement is <code>super(6, 6)</code>, so control leaves at once for <code>Rectangle</code>. <em>Nothing in <code>Square</code>'s body has run yet.</em></td></tr> <tr><td>3</td><td><code>Rectangle</code>'s first statement is <code>super(24.0, 36.0)</code>, so control leaves again for <code>Shape</code>.</td></tr> <tr><td>4</td><td><code>Shape</code> has no explicit <code>super(...)</code>, so Java inserts <code>super()</code> &mdash; the <code>Object</code> constructor, which does nothing visible. Then <code>Shape</code>'s body runs and prints. <strong>The chain has reached the top and is now unwinding.</strong></td></tr> <tr><td>5</td><td>Control returns to <code>Rectangle</code>, whose body runs and prints.</td></tr> <tr><td>6</td><td>Control returns to <code>Square</code>, whose body runs and prints. The object is now complete.</td></tr> </table> <p>Two things follow from this that are worth writing down.</p> <ul> <li><strong>Every object is built top-down.</strong> The <code>Object</code> part first, then <code>Shape</code>, then <code>Rectangle</code>, then <code>Square</code>. By the time <em>your</em> constructor body runs, everything you inherited is already initialized &mdash; which is precisely why <code>super(...)</code> has to be first.</li> <li><strong>The chain always reaches <code>Object</code>.</strong> Even <code>Shape</code>, which extends nothing explicitly, calls a constructor above itself. &sect;7 says what is up there.</li> </ul> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 12.4</div> <div class="bd"> <p>Each of these subclass constructors is wrong. Say what <code>javac</code> reports and fix it. Assume <code>Shape</code> is exactly as printed above, with its single two-argument constructor.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>public Circle(double radius) { this.radius = radius; }</code></p> <details class="soln"><summary></summary><div class="ans"> <p>No <code>super(...)</code> call, so Java inserts <code>super()</code>, and <code>Shape</code> has no no-argument constructor: <code>constructor Shape in class Shape cannot be applied to given types; ... found: no arguments</code>. Fix it by computing the circle's perimeter and area and passing them up:</p> <pre><code class="language-java">public Circle(double radius) {
+    super(2 * Math.PI * radius, Math.PI * radius * radius);
+    this.radius = radius;
+}</code></pre> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>public Square(double side) { System.out.println("building"); super(side, side); }</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>error: call to super must be first statement in constructor</code>. Move the <code>super(side, side);</code> line above the <code>println</code>. If you genuinely need something computed before the super call, compute it <em>inside the argument list</em> &mdash; <code>super(side, side * 1.0)</code> &mdash; or in a <code>static</code> helper method, since a static method does not touch the half-built object.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>Square</code> is given a second constructor, <code>public Square() { }</code>, intended to make a square of side 1.</p> <details class="soln"><summary></summary><div class="ans"> <p>Same error as (a), one level down: the inserted <code>super()</code> looks for a no-argument <code>Rectangle</code> constructor and there isn't one. Write <code>public Square() { super(1, 1); }</code>, or better, <code>public Square() { this(1); }</code> &mdash; <code>this(...)</code> calls another constructor of the <em>same</em> class, and it has the same must-be-first rule.</p> <p><strong>Things to notice across all three parts.</strong> Every one of these is the same underlying rule: the superclass part of the object gets built first, no exceptions. If you remember only one sentence from &sect;4, make it that one &mdash; all three error messages fall out of it.</p> </div></details> </div> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 12.4</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="6" aria-label="Live coding - Quick Check 12.4">public class Square extends Rectangle {
+    // Fix this constructor: it does not compile. public Square(double side) { System.out.println("building a square of side " + side); super(side, side); } // Add a no-argument constructor that makes a square of side 1. }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s5"><span class="num">5.</span>Overriding, <code>@Override</code> and <code>super.method()</code></h2> <p>Every class in our hierarchy has a <code>toString</code>, and they are all different. That is not a collision &mdash; it is the second big thing inheritance gives you.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; method overriding</span></div> <div class="bd"> <p><strong>Overriding</strong> is redefining, in a subclass, a method that was already defined in the superclass. To override a method the subclass version must have:</p> <ul> <li>the <strong>same name</strong>,</li> <li>the <strong>same parameter list</strong> &mdash; same types, same number, same order,</li> <li>a return type that is the same (or a subclass of the original's, which Java calls <em>covariant</em>),</li> <li>access that is <strong>not more restrictive</strong> than the original's.</li> </ul> <p>When those match, the subclass version <em>replaces</em> the superclass version for objects of the subclass. Recall the search rule from &sect;2: start at the object's class and walk up, stopping at the first match. An override is simply a match found earlier.</p> </div> </div> <p>You have already seen the effect. <code>Square</code>'s <code>toString</code> wins over <code>Rectangle</code>'s, which wins over <code>Shape</code>'s. What you have not seen is what happens when the match is <em>almost</em> right.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; one letter, and the override disappears</span></div> <div class="bd"> <p>Here is <code>Rectangle</code> with a single typo: the method is called <code>toSting</code>, not <code>toString</code>. There is no <code>@Override</code> annotation on it. The class compiles cleanly &mdash; <code>javac</code> prints nothing at all.</p> <p class="filename">Rectangle.java</p>
+<pre><code class="language-java">public class Rectangle extends Shape {
+    private final double base;
+    private final double height;
+
+    public Rectangle(double base, double height) {
+        super(2 * base + 2 * height, base * height);
+        this.base = base;
+        this.height = height;
+    }
+
+    public double getBase()   { return base; }
+    public double getHeight() { return height; }
+
+    // The name is misspelled, and there is no @Override to catch it.
+    public String toSting() {
+        return "Rectangle with base: " + base + ", height: " + height;
+    }
+}</code></pre> <p class="filename">TypoDemo.java</p>
+<pre><code class="language-java">public class TypoDemo {
+    public static void main(String args[]) {
+        Rectangle rectangle = new Rectangle(5, 4);
+        System.out.println(rectangle);
+    }
+}</code></pre> <p>What does it print?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Shape with area: 20.0 and perimeter: 18.0 </code></pre> <p>It printed <code>Shape</code>'s version. Nothing overrode anything. <code>Rectangle</code> now simply has two unrelated methods &mdash; an inherited <code>toString</code> and a brand-new <code>toSting</code> that nobody ever calls &mdash; and the program is wrong with no error message anywhere.</p> <p>This class of bug is why the annotation exists.</p> 
+</div></details> </div> </div> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the <code>@Override</code> annotation</span></div> <div class="bd"> <p><code>@Override</code> written immediately above a method declaration tells the compiler: <em>I believe this method overrides something in a supertype; please check.</em> It changes nothing at run time. Its entire value is that it turns a silent failure into a compile error.</p> </div> </div> <p>Add <code>@Override</code> above that misspelled method and the same file stops compiling:</p> <pre class="err"><code>Rectangle.java:11: error: method does not override or implement a method from a supertype @Override
+^
+1 error</code></pre> <p>The caret points at the annotation, not at the method name, which reads oddly until you see what it means: <em>you claimed this overrides something, and it does not.</em> Write <code>@Override</code> on every method you intend as an override. It costs nine characters and it catches misspellings, wrong parameter types, and a superclass method somebody renamed last week.</p> <div class="box qc"> <div class="hd">Quick Check 12.5</div> <div class="bd"> <p><code>Shape</code> declares <code>public String toString()</code>. For each attempted <code>Rectangle</code> method, say whether it overrides <code>toString</code>, and what happens if you put <code>@Override</code> on it.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>public String toString(int digits)</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Does not override &mdash; the parameter list differs, so this is an <em>overload</em>, a different method that happens to share a name. With <code>@Override</code> on it you get <code>method does not override or implement a method from a supertype</code>. This is the single most common false override on exams.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>protected String toString()</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Does not compile, with or without <code>@Override</code>. The signature matches, but <code>protected</code> is more restrictive than the <code>public</code> it is replacing:</p> <pre class="err"><code>Rectangle.java:12: error: toString() in Rectangle cannot override toString() in Shape protected String toString() {
+^
+attempting to assign weaker access privileges; was public
+1 error</code></pre> <p>Going the other way is fine: a <code>protected</code> superclass method may be overridden as <code>public</code>. You may widen access, never narrow it.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>public String toString()</code>, but <code>Shape</code> declared its version as <code>public final String toString()</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p>Does not compile. <code>final</code> on a method means "no subclass may replace this":</p> <pre class="err"><code>Rectangle.java:12: error: toString() in Rectangle cannot override toString() in Shape public String toString() {
+^
+overridden method is final
+1 error</code></pre> <p><strong>Things to notice across all three parts.</strong> Only (a) is a silent problem &mdash; without <code>@Override</code> it compiles and quietly does nothing useful. (b) and (c) are caught for you regardless. That asymmetry is the argument for writing <code>@Override</code> habitually: it is insurance against exactly the one case the compiler cannot otherwise see.</p> </div></details> </div> </div> </div> <p>Overriding replaces the superclass version. Sometimes you want to <em>extend</em> it instead &mdash; do what the superclass did, plus something extra. That is the second use of <code>super</code>.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; <code>super.toString()</code> inside an override</span></div> <div class="bd"> <p><code>Square</code>'s <code>toString</code> repeats a lot of what <code>Rectangle</code>'s already says. Here it delegates instead: it prints its own headline and then asks <code>Rectangle</code> for the rest.</p> <p class="filename">Square.java</p>
+<pre><code class="language-java">public class Square extends Rectangle {
+
+    public Square(double sideLength) {
+        super(sideLength, sideLength);
+    }
+
+    @Override
+    public String toString() {
+        return "Square with side length: " + getBase()
+             + "  [as a Rectangle: " + super.toString() + "]";
+    }
+}</code></pre> <p class="filename">SuperCallDemo.java</p>
+<pre><code class="language-java">public class SuperCallDemo {
+    public static void main(String args[]) {
+        Square square = new Square(6);
+        System.out.println(square);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Square with side length: 6.0  [as a Rectangle: Rectangle with base: 6.0, height: 6.0, area: 36.0, perimeter: 24.0] </code></pre> <p><code>super.toString()</code> runs <code>Rectangle</code>'s version on this same object. Note carefully what would happen if you wrote plain <code>toString()</code> instead of <code>super.toString()</code>: the search would start at <code>Square</code> again, find <code>Square</code>'s own <code>toString</code>, and call it &mdash; infinitely. That is a <code>StackOverflowError</code>, and it is a rite of passage.</p> <p><code>super.method()</code> is how "override to add behavior" is written in Java, and you will use it constantly:</p> <pre><code class="language-java">@Override public void withdraw(double amount) {
+    super.withdraw(amount);
+    // do the normal thing transactionCount++;              // then the extra thing }</code></pre> <p>One limitation to know: <code>super</code> reaches exactly one level up. From <code>Square</code> you can call <code>super.toString()</code> to get <code>Rectangle</code>'s version, but there is no way to write <code>super.super.toString()</code> and reach <code>Shape</code>'s. Java does not allow a class to skip past its immediate parent.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 12.6</div> <div class="bd"> <p>Write a class <code>LabeledCircle</code> that extends the <code>Circle</code> you wrote in Quick Check 12.3. It adds one private <code>String</code> field <code>label</code>, a constructor taking a label and a radius, and an overridden <code>toString</code> that returns the label, a colon and a space, and then whatever <code>Circle</code>'s <code>toString</code> returns. Do not copy <code>Circle</code>'s text.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Two things have to happen in the constructor, in this order: <code>super(radius)</code> to build the <code>Circle</code> part, then <code>this.label = label</code>. In <code>toString</code>, the whole point is not to duplicate <code>Circle</code>'s string, so call <code>super.toString()</code> and concatenate.</p> <p class="filename">LabeledCircle.java</p>
+<pre><code class="language-java">public class LabeledCircle extends Circle {
+    private final String label;
+
+    public LabeledCircle(String label, double radius) {
+        super(radius);
+        this.label = label;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    @Override
+    public String toString() {
+        return label + ": " + super.toString();
+    }
+}</code></pre> <p class="filename">LabeledCircleTest.java</p>
+<pre><code class="language-java">public class LabeledCircleTest {
+    public static void main(String args[]) {
+        LabeledCircle target = new LabeledCircle("Bullseye", 3);
+        System.out.println(target);
+        System.out.println("Radius is still available: " + target.getRadius());
+    }
+}</code></pre> <pre class="out"><code>Bullseye: Circle with radius: 3.0, area: 28.274333882308138, perimeter: 18.84955592153876
+Radius is still available: 3.0</code></pre> <p><strong>Things to notice.</strong> <code>LabeledCircle</code> is now three levels down from <code>Object</code> and four constructors run when you create one, in the order <code>Object</code>, <code>Shape</code>, <code>Circle</code>, <code>LabeledCircle</code>. <code>getRadius()</code> still works without being mentioned anywhere in <code>LabeledCircle</code> &mdash; that is inheritance being transitive again.</p> <p>Writing <code>this.toString()</code> instead of <code>super.toString()</code> here would recurse until the stack overflowed. Writing <code>getLabel() + ": " + super.toString()</code> would be fine but pointless; inside the class, name the field directly.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 12.6</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="6" aria-label="Live coding - Quick Check 12.6">public class LabeledCircle extends Circle {
+    // 1. private final String label; // 2. Constructor (String label, double radius): //    super(...) FIRST, then store the label. // 3. getLabel() // 4. toString() -- label, ": ", then super.toString(). //    Do NOT copy Circle's text. }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s6"><span class="num">6.</span>Overriding is not overloading</h2> <p>The two words look alike, both involve several methods with one name, and they are asked about on every exam. They are unrelated mechanisms.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; overloading, from Lecture 2</span></div> <div class="bd"> <p><strong>Overloading</strong> is writing several methods with the <em>same name</em> and <em>different parameter lists</em> in scope at once. <code>System.out.println</code> is overloaded about ten times &mdash; one for <code>int</code>, one for <code>double</code>, one for <code>String</code>, one for <code>Object</code>. Overloading needs no inheritance at all; the methods can sit in one class.</p> <p><strong>Overriding</strong> is a subclass supplying its own version of a method with the <em>identical</em> signature. It requires inheritance by definition.</p> </div> </div> <p>Here is her table of the differences.</p> <table> <tr><th>Aspect</th><th>Overriding</th><th>Overloading</th></tr> <tr><td>Definition</td><td>Same method in subclass</td><td>Same method name, different parameters</td></tr> <tr><td>Resolution</td><td>Run time (dynamic binding)</td><td>Compile time (static binding)</td></tr> <tr><td>Inheritance</td><td>Requires inheritance</td><td>Can be in the same class or a subclass</td></tr> <tr><td>Parameters</td><td>Must be the same</td><td>Must be different (type, number or order)</td></tr> <tr><td>Return type</td><td>Must be the same or covariant</td><td>Can be different</td></tr> <tr><td>Access modifier</td><td>Cannot be more restrictive</td><td>Can be different</td></tr> </table> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; who decides, and when</span></div> <div class="bd"> <p><strong>Overloading is decided by the compiler, from the declared types in your source.</strong> Which of the same-named methods you meant is fixed before the program starts, and the compiler only knows what the variable is <em>declared</em> as.</p> <p><strong>Overriding is decided while the program runs, from the actual object.</strong> Which version of one method runs depends on what the reference really points at.</p> <p>The two decisions happen at different times, so one program can show both at once &mdash; which is exactly what the next example does.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; her <code>ShapeProcessor</code>, doing both at once</span></div> <div class="bd"> <p><code>displayType</code> is overloaded three times: one for <code>Shape</code>, one for <code>Rectangle</code>, one for <code>Circle</code>. <code>toString</code> is overridden in every subclass. Read <code>main</code> carefully. Lines (a) through (f) exercise the overloads; lines (g) and (h) exercise the overrides, on the very same two objects.</p> <p>Before you reveal, predict lines (c), (e) and (g). They are where the whole section lives.</p> <p class="filename">ShapeProcessor.java</p>
+<pre><code class="language-java">public class ShapeProcessor {
+
+    public static void displayType(Shape shape) {
+        System.out.println("This is a shape");
+    }
+
+    public static void displayType(Rectangle rect) {
+        System.out.println("This is a rectangle with base " + rect.getBase()
+                          + " and height " + rect.getHeight());
+    }
+
+    public static void displayType(Circle circle) {
+        System.out.println("This is a circle with radius " + circle.getRadius());
+    }
+
+    public static void main(String args[]) {
+        Shape shape = new Shape(10, 20);
+        Rectangle rect = new Rectangle(5, 4);
+        Square sq = new Square(7);
+        Circle circle = new Circle(3);
+
+        displayType(shape);              // line (a)
+        displayType(rect);               // line (b)
+        displayType(sq);                 // line (c)
+        displayType(circle);             // line (d)
+
+        Shape polyShape1 = new Rectangle(6, 8);
+        Shape polyShape2 = new Circle(5);
+
+        displayType(polyShape1);         // line (e)
+        displayType(polyShape2);         // line (f)
+
+        System.out.println();
+        System.out.println(polyShape1);  // line (g)
+        System.out.println(polyShape2);  // line (h)
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>This is a shape
+This is a rectangle with base 5.0 and height 4.0
+This is a rectangle with base 7.0 and height 7.0
+This is a circle with radius 3.0
+This is a shape
+This is a shape
+
+Rectangle with base: 6.0, height: 8.0, area: 48.0, perimeter: 28.0
+Circle with radius: 5.0, area: 78.53981633974483, perimeter: 31.41592653589793</code></pre> <table class="trace"> <tr><th>Line</th><th>Declared type of the argument</th><th>Actual object</th><th>Output, and why</th></tr> <tr><td>(a)</td><td><code>Shape</code></td><td><code>Shape</code></td><td><code>This is a shape</code> &mdash; the only applicable overload.</td></tr> <tr><td>(b)</td><td><code>Rectangle</code></td><td><code>Rectangle</code></td><td>Both the <code>Shape</code> and the <code>Rectangle</code> overloads apply; the compiler picks the <em>most specific</em> one.</td></tr> <tr><td>(c)</td><td><code>Square</code></td><td><code>Square</code></td><td>There is no <code>displayType(Square)</code>. The most specific applicable overload is the <code>Rectangle</code> one, so a square is described as a rectangle with base 7.0 and height 7.0.</td></tr> <tr><td>(d)</td><td><code>Circle</code></td><td><code>Circle</code></td><td>The <code>Circle</code> overload.</td></tr> <tr><td>(e)</td><td><code>Shape</code></td><td><code>Rectangle</code></td><td><strong><code>This is a shape</code>.</strong> The variable is declared <code>Shape</code>, and that is all the compiler looks at.</td></tr> <tr><td>(f)</td><td><code>Shape</code></td><td><code>Circle</code></td><td><strong><code>This is a shape</code></strong>, for the same reason.</td></tr> <tr><td>(g)</td><td><code>Shape</code></td><td><code>Rectangle</code></td><td><strong><code>Rectangle</code>'s <code>toString</code>.</strong> Same variable as line (e) &mdash; but this is an override, resolved from the object.</td></tr> <tr><td>(h)</td><td><code>Shape</code></td><td><code>Circle</code></td><td><strong><code>Circle</code>'s <code>toString</code></strong>, likewise.</td></tr> </table> <p>Lines (e) and (g) are the whole lesson, and they use <em>the same variable</em>. <code>displayType(polyShape1)</code> says "shape"; <code>System.out.println(polyShape1)</code> prints a rectangle. Overload selection asked the compiler, which sees <code>Shape polyShape1</code>. Override dispatch asked the running program, which sees a <code>Rectangle</code> object.</p> <p>Line (c) is the other one people miss. Adding a <code>Square</code> to the hierarchy did nothing for <code>displayType</code>, because overload resolution never looks past the declared types that exist in the source. If you want per-type behavior that follows the object, you write an <em>overridden method on the class</em>, not an overloaded static method that takes the class &mdash; and that argument is the opening move of Lecture 13.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 12.7</div> <div class="bd"> <p>What does this program print? There are three calls and four lines of output.</p> <pre><code class="language-java">class Greeter {
+    public void greet() {
+        System.out.println("Hello from Greeter");
+    }
+
+    public void greet(String name) {
+        System.out.println("Hello " + name + " from Greeter");
+    }
+}
+
+class LoudGreeter extends Greeter {
+    @Override
+    public void greet() {
+        System.out.println("HELLO FROM LOUDGREETER");
+    }
+
+    public void greet(int times) {
+        for (int i = 0; i &lt; times; i++) {
+            greet();
+        }
+    }
+}
+
+public class GreetTest {
+    public static void main(String args[]) {
+        LoudGreeter g = new LoudGreeter();
+        g.greet();              // line (a)
+        g.greet("Ana");         // line (b)
+        g.greet(2);             // line (c)
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> There are three methods named <code>greet</code> in scope on a <code>LoudGreeter</code>: the no-argument one (overridden), the <code>String</code> one (inherited), and the <code>int</code> one (new). For each call, first pick the overload from the argument types, then ask which class's version of <em>that</em> method runs.</p> <pre class="out"><code>HELLO FROM LOUDGREETER
+Hello Ana from Greeter
+HELLO FROM LOUDGREETER
+HELLO FROM LOUDGREETER</code></pre> <p><strong>Line (a).</strong> No arguments, so the no-argument overload. <code>LoudGreeter</code> overrides it, so the loud version runs.</p> <p><strong>Line (b).</strong> A <code>String</code> argument, so the <code>String</code> overload &mdash; which <code>LoudGreeter</code> never touched. It is inherited from <code>Greeter</code> and prints <code>Greeter</code>'s text. Overriding one overload does not affect the others; they are separate methods.</p> <p><strong>Line (c).</strong> An <code>int</code> argument, so <code>LoudGreeter</code>'s own <code>greet(int)</code>, which loops twice calling <code>greet()</code> &mdash; the no-argument overload, overridden &mdash; so two loud lines.</p> <p><strong>Things to notice.</strong> Line (c) is worth pausing on. <code>greet()</code> inside <code>greet(int)</code> means <code>this.greet()</code>, and <code>this</code> is a <code>LoudGreeter</code>, so the override runs. Had <code>greet(int)</code> been written in <code>Greeter</code> instead, calling <code>greet()</code> from inside it would <em>still</em> reach <code>LoudGreeter</code>'s version for a <code>LoudGreeter</code> object. A superclass method calling an overridable method is calling the subclass's version without knowing it &mdash; powerful, and occasionally the source of a very confusing afternoon.</p> </div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 12.8</div> <div class="bd"> <p>Classify each pair of method declarations: overriding, overloading, or neither (a compile error). <code>B extends A</code> in every part.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>A</code> has <code>public void draw(int n)</code>; <code>B</code> has <code>public void draw(double n)</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Overloading.</strong> Different parameter types, so <code>B</code> now has two <code>draw</code> methods: the inherited <code>draw(int)</code> and its own <code>draw(double)</code>. <code>b.draw(3)</code> calls the inherited <code>int</code> one; <code>b.draw(3.0)</code> calls the new one. Putting <code>@Override</code> on <code>B</code>'s version would be a compile error.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>A</code> has <code>public void draw(int n)</code>; <code>B</code> has <code>public void draw(int count)</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Overriding.</strong> Parameter <em>names</em> are irrelevant &mdash; only the types, count and order form the signature. <code>int n</code> and <code>int count</code> are the same signature, so <code>B</code>'s version replaces <code>A</code>'s.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>A</code> has <code>public String label()</code>; <code>B</code> has <code>public int label()</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Neither &mdash; a compile error.</strong> The signatures are identical (no parameters), so this must be an override attempt, but <code>int</code> is not <code>String</code> and not a subtype of it. Return types are not part of the signature, so this cannot be an overload either. Java reports that <code>label()</code> in <code>B</code> cannot override <code>label()</code> in <code>A</code> because the return type is incompatible.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>A</code> has <code>public void draw(int n, String s)</code>; <code>B</code> has <code>public void draw(String s, int n)</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Overloading.</strong> Same types, different <em>order</em> &mdash; and order is part of the signature, so these are two distinct methods. <code>b.draw(3, "x")</code> and <code>b.draw("x", 3)</code> go to different places, which is exactly the sort of thing that makes overloaded APIs hard to read.</p> <p><strong>Things to notice across all four parts.</strong> A one-line test settles every one of them: <em>write the parameter types out in order and compare.</em> Identical list means override (then check return type and access); different list means overload; same list with a clashing return type means an error. Names of parameters never matter.</p> </div></details> </div> </div> </div> <h2 id="s7"><span class="num">7.</span><code>Object</code>, the root of everything &mdash; and one design question</h2> <p>In &sect;4 the constructor chain kept going after <code>Shape</code>, even though <code>Shape</code> extends nothing. Here is what is above it.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the <code>Object</code> class</span></div> <div class="bd"> <p><code>java.lang.Object</code> is the root of the entire class hierarchy. A class that does not say <code>extends</code> anything implicitly extends <code>Object</code>, so <em>every</em> class in Java &mdash; yours, the library's, everyone's &mdash; has <code>Object</code> as an ancestor.</p> <p>That means every object you will ever create already has these methods, inherited, before you write a line:</p> <ul> <li><code>toString()</code> &mdash; a text description. You met it in Lecture 9.</li> <li><code>equals(Object other)</code> &mdash; equality. Also Lecture 9.</li> <li><code>hashCode()</code> &mdash; an <code>int</code> summary of the object, used by hash-based collections.</li> <li><code>getClass()</code> &mdash; the object's actual class, at run time.</li> </ul> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; walking the chain to the top</span></div> <div class="bd"> <p><code>getClass()</code> returns an object describing a class, and that object has a <code>getSuperclass()</code>. Following it repeatedly walks the hierarchy upward until there is nothing left. <code>Triangle</code> here extends <code>Shape</code> and deliberately does <em>not</em> override <code>toString</code>; <code>Badge</code> extends nothing and overrides nothing.</p> <p class="filename">ObjectRoot.java</p>
+<pre><code class="language-java">public class ObjectRoot {
+    public static void main(String args[]) {
+        Square square = new Square(6);
+
+        Class&lt;?&gt; c = square.getClass();
+        while (c != null) {
+            System.out.println(c.getName());
+            c = c.getSuperclass();
+        }
+
+        System.out.println();
+        System.out.println(new Triangle(4));
+        System.out.println(new Badge(7));
+    }
+}</code></pre> <p class="filename">Triangle.java</p>
+<pre><code class="language-java">public class Triangle extends Shape {
+    private final double side;
+
+    public Triangle(double side) {
+        super(3 * side, Math.sqrt(3) / 4 * side * side);
+        this.side = side;
+    }
+
+    public double getSide() {
+        return side;
+    }
+}</code></pre> <p class="filename">Badge.java</p>
+<pre><code class="language-java">public class Badge {
+    private final int number;
+
+    public Badge(int number) {
+        this.number = number;
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Square Rectangle Shape java.lang.Object Shape with area: 6.928203230275509 and perimeter: 12.0 Badge@66d3c617 </code></pre> <p>The last line is <em>representative &mdash; yours will differ</em>: the hexadecimal part is derived from the object's identity hash code, which changes from run to run and machine to machine.</p> <p>Three things to read out of this output.</p> <ul> <li>The chain from <code>Square</code> ends at <code>java.lang.Object</code>, four levels up. <code>Shape</code> never wrote <code>extends Object</code>; Java supplied it.</li> <li><code>Triangle</code> prints <code>Shape</code>'s <code>toString</code>. It did not override it, so the upward search found <code>Shape</code>'s first. An equilateral triangle of side 4 has perimeter 12 and area about 6.93, so the inherited method is telling the truth &mdash; it just cannot mention the side.</li> <li><code>Badge</code> prints <code>Badge@66d3c617</code>, which is <code>Object</code>'s <code>toString</code>: the class name, an <code>@</code>, and the hash code in hex. Whenever you see that pattern in your own output, it means "this class never overrode <code>toString</code>" &mdash; and it is normally a bug you have just caught.</li> </ul> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 12.9</div> <div class="bd"> <p>Suppose you delete the <code>toString</code> method from <code>Square</code> but leave <code>Rectangle</code>'s and <code>Shape</code>'s alone.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> What does <code>System.out.println(new Square(6));</code> print now?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Rectangle with base: 6.0, height: 6.0, area: 36.0, perimeter: 24.0</code>. The search starts at <code>Square</code>, finds nothing, and stops at the first match one level up. It never reaches <code>Shape</code>'s version, and it certainly never reaches <code>Object</code>'s.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> And if you delete <code>Rectangle</code>'s as well?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Shape with area: 36.0 and perimeter: 24.0</code>. Two levels up. The numbers are still right, because they were computed by the <code>super(...)</code> chain when the object was built.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> And if you delete <code>Shape</code>'s too?</p> <details class="soln"><summary></summary><div class="ans"> <p>Something of the form <code>Square@1b6d3586</code> &mdash; <code>Object</code>'s version, the last stop on the search. The exact digits vary from run to run.</p> <p><strong>Things to notice across all three parts.</strong> There is no such thing as a class without a <code>toString</code>; the only question is how far up the chain the search has to go before it finds one. The same is true of <code>equals</code> and <code>hashCode</code>, and that is why Lecture 9 talked about <em>overriding</em> <code>equals</code> rather than <em>writing</em> it.</p> </div></details> </div> </div> </div> <p>One last thing, and it is a design question rather than a syntax rule. Her hierarchy has <code>Square extends Rectangle</code>. That reads perfectly in English &mdash; a square is a rectangle &mdash; and passes the &sect;1 test. But it is the most famous debatable example in object-oriented design, and it is worth seeing why.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the same hierarchy, made mutable</span></div> <div class="bd"> <p>Suppose <code>Rectangle</code> had setters, as a shape class perfectly well might. <code>Square</code> still extends it and still passes a side length up to both dimensions. Nothing here looks unreasonable.</p> <p class="filename">MutableRectangle.java</p>
+<pre><code class="language-java">public class MutableRectangle {
+    private double base;
+    private double height;
+
+    public MutableRectangle(double base, double height) {
+        this.base = base;
+        this.height = height;
+    }
+
+    public void setBase(double base)     { this.base = base; }
+    public void setHeight(double height) { this.height = height; }
+
+    public double getArea() { return base * height; }
+
+    @Override
+    public String toString() {
+        return "base " + base + ", height " + height + ", area " + getArea();
+    }
+}</code></pre> <p class="filename">MutableSquare.java</p>
+<pre><code class="language-java">public class MutableSquare extends MutableRectangle {
+
+    public MutableSquare(double sideLength) {
+        super(sideLength, sideLength);
+    }
+}</code></pre> <p class="filename">DesignDemo.java</p>
+<pre><code class="language-java">public class DesignDemo {
+    public static void main(String args[]) {
+        MutableSquare square = new MutableSquare(10);
+        System.out.println("A square of side 10: " + square);
+
+        MutableRectangle r = square;      // a square is-a rectangle
+        r.setBase(6);                     // perfectly reasonable for a rectangle
+
+        System.out.println("After r.setBase(6): " + square);
+    }
+}</code></pre> <p><code>r</code> and <code>square</code> are the same object. What does the second line print?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>A square of side 10: base 10.0, height 10.0, area 100.0
+After r.setBase(6): base 6.0, height 10.0, area 60.0</code></pre> <p>The square is no longer square. <code>setBase</code> is a method every <code>MutableRectangle</code> is entitled to, <code>MutableSquare</code> inherited it without thinking about it, and the object is now in a state its own class says is impossible.</p> <p>The principle being broken has a name &mdash; the <em>Liskov substitution principle</em>: anywhere a superclass object is expected, a subclass object should work without surprising anyone. A mutable <code>Square</code> cannot honor <code>setBase</code>, so it is not really substitutable for a mutable <code>Rectangle</code>, however good the English sentence sounds.</p> <p>Now look again at what her <code>Shape</code> and <code>Rectangle</code> actually do. Every field is <code>private final</code>, there are no setters, and the only way to set a rectangle's dimensions is the constructor. An immutable <code>Square</code> <em>is</em> perfectly substitutable for an immutable <code>Rectangle</code>, because there is no operation that could break it. The design question does not arise. That is not luck &mdash; immutability is one of the standard answers to this problem, and this is a good example of a <code>final</code> keyword doing more than it appears to.</p> <p>Three ways out, for reference: make the classes immutable (what she did); have <code>Square</code> hold a <code>Rectangle</code> as a field instead of extending it (has-a rather than is-a); or drop <code>Square</code> as a class and let a rectangle with equal sides simply be a rectangle.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 12.10</div> <div class="bd"> <p>Someone proposes fixing <code>MutableSquare</code> by overriding both setters so that each one sets both dimensions:</p> <pre><code class="language-java">@Override public void setBase(double base) {
+    super.setBase(base);
+    super.setHeight(base);
+}
+@Override public void setHeight(double height) {
+    super.setBase(height);
+    super.setHeight(height);
+}</code></pre> <p>Does this fix the problem? Argue for or against.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Ask two questions: does the object stay square, and does code written against <code>MutableRectangle</code> still behave the way that code expects?</p> <p><strong>It fixes the first problem and creates a second.</strong> The object does stay square &mdash; <code>r.setBase(6)</code> now yields base 6, height 6, area 36. But consider a method that was written for rectangles and is entirely reasonable:</p> <pre><code class="language-java">public static void makeTwiceAsWide(MutableRectangle r) {
+    double h = r.getHeight();
+    r.setBase(r.getBase() * 2);
+    // the caller is entitled to assume the height is still h }</code></pre> <p>Hand it a <code>MutableSquare</code> and the height silently doubles too. No exception, no error &mdash; just a routine that no longer does what its name and its contract say. You have moved the violation from "the object is in an impossible state" to "the object quietly disobeys the superclass's contract", which is harder to find, not easier.</p> <p><strong>Things to notice.</strong> This is the honest answer to the classic interview question, and it is worth internalizing the shape of it: <em>you cannot patch a broken is-a relationship with more overriding.</em> If the subclass cannot honor everything the superclass promises, the relationship itself was wrong. Removing the setters &mdash; her design &mdash; removes the promise, and then there is nothing to break.</p> </div></details> </div> </div> <h2 id="prac"><span class="num">&#9733;</span>Practice Problems</h2> <div class="box prac"> <div class="hd">Practice Problems<span class="tag">&mdash; exam-style, Lecture 12 material</span></div> <div class="bd"> <p>The first three are taken from her own exams and practice sets; the last two are added here to drill the two things that cost the most points &mdash; constructor rules and <code>super.method()</code>. Inheritance appears on every exam in this course in two forms: "write a subclass" and "what is the output". Both are represented below. Work them on paper first; the exam is closed book and there is no compiler in the room.</p> </div> </div> <h3>Problem 1 &mdash; <code>SavingsAccount extends BankAccount</code> <span class="muted">(from CSCI 212 Midterm, Summer 2026)</span></h3> <p>Assume the class <code>BankAccount</code> below is correctly implemented. Write complete Java code for a class <code>SavingsAccount</code> that inherits from <code>BankAccount</code>.</p> <ul> <li><code>SavingsAccount</code> should have exactly one additional private instance variable <code>interestRate</code> of type <code>double</code>.</li> <li>The constructor should take three parameters: <code>owner</code>, <code>balance</code> and <code>interestRate</code>. It should call the constructor of <code>BankAccount</code> to initialize <code>owner</code> and <code>balance</code>.</li> <li>The class should also have a <code>getInterestRate</code> method and an <code>addInterest</code> method.</li> <li><code>addInterest</code> should add <code>balance * interestRate</code> to the account <em>by using the inherited <code>deposit</code> method</em>.</li> <li>Override <code>toString</code> so that it returns a <code>String</code> of the form <code>getOwner() + " has savings balance " + getBalance() + " at rate " + interestRate</code>.</li> </ul> <p class="filename">BankAccount.java</p>
+<pre><code class="language-java">public class BankAccount {
+    private String owner;
+    private double balance;
+
+    public BankAccount(String owner, double balance) {
+        this.owner = owner;
+        this.balance = balance;
+    }
+
+    public String getOwner() { return owner; }
+
+    public double getBalance() { return balance; }
+
+    public void deposit(double amount) {
+        balance += amount;
+    }
+
+    public void withdraw(double amount) {
+        if (amount &lt;= balance) {
+            balance -= amount;
+        }
+    }
+
+    public String toString() {
+        return owner + " has balance " + balance;
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Work through the four inheritance decisions in order.</p> <ol> <li><em>The header.</em> "Inherits from" means <code>extends BankAccount</code>.</li> <li><em>The constructor.</em> <code>BankAccount</code> has no no-argument constructor, so the first statement <strong>must</strong> be <code>super(owner, balance);</code>. Then store <code>interestRate</code>. Forgetting this line is the error that costs the most points on this question.</li> <li><em><code>addInterest</code>.</em> The problem insists you use the inherited <code>deposit</code>, so do not reach for <code>balance</code> &mdash; you cannot anyway, it is <code>private</code> in <code>BankAccount</code>. Read the balance with <code>getBalance()</code> and hand the interest to <code>deposit(...)</code>.</li> <li><em><code>toString</code>.</em> Same reason: <code>owner</code> and <code>balance</code> are private up there, so build the string from <code>getOwner()</code> and <code>getBalance()</code>.</li> </ol> <p class="filename">SavingsAccount.java</p>
+<pre><code class="language-java">public class SavingsAccount extends BankAccount {
+    private double interestRate;
+
+    public SavingsAccount(String owner, double balance, double interestRate) {
+        super(owner, balance);
+        this.interestRate = interestRate;
+    }
+
+    public double getInterestRate() {
+        return interestRate;
+    }
+
+    public void addInterest() {
+        deposit(getBalance() * interestRate);
+    }
+
+    @Override
+    public String toString() {
+        return getOwner() + " has savings balance " + getBalance()
+                          + " at rate " + interestRate;
+    }
+}</code></pre> <p>A driver, to see it work:</p> <p class="filename">SavingsTest.java</p>
+<pre><code class="language-java">public class SavingsTest {
+    public static void main(String args[]) {
+        BankAccount checking = new BankAccount("Ana", 500.0);
+        SavingsAccount savings = new SavingsAccount("Ben", 1000.0, 0.05);
+
+        System.out.println(checking);
+        System.out.println(savings);
+
+        savings.addInterest();
+        System.out.println("After one year of interest:");
+        System.out.println(savings);
+
+        savings.withdraw(50.0);
+        System.out.println("After withdrawing 50:");
+        System.out.println(savings);
+        System.out.println("Rate is " + savings.getInterestRate());
+    }
+}</code></pre> <pre class="out"><code>Ana has balance 500.0
+Ben has savings balance 1000.0 at rate 0.05
+After one year of interest:
+Ben has savings balance 1050.0 at rate 0.05
+After withdrawing 50:
+Ben has savings balance 1000.0 at rate 0.05
+Rate is 0.05</code></pre> <p><strong>Things to notice.</strong> <code>SavingsAccount</code> is twenty lines and yet supports <code>deposit</code>, <code>withdraw</code>, <code>getOwner</code> and <code>getBalance</code> &mdash; none of which appear in the file. That is the argument for inheritance in one screen.</p> <p><code>savings.withdraw(50.0)</code> runs <code>BankAccount</code>'s withdraw, including its "only if there is enough money" check, and it operates on the same <code>balance</code> field the savings interest went into. There is one balance, not two.</p> <p>Look at <code>addInterest</code> once more. <code>deposit(getBalance() * interestRate)</code> mixes an inherited method, an inherited getter and the subclass's own field in one line, and that mixture is normal. What you may <em>not</em> write is <code>balance += balance * interestRate;</code> &mdash; that is <code>area has private access in Shape</code> all over again, with different names.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 1</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="6" aria-label="Live coding - Practice Problem 1">public class SavingsAccount extends BankAccount {
+    // 1. private double interestRate; // 2. Constructor (String owner, double balance, double interestRate) //    -- call super(...) FIRST. // 3. getInterestRate() // 4. addInterest() -- add balance * interestRate using the //    INHERITED deposit method. // 5. Override toString(): //    getOwner() + " has savings balance " + getBalance() //                                         + " at rate " + interestRate }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 2 &mdash; <code>FormattedDocument extends Document</code> <span class="muted">(from CSCI 212 Exam 2, Spring 2025)</span></h3> <p>The class <code>Document</code> below is given, already written. (<code>Printable</code> is an <em>interface</em>; interfaces are the subject of Lecture 14, and for this problem you can read <code>implements Printable</code> as a promise that <code>Document</code> supplies both <code>printInfo</code> methods.)</p> <p>Write a subclass <code>FormattedDocument</code> that extends <code>Document</code> and has only one method. That method should override <code>printInfo()</code> to print the content in ALL CAPS. <em>Hint: you can use the <code>String</code> method <code>toUpperCase()</code>.</em></p> <p class="filename">Printable.java</p>
+<pre><code class="language-java">public interface Printable {
+    void printInfo();
+    void printInfo(int times);
+}</code></pre> <p class="filename">Document.java</p>
+<pre><code class="language-java">public class Document implements Printable {
+    private String content;
+
+    public Document(String content) {
+        this.content = content;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    @Override
+    public void printInfo() {
+        System.out.println(content);
+    }
+
+    @Override
+    public void printInfo(int times) {
+        for (int i = 0; i &lt; times; i++) {
+            printInfo();
+        }
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> "Has only one method" is a constraint, not a hint &mdash; but a constructor is not a method, and you need one, because <code>Document</code> has no no-argument constructor. So: a constructor that passes the content straight up with <code>super(content)</code>, and exactly one method, the overridden <code>printInfo()</code>. <code>content</code> is <code>private</code> in <code>Document</code>, so read it through <code>getContent()</code>.</p> <p class="filename">FormattedDocument.java</p>
+<pre><code class="language-java">public class FormattedDocument extends Document {
+
+    public FormattedDocument(String content) {
+        super(content);
+    }
+
+    @Override
+    public void printInfo() {
+        System.out.println(getContent().toUpperCase());
+    }
+}</code></pre> <p class="filename">DocumentTest.java</p>
+<pre><code class="language-java">public class DocumentTest {
+    public static void main(String args[]) {
+        Document plain = new Document("csci 212 midterm");
+        FormattedDocument shout = new FormattedDocument("csci 212 midterm");
+
+        plain.printInfo();
+        shout.printInfo();
+
+        System.out.println("---");
+        shout.printInfo(3);
+    }
+}</code></pre> <pre class="out"><code>csci 212 midterm
+CSCI 212 MIDTERM
+---
+CSCI 212 MIDTERM
+CSCI 212 MIDTERM
+CSCI 212 MIDTERM</code></pre> <p><strong>Things to notice.</strong> The last three lines are the interesting part. <code>FormattedDocument</code> never overrode <code>printInfo(int)</code> &mdash; it inherited <code>Document</code>'s version unchanged. That inherited loop calls <code>printInfo()</code>, and because <code>this</code> is a <code>FormattedDocument</code>, the call lands on the <em>override</em>. So a method written in the superclass, months earlier, is now shouting.</p> <p>That is the mechanism from Quick Check 12.7 line (c), and it is the reason overriding is worth so much more than it looks: every existing call to <code>printInfo()</code> anywhere in the program &mdash; including inside the superclass &mdash; automatically picks up your new behavior. It is also why overriding a method changes more than you might intend, and why <code>final</code> exists for the cases where you want to forbid it.</p> <p>If the original exam question's "only one method" is read strictly enough to exclude the constructor too, the class cannot be written at all, since <code>Document</code> has no no-argument constructor to fall back on. The intent is clearly "one <em>method</em>, plus whatever plumbing", and the rubric's answer includes the constructor.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 2</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="6" aria-label="Live coding - Practice Problem 2">public class FormattedDocument extends Document { // 1. A constructor taking the content. Document has no no-argument //    constructor, so pass it up with super(...). // 2. Exactly one method: override printInfo() so it prints the //    content in ALL CAPS. content is private in Document -- use //    getContent(), and String's toUpperCase(). } </textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 3 &mdash; What is the output? <span class="muted">(from Exam 2 Practice Problems)</span></h3> <p>Consider the following program and the two classes it uses.</p> <p class="filename">Question.java</p>
+<pre><code class="language-java">class A {
+    int x = 0;
+
+    public void increment() { x++; }
+
+    public String toString() { return "class A: " + x; }
+
+    public B getB() { return new B(); }
+}
+
+class B extends A {
+    public String toString() { return "Class B: " + x; }
+
+    public A getA() { return getB(); }
+}
+
+public class Question {
+    public static void main(String args[]) {
+        B b = new B();
+        A a = b;
+        System.out.println(a);          // line A
+        b.increment();
+        System.out.println(a);          // line B
+        a = new A();
+        System.out.println(a.getB());   // line C
+        System.out.println(b.getA());   // line D
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> What is the output generated at line A?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Class B: 0</code>. <code>a</code> and <code>b</code> are two references to the <em>same</em> <code>B</code> object &mdash; <code>A a = b;</code> copies the reference, not the object. <code>println</code> calls <code>toString</code>, and the search starts at the object's real class, <code>B</code>. <code>B</code>'s version wins, with <code>x</code> still 0. The capital <code>C</code> in <code>Class B</code> is <code>B</code>'s own spelling; <code>A</code> writes a lowercase <code>class</code>, and that difference is how you tell which one ran.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What is the output generated at line B?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Class B: 1</code>. <code>b.increment()</code> runs <code>A</code>'s inherited <code>increment</code>, which does <code>x++</code> on the one and only <code>x</code> in that object. <code>a</code> sees the change because <code>a</code> <em>is</em> that object.</p> <p>Note also that <code>B</code>'s <code>toString</code> reads <code>x</code> directly. That compiles because <code>x</code> in <code>A</code> is declared with no modifier &mdash; package-private &mdash; and <code>A</code> and <code>B</code> are in the same file, hence the same package. Had <code>A</code> written <code>private int x = 0;</code>, <code>B</code>'s <code>toString</code> would not compile.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> What is the output generated at line C?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Class B: 0</code>. Two steps. <code>a = new A();</code> makes <code>a</code> point at a fresh, plain <code>A</code>. Then <code>a.getB()</code> runs <code>A</code>'s <code>getB</code>, which returns <code>new B()</code> &mdash; a brand-new <code>B</code> object with <code>x</code> at its default 0. Printing that new <code>B</code> uses <code>B</code>'s <code>toString</code>.</p> <p>The trap is the declared return type. <code>getB</code> is declared to return <code>B</code>, and it does; the fact that it was called on an <code>A</code> changes nothing about the object it hands back.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> What is the output generated at line D?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Class B: 0</code>. <code>b.getA()</code> runs <code>B</code>'s <code>getA</code>, whose body is <code>return getB();</code> &mdash; the inherited <code>getB</code>, which again returns a fresh <code>B</code>. So although the method is named <code>getA</code> and is <em>declared</em> to return an <code>A</code>, the object it actually returns is a <code>B</code>, with <code>x</code> at 0, and <code>B</code>'s <code>toString</code> prints it.</p> <p><strong>Things to notice across the whole problem.</strong> Every line here is decided by the same question: <em>what class is the object, really?</em> Lines A and B answer "a <code>B</code>, which <code>a</code> merely happens to be pointing at". Lines C and D answer "a <code>B</code>, because <code>getB</code> built one, whatever the variable or the return type is called".</p> <p>The two counters are also worth separating. There is exactly one <code>x</code> per object. The <code>x</code> that reached 1 belongs to the original <code>b</code>; the objects printed at lines C and D are new, so their <code>x</code> is 0. Nothing about inheritance makes fields shared &mdash; that would be <code>static</code>, from Lecture 9.</p> </div></details> </div> <h3>Problem 4 &mdash; Find the three errors <span class="muted">(added for these notes)</span></h3> <p>The file <code>Circle.java</code> below is meant to extend the <code>Shape</code> class from &sect;2 &mdash; the one with <code>private final double perimeter</code>, <code>private final double area</code>, a two-argument constructor, <code>getPerimeter()</code>, <code>getArea()</code> and <code>toString()</code>. Exactly 3 of the numbered lines have errors. Identify the 3 different errors by giving the numbers of the incorrect lines. For each error also give a corrected version of the line. Any line without a number is correct as written.</p> <p class="filename">Circle.java</p>
+<pre><code class="language-java">public class Circle extends Shape {
+    private final double radius;
+
+    public Circle(double radius) {
+        this.radius = radius;                                     // line 1
+        super(2 * Math.PI * radius, Math.PI * radius * radius);    // line 2
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+
+    @Override
+    public String toSting() {                                     // line 3
+        return "Circle with radius: " + radius +
+               ", area: " + area + ", perimeter: " + getPerimeter();   // line 4
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Three separate categories, and each is one of the three rules from this lecture: where <code>super(...)</code> may appear, what <code>@Override</code> promises, and what <code>private</code> means for a subclass. Read the file once for each rule rather than trying to spot everything at once.</p> <p><strong>Error 1 &mdash; line 2.</strong> <code>super(...)</code> is not the first statement in the constructor.</p> <pre class="err"><code>Circle.java:6: error: call to super must be first statement in constructor super(2 * Math.PI * radius, Math.PI * radius * radius);
+        // line 2
+^</code></pre> <p>Corrected: move it above line 1, so the constructor reads <code>super(2 * Math.PI * radius, Math.PI * radius * radius);</code> and then <code>this.radius = radius;</code>.</p> <p><strong>Error 2 &mdash; line 3.</strong> The method is named <code>toSting</code>, which overrides nothing, and <code>@Override</code> says otherwise.</p> <pre class="err"><code>Circle.java:13: error: method does not override or implement a method from a supertype @Override
+^</code></pre> <p>Corrected: <code>public String toString() {</code></p> <p><strong>Error 3 &mdash; line 4.</strong> <code>area</code> is <code>private</code> in <code>Shape</code>, so <code>Circle</code>'s code cannot name it.</p> <pre class="err"><code>Circle.java:16: error: area has private access in Shape ", area: " + area + ", perimeter: " + getPerimeter();
+        // line 4
+^</code></pre> <p>Corrected: <code>", area: " + getArea() + ", perimeter: " + getPerimeter();</code></p> <p>Note what is <em>not</em> wrong. <code>radius</code> on line 4 is fine &mdash; it is <code>Circle</code>'s own private field, read from inside <code>Circle</code>. <code>getPerimeter()</code> on the same line is fine &mdash; it is a <code>public</code> method. The three failures and the two successes sit in one expression, which is exactly how this is asked on an exam.</p> <p>With all three fixed, this is her <code>Circle</code> class, and it runs:</p> <p class="filename">Circle.java</p>
+<pre><code class="language-java">public class Circle extends Shape {
+    private final double radius;
+
+    public Circle(double radius) {
+        super(2 * Math.PI * radius, Math.PI * radius * radius);
+        this.radius = radius;
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+
+    @Override
+    public String toString() {
+        return "Circle with radius: " + radius +
+               ", area: " + getArea() + ", perimeter: " + getPerimeter();
+    }
+}</code></pre> <pre class="out"><code>Circle with radius: 3.0, area: 28.274333882308138, perimeter: 18.84955592153876 </code></pre> <p><strong>Things to notice.</strong> All three errors were reported by a single <code>javac</code> run, which is not always the case &mdash; a missing semicolon or brace stops the parser and hides everything after it. These three are all <em>semantic</em> errors found after parsing succeeded, so the compiler could reach all of them. When you get one error, fix it and recompile; when you get three, you have been given a complete list.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 4</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="20" aria-label="Live coding - Practice Problem 4">public class Circle extends Shape {
+    private final double radius;
+
+    public Circle(double radius) {
+        this.radius = radius;                                     // line 1
+        super(2 * Math.PI * radius, Math.PI * radius * radius);    // line 2
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+
+    @Override
+    public String toSting() {                                     // line 3
+        return "Circle with radius: " + radius +
+               ", area: " + area + ", perimeter: " + getPerimeter();   // line 4
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 5 &mdash; <code>CheckingAccount</code>, overriding with <code>super</code> <span class="muted">(added for these notes)</span></h3> <p>Using the same <code>BankAccount</code> from Problem 1, write a class <code>CheckingAccount</code> that extends it. It has one additional private field, <code>overdraftFee</code> of type <code>double</code>, a three-parameter constructor, and a <code>getOverdraftFee</code> method. It must <strong>override <code>withdraw</code></strong> so that:</p> <ul> <li>if the account has enough money, the withdrawal happens normally &mdash; and your override must perform it by calling the superclass's <code>withdraw</code>, not by touching the balance itself;</li> <li>otherwise no money is withdrawn, the overdraft fee is taken out of the balance instead, and a message is printed.</li> </ul> <p>Also override <code>toString</code> to return <code>getOwner() + " has checking balance " + getBalance() + " with overdraft fee " + overdraftFee</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The overriding rules first: same name <code>withdraw</code>, same parameter list <code>(double)</code>, same return type <code>void</code>, and access no more restrictive than <code>public</code>. That fixes the signature before you write any logic.</p> <p>Then the logic. You cannot read <code>balance</code> &mdash; it is <code>private</code> in <code>BankAccount</code> &mdash; so test with <code>getBalance()</code>. And you must not write <code>balance -= amount</code>, for the same reason; every change to the balance goes through the inherited <code>withdraw</code> or <code>deposit</code>. Charging the fee is itself just a withdrawal, so <code>super.withdraw(overdraftFee)</code> does it.</p> <p class="filename">CheckingAccount.java</p>
+<pre><code class="language-java">public class CheckingAccount extends BankAccount {
+    private double overdraftFee;
+
+    public CheckingAccount(String owner, double balance, double overdraftFee) {
+        super(owner, balance);
+        this.overdraftFee = overdraftFee;
+    }
+
+    public double getOverdraftFee() {
+        return overdraftFee;
+    }
+
+    @Override
+    public void withdraw(double amount) {
+        if (amount &lt;= getBalance()) {
+            super.withdraw(amount);
+        } else {
+            super.withdraw(overdraftFee);
+            System.out.println("Declined. Overdraft fee of " + overdraftFee + " charged.");
+        }
+    }
+
+    @Override
+    public String toString() {
+        return getOwner() + " has checking balance " + getBalance()
+                          + " with overdraft fee " + overdraftFee;
+    }
+}</code></pre> <p class="filename">CheckingTest.java</p>
+<pre><code class="language-java">public class CheckingTest {
+    public static void main(String args[]) {
+        CheckingAccount checking = new CheckingAccount("Ana", 200.0, 35.0);
+        System.out.println(checking);
+
+        checking.withdraw(50.0);
+        System.out.println(checking);
+
+        checking.withdraw(500.0);
+        System.out.println(checking);
+    }
+}</code></pre> <pre class="out"><code>Ana has checking balance 200.0 with overdraft fee 35.0
+Ana has checking balance 150.0 with overdraft fee 35.0
+Declined. Overdraft fee of 35.0 charged.
+Ana has checking balance 115.0 with overdraft fee 35.0</code></pre> <p><strong>Things to notice.</strong> <code>super.withdraw(amount)</code> and plain <code>withdraw(amount)</code> are completely different here. The plain call would mean <code>this.withdraw(amount)</code>, which is the method you are currently inside &mdash; infinite recursion and a <code>StackOverflowError</code>. Any time an override calls "the normal version", it must say <code>super.</code></p> <p>The <code>if</code> test is deliberately duplicated: <code>CheckingAccount</code> checks <code>amount &lt;= getBalance()</code> and then <code>BankAccount.withdraw</code> checks it again. That is a little wasteful and completely safe. The alternative &mdash; calling <code>super.withdraw(amount)</code> unconditionally and inspecting the balance afterwards to see whether it worked &mdash; is worse, because it depends on a detail of the superclass that its author never promised.</p> <p>Finally, note that <code>CheckingAccount</code> and <code>SavingsAccount</code> are siblings: both extend <code>BankAccount</code>, neither knows about the other, and each changes exactly the behavior it needs to. That is the shape a healthy hierarchy has.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 5</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="6" aria-label="Live coding - Practice Problem 5">public class CheckingAccount extends BankAccount {
+    // 1. private double overdraftFee; // 2. Constructor (String owner, double balance, double overdraftFee) // 3. getOverdraftFee() // 4. Override withdraw(double amount): //    enough money  -&gt; super.withdraw(amount) //    not enough    -&gt; charge the fee instead, and print a message. //    Never touch balance directly -- it is private in BankAccount. // 5. Override toString(). }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <div class="box sum" id="summary"> <div class="hd">Lecture Summary</div> <div class="bd"> <ul> <li>Inheritance models an <strong>"is-a"</strong> relationship; a field models <strong>"has-a"</strong>. Say the sentence out loud before you choose.</li> <li><code>class Sub extends Super</code> gives <code>Sub</code> everything <code>Super</code> has, transitively, all the way up. One superclass only &mdash; Java has no multiple inheritance of classes.</li> <li>A subclass inherits <code>public</code> and <code>protected</code> members (and package-private ones in the same package). It does <strong>not</strong> inherit constructors, and it cannot name a <code>private</code> field even though that field is part of its objects.</li> <li>Four access levels: <code>private</code>, package-private (no keyword), <code>protected</code>, <code>public</code>. <code>protected</code> exists for subclasses &mdash; but prefer <code>private</code> fields plus getters, which is what her <code>Shape</code> does.</li> <li><code>super(...)</code> calls the superclass constructor and <strong>must be the first statement</strong>. Constructors run top-down: <code>Object</code> first, your class last. Omit <code>super(...)</code> and Java inserts <code>super()</code>, which fails loudly if the superclass has no no-argument constructor.</li> <li>A method is <strong>overridden</strong> when a subclass declares the same name, the same parameter list, a compatible return type and access no more restrictive. Write <code>@Override</code> &mdash; it turns a silent typo into a compile error. Use <code>super.method()</code> to extend the superclass version rather than replace it.</li> <li><strong>Overloading</strong> is different parameter lists, chosen by the compiler from the declared types. <strong>Overriding</strong> is the identical signature, chosen while the program runs from the actual object. <code>displayType(polyShape1)</code> says "shape" while <code>println(polyShape1)</code> prints a rectangle &mdash; same variable, different mechanism.</li> <li>Every class extends <code>Object</code> in the end, which is why every object already has <code>toString</code>, <code>equals</code>, <code>hashCode</code> and <code>getClass</code>. A printout like <code>Badge@66d3c617</code> means nobody overrode <code>toString</code>.</li> </ul> <p><strong>Coming up in Lecture 13: Polymorphism and Dynamic Binding.</strong> Today we kept noticing something and postponing it: a <code>Shape[]</code> array whose elements each printed their own <code>toString</code>, a <code>Shape</code> variable holding a <code>Rectangle</code>, an inherited <code>printInfo(int)</code> that somehow called a subclass's <code>printInfo()</code>. Next time that becomes the topic &mdash; how Java decides at run time which version of a method to call, why that is the single most useful thing inheritance buys you, and what <code>instanceof</code> and casting are for when you need to go back
+    down the hierarchy.</p>
+  </div>
+</div>
+
+<nav class="pagenav">
+<span class="disabled"><div class="dir">&larr; Previous</div><div class="ttl">Lecture 11 &mdash; OOP Case Study II: Implementing the Parking Ticket System</div><div class="pending">posts Thu Oct 15</div></span>
+<span class="disabled next"><div class="dir">Next &rarr;</div><div class="ttl">Lecture 13 &mdash; Polymorphism and Dynamic Binding</div><div class="pending">posts Thu Oct 22</div></span>
+</nav>
+<footer class="pf">CSCI 212 &middot; Object-Oriented Programming in Java &middot; Queens College, CUNY</footer>
+</div>
+<script>
+(()=>{var ut=Object.create;var xe=Object.defineProperty;var ft=Object.getOwnPropertyDescriptor;var gt=Object.getOwnPropertyNames;var ht=Object.getPrototypeOf,dt=Object.prototype.hasOwnProperty;var pt=(e,t)=>()=>{try{return t||e((t={exports:{}}).exports,t),t.exports}catch(n){throw t=0,n}};var Et=(e,t,n,l)=>{if(t&&typeof t=="object"||typeof t=="function")for(let d of gt(t))!dt.call(e,d)&&d!==n&&xe(e,d,{get:()=>t[d],enumerable:!(l=ft(t,d))||l.enumerable});return e};var bt=(e,t,n)=>(n=e!=null?ut(ht(e)):{},Et(t||!e||!e.__esModule?xe(n,"default",{value:e,enumerable:!0}):n,e));var Ke=pt((ln,Ge)=>{function Ie(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(t=>{let n=e[t],l=typeof n;(l==="object"||l==="function")&&!Object.isFrozen(n)&&Ie(n)}),e}var Z=class{constructor(t){t.data===void 0&&(t.data={}),this.data=t.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function Ce(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function k(e,...t){let n=Object.create(null);for(let l in e)n[l]=e[l];return t.forEach(function(l){for(let d in l)n[d]=l[d]}),n}var _t="</span>",Ne=e=>!!e.scope,Mt=(e,{prefix:t})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let n=e.split(".");return[`${t}${n.shift()}`,...n.map((l,d)=>`${l}${"_".repeat(d+1)}`)].join(" ")}return`${t}${e}`},oe=class{constructor(t,n){this.buffer="",this.classPrefix=n.classPrefix,t.walk(this)}addText(t){this.buffer+=Ce(t)}openNode(t){if(!Ne(t))return;let n=Mt(t.scope,{prefix:this.classPrefix});this.span(n)}closeNode(t){Ne(t)&&(this.buffer+=_t)}value(){return this.buffer}span(t){this.buffer+=`<span class="${t}">`}},Re=(e={})=>{let t={children:[]};return Object.assign(t,e),t},ae=class e{constructor(){this.rootNode=Re(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(t){this.top.children.push(t)}openNode(t){let n=Re({scope:t});this.add(n),this.stack.push(n)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(t){return this.constructor._walk(t,this.rootNode)}static _walk(t,n){return typeof n=="string"?t.addText(n):n.children&&(t.openNode(n),n.children.forEach(l=>this._walk(t,l)),t.closeNode(n)),t}static _collapse(t){typeof t!="string"&&t.children&&(t.children.every(n=>typeof n=="string")?t.children=[t.children.join("")]:t.children.forEach(n=>{e._collapse(n)}))}},le=class extends ae{constructor(t){super(),this.options=t}addText(t){t!==""&&this.add(t)}startScope(t){this.openNode(t)}endScope(){this.closeNode()}__addSublanguage(t,n){let l=t.root;n&&(l.scope=`language:${n}`),this.add(l)}toHTML(){return new oe(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function G(e){return e?typeof e=="string"?e:e.source:null}function De(e){return B("(?=",e,")")}function Ot(e){return B("(?:",e,")*")}function wt(e){return B("(?:",e,")?")}function B(...e){return e.map(n=>G(n)).join("")}function xt(e){let t=e[e.length-1];return typeof t=="object"&&t.constructor===Object?(e.splice(e.length-1,1),t):{}}function V(...e){return"("+(xt(e).capture?"":"?:")+e.map(l=>G(l)).join("|")+")"}function ke(e){return new RegExp(e.toString()+"|").exec("").length-1}function Nt(e,t){let n=e&&e.exec(t);return n&&n.index===0}var Rt=new RegExp(V(/\[(?:[^\\\]]|\\.)*\]/,/\(\?<(?![=!])[^>]+>/,/\(\?'[^']+'/,/\(\??/,/\\([1-9][0-9]*)/,/\\./));function fe(e,{joinWith:t}){let n=0;return e.map(l=>{n+=1;let d=n,_=G(l),c="";for(;_.length>0;){let r=Rt.exec(_);if(!r){c+=_;break}c+=_.substring(0,r.index),_=_.substring(r.index+r[0].length),r[0][0]==="\\"&&r[1]?c+="\\"+String(Number(r[1])+d):(c+=r[0],(r[0]==="("||/^\(\?[<']/.test(r[0]))&&n++)}return c}).map(l=>`(${l})`).join(t)}var yt=/\b\B/,ve="[a-zA-Z]\\w*",ge="[a-zA-Z_]\\w*",Le="\\b\\d+(\\.\\d+)?",Be="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Pe="\\b(0b[01]+)",St="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",At=(e={})=>{let t=/^#![ ]*\//;return e.binary&&(e.begin=B(t,/.*\b/,e.binary,/\b.*/)),k({scope:"meta",begin:t,end:/$/,relevance:0,"on:begin":(n,l)=>{n.index!==0&&l.ignoreMatch()}},e)},K={begin:"\\\\[\\s\\S]",relevance:0},Tt={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[K]},It={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[K]},Ct={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},Q=function(e,t,n={}){let l=k({scope:"comment",begin:e,end:t,contains:[]},n);l.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let d=V("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return l.contains.push({begin:B(/[ ]+/,"(",d,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),l},Dt=Q("//","$"),kt=Q("/\\*","\\*/"),vt=Q("#","$"),Lt={scope:"number",begin:Le,relevance:0},Bt={scope:"number",begin:Be,relevance:0},Pt={scope:"number",begin:Pe,relevance:0},$t={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[K,{begin:/\[/,end:/\]/,relevance:0,contains:[K]}]},Ht={scope:"title",begin:ve,relevance:0},Ut={scope:"title",begin:ge,relevance:0},jt={begin:"\\.\\s*"+ge,relevance:0},Gt=function(e){return Object.assign(e,{"on:begin":(t,n)=>{n.data._beginMatch=t[1]},"on:end":(t,n)=>{n.data._beginMatch!==t[1]&&n.ignoreMatch()}})},X=Object.freeze({__proto__:null,APOS_STRING_MODE:Tt,BACKSLASH_ESCAPE:K,BINARY_NUMBER_MODE:Pt,BINARY_NUMBER_RE:Pe,COMMENT:Q,C_BLOCK_COMMENT_MODE:kt,C_LINE_COMMENT_MODE:Dt,C_NUMBER_MODE:Bt,C_NUMBER_RE:Be,END_SAME_AS_BEGIN:Gt,HASH_COMMENT_MODE:vt,IDENT_RE:ve,MATCH_NOTHING_RE:yt,METHOD_GUARD:jt,NUMBER_MODE:Lt,NUMBER_RE:Le,PHRASAL_WORDS_MODE:Ct,QUOTE_STRING_MODE:It,REGEXP_MODE:$t,RE_STARTERS_RE:St,SHEBANG:At,TITLE_MODE:Ht,UNDERSCORE_IDENT_RE:ge,UNDERSCORE_TITLE_MODE:Ut});function Kt(e,t){e.input[e.index-1]==="."&&t.ignoreMatch()}function mt(e,t){e.className!==void 0&&(e.scope=e.className,delete e.className)}function Wt(e,t){t&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=Kt,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function Ft(e,t){Array.isArray(e.illegal)&&(e.illegal=V(...e.illegal))}function zt(e,t){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function Yt(e,t){e.relevance===void 0&&(e.relevance=1)}var Xt=(e,t)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let n=Object.assign({},e);Object.keys(e).forEach(l=>{delete e[l]}),e.keywords=n.keywords,e.begin=B(n.beforeMatch,De(n.begin)),e.starts={relevance:0,contains:[Object.assign(n,{endsParent:!0})]},e.relevance=0,delete n.beforeMatch},Zt=["of","and","for","in","not","or","if","then","parent","list","value"],Jt="keyword";function $e(e,t,n=Jt){let l=Object.create(null);return typeof e=="string"?d(n,e.split(" ")):Array.isArray(e)?d(n,e):Object.keys(e).forEach(function(_){Object.assign(l,$e(e[_],t,_))}),l;function d(_,c){t&&(c=c.map(r=>r.toLowerCase())),c.forEach(function(r){let u=r.split("|");l[u[0]]=[_,Vt(u[0],u[1])]})}}function Vt(e,t){return t?Number(t):Qt(e)?0:1}function Qt(e){return Zt.includes(e.toLowerCase())}var ye={},L=e=>{console.error(e)},Se=(e,...t)=>{console.log(`WARN: ${e}`,...t)},H=(e,t)=>{ye[`${e}/${t}`]||(console.log(`Deprecated as of ${e}. ${t}`),ye[`${e}/${t}`]=!0)},J=new Error;function He(e,t,{key:n}){let l=0,d=e[n],_={},c={};for(let r=1;r<=t.length;r++)c[r+l]=d[r],_[r+l]=!0,l+=ke(t[r-1]);e[n]=c,e[n]._emit=_,e[n]._multi=!0}function qt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw L("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),J;if(typeof e.beginScope!="object"||e.beginScope===null)throw L("beginScope must be object"),J;He(e,e.begin,{key:"beginScope"}),e.begin=fe(e.begin,{joinWith:""})}}function en(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw L("skip, excludeEnd, returnEnd not compatible with endScope: {}"),J;if(typeof e.endScope!="object"||e.endScope===null)throw L("endScope must be object"),J;He(e,e.end,{key:"endScope"}),e.end=fe(e.end,{joinWith:""})}}function tn(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function nn(e){tn(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),qt(e),en(e)}function sn(e){function t(c,r){return new RegExp(G(c),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(r?"g":""))}class n{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(r,u){u.position=this.position++,this.matchIndexes[this.matchAt]=u,this.regexes.push([u,r]),this.matchAt+=ke(r)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let r=this.regexes.map(u=>u[1]);this.matcherRe=t(fe(r,{joinWith:"|"}),!0),this.lastIndex=0}exec(r){this.matcherRe.lastIndex=this.lastIndex;let u=this.matcherRe.exec(r);if(!u)return null;let O=u.findIndex((P,I)=>I>0&&P!==void 0),M=this.matchIndexes[O];return u.splice(0,O),Object.assign(u,M)}}class l{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(r){if(this.multiRegexes[r])return this.multiRegexes[r];let u=new n;return this.rules.slice(r).forEach(([O,M])=>u.addRule(O,M)),u.compile(),this.multiRegexes[r]=u,u}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(r,u){this.rules.push([r,u]),u.type==="begin"&&this.count++}exec(r){let u=this.getMatcher(this.regexIndex);u.lastIndex=this.lastIndex;let O=u.exec(r);if(this.resumingScanAtSamePosition()&&!(O&&O.index===this.lastIndex)){let M=this.getMatcher(0);M.lastIndex=this.lastIndex+1,O=M.exec(r)}return O&&(this.regexIndex+=O.position+1,this.regexIndex===this.count&&this.considerAll()),O}}function d(c){let r=new l;return c.contains.forEach(u=>r.addRule(u.begin,{rule:u,type:"begin"})),c.terminatorEnd&&r.addRule(c.terminatorEnd,{type:"end"}),c.illegal&&r.addRule(c.illegal,{type:"illegal"}),r}function _(c,r){let u=c;if(c.isCompiled)return u;[mt,zt,nn,Xt].forEach(M=>M(c,r)),e.compilerExtensions.forEach(M=>M(c,r)),c.__beforeBegin=null,[Wt,Ft,Yt].forEach(M=>M(c,r)),c.isCompiled=!0;let O=null;return typeof c.keywords=="object"&&c.keywords.$pattern&&(c.keywords=Object.assign({},c.keywords),O=c.keywords.$pattern,delete c.keywords.$pattern),O=O||/\w+/,c.keywords&&(c.keywords=$e(c.keywords,e.case_insensitive)),u.keywordPatternRe=t(O,!0),r&&(c.begin||(c.begin=/\B|\b/),u.beginRe=t(u.begin),!c.end&&!c.endsWithParent&&(c.end=/\B|\b/),c.end&&(u.endRe=t(u.end)),u.terminatorEnd=G(u.end)||"",c.endsWithParent&&r.terminatorEnd&&(u.terminatorEnd+=(c.end?"|":"")+r.terminatorEnd)),c.illegal&&(u.illegalRe=t(c.illegal)),c.contains||(c.contains=[]),c.contains=[].concat(...c.contains.map(function(M){return rn(M==="self"?c:M)})),c.contains.forEach(function(M){_(M,u)}),c.starts&&_(c.starts,r),u.matcher=d(u),u}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=k(e.classNameAliases||{}),_(e)}function Ue(e){return e?e.endsWithParent||Ue(e.starts):!1}function rn(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(t){return k(e,{variants:null},t)})),e.cachedVariants?e.cachedVariants:Ue(e)?k(e,{starts:e.starts?k(e.starts):null}):Object.isFrozen(e)?k(e):e}var cn="11.12.0",ue=class extends Error{constructor(t,n){super(t),this.name="HTMLInjectionError",this.html=n}},ce=Ce,Ae=k,Te=Symbol("nomatch"),on=7,je=function(e){let t=Object.create(null),n=Object.create(null),l=[],d=!0,_="Could not find the language '{}', did you forget to load/include a language module?",c={disableAutodetect:!0,name:"Plain text",contains:[]},r={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:le};function u(i){return r.noHighlightRe.test(i)}function O(i){let a=i.className+" ";a+=i.parentNode?i.parentNode.className:"";let h=r.languageDetectRe.exec(a);if(h){let E=C(h[1]);return E||(Se(_.replace("{}",h[1])),Se("Falling back to no-highlight mode for this block.",i)),E?h[1]:"no-highlight"}return a.split(/\s+/).find(E=>u(E)||C(E))}function M(i,a,h){let E="",w="";typeof a=="object"?(E=i,h=a.ignoreIllegals,w=a.language):(H("10.7.0","highlight(lang, code, ...args) has been deprecated."),H("10.7.0",`Please use highlight(code, options) instead.
+(see the highlight.js issue tracker)`),w=i,E=a),h===void 0&&(h=!0);let y={code:E,language:w};W("before:highlight",y);let D=y.result?y.result:P(y.language,y.code,h);return D.code=y.code,W("after:highlight",D),D}function P(i,a,h,E){let w=Object.create(null);function y(s,o){return s.keywords[o]}function D(){if(!f.keywords){x.addText(b);return}let s=0;f.keywordPatternRe.lastIndex=0;let o=f.keywordPatternRe.exec(b),g="";for(;o;){g+=b.substring(s,o.index);let p=A.case_insensitive?o[0].toLowerCase():o[0],N=y(f,p);if(N){let[T,at]=N;if(x.addText(g),g="",w[p]=(w[p]||0)+1,w[p]<=on&&(Y+=at),T.startsWith("_"))g+=o[0];else{let lt=A.classNameAliases[T]||T;S(o[0],lt)}}else g+=o[0];s=f.keywordPatternRe.lastIndex,o=f.keywordPatternRe.exec(b)}g+=b.substring(s),x.addText(g)}function F(){if(b==="")return;let s=null;if(typeof f.subLanguage=="string"){if(!t[f.subLanguage]){x.addText(b);return}s=P(f.subLanguage,b,!0,we[f.subLanguage]),we[f.subLanguage]=s._top}else s=$(b,f.subLanguage.length?f.subLanguage:null);f.relevance>0&&(Y+=s.relevance),x.__addSublanguage(s._emitter,s.language)}function R(){f.subLanguage!=null?F():D(),b=""}function S(s,o){s!==""&&(x.startScope(o),x.addText(s),x.endScope())}function be(s,o){let g=1,p=o.length-1;for(;g<=p;){if(!s._emit[g]){g++;continue}let N=A.classNameAliases[s[g]]||s[g],T=o[g];N?S(T,N):(b=T,D(),b=""),g++}}function _e(s,o){return s.scope&&typeof s.scope=="string"&&x.openNode(A.classNameAliases[s.scope]||s.scope),s.beginScope&&(s.beginScope._wrap?(S(b,A.classNameAliases[s.beginScope._wrap]||s.beginScope._wrap),b=""):s.beginScope._multi&&(be(s.beginScope,o),b="")),f=Object.create(s,{parent:{value:f}}),f}function Me(s,o,g){let p=Nt(s.endRe,g);if(p){if(s["on:end"]){let N=new Z(s);s["on:end"](o,N),N.isMatchIgnored&&(p=!1)}if(p){for(;s.endsParent&&s.parent;)s=s.parent;return s}}if(s.endsWithParent)return Me(s.parent,o,g)}function it(s){return f.matcher.regexIndex===0?(b+=s[0],1):(re=!0,0)}function st(s){let o=s[0],g=s.rule,p=new Z(g),N=[g.__beforeBegin,g["on:begin"]];for(let T of N)if(T&&(T(s,p),p.isMatchIgnored))return it(o);return g.skip?b+=o:(g.excludeBegin&&(b+=o),R(),!g.returnBegin&&!g.excludeBegin&&(b=o)),_e(g,s),g.returnBegin?0:o.length}function rt(s){let o=s[0],g=a.substring(s.index),p=Me(f,s,g);if(!p)return Te;let N=f;f.endScope&&f.endScope._wrap?(R(),S(o,f.endScope._wrap)):f.endScope&&f.endScope._multi?(R(),be(f.endScope,s)):N.skip?b+=o:(N.returnEnd||N.excludeEnd||(b+=o),R(),N.excludeEnd&&(b=o));do f.scope&&x.closeNode(),!f.skip&&!f.subLanguage&&(Y+=f.relevance),f=f.parent;while(f!==p.parent);return p.starts&&_e(p.starts,s),N.returnEnd?0:o.length}function ct(){let s=[];for(let o=f;o!==A;o=o.parent)o.scope&&s.unshift(o.scope);s.forEach(o=>x.openNode(o))}let z={};function Oe(s,o){let g=o&&o[0];if(b+=s,g==null)return R(),0;if(z.type==="begin"&&o.type==="end"&&z.index===o.index&&g===""){if(b+=a.slice(o.index,o.index+1),!d){let p=new Error(`0 width match regex (${i})`);throw p.languageName=i,p.badRule=z.rule,p}return 1}if(z=o,o.type==="begin")return st(o);if(o.type==="illegal"&&!h){let p=new Error('Illegal lexeme "'+g+'" for mode "'+(f.scope||"<unnamed>")+'"');throw p.mode=f,p}else if(o.type==="end"){let p=rt(o);if(p!==Te)return p}if(o.type==="illegal"&&g==="")return o.index===a.length||(b+=`
+`),1;if(se>1e5&&se>o.index*3)throw new Error("potential infinite loop, way more iterations than matches");return b+=g,g.length}let A=C(i);if(!A)throw L(_.replace("{}",i)),new Error('Unknown language: "'+i+'"');let ot=sn(A),ie="",f=E||ot,we={},x=new r.__emitter(r);ct();let b="",Y=0,v=0,se=0,re=!1;try{if(A.__emitTokens)A.__emitTokens(a,x);else{for(f.matcher.considerAll();;){se++,re?re=!1:f.matcher.considerAll(),f.matcher.lastIndex=v;let s=f.matcher.exec(a);if(!s)break;let o=a.substring(v,s.index),g=Oe(o,s);v=s.index+g}Oe(a.substring(v))}return x.finalize(),ie=x.toHTML(),{language:i,value:ie,relevance:Y,illegal:!1,_emitter:x,_top:f}}catch(s){if(s.message&&s.message.includes("Illegal"))return{language:i,value:ce(a),illegal:!0,relevance:0,_illegalBy:{message:s.message,index:v,context:a.slice(v-100,v+100),mode:s.mode,resultSoFar:ie},_emitter:x};if(d)return{language:i,value:ce(a),illegal:!1,relevance:0,errorRaised:s,_emitter:x,_top:f};throw s}}function I(i){let a={value:ce(i),illegal:!1,relevance:0,_top:c,_emitter:new r.__emitter(r)};return a._emitter.addText(i),a}function $(i,a){a=a||r.languages||Object.keys(t);let h=I(i),E=a.filter(C).filter(Ee).map(R=>P(R,i,!1));E.unshift(h);let w=E.sort((R,S)=>{if(R.relevance!==S.relevance)return S.relevance-R.relevance;if(R.language&&S.language){if(C(R.language).supersetOf===S.language)return 1;if(C(S.language).supersetOf===R.language)return-1}return 0}),[y,D]=w,F=y;return F.secondBest=D,F}function te(i,a,h){let E=a&&n[a]||h;i.classList.add("hljs"),i.classList.add(`language-${E}`)}function ne(i){let a=null,h=O(i);if(u(h))return;if(W("before:highlightElement",{el:i,language:h}),i.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",i);return}if(i.children.length>0&&(r.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("(see the highlight.js security wiki)"),console.warn("The element with unescaped HTML:"),console.warn(i)),r.throwUnescapedHTML))throw new ue("One of your code blocks includes unescaped HTML.",i.innerHTML);a=i;let E=a.textContent,w=h?M(E,{language:h,ignoreIllegals:!0}):$(E);i.innerHTML=w.value,i.dataset.highlighted="yes",te(i,h,w.language),i.result={language:w.language,re:w.relevance,relevance:w.relevance},w.secondBest&&(i.secondBest={language:w.secondBest.language,relevance:w.secondBest.relevance}),W("after:highlightElement",{el:i,result:w,text:E})}function Ye(i){r=Ae(r,i)}let Xe=()=>{m(),H("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function Ze(){m(),H("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let de=!1;function m(){function i(){m()}if(document.readyState==="loading"){de||window.addEventListener("DOMContentLoaded",i,!1),de=!0;return}document.querySelectorAll(r.cssSelector).forEach(ne)}function Je(i,a){let h=null;try{h=a(e)}catch(E){if(L("Language definition for '{}' could not be registered.".replace("{}",i)),d)L(E);else throw E;h=c}h.name||(h.name=i),t[i]=h,h.rawDefinition=a.bind(null,e),h.aliases&&pe(h.aliases,{languageName:i})}function Ve(i){delete t[i];for(let a of Object.keys(n))n[a]===i&&delete n[a]}function Qe(){return Object.keys(t)}function C(i){return i=(i||"").toLowerCase(),t[i]||t[n[i]]}function pe(i,{languageName:a}){typeof i=="string"&&(i=[i]),i.forEach(h=>{n[h.toLowerCase()]=a})}function Ee(i){let a=C(i);return a&&!a.disableAutodetect}function qe(i){i["before:highlightBlock"]&&!i["before:highlightElement"]&&(i["before:highlightElement"]=a=>{i["before:highlightBlock"](Object.assign({block:a.el},a))}),i["after:highlightBlock"]&&!i["after:highlightElement"]&&(i["after:highlightElement"]=a=>{i["after:highlightBlock"](Object.assign({block:a.el},a))})}function et(i){qe(i),l.push(i)}function tt(i){let a=l.indexOf(i);a!==-1&&l.splice(a,1)}function W(i,a){let h=i;l.forEach(function(E){E[h]&&E[h](a)})}function nt(i){return H("10.7.0","highlightBlock will be removed entirely in v12.0"),H("10.7.0","Please use highlightElement now."),ne(i)}Object.assign(e,{highlight:M,highlightAuto:$,highlightAll:m,highlightElement:ne,highlightBlock:nt,configure:Ye,initHighlighting:Xe,initHighlightingOnLoad:Ze,registerLanguage:Je,unregisterLanguage:Ve,listLanguages:Qe,getLanguage:C,registerAliases:pe,autoDetection:Ee,inherit:Ae,addPlugin:et,removePlugin:tt}),e.debugMode=function(){d=!1},e.safeMode=function(){d=!0},e.versionString=cn,e.regex={concat:B,lookahead:De,either:V,optional:wt,anyNumberOfTimes:Ot};for(let i in X)typeof X[i]=="object"&&Ie(X[i]);return Object.assign(e,X),e},U=je({});U.newInstance=()=>je({});Ge.exports=U;U.HighlightJS=U;U.default=U});var me=bt(Ke(),1);var he=me.default;var j="[0-9](_*[0-9])*",q=`\\.(${j})`,ee="[0-9a-fA-F](_*[0-9a-fA-F])*",We={className:"number",variants:[{begin:`(\\b(${j})((${q})|\\.)?|(${q}))[eE][+-]?(${j})[fFdD]?\\b`},{begin:`\\b(${j})((${q})[fFdD]?\\b|\\.([fFdD]\\b)?)`},{begin:`(${q})[fFdD]?\\b`},{begin:`\\b(${j})[fFdD]\\b`},{begin:`\\b0[xX]((${ee})\\.?|(${ee})?\\.(${ee}))[pP][+-]?(${j})[fFdD]?\\b`},{begin:"\\b(0|[1-9](_*[0-9])*)[lL]?\\b"},{begin:`\\b0[xX](${ee})[lL]?\\b`},{begin:"\\b0(_*[0-7])*[lL]?\\b"},{begin:"\\b0[bB][01](_*[01])*[lL]?\\b"}],relevance:0};function Fe(e,t,n){return n===-1?"":e.replace(t,l=>Fe(e,t,n-1))}function ze(e){let t=e.regex,n="[\xC0-\u02B8a-zA-Z_$][\xC0-\u02B8a-zA-Z_$0-9]*",l="(?:(?:\\s*\\[\\s*])+)?",d=n+"<@@@>"+l,c="(?:"+("\\?(?:\\s+(?:extends|super)\\s+"+d+")?")+"|"+d+")",r=Fe("(?:\\s*<\\s*"+c+"(?:\\s*,\\s*"+c+")*\\s*>)?",/<@@@>/g,2),I={keyword:["synchronized","abstract","private","var","static","if","const ","for","while","strictfp","finally","protected","import","native","final","void","enum","else","break","transient","catch","instanceof","volatile","case","assert","package","default","public","try","switch","continue","throws","protected","public","private","module","requires","exports","do","sealed","yield","permits","goto","when"],literal:["false","true","null"],type:["char","boolean","long","float","int","byte","short","double"],built_in:["super","this"]},$={className:"meta",begin:"@"+n,contains:[{begin:/\(/,end:/\)/,contains:["self"]}]},te={className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[e.C_BLOCK_COMMENT_MODE],endsParent:!0};return{name:"Java",aliases:["jsp"],keywords:I,illegal:/<\/|#/,contains:[e.COMMENT("/\\*\\*","\\*/",{relevance:0,contains:[{begin:/\w+@/,relevance:0},{className:"doctag",begin:"@[A-Za-z]+"}]}),{begin:/import java\.[a-z]+\./,keywords:"import",relevance:2},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE,{begin:/"""/,end:/"""/,className:"string",contains:[e.BACKSLASH_ESCAPE]},e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,{match:[/\b(?:class|interface|enum|extends|implements|new)/,/\s+/,n],className:{1:"keyword",3:"title.class"}},{match:/non-sealed/,scope:"keyword"},{beginKeywords:"new throw return else yield assert",relevance:0},{begin:[n,t.concat(r,l,/\s+/),n,l,/\s*/,/=(?!=)/],className:{1:"type",3:"variable",6:"operator"}},{begin:[/record/,/\s+/,n],className:{1:"keyword",3:"title.class"},contains:[te,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},{begin:[n,t.concat(r,l,/\s+/),n,/\s*(?=\()/],className:{1:"type",3:"title.function"},keywords:I,contains:[{className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[$,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,We,e.C_BLOCK_COMMENT_MODE]},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},We,$]}}he.registerLanguage("java",ze);window.hljs=he;})();
+</script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---- 1. syntax highlighting -------------------------------------- */
+  function highlight() {
+    if (!window.hljs) return;
+    var blocks = document.querySelectorAll('pre code.language-java');
+    for (var i = 0; i < blocks.length; i++) {
+      try { window.hljs.highlightElement(blocks[i]); } catch (e) {}
+    }
+  }
+
+  /* ---- 2. every solution / reveal starts closed --------------------- */
+  function closeAll() {
+    var d = document.querySelectorAll('details.soln');
+    for (var i = 0; i < d.length; i++) { d[i].open = false; }
+  }
+
+  /* ---- 3. show all / hide all -------------------------------------- */
+  function wireToolbar() {
+    var show = document.getElementById('showAll');
+    var hide = document.getElementById('hideAll');
+    function setAll(v) {
+      var d = document.querySelectorAll('details.soln');
+      for (var i = 0; i < d.length; i++) { d[i].open = v; }
+    }
+    if (show) show.addEventListener('click', function () { setAll(true); });
+    if (hide) hide.addEventListener('click', function () { setAll(false); });
+  }
+
+  /* ---- 4. live-coding editors -------------------------------------- */
+  var INDENT = '    ';
+
+  function wireEditors() {
+    var eds = document.querySelectorAll('.editor');
+    for (var i = 0; i < eds.length; i++) { wireOne(eds[i]); }
+  }
+
+  function wireOne(box) {
+    var ta = box.querySelector('textarea');
+    if (!ta) return;
+    var starter = ta.value;
+
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Tab' || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+      ev.preventDefault();
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+
+      if (s === e && !ev.shiftKey) {
+        ta.value = v.slice(0, s) + INDENT + v.slice(e);
+        ta.selectionStart = ta.selectionEnd = s + INDENT.length;
+        return;
+      }
+      /* block indent / outdent over the selected lines */
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var le = v.indexOf('\n', e);
+      if (le === -1) le = v.length;
+      var seg = v.slice(ls, le);
+      var lines = seg.split('\n');
+      var delta0 = 0, total = 0;
+
+      for (var i = 0; i < lines.length; i++) {
+        if (ev.shiftKey) {
+          var m = lines[i].match(/^(\t| {1,4})/);
+          if (m) {
+            lines[i] = lines[i].slice(m[0].length);
+            if (i === 0) delta0 = -m[0].length;
+            total -= m[0].length;
+          }
+        } else {
+          lines[i] = INDENT + lines[i];
+          if (i === 0) delta0 = INDENT.length;
+          total += INDENT.length;
+        }
+      }
+      ta.value = v.slice(0, ls) + lines.join('\n') + v.slice(le);
+      ta.selectionStart = Math.max(ls, s + delta0);
+      ta.selectionEnd = Math.max(ta.selectionStart, e + total);
+    });
+
+    /* keep the indent of the current line when Enter is pressed */
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Enter' || ev.shiftKey || ev.ctrlKey || ev.metaKey) return;
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+      if (s !== e) return;
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var lead = (v.slice(ls, s).match(/^[ \t]*/) || [''])[0];
+      var extra = /[{(\[]\s*$/.test(v.slice(ls, s)) ? INDENT : '';
+      if (!lead && !extra) return;
+      ev.preventDefault();
+      var ins = '\n' + lead + extra;
+      ta.value = v.slice(0, s) + ins + v.slice(e);
+      ta.selectionStart = ta.selectionEnd = s + ins.length;
+    });
+
+    var rst = box.querySelector('[data-act="reset"]');
+    if (rst) rst.addEventListener('click', function () {
+      ta.value = starter;
+      ta.focus();
+      flash(box, 'Reset to starter code');
+    });
+
+    var cpy = box.querySelector('[data-act="copy"]');
+    if (cpy) cpy.addEventListener('click', function () {
+      var done = function () { flash(box, 'Copied — paste it into your IDE'); };
+      var fail = function () { flash(box, 'Copy failed — select the text and press Ctrl/Cmd+C'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value).then(done, function () { legacy(ta, done, fail); });
+      } else {
+        legacy(ta, done, fail);
+      }
+    });
+  }
+
+  function legacy(ta, done, fail) {
+    try {
+      var st = ta.selectionStart, en = ta.selectionEnd;
+      ta.select();
+      var ok = document.execCommand('copy');
+      ta.selectionStart = st; ta.selectionEnd = en;
+      ok ? done() : fail();
+    } catch (e) { fail(); }
+  }
+
+  function flash(box, msg) {
+    var f = box.querySelector('.foot');
+    if (!f) return;
+    if (f.getAttribute('data-base') === null || f.getAttribute('data-base') === undefined) {
+      f.setAttribute('data-base', f.textContent);
+    }
+    f.textContent = msg;
+    window.setTimeout(function () { f.textContent = f.getAttribute('data-base'); }, 2200);
+  }
+
+  /* ---- go ----------------------------------------------------------- */
+  function init() {
+    highlight();
+    closeAll();
+    wireToolbar();
+    wireEditors();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  /* belt and braces: some browsers restore <details> state on soft reload */
+  window.addEventListener('pageshow', closeAll);
+})();
+</script>
+</body>
+</html>

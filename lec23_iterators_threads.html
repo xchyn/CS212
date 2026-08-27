@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class 27 — Iterators, and a Look at Threads | CSCI 212</title>
+<style>
+:root{
+  --ink:#0f172a; --ink2:#334155; --muted:#64748b; --line:#e2e8f0;
+  --bg:#ffffff; --bg2:#f8fafc;
+  --obj:#4f46e5; --def:#2563eb; --ex:#059669; --alg:#7c3aed;
+  --key:#b45309; --warn:#dc2626; --qc:#0891b2; --prac:#be185d; --sum:#475569;
+  --edit:#ea580c; --edit-bg:#fff7ed;
+  --code-bg:#0d1117; --code-bd:#000000;   /* read-only listings: black */
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px 80px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:#0f172a;color:#e2e8f0;font-size:13.5px;
+  border-bottom:3px solid var(--obj);
+}
+.topbar .inner{max-width:900px;margin:0 auto;padding:10px 22px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.topbar a{color:#e2e8f0;text-decoration:none;border-bottom:1px solid transparent}
+.topbar a:hover{border-bottom-color:#94a3b8}
+.topbar .course{font-weight:700;letter-spacing:.02em}
+.topbar .sep{color:#475569}
+.topbar .spacer{flex:1}
+
+/* ---------- title block ---------- */
+.titleblock{padding:34px 0 10px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.eyebrow{
+  font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--obj);margin-bottom:8px;
+}
+.titleblock h1{font-size:33px;line-height:1.2;margin:0 0 10px;letter-spacing:-.015em}
+.titleblock .sub{margin:0;color:var(--muted);font-size:17px;line-height:1.5}
+
+h2{
+  font-size:24px;margin:46px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line);letter-spacing:-.01em;scroll-margin-top:14px;
+}
+h2 .num{color:var(--obj);font-weight:800;margin-right:11px}
+h3{font-size:18.5px;margin:30px 0 10px;color:var(--ink)}
+h4{font-size:16px;margin:20px 0 8px;color:var(--ink2)}
+p{margin:12px 0}
+ul,ol{margin:12px 0;padding-left:26px}
+li{margin:6px 0}
+a{color:var(--def)}
+hr{border:0;border-top:1px solid var(--line);margin:30px 0}
+strong{color:var(--ink)}
+.muted{color:var(--muted)}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--bg2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 20px 16px;margin:22px 0;
+}
+.toc .th{
+  font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;
+}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:30px}
+.toc li{margin:3px 0;font-size:14.5px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- show all / hide all ---------- */
+.tools{
+  display:flex;gap:9px;align-items:center;flex-wrap:wrap;
+  padding:11px 15px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:9px;margin:22px 0;font-size:13.5px;
+}
+.tools .lab{font-weight:700;color:var(--ink2)}
+.tools button{
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  background:#fff;color:var(--ink2);border:1px solid #cbd5e1;
+  border-radius:6px;padding:4px 12px;
+}
+.tools button:hover{background:var(--obj);border-color:var(--obj);color:#fff}
+.tools .muted{font-size:12.5px}
+
+/* ---------- boxes ---------- */
+.box{border:1px solid var(--line);border-left:5px solid var(--muted);border-radius:8px;margin:22px 0;overflow:hidden;background:#fff}
+.box>.hd{
+  padding:9px 16px;font-size:12.5px;font-weight:700;
+  letter-spacing:.075em;text-transform:uppercase;color:#fff;background:var(--muted);
+}
+.box>.hd .tag{margin-left:5px;font-weight:500;text-transform:none;letter-spacing:0;opacity:.92;font-size:13px}
+.box>.bd{padding:4px 18px 14px}
+.box>.bd>:first-child{margin-top:12px}
+.box>.bd>:last-child{margin-bottom:2px}
+
+.box.obj{border-left-color:var(--obj)}  .box.obj>.hd{background:var(--obj)}
+.box.def{border-left-color:var(--def)}  .box.def>.hd{background:var(--def)}
+.box.ex{border-left-color:var(--ex)}    .box.ex>.hd{background:var(--ex)}
+.box.alg{border-left-color:var(--alg)}  .box.alg>.hd{background:var(--alg)}
+.box.key{border-left-color:var(--key)}  .box.key>.hd{background:var(--key)}
+.box.warn{border-left-color:var(--warn)}.box.warn>.hd{background:var(--warn)}
+.box.qc{border-left-color:var(--qc)}    .box.qc>.hd{background:var(--qc)}
+.box.prac{border-left-color:var(--prac)}.box.prac>.hd{background:var(--prac)}
+.box.sum{border-left-color:var(--sum)}  .box.sum>.hd{background:var(--sum)}
+
+.box.obj{background:#f5f5ff}
+.box.qc{background:#f0fbfe}
+.box.warn{background:#fff7f7}
+.box.key{background:#fffbf2}
+.box.sum{background:#f8fafc}
+
+/* ---------- code ---------- */
+/* Read-only listings sit on black, matching CSCI 211, so a code block is never
+   mistaken for the editable live-coding box. */
+pre{
+  margin:14px 0;padding:13px 15px;overflow-x:auto;
+  background:var(--code-bg);border:1px solid var(--code-bd);border-radius:8px;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;color:#c9d1d9;
+}
+pre code{font-family:inherit;font-size:inherit;background:none;padding:0;border:0;color:inherit;display:block}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef2f7;
+  border:1px solid #e2e8f0;border-radius:4px;padding:1px 5px;color:#0b3a5b;
+}
+.filename{
+  font-family:var(--mono);font-size:12px;color:#475569;
+  margin:16px 0 -9px;font-weight:600;
+}
+
+/* comparison block: another language, never syntax-highlighted. Dark like the
+   Java listings, but desaturated and dashed so it reads as "not this course". */
+pre.cmp{background:#161b22;border-style:dashed;border-color:#3f4650;color:#9aa4b2}
+pre.cmp code{color:#9aa4b2}
+
+/* shell commands you type */
+pre.sh{background:#1e293b;border-color:#1e293b;color:#e2e8f0;position:relative;padding-top:26px}
+pre.sh code{color:#e2e8f0}
+pre.sh::before{
+  content:"Terminal";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#86efac;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* output / terminal blocks */
+pre.out{background:#111d33;border-color:#111d33;color:#e2e8f0;position:relative;padding-top:26px}
+pre.out code{color:#e2e8f0}
+pre.out::before{
+  content:"Output";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#7dd3fc;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+pre.err{background:#1f1416;border-color:#7f1d1d;color:#fecdd3;padding-top:26px;position:relative}
+pre.err code{color:#fecdd3}
+pre.err::before{
+  content:"Compiler message";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#fda4af;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* ---- highlight.js, GitHub-dark palette (hand-written, no external file) ---- */
+.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-template-tag,
+.hljs-template-variable,.hljs-type,.hljs-variable.language_{color:#ff7b72}
+.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#d2a8ff}
+.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,
+.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable{color:#79c0ff}
+.hljs-meta .hljs-string,.hljs-regexp,.hljs-string{color:#a5d6ff}
+.hljs-built_in,.hljs-symbol{color:#ffa657}
+.hljs-code,.hljs-comment,.hljs-formula{color:#8b949e;font-style:italic}
+.hljs-name,.hljs-quote,.hljs-selector-pseudo,.hljs-selector-tag{color:#7ee787}
+.hljs-subst{color:#c9d1d9}
+.hljs-section{color:#1f6feb;font-weight:700}
+.hljs-bullet{color:#f2cc60}
+.hljs-emphasis{color:#c9d1d9;font-style:italic}
+.hljs-strong{color:#c9d1d9;font-weight:700}
+
+/* ---------- trace tables ---------- */
+table{border-collapse:collapse;margin:16px 0;font-size:14px;width:100%}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg2);font-weight:700;font-size:13px}
+table.trace td:first-child,table.trace th:first-child{white-space:nowrap}
+table code{font-size:.88em}
+
+/* ---------- multi-part questions ---------- */
+.part{margin:16px 0;padding-left:14px;border-left:2px solid #cbd5e1}
+.part .q{margin:0 0 8px}
+.part .pl{font-weight:700;color:var(--qc);margin-right:6px}
+
+/* ---------- collapsible solutions ---------- */
+details.soln{margin:10px 0 4px}
+details.soln>summary{
+  list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  font-size:12.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:#fff;background:var(--sum);border-radius:6px;padding:5px 13px;
+  user-select:none;
+}
+details.soln>summary::-webkit-details-marker{display:none}
+details.soln>summary::before{content:"\25B6";font-size:9px;transition:transform .15s}
+details.soln[open]>summary::before{transform:rotate(90deg)}
+details.soln>summary::after{content:"Show Answer"}
+details.soln[open]>summary::after{content:"Hide Answer"}
+details.soln>summary:hover{filter:brightness(1.18)}
+
+details.soln.reveal>summary{background:var(--ex)}
+details.soln.reveal>summary::after{content:"Show Output & Explanation"}
+details.soln.reveal[open]>summary::after{content:"Hide Output & Explanation"}
+details.soln.reveal.noout>summary::after{content:"Show Explanation"}
+details.soln.reveal.noout[open]>summary::after{content:"Hide Explanation"}
+
+.ans{
+  margin-top:11px;padding:2px 16px 10px;background:#fff;
+  border:1px solid var(--line);border-left:3px solid var(--sum);border-radius:7px;
+}
+details.soln.reveal .ans{border-left-color:var(--ex)}
+.ans>:first-child{margin-top:12px}
+.ans>:last-child{margin-bottom:6px}
+
+/* ---------- live coding editor ---------- */
+.editor{
+  margin:18px 0;border:2px dashed var(--edit);border-radius:9px;
+  background:var(--edit-bg);overflow:hidden;
+}
+.editor .ehd{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:7px 13px;background:var(--edit);color:#fff;
+  font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+}
+.editor .ehd .etitle{flex:1}
+.editor .ehd button{
+  font:inherit;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  cursor:pointer;background:rgba(255,255,255,.16);color:#fff;
+  border:1px solid rgba(255,255,255,.5);border-radius:5px;padding:3px 10px;
+}
+.editor .ehd button:hover{background:#fff;color:var(--edit)}
+.editor textarea{
+  display:block;width:100%;border:0;outline:0;resize:vertical;
+  padding:12px 15px;background:var(--edit-bg);color:#431407;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;
+  tab-size:4;-moz-tab-size:4;min-height:150px;
+}
+.editor textarea:focus{background:#fff}
+.editor .foot{
+  padding:5px 13px 7px;font-size:11.5px;color:#9a3412;background:#ffedd5;
+  border-top:1px solid #fed7aa;
+}
+
+/* ---------- prev/next nav ---------- */
+.pagenav{display:flex;gap:14px;margin:52px 0 0;flex-wrap:wrap}
+.pagenav a,.pagenav span.disabled{
+  flex:1 1 260px;display:block;text-decoration:none;
+  border:1px solid var(--line);border-radius:9px;padding:12px 16px;background:#fff;
+}
+.pagenav a:hover{border-color:var(--obj);background:var(--bg2)}
+.pagenav .dir{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.pagenav .ttl{font-size:15px;font-weight:600;color:var(--ink);margin-top:3px}
+.pagenav .next{text-align:right}
+.pagenav span.disabled{opacity:.4}
+.pagenav span.disabled .ttl{color:var(--muted)}
+
+footer.pf{
+  margin-top:40px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--muted);text-align:center;
+}
+
+/* ---------- index page ---------- */
+table.sched{font-size:14.5px}
+table.sched th{background:#0f172a;color:#fff;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+table.sched td:first-child{white-space:nowrap;font-weight:700;color:var(--muted);width:60px}
+table.sched tr.examrow td{background:#fff1f2}
+table.sched tr.revrow td{background:#fffbeb}
+table.sched a{font-weight:600;text-decoration:none}
+table.sched a:hover{text-decoration:underline}
+
+
+/* ---------- release gating ---------- */
+.pending{
+  margin-top:4px;font-size:11.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:#b45309;
+}
+.pagenav span.disabled .pending{color:#b45309}
+table.sched tr.pendingrow td{background:#fcfcfd}
+table.sched .unrel{color:var(--muted)}
+table.sched .pending{display:block;margin-top:2px}
+table.sched td.cn{white-space:nowrap;width:52px;font-weight:700;color:var(--muted)}
+table.sched td.dt{white-space:nowrap;width:104px;color:var(--muted);font-size:13.5px}
+table.sched tr.offrow td{background:#f1f5f9;color:var(--muted);font-style:italic}
+.refcard{
+  display:block;text-decoration:none;border:1px solid var(--line);
+  border-left:5px solid var(--alg);border-radius:9px;padding:13px 17px;
+  margin:22px 0;background:#faf9ff;
+}
+.refcard:hover{background:#f5f3ff;border-color:var(--alg)}
+.refcard .rl{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--alg)}
+.refcard .rt{font-size:16px;font-weight:600;color:var(--ink);margin-top:3px}
+.refcard .rd{font-size:14px;color:var(--muted);margin-top:4px}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,.tools,.pagenav,.pending{display:none !important}
+  html,body{width:100%;font-size:10pt}
+  .wrap{max-width:100%;width:100%;padding:0}
+  /* a wide <pre> must wrap rather than widen the page and clip every other
+     element at the paper edge */
+  /* Screen shows code on black; paper does not. Restore a dark-on-light palette
+     for print only, or the dark theme's light tokens vanish on white. */
+  pre{white-space:pre-wrap;overflow:visible;overflow-wrap:anywhere;font-size:8.6pt;
+      background:#f8fafc !important;color:#24292e !important;border-color:#cbd5e1 !important;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  pre code{color:#24292e !important}
+  pre.cmp{background:#fff !important;color:#475569 !important;border-color:#94a3b8 !important}
+  pre.cmp code{color:#475569 !important}
+  pre .hljs-doctag,pre .hljs-keyword,pre .hljs-meta .hljs-keyword,pre .hljs-template-tag,
+  pre .hljs-template-variable,pre .hljs-type,pre .hljs-variable.language_{color:#d73a49 !important}
+  pre .hljs-title,pre .hljs-title.class_,pre .hljs-title.class_.inherited__,
+  pre .hljs-title.function_{color:#6f42c1 !important}
+  pre .hljs-attr,pre .hljs-attribute,pre .hljs-literal,pre .hljs-meta,pre .hljs-number,
+  pre .hljs-operator,pre .hljs-selector-attr,pre .hljs-selector-class,pre .hljs-selector-id,
+  pre .hljs-variable{color:#005cc5 !important}
+  pre .hljs-meta .hljs-string,pre .hljs-regexp,pre .hljs-string{color:#032f62 !important}
+  pre .hljs-built_in,pre .hljs-symbol{color:#e36209 !important}
+  pre .hljs-code,pre .hljs-comment,pre .hljs-formula{color:#6a737d !important}
+  pre .hljs-name,pre .hljs-quote,pre .hljs-selector-pseudo,
+  pre .hljs-selector-tag{color:#22863a !important}
+  pre .hljs-subst,pre .hljs-emphasis,pre .hljs-strong{color:#24292e !important}
+  .filename{color:#475569 !important}
+  table{table-layout:fixed;width:100%;word-wrap:break-word;overflow-wrap:anywhere}
+  .box,.toc{max-width:100%}
+  a{color:var(--ink);text-decoration:none}
+  .box,.part,pre,table,.editor{break-inside:avoid;page-break-inside:avoid}
+  h2{break-after:avoid;page-break-after:avoid}
+  details.soln>summary{display:none !important}
+  details.soln:not([open])>.ans{display:none !important}
+  details.soln::before{
+    content:"Answer withheld — see the online notes.";
+    display:block;font-size:9pt;font-style:italic;color:#64748b;margin:6px 0;
+  }
+  details.soln[open]::before{content:""}
+  .editor textarea{display:none !important}
+  .editor{border:1.5px solid #fdba74 !important;background:#fff;border-style:solid}
+  .editor .ehd{background:#fff !important;color:#9a3412 !important;border-bottom:1px solid #fdba74}
+  .editor .ehd button{display:none}
+  .editor .foot{display:none}
+  .editor::after{content:"";display:block;height:2.1in;background:#fff}
+  pre.out,pre.sh{background:#f1f5f9 !important;color:#0f172a !important;border-color:#94a3b8 !important}
+  pre.err{background:#fef2f2 !important;color:#7f1d1d !important;border-color:#fca5a5 !important}
+  pre.out code,pre.sh code{color:#0f172a !important}
+  pre.err code{color:#7f1d1d !important}
+  pre.out::before,pre.sh::before{color:#475569}
+  pre.err::before{color:#b91c1c}
+  .box>.hd{color:#000;background:#fff !important;border-bottom:1px solid #cbd5e1}
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="inner">
+<span class="course">CSCI 212</span>
+<span class="sep">|</span>
+<a href="index.html">Course index</a>
+<span class="sep">|</span>
+<span>Class 27 of 28</span>
+<span class="sep">|</span>
+<span>Tuesday, December 8</span>
+<span class="spacer"></span>
+<span>Queens College, CUNY</span>
+</div></div>
+<div class="wrap">
+<div class="titleblock">
+  <div class="eyebrow">Session 27 &middot; Lecture 23</div>
+  <h1>Iterators, and a Look at Threads</h1>
+  <p class="sub">One object that walks any collection without ever telling you how the collection is built &mdash; and then, to close the course, a first look at running two things at once.</p>
+</div>
+
+<div class="box obj">
+  <div class="hd">Learning Objectives</div>
+  <div class="bd">
+    <p>By the end of today's session you should be able to:</p>
+    <ol>
+      <li>Say what an <strong>iterator</strong> is, and explain why a collection hands one out instead of letting you reach inside it.</li>
+      <li>Write the standard iterator loop &mdash; <code>Iterator&lt;E&gt; it = c.iterator(); while (it.hasNext()) { E e = it.next(); ... }</code> &mdash; without looking it up.</li> <li>Name the three methods of <code>Iterator&lt;E&gt;</code> and the single method of <code>Iterable&lt;E&gt;</code>, and say which one a for-each loop needs.</li> <li>Explain what the enhanced for loop <code>for (String s : list)</code> is actually compiled into, and demonstrate it on a class of your own.</li> <li>Write an iterator for a linked structure &mdash; the cursor field, <code>hasNext</code>, <code>next</code> &mdash; and say exactly what <code>next()</code> does when there is nothing left.</li> <li>Predict the output of exam questions that create two iterators over one list, or call <code>next()</code> more times than there are elements.</li> <li>Recognize a <code>ConcurrentModificationException</code>, and remove elements safely with <code>Iterator.remove()</code>.</li> <li>Start a thread with <code>start()</code>, explain why calling <code>run()</code> yourself is not the same thing, and say what <code>synchronized</code> protects against and how a deadlock happens.</li> </ol> </div> </div> <div class="toc"> <div class="th">On this page</div> <ol> <li><a href="#s1">Why a collection hands out an iterator</a></li> <li><a href="#s2">The <code>Iterator</code> interface</a></li> <li><a href="#s3"><code>Iterable</code>: one loop for every collection</a></li> <li><a href="#s4">The for-each loop is an iterator in disguise</a></li> <li><a href="#s5">Writing your own iterator</a></li> <li><a href="#s6">Two iterators, <code>remove()</code>, and the modification trap</a></li> <li><a href="#s7">A look at threads: <code>start</code>, <code>sleep</code>, <code>join</code></a></li> <li><a href="#s8">Sharing data: race conditions, <code>synchronized</code>, deadlock</a></li> <li><a href="#prac">Practice Problems</a></li> <li><a href="#summary">Lecture Summary</a></li> </ol> </div> <div class="tools"> <span class="lab">Answers</span> <button id="showAll" type="button">Show all</button> <button id="hideAll" type="button">Hide all</button> <span class="muted">&mdash; every worked-example output and every solution is hidden when the page loads. Work it out first, then reveal.</span> </div> <hr> <h2 id="s1"><span class="num">1.</span>Why a collection hands out an iterator</h2> <p>Two lectures ago you built a <code>LinkedList</code> out of <code>Node</code> objects, and last time you made it generic so it could hold anything. Both times, walking the list looked like this:</p> <pre><code class="language-java">Node&lt;T&gt; n = head;
+while (n != null) {
+    System.out.println(n.getData());
+    n = n.getNext();
+}</code></pre> <p>That loop works, but look at what it needs to know. It needs to know there is a field called <code>head</code>. It needs to know the elements live in objects called <code>Node</code>. It needs to know the way to step forward is <code>getNext()</code>, and that the end is marked by <code>null</code>. Every one of those is an internal detail of how the list is built &mdash; and every caller who writes that loop is now welded to those details. Change the class from a singly linked list to a doubly linked list, or to an array underneath, and every one of those loops breaks.</p> <p>Now compare it with the loop you have been writing since Lecture 6 for an <code>ArrayList</code>:</p> <pre><code class="language-java">for (int i = 0; i &lt; list.size(); i++) {
+    System.out.println(list.get(i));
+}</code></pre> <p>Different loop, different vocabulary, same intention. And on a linked list this second form is not just different &mdash; it is a disaster, which we will measure in &sect;6.</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; the problem an iterator solves</span></div> <div class="bd"> <p>Walking a collection is one idea. But every kind of collection stores its elements differently, so every kind of collection would otherwise need its own kind of loop, and every piece of code that walks a collection would be locked to one implementation.</p> <p>The fix is to make <em>walking</em> into an object. The collection builds that object and hands it to you. It knows how to get from one element to the next; you do not, and you do not need to.</p> </div> </div> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; iterator</span></div> <div class="bd"> <p>An <strong>iterator</strong> is an object that lets you traverse a collection of objects, one element at a time, <em>without exposing how that collection stores them</em>.</p> <p>The four things an iterator buys you, in your instructor's words:</p> <ul> <li>a <strong>uniform</strong> way to access the elements of different collections;</li> <li>the underlying implementation of the collection stays <strong>hidden</strong>;</li> <li>you can traverse a collection <strong>without modifying</strong> it;</li> <li>the operations you need are just <code>hasNext()</code> and <code>next()</code>.</li> </ul> </div> </div> <p>The word for this arrangement is the <em>iterator pattern</em>: a way to reach the elements of some aggregate object in sequence without exposing its underlying representation. You have met the idea before under other names. A <code>Scanner</code> is essentially an iterator over the tokens of an input stream: <code>hasNextInt()</code> and <code>nextInt()</code> are <code>hasNext()</code> and <code>next()</code> wearing a different hat.</p> <div class="box qc"> <div class="hd">Quick Check 23.1</div> <div class="bd"> <p>Your <code>LinkedList</code> class currently gives callers a <code>getHead()</code> method, and callers use it to walk the list with <code>getNext()</code>.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Name one thing you can no longer safely change about <code>LinkedList</code> once callers are doing that.</p> <details class="soln"><summary></summary><div class="ans"> <p>Anything about the storage. You cannot switch to a doubly linked list with a different <code>Node</code> class, you cannot add a dummy header node, and you certainly cannot re-implement the list on top of an array &mdash; every caller's loop names <code>Node</code>, <code>getNext()</code> and <code>null</code> directly, so all of them would stop compiling.</p> <p>There is a second cost that is easier to miss: <code>getHead()</code> hands out a reference to your internal node. A caller can call <code>setData</code> or <code>setNext</code> on it and quietly corrupt your list. That is the encapsulation lesson from Lecture 7 all over again.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> If instead the class hands out an iterator, what exactly does the caller now know about the list?</p> <details class="soln"><summary></summary><div class="ans"> <p>Only two things: whether there is another element, and what it is. That is the whole contract. The caller does not know whether the elements sit in nodes, in an array, in a file, or are computed on demand &mdash; and because it does not know, you are free to change any of that later without breaking a single line of caller code.</p> <p><strong>Things to notice across both parts.</strong> This is the same trade you made when you made instance variables <code>private</code> and added getters. An iterator is a getter for <em>traversal</em>: the smallest possible public window onto a private structure.</p> </div></details> </div> </div> </div> <h2 id="s2"><span class="num">2.</span>The <code>Iterator</code> interface</h2> <p>Java does not leave "what an iterator looks like" up to each collection. It is fixed by an interface in <code>java.util</code>, and it has exactly three methods.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the <code>Iterator</code> interface</span></div> <div class="bd"> <pre><code class="language-java">public interface Iterator&lt;E&gt; {
+    boolean hasNext();     // true if the iteration has more elements
+    E       next();        // return the next element in the iteration
+    void    remove();      // remove the last element returned  (optional)
+}</code></pre> <ul> <li><code>hasNext()</code> asks a question and changes nothing. You may call it as many times as you like.</li> <li><code>next()</code> returns the next element <em>and advances</em>. Calling it twice gives you two different elements. This is the one that must be handled with care on an exam.</li> <li><code>remove()</code> deletes the element that <code>next()</code> most recently returned. It is marked <em>optional</em>, which has a precise meaning we come back to in &sect;6.</li> </ul> <p>The <code>E</code> is a type parameter, exactly as in Lecture 22: an <code>Iterator&lt;String&gt;</code> returns a <code>String</code> from <code>next()</code>, an <code>Iterator&lt;Integer&gt;</code> returns an <code>Integer</code>, and no cast is needed anywhere.</p> </div> </div> <p>Every collection in the Java library will hand you one of these when you ask, by calling its <code>iterator()</code> method. That gives the standard loop, and it is worth memorizing as a shape:</p> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; the standard iterator loop</span></div> <div class="bd"> <pre><code class="language-java">Iterator&lt;E&gt; it = collection.iterator();   // 1. ask the collection for a walker
+while (it.hasNext()) {                    // 2. is there another element?
+    E element = it.next();                // 3. take it, and advance
+    // process element                    // 4. do the work
+}</code></pre> <ol> <li>Ask the collection for an iterator. The iterator starts <em>before</em> the first element.</li> <li>Test <code>hasNext()</code> in the loop condition.</li> <li>Call <code>next()</code> <strong>exactly once per iteration</strong>, and store what it gives you.</li> <li>Use the stored value as many times as you want.</li> </ol> <p>Step 3 is where marks are lost. <code>it.next()</code> is not a variable you can read repeatedly; it is a request that consumes an element.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the even numbers in a list</span></div> <div class="bd"> <p>This is your instructor's first iterator example. <code>Arrays.asList</code> wraps an array in a <code>List</code> so we have a collection to iterate; then the loop is exactly the shape above.</p> <p>Before you open the toggle: how many lines does this print, and what is on them?</p> <p class="filename">Example1.java</p>
+<pre><code class="language-java">import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+
+public class Example1 {
+   public static void main(String args[]) {
+      Integer a[] = {3, 1, 4, 1, 5, 9, 2, 6};
+      List&lt;Integer&gt; l = Arrays.asList(a);
+      Iterator&lt;Integer&gt; x = l.iterator();
+      System.out.println("The even numbers in your list are: ");
+      while (x.hasNext()) {
+         int i = x.next();
+         if (i % 2 == 0) System.out.print(i + " ");
+      }
+      System.out.println();
+   }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>The even numbers in your list are:
+4 2 6</code></pre> <p>Two lines. The first is a <code>println</code>, so it ends immediately; the evens are then printed with <code>print</code> onto a single second line, which the final <code>println()</code> closes.</p> <p>Three details are worth pulling out of this small program.</p> <ul> <li><strong><code>int i = x.next();</code></strong> &mdash; <code>next()</code> returns an <code>Integer</code>, and it is assigned to an <code>int</code>. That is auto-unboxing, from Lecture 6. It also shows the payoff of generics: because <code>l</code> is a <code>List&lt;Integer&gt;</code>, <code>x</code> is an <code>Iterator&lt;Integer&gt;</code> and <code>next()</code> is already typed. Without generics you would be writing <code>int i = ((Integer) x.next()).intValue();</code>.</li> <li><strong><code>next()</code> is called once per iteration</strong>, and its value is stored in <code>i</code>. The <code>if</code> then tests <code>i</code>, not <code>x.next()</code>. Had the condition been <code>if (x.next() % 2 == 0)</code> the loop would consume two elements per pass and fall off the end.</li> <li><strong>The array is untouched.</strong> Iterating reads; it does not consume the collection. After the loop, <code>l</code> still holds all eight numbers.</li> </ul> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 23.2</div> <div class="bd"> <p>Let <code>list</code> be an <code>ArrayList&lt;String&gt;</code> holding <code>a</code>, <code>b</code>, <code>c</code> and let <code>Iterator&lt;String&gt; it = list.iterator();</code>. Give the output of each fragment, or say what goes wrong.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>System.out.println(it.next() + it.next());</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>ab</code>. Both calls happen, left to right, and each one advances. The <code>+</code> then concatenates the two different elements. This is the single most common exam trick with iterators, and it is why you assign <code>next()</code> to a variable when you mean to use one element twice.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>while (it.hasNext()) System.out.print(it.next() + it.next());</code></p> <details class="soln"><summary></summary><div class="ans"> <p>It prints <code>ab</code> and then throws. First pass: <code>hasNext()</code> is true, and the two <code>next()</code> calls take <code>a</code> and <code>b</code>, printing <code>ab</code>. Second pass: <code>hasNext()</code> is still true, because <code>c</code> is left. The first <code>next()</code> returns <code>c</code>; the second has nothing to return and throws a <code>NoSuchElementException</code>, which nothing catches, so the program stops.</p> <p>Note carefully that <em>nothing</em> is printed on the second pass. The whole expression <code>it.next() + it.next()</code> has to be evaluated before <code>print</code> is called, and the evaluation threw partway through.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>System.out.println(it.hasNext() + " " + it.hasNext() + " " + it.hasNext());</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>true true true</code>. <code>hasNext()</code> is a pure question &mdash; it does not advance anything, so asking it three times in a row gives the same answer three times.</p> <p><strong>Things to notice across all three parts.</strong> The whole of iterator arithmetic on an exam comes down to one rule: <em>count the <code>next()</code> calls, not the iterations.</em> Put a tick mark on the page for every <code>next()</code> you see in the loop body, and walk the collection that many elements at a time. Parts (a) and (b) are two <code>next()</code> calls per pass; part (c) is none.</p> </div></details> </div> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; calling <code>next()</code> once too often</span></div> <div class="bd"> <p><code>hasNext()</code> promises that <em>one</em> more element exists. It says nothing about two. A loop written like this is wrong on any collection with an odd number of elements:</p> <pre><code class="language-java">while (it.hasNext()) {
+    System.out.println(it.next() + " and " + it.next());   // two per pass, one guarantee
+}</code></pre> <p>On a three-element list holding <code>a</code>, <code>b</code>, <code>c</code> it prints one line and then throws:</p> <pre class="out"><code>a and b
+Exception in thread "main" java.util.NoSuchElementException
+	at java.base/java.util.ArrayList$Itr.next(ArrayList.java:1052)
+	at PairLoop.main(PairLoop.java:10)</code></pre> <p>If you genuinely want to consume elements in pairs, you must check again in the middle: <code>if (it.hasNext())</code> before the second <code>next()</code>. Your instructor's exam questions deliberately put two <code>next()</code> calls in one loop body and then ask what happens &mdash; see the Practice Problems.</p> </div> </div> <h2 id="s3"><span class="num">3.</span><code>Iterable</code>: one loop for every collection</h2> <p><code>Iterator</code> describes the walker. There is a second, even smaller interface that describes "a thing that can produce a walker".</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the <code>Iterable</code> interface</span></div> <div class="bd"> <pre><code class="language-java">public interface Iterable&lt;T&gt; {
+    Iterator&lt;T&gt; iterator();
+}</code></pre> <p>One method. A class that implements <code>Iterable&lt;T&gt;</code> promises it can hand out an <code>Iterator&lt;T&gt;</code> on request.</p> <p><code>Iterable</code> is the root interface for everything that can be iterated over. <code>ArrayList</code>, <code>LinkedList</code>, <code>Stack</code>, <code>HashSet</code> &mdash; all of them implement it, which is exactly why they all answer to <code>.iterator()</code>. And any class of your own can implement it too.</p> </div> </div> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; two interfaces, two jobs</span></div> <div class="bd"> <p><code>Iterable</code> is the <em>collection</em> side: "I can be walked." <code>Iterator</code> is the <em>walker</em>: "I am partway through walking something." A collection is an <code>Iterable</code> and hands out <code>Iterator</code>s &mdash; possibly several at once, all independent of each other.</p> <p>Mixing the two up is the most common error on this topic. <code>list.hasNext()</code> does not compile; <code>it.iterator()</code> does not compile either.</p> </div> </div> <p>Here is why the distinction earns its keep. Once you write a method whose parameter type is <code>Iterable&lt;T&gt;</code>, that one method works on every collection in the library at once &mdash; and on every class you ever write that implements the interface.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; one method, every collection</span></div> <div class="bd"> <p>This is your instructor's <code>Example2</code>. The <code>print</code> method knows nothing at all about stacks or lists: it takes an <code>Iterable&lt;T&gt;</code>, asks it for an iterator, and walks.</p> <p class="filename">Example2.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Stack;
+
+public class Example2 {
+   public static &lt;T&gt; void print(Iterable&lt;T&gt; x) {
+      Iterator&lt;T&gt; it = x.iterator();
+      while (it.hasNext()) {
+         System.out.print(it.next() + " ");
+      }
+      System.out.println();
+   }
+
+   public static void main(String args[]) {
+      Stack&lt;String&gt; s = new Stack&lt;&gt;();
+      ArrayList&lt;Integer&gt; l = new ArrayList&lt;&gt;();
+      int array[] = {3, 1, 4, 1, 5, 2, 6};
+      for (int i = 0; i &lt; array.length; i++) {
+         s.push("array[" + i + "] = " + array[i] + ", ");
+         l.add(array[i]);
+      }
+      print(l);
+      print(s);
+      System.out.println(s.pop());
+   }
+}</code></pre> <p>Two questions before you reveal. First, in what order does the stack print &mdash; the order things were pushed, or the order they would pop? Second, after <code>print(s)</code> has walked the whole stack, what is left on it?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>3 1 4 1 5 2 6
+array[0] = 3,  array[1] = 1,  array[2] = 4,  array[3] = 1,  array[4] = 5,  array[5] = 2,  array[6] = 6,
+array[6] = 6,</code></pre> <p><strong>The stack iterates bottom to top</strong> &mdash; <code>array[0]</code> first &mdash; which is the <em>opposite</em> of pop order. That surprises nearly everyone. <code>java.util.Stack</code> extends <code>java.util.Vector</code>, and it inherits <code>Vector</code>'s iterator, which walks index 0 upward. Pushing adds at the end, so the first thing pushed is index 0 and comes out of the iterator first. Remember this: <strong>iterating a <code>Stack</code> is not popping it.</strong> It is worth two points on the final.</p> <p><strong>And the stack is still full.</strong> The last line pops and gets <code>array[6] = 6, </code> &mdash; the top, the last thing pushed. Iteration reads; it does not consume.</p> <p>Notice also the double spaces in the middle line. Each pushed string already ends with <code>", "</code>, and <code>print</code> adds <code>" "</code> after every element, so you get both. That is not a typo in the notes; it is what the program really prints.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 23.3</div> <div class="bd"> <p>For each line, say whether it compiles, and if not, why.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>Iterable&lt;String&gt; things = new ArrayList&lt;String&gt;();</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compiles. <code>ArrayList&lt;String&gt;</code> implements <code>Iterable&lt;String&gt;</code>, so it can be assigned to a variable of that interface type &mdash; the same polymorphic assignment you did with <code>Shape s = new Circle();</code> in Lecture 13. Through this variable the only method you can call is <code>iterator()</code>; <code>add</code> and <code>get</code> are invisible, because <code>Iterable</code> does not declare them.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>while (list.hasNext()) { ... }</code> where <code>list</code> is an <code>ArrayList&lt;String&gt;</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Does not compile. <code>hasNext</code> belongs to the iterator, not to the list. <code>ArrayList</code> has no such method &mdash; the compiler says <code>cannot find symbol</code>. You need <code>Iterator&lt;String&gt; it = list.iterator();</code> first, and then <code>it.hasNext()</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Passing an <code>Integer[]</code> array to <code>print(Iterable&lt;T&gt; x)</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Does not compile. An array is not an <code>Iterable</code> &mdash; arrays are a built-in language construct, not a class that implements interfaces:</p> <pre class="err"><code>ArrayNotIterable.java:14: error: method print in class ArrayNotIterable cannot be applied to given types;
+        print(array);                                    // this is not
+        ^
+  required: Iterable&lt;T&gt;
+  found:    Integer[]
+  reason: cannot infer type-variable(s) T
+    (argument mismatch; Integer[] cannot be converted to Iterable&lt;T&gt;)</code></pre> <p>To pass an array to such a method, wrap it first: <code>print(Arrays.asList(array))</code>.</p> <p><strong>Things to notice across all three parts.</strong> Keep the two names in separate boxes in your head. The <em>collection</em> answers <code>iterator()</code>. The <em>iterator</em> answers <code>hasNext()</code>, <code>next()</code> and <code>remove()</code>. Nothing answers both.</p> </div></details> </div> </div> </div> <h2 id="s4"><span class="num">4.</span>The for-each loop is an iterator in disguise</h2> <p>You have been writing <code>for (String s : list)</code> since Lecture 6 without being told what it is. Now you can be told, and it is the payoff of the whole lecture.</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; what the compiler does with a for-each loop</span></div> <div class="bd"> <p>The enhanced for loop is not a separate kind of loop. The compiler rewrites</p> <pre><code class="language-java">for (String s : list) {
+    body(s);
+}</code></pre> <p>into exactly this:</p> <pre><code class="language-java">Iterator&lt;String&gt; it = list.iterator();
+while (it.hasNext()) {
+    String s = it.next();
+    body(s);
+}</code></pre> <p>That is the entire feature. It is a shorthand for the standard iterator loop &mdash; which is why it works on <em>anything</em> that implements <code>Iterable</code>, including a class you wrote yourself, and why it cannot work on anything that does not.</p> </div> </div> <p>You do not have to take that on faith. Here is a small <code>Iterable</code> whose <code>iterator()</code>, <code>hasNext()</code> and <code>next()</code> each announce themselves, walked by a plain for-each loop. It is built on the same generic <code>Node&lt;T&gt;</code> from Lecture 22 &mdash; shown here trimmed to just the constructor and the two getters these classes actually use.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; watching the for-each loop call the iterator</span></div> <div class="bd"> <p><code>TracedList</code> is a stripped-down linked list; <code>TracedIterator</code> is its walker. Both print a bracketed note every time one of their methods runs. Then <code>main</code> does nothing but a for-each loop over three elements.</p> <p class="filename">Node.java</p>
+<pre><code class="language-java">public class Node&lt;T&gt; {
+    private T data;
+    private Node&lt;T&gt; next;
+
+    public Node(T d, Node&lt;T&gt; n) {
+        data = d;
+        next = n;
+    }
+
+    public T getData() { return data; }
+    public Node&lt;T&gt; getNext() { return next; }
+}</code></pre> <p class="filename">TracedIterator.java</p>
+<pre><code class="language-java">import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+public class TracedIterator&lt;T&gt; implements Iterator&lt;T&gt; {
+    private Node&lt;T&gt; current;
+
+    public TracedIterator(Node&lt;T&gt; head) { this.current = head; }
+
+    public boolean hasNext() {
+        System.out.println("      [hasNext() -&gt; " + (current != null) + "]");
+        return current != null;
+    }
+
+    public T next() {
+        if (current == null) throw new NoSuchElementException();
+        T data = current.getData();
+        current = current.getNext();
+        System.out.println("      [next() -&gt; " + data + "]");
+        return data;
+    }
+}</code></pre> <p class="filename">TracedList.java</p>
+<pre><code class="language-java">import java.util.Iterator;
+
+public class TracedList&lt;T&gt; implements Iterable&lt;T&gt; {
+    private Node&lt;T&gt; head;
+
+    public void addFirst(T item) { head = new Node&lt;&gt;(item, head); }
+
+    public Iterator&lt;T&gt; iterator() {
+        System.out.println("      [iterator() called]");
+        return new TracedIterator&lt;T&gt;(head);
+    }
+
+    public static void main(String[] args) {
+        TracedList&lt;String&gt; list = new TracedList&lt;&gt;();
+        list.addFirst("gamma");
+        list.addFirst("beta");
+        list.addFirst("alpha");
+
+        System.out.println("The for-each loop:");
+        for (String w : list) {
+            System.out.println("   body sees: " + w);
+        }
+    }
+}</code></pre> <p>The for-each loop in <code>main</code> mentions none of these methods. Before you reveal: how many times will <code>iterator()</code> run, and how many times will <code>hasNext()</code> run?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>The for-each loop:
+      [iterator() called]
+      [hasNext() -&gt; true]
+      [next() -&gt; alpha]
+   body sees: alpha
+      [hasNext() -&gt; true]
+      [next() -&gt; beta]
+   body sees: beta
+      [hasNext() -&gt; true]
+      [next() -&gt; gamma]
+   body sees: gamma
+      [hasNext() -&gt; false]</code></pre> <p><code>iterator()</code> runs <strong>once</strong>, at the top. <code>hasNext()</code> runs <strong>four</strong> times for three elements &mdash; three times to say yes and once to say no. That final <code>false</code> is what ends the loop.</p> <p>Read the trace against the rewrite in the Key Idea box and they match line for line: <code>iterator()</code>, then repeatedly <code>hasNext()</code> / <code>next()</code> / body, then a last <code>hasNext()</code>. Nothing else is going on. The for-each loop is sugar, and this is the sugar dissolved.</p> <p>One consequence you can now predict: <strong>a for-each loop gives you no index and no handle on the collection.</strong> There is no <code>i</code>, and the loop variable <code>w</code> is a fresh local copy of the reference each time. Assigning to <code>w</code> inside the body changes nothing in the list, because the rewrite makes <code>w</code> a local variable initialized from <code>next()</code>.</p> 
+</div></details> </div> </div> <p>Two footnotes to the rewrite, both of which show up on exams.</p> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; an <code>iterator()</code> method is not enough</span></div> <div class="bd"> <p>The rewrite is triggered by the <em>type</em> of the thing after the colon, not by whether it happens to have a suitable method. This class has a perfectly good <code>iterator()</code> method, but forgot <code>implements Iterable&lt;T&gt;</code>:</p> <pre><code class="language-java">public class Bag&lt;T&gt; {                      // &lt;-- no "implements Iterable&lt;T&gt;"
+    private Node&lt;T&gt; head;
+    public void addFirst(T item) { head = new Node&lt;&gt;(item, head); }
+    public Iterator&lt;T&gt; iterator() { return new LinkedListIterator&lt;T&gt;(head); }
+}</code></pre> <pre class="err"><code>Bag.java:12: error: for-each not applicable to expression type
+        for (String s : b) System.out.print(s + " ");
+                        ^
+  required: array or java.lang.Iterable
+  found:    Bag&lt;String&gt;
+1 error</code></pre> <p>Read the <code>required:</code> line &mdash; it tells you the whole rule. Add <code>implements Iterable&lt;T&gt;</code> to the class header and the identical code compiles and runs.</p> </div> </div> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the array special case</span></div> <div class="bd"> <p>Arrays do <strong>not</strong> implement <code>Iterable</code> &mdash; you saw the compiler say so in Quick Check 23.3. Yet <code>for (int i : array)</code> works.</p> <p>That is because the enhanced for loop has a second, separate rewrite for arrays: over an array it becomes an ordinary indexed <code>for</code> loop with a hidden counter, no iterator object involved at all. One piece of syntax, two rewrites, chosen by the type. The <code>required:</code> line in the error message above names both: <em>array or java.lang.Iterable</em>.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the same loop over an array, a list and a stack</span></div> <div class="bd"> <p>Your instructor's <code>Example3</code> uses all three in eight lines. The loop bodies differ; the loop syntax does not.</p> <p class="filename">Example3.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+import java.util.Stack;
+
+public class Example3 {
+   public static void main(String args[]) {
+      Stack&lt;String&gt; s = new Stack&lt;&gt;();
+      ArrayList&lt;Integer&gt; l = new ArrayList&lt;&gt;();
+      int array[] = {3, 1, 4, 1, 5, 2, 6};
+
+      // Using for-each loop with array
+      for (int i : array) {
+         s.push("" + i + ", ");
+         l.add(i);
+      }
+
+      // Using for-each loop with ArrayList
+      for (int i : l) System.out.print(i + " ");
+      System.out.println();
+
+      // Using for-each loop with Stack
+      for (String i : s) System.out.print(i);
+      System.out.println();
+   }
+}</code></pre> <p>Before you reveal: the stack was pushed in the order 3, 1, 4, 1, 5, 2, 6. What order does the last loop print?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>3 1 4 1 5 2 6
+3, 1, 4, 1, 5, 2, 6,</code></pre> <p>The same order, not the reverse. This is the point from &sect;3 again, and it is worth seeing twice: a for-each over a <code>Stack</code> walks it bottom to top, because it uses the stack's iterator, and <code>Stack</code> inherits <code>Vector</code>'s bottom-to-top iterator. If you want pop order you must actually pop.</p> <p>Note the loop variable types too. <code>for (int i : l)</code> over an <code>ArrayList&lt;Integer&gt;</code> unboxes each element into an <code>int</code>; <code>for (String i : s)</code> over a <code>Stack&lt;String&gt;</code> needs <code>String</code>. Writing <code>for (int i : s)</code> would not compile &mdash; the element type of the collection has to be assignable to the loop variable.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 23.4</div> <div class="bd"> <p>Rewrite this for-each loop as an explicit iterator loop, without changing what it prints.</p> <pre><code class="language-java">ArrayList&lt;String&gt; names = new ArrayList&lt;&gt;();
+names.add("Ann"); names.add("Bob"); names.add("Cal");
+
+for (String n : names) {
+    System.out.println(n.length() + " " + n);
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Apply the rewrite mechanically: ask for the iterator, loop on <code>hasNext()</code>, make the loop variable the first statement of the body by assigning <code>next()</code> to it, and leave the rest of the body alone.</p> <p class="filename">Rewrite.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+import java.util.Iterator;
+
+public class Rewrite {
+    public static void main(String[] args) {
+        ArrayList&lt;String&gt; names = new ArrayList&lt;&gt;();
+        names.add("Ann"); names.add("Bob"); names.add("Cal");
+
+        Iterator&lt;String&gt; it = names.iterator();
+        while (it.hasNext()) {
+            String n = it.next();
+            System.out.println(n.length() + " " + n);
+        }
+    }
+}</code></pre> <pre class="out"><code>3 Ann
+3 Bob
+3 Cal</code></pre> <p><strong>Things to notice.</strong> The body uses <code>n</code> twice. That is exactly why the rewrite assigns <code>next()</code> to a variable first &mdash; writing <code>System.out.println(it.next().length() + " " + it.next());</code> would consume two elements per pass and print <code>3 Bob</code> then throw. The for-each loop protects you from that mistake by construction, which is a good reason to prefer it whenever you do not need the index.</p> <p>Going the other way is just as useful on an exam: when you see an explicit iterator loop that calls <code>next()</code> exactly once and does nothing else clever, you may read it as a for-each loop.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 23.4</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="18" aria-label="Live coding - Quick Check 23.4">import java.util.ArrayList;
+import java.util.Iterator;
+
+public class Rewrite {
+    public static void main(String[] args) {
+        ArrayList&lt;String&gt; names = new ArrayList&lt;&gt;();
+        names.add("Ann"); names.add("Bob"); names.add("Cal");
+
+        // Rewrite this loop using an explicit Iterator:
+        //
+        // for (String n : names) {
+        //     System.out.println(n.length() + " " + n);
+        // }
+
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 23.5</div> <div class="bd"> <p>A <code>Stack&lt;String&gt;</code> has <code>red</code>, <code>blue</code>, <code>green</code> pushed onto it in that order.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> What does <code>for (String c : s) System.out.print(c + " ");</code> print?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>red blue green </code> &mdash; insertion order, bottom to top. The for-each loop uses the stack's iterator, and <code>Stack</code> inherits <code>Vector</code>'s iterator, which starts at index 0.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What does <code>while (!s.isEmpty()) System.out.print(s.pop() + " ");</code> print?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>green blue red </code> &mdash; LIFO, the reverse. <code>pop</code> takes the top, which is the last thing pushed.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> After part (a) has run, how many elements are on the stack? After part (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p>Three, then zero. Iterating leaves the collection exactly as it was; popping empties it. If you run (a) then (b) you get both lines. If you run (b) then (a), the second loop prints nothing, because the stack is empty.</p> <p><strong>Things to notice across all three parts.</strong> Your instructor's final puts these two loops next to each other on purpose &mdash; one line iterating a stack, one line popping it &mdash; and the two answers are reverses of each other. When you see a <code>Stack</code> and an <code>Iterator</code> in the same question, that contrast is what is being tested.</p> </div></details> </div> </div> </div> <h2 id="s5"><span class="num">5.</span>Writing your own iterator</h2> <p>Everything so far has used iterators the library already wrote. Now write one. The exercise at the end of your instructor's notes is exactly this: <em>implement an iterable <code>LinkedList</code></em>, using the generic <code>Node&lt;T&gt;</code> you already have.</p> <p>It takes two classes, and between them they are about twenty lines.</p> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; making one of your classes iterable</span></div> <div class="bd"> <ol> <li>Write a class <code>XIterator&lt;T&gt; implements Iterator&lt;T&gt;</code>. Give it <strong>one field</strong>: a cursor that remembers where the walk has reached. For a linked list that is a <code>Node&lt;T&gt; current</code>.</li> <li>Its constructor takes whatever the walk should start from &mdash; here, the head node.</li> <li><code>hasNext()</code> returns whether the cursor still points at something: <code>current != null</code>.</li> <li><code>next()</code> does three things in this order: check there is something (throw if not), save the current element, advance the cursor, and return the saved element.</li> <li>Make the collection class say <code>implements Iterable&lt;T&gt;</code> and add <code>public Iterator&lt;T&gt; iterator() { return new XIterator&lt;&gt;(head); }</code>.</li> </ol> <p>Step 4's order matters. You must read the data <em>before</em> you move the cursor, or you will return the wrong element &mdash; and you must move it <em>before</em> you return, or the iterator never advances and <code>hasNext()</code> is true forever.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; an iterable <code>LinkedList</code></span></div> <div class="bd"> <p>Here is your instructor's solution to the exercise, complete and compilable. <code>Node&lt;T&gt;</code> is the generic node from Lecture 22; <code>LinkedListIterator</code> is the walker; <code>LinkedList</code> is a small list that implements <code>Iterable&lt;T&gt;</code> by handing one out.</p> <p class="filename">LinkedListIterator.java</p>
+<pre><code class="language-java">import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+public class LinkedListIterator&lt;T&gt; implements Iterator&lt;T&gt; {
+    private Node&lt;T&gt; current;
+
+    public LinkedListIterator(Node&lt;T&gt; head) { this.current = head; }
+
+    @Override
+    public boolean hasNext() { return current != null; }
+
+    @Override
+    public T next() {
+        if (!hasNext()) {
+            throw new NoSuchElementException();
+        }
+        T data = current.getData();
+        current = current.getNext();
+        return data;
+    }
+}</code></pre> <p class="filename">LinkedList.java</p>
+<pre><code class="language-java">import java.util.Iterator;
+
+public class LinkedList&lt;T&gt; implements Iterable&lt;T&gt; {
+    private Node&lt;T&gt; head;
+    private int size;
+
+    public LinkedList() {
+        head = null;
+        size = 0;
+    }
+
+    public void addFirst(T item) {
+        head = new Node&lt;&gt;(item, head);
+        size++;
+    }
+
+    public int size() { return size; }
+
+    public Node&lt;T&gt; getHead() { return head; }
+
+    // Implementation of the iterator() method required by Iterable
+    @Override
+    public Iterator&lt;T&gt; iterator() {
+        return new LinkedListIterator&lt;&gt;(head);
+    }
+}</code></pre> <p>And the driver, which walks the same list twice &mdash; once with the iterator by hand, once with a for-each loop that has no idea any of this exists. Note that <code>addFirst</code> puts each new item at the head, so the list ends up in the reverse of the order the calls were made.</p> <p class="filename">Example4.java</p>
+<pre><code class="language-java">public class Example4 {
+    public static void main(String[] args) {
+        LinkedList&lt;String&gt; list = new LinkedList&lt;&gt;();
+        list.addFirst("World");
+        list.addFirst("Hello");
+
+        // Using iterator explicitly
+        System.out.println("Using explicit iterator:");
+        LinkedListIterator&lt;String&gt; it = (LinkedListIterator&lt;String&gt;) list.iterator();
+        while (it.hasNext()) {
+            System.out.print(it.next() + " ");
+        }
+        System.out.println();
+
+        // Using for-each loop
+        System.out.println("Using for-each loop:");
+        for (String s : list) {
+            System.out.print(s + " ");
+        }
+        System.out.println();
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Using explicit iterator:
+Hello World
+Using for-each loop:
+Hello World</code></pre> <p>Identical output from the two loops, which is the entire point: the second loop is the first loop, written by the compiler.</p> <p><code>Hello</code> comes first because <code>addFirst("World")</code> ran first and then <code>addFirst("Hello")</code> pushed <code>Hello</code> in front of it. The list holds <code>Hello</code> first and <code>World</code> second.</p> <p>Two remarks on the driver's third line. The cast <code>(LinkedListIterator&lt;String&gt;) list.iterator()</code> is legal but unnecessary &mdash; <code>iterator()</code> is declared to return <code>Iterator&lt;String&gt;</code>, and every method the loop uses is declared there. Writing <code>Iterator&lt;String&gt; it = list.iterator();</code> is better style, because it does not tie the driver to which iterator class the list happens to use. That is exactly the coupling we were trying to get rid of.</p> <p>The <code>@Override</code> annotations are optional but worth writing. They ask the compiler to check that the method really does override something; misspell <code>hasNext</code> as <code>hasnext</code> and you get an error instead of a class that silently fails to implement the interface.</p> 
+</div></details> </div> </div> <p>Now the question the interface leaves open: what does <code>next()</code> do when there is nothing left? Her implementation answers it in the first three lines &mdash; it throws. Here is that happening for real.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; walking off the end</span></div> <div class="bd"> <p>Two elements, three calls to <code>next()</code>.</p> <p class="filename">NoSuchDemo.java</p>
+<pre><code class="language-java">public class NoSuchDemo {
+    public static void main(String[] args) {
+        LinkedList&lt;String&gt; list = new LinkedList&lt;&gt;();
+        list.addFirst("World");
+        list.addFirst("Hello");
+
+        LinkedListIterator&lt;String&gt; it = (LinkedListIterator&lt;String&gt;) list.iterator();
+        System.out.println("hasNext -&gt; " + it.hasNext() + ", next -&gt; " + it.next());
+        System.out.println("hasNext -&gt; " + it.hasNext() + ", next -&gt; " + it.next());
+        System.out.println("hasNext -&gt; " + it.hasNext());
+        System.out.println("asking for one more...");
+        System.out.println(it.next());
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>hasNext -&gt; true, next -&gt; Hello
+hasNext -&gt; true, next -&gt; World
+hasNext -&gt; false
+asking for one more...
+Exception in thread "main" java.util.NoSuchElementException
+	at LinkedListIterator.next(LinkedListIterator.java:15)
+	at NoSuchDemo.main(NoSuchDemo.java:12)</code></pre> <p><code>java.util.NoSuchElementException</code>, thrown from the line <code>throw new NoSuchElementException();</code> inside <code>next()</code>. It is an <em>unchecked</em> exception &mdash; it extends <code>RuntimeException</code> &mdash; so no <code>throws</code> clause is needed and no caller is forced to catch it. That was Lecture 20's distinction, and this is the standard example of where an unchecked exception is the right choice: calling <code>next()</code> with nothing left is a programming error, not an expected condition.</p> <p>Notice that the first four lines <em>did</em> print. The exception stops the program at the point it is thrown, not before; everything already written to <code>System.out</code> stays written. When an exam question wraps <code>next()</code> in a <code>try</code>/<code>catch</code>, this is why partial output appears before the message.</p> <p>The alternative designs are worse. Returning <code>null</code> would be indistinguishable from a list that legitimately contains <code>null</code>. Returning some "empty" value would need a different one per type. Throwing says exactly what happened, at exactly the moment it happened.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 23.6</div> <div class="bd"> <p>Each of these three versions of <code>next()</code> is wrong. Say what goes wrong when it runs.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>public T next() { current = current.getNext(); return current.getData(); }</code></p> <details class="soln"><summary></summary><div class="ans"> <p>It advances first and then reads, so it skips the first element entirely and reads one element too far at the end. On the two-element list holding <code>Hello</code> then <code>World</code> it returns <code>World</code> and then, on the second call, throws a <code>NullPointerException</code> when it calls <code>getData()</code> on <code>null</code>.</p> <p>Read data first, then advance. That is the whole of step 4 in the Procedure box.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>public T next() { return current.getData(); }</code></p> <details class="soln"><summary></summary><div class="ans"> <p>It never advances the cursor. <code>hasNext()</code> is true forever, so a <code>while (it.hasNext())</code> loop prints the first element over and over and never terminates &mdash; an infinite loop that produces infinite output.</p> <p>This is the most common bug when writing your first iterator, and it is easy to spot: if <code>next()</code> does not assign to the cursor field, it is wrong.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>public T next() { T d = current.getData(); current = current.getNext(); return d; }</code> &mdash; correct order, but with the <code>if (!hasNext()) throw ...</code> line deleted.</p> <details class="soln"><summary></summary><div class="ans"> <p>It works perfectly for every call that should succeed, and then throws a <code>NullPointerException</code> instead of a <code>NoSuchElementException</code> on the call that should fail. The program still stops, but the message now blames a null reference rather than saying "you asked for an element that does not exist".</p> <p><strong>Things to notice across all three parts.</strong> The guard is not there to make the code work; it is there to make the failure <em>legible</em>. A <code>NullPointerException</code> sends the reader hunting for which reference was null. <code>NoSuchElementException</code> names the actual mistake, and it is the exception the <code>Iterator</code> documentation promises, so code that catches it will keep working with your class.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 23.7</div> <div class="bd"> <p>Write a class <code>Range</code> that implements <code>Iterable&lt;Integer&gt;</code> so that <code>for (int k : new Range(1, 6))</code> prints <code>1 2 3 4 5</code> &mdash; the low end included, the high end excluded. Nothing is stored: the iterator counts. Give both the <code>Range</code> class and the iterator class it uses.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> This is the Procedure box with a different cursor. There is no linked structure here at all &mdash; the "collection" is imaginary, and the iterator's cursor is just an <code>int</code>. <code>hasNext()</code> is <code>cursor &lt; hi</code>, and <code>next()</code> returns the cursor and then increments it, which <code>cursor++</code> does in one step. That is worth doing deliberately: it proves that nothing about <code>Iterable</code> requires the elements to exist anywhere.</p> <p class="filename">RangeIterator.java</p>
+<pre><code class="language-java">import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+public class RangeIterator implements Iterator&lt;Integer&gt; {
+    private int cursor, hi;
+
+    public RangeIterator(int lo, int hi) {
+        this.cursor = lo;
+        this.hi = hi;
+    }
+
+    public boolean hasNext() { return cursor &lt; hi; }
+
+    public Integer next() {
+        if (!hasNext()) throw new NoSuchElementException();
+        return cursor++;
+    }
+}</code></pre> <p class="filename">Range.java</p>
+<pre><code class="language-java">import java.util.Iterator;
+
+public class Range implements Iterable&lt;Integer&gt; {
+    private int lo, hi;
+
+    public Range(int lo, int hi) {
+        this.lo = lo;
+        this.hi = hi;
+    }
+
+    public Iterator&lt;Integer&gt; iterator() {
+        return new RangeIterator(lo, hi);
+    }
+
+    public static void main(String[] args) {
+        int total = 0;
+        for (int k : new Range(1, 6)) {
+            System.out.print(k + " ");
+            total += k;
+        }
+        System.out.println();
+        System.out.println("total = " + total);
+
+        for (int k : new Range(4, 4)) System.out.print(k + " ");
+        System.out.println("(empty range printed nothing before this)");
+    }
+}</code></pre> <pre class="out"><code>1 2 3 4 5
+total = 15
+(empty range printed nothing before this)</code></pre> <p><strong>Things to notice.</strong> <code>return cursor++;</code> returns the old value and then increments &mdash; the post-increment rule from Lecture 1, doing real work for once. Writing <code>return ++cursor;</code> would print <code>2 3 4 5 6</code>.</p> <p>The empty range works with no special case. <code>new Range(4, 4)</code> gives an iterator whose very first <code>hasNext()</code> is <code>4 &lt; 4</code>, which is false, so the loop body never runs. A correct <code>hasNext()</code> handles the empty collection for free; if you find yourself writing an <code>if</code> for the empty case, look again at your <code>hasNext()</code>.</p> <p><code>Range</code> keeps <code>lo</code> so that <code>iterator()</code> can be called more than once and each call starts a fresh walk from the beginning. Storing the cursor in <code>Range</code> itself instead of in the iterator would be a real bug &mdash; the second for-each loop over the same <code>Range</code> would find it already exhausted.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 23.7</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="22" aria-label="Live coding - Quick Check 23.7">import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+public class RangeIterator implements Iterator&lt;Integer&gt; {
+    // 1. one int cursor, and the exclusive upper bound
+
+    // 2. constructor taking (lo, hi)
+
+    // 3. hasNext(): is the cursor still below hi?
+
+    // 4. next(): throw NoSuchElementException if not, else return and advance
+
+}
+
+// ---- in a second file, Range.java ----
+
+// public class Range implements Iterable&lt;Integer&gt; {
+//     5. fields lo and hi, a constructor, and
+//     6. iterator() returning a new RangeIterator(lo, hi)
+// }</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s6"><span class="num">6.</span>Two iterators, <code>remove()</code>, and the modification trap</h2> <p>Three loose ends, and all three appear on the final.</p> <h3>Iterators are independent objects</h3> <p>Nothing stops you from asking one collection for two iterators. You get two separate objects, each with its own cursor, neither aware of the other.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; two walkers, one list</span></div> <div class="bd"> <p>Predict all six lines before you reveal &mdash; especially the first.</p> <p class="filename">TwoIterators.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+import java.util.Iterator;
+
+public class TwoIterators {
+    public static void main(String[] args) {
+        ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();
+        list.add("a"); list.add("b"); list.add("c");
+
+        Iterator&lt;String&gt; y = list.iterator();
+        Iterator&lt;String&gt; z = list.iterator();
+
+        System.out.println("y == z ? " + (y == z));
+        System.out.println("y.next() -&gt; " + y.next());
+        System.out.println("y.next() -&gt; " + y.next());
+        System.out.println("z.next() -&gt; " + z.next());
+        System.out.println("y still has more? " + y.hasNext());
+        System.out.println("z still has more? " + z.hasNext());
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>y == z ? false
+y.next() -&gt; a
+y.next() -&gt; b
+z.next() -&gt; a
+y still has more? true
+z still has more? true</code></pre> <p><code>y == z</code> is <strong>false</strong>. Each call to <code>iterator()</code> executes a <code>new</code>, so you get two distinct objects &mdash; the reference comparison from Lecture 8, applied to iterators. This exact line is on both of your instructor's finals.</p> <p><code>y</code> has consumed <code>a</code> and <code>b</code>; <code>z</code> has consumed only <code>a</code>. Advancing one has no effect at all on the other. Both still report more to come, because <code>y</code> has <code>c</code> left and <code>z</code> has <code>b</code> and <code>c</code> left.</p> <p>The practical use of this is walking a collection twice at the same time, for instance to compare every element against every other. The exam use of it is simpler: a question hands you two iterators over the same list, drains one at a different rate from the other, and asks what each prints.</p> 
+</div></details> </div> </div> <h3><code>remove()</code> is optional &mdash; and that is a technical term</h3> <p>The third method of <code>Iterator</code> deletes the element <code>next()</code> most recently returned. Because it is declared with a default implementation in the interface, a class may simply not provide one.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; an optional operation</span></div> <div class="bd"> <p>An <strong>optional operation</strong> is a method an interface declares, but which an implementing class is permitted to refuse. The refusal is not a compile error &mdash; the method exists and can be called &mdash; it is a run-time <code>UnsupportedOperationException</code>.</p> <p>The <code>LinkedListIterator</code> above never mentions <code>remove</code>, so it inherits the interface's default, and the default throws. A fixed-size list such as the one <code>Arrays.asList</code> returns behaves the same way, because there is nothing it could remove an element from.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; what an unimplemented <code>remove()</code> does</span></div> <div class="bd"> <p>Both <code>remove()</code> calls here are wrapped in a <code>try</code> so the program survives them and we can see both messages.</p> <p class="filename">OptionalRemove.java</p>
+<pre><code class="language-java">import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+
+public class OptionalRemove {
+    public static void main(String[] args) {
+        LinkedList&lt;String&gt; mine = new LinkedList&lt;&gt;();
+        mine.addFirst("World");
+        mine.addFirst("Hello");
+        Iterator&lt;String&gt; it = mine.iterator();
+        it.next();
+        try {
+            it.remove();
+        } catch (UnsupportedOperationException e) {
+            System.out.println("our LinkedListIterator: " + e);
+        }
+
+        Integer a[] = {3, 1, 4};
+        List&lt;Integer&gt; fixed = Arrays.asList(a);
+        Iterator&lt;Integer&gt; jt = fixed.iterator();
+        jt.next();
+        try {
+            jt.remove();
+        } catch (UnsupportedOperationException e) {
+            System.out.println("Arrays.asList iterator: " + e);
+        }
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>our LinkedListIterator: java.lang.UnsupportedOperationException: remove
+Arrays.asList iterator: java.lang.UnsupportedOperationException: remove</code></pre> <p>Both refuse, for different reasons. Ours refuses because nobody wrote the method. <code>Arrays.asList</code> refuses because it is a fixed-size view onto an array &mdash; you can <code>set</code> an element through it, but you cannot change its length, and removing would.</p> <p><code>UnsupportedOperationException</code> is unchecked, so neither call is a compile error. That is the price of "optional": the compiler cannot help you, and you have to know which collections support which operations. An <code>ArrayList</code> iterator supports <code>remove</code> and is the case you will actually use.</p> 
+</div></details> </div> </div> <h3>Modifying a collection while you iterate it</h3> <p>The definition in &sect;1 said an iterator lets you traverse a collection <em>without modifying it</em>. That is not just a description of good manners; the library enforces it.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; removing during a for-each loop</span></div> <div class="bd"> <p>A four-name list, and a loop that deletes one name while walking. This is the code every student writes the first time they need to filter a list.</p> <p class="filename">RemoveDemo.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class RemoveDemo {
+    public static void main(String[] args) {
+        ArrayList&lt;String&gt; names = new ArrayList&lt;&gt;();
+        names.add("Ann");
+        names.add("Bob");
+        names.add("Cal");
+        names.add("Dee");
+
+        System.out.println("Before: " + names);
+        for (String n : names) {
+            if (n.equals("Bob")) names.remove(n);
+        }
+        System.out.println("After:  " + names);
+    }
+}</code></pre> <p>Does the <code>After:</code> line print? If so, what is on it?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Before: [Ann, Bob, Cal, Dee]
+Exception in thread "main" java.util.ConcurrentModificationException
+	at java.base/java.util.ArrayList$Itr.checkForComodification(ArrayList.java:1095)
+	at java.base/java.util.ArrayList$Itr.next(ArrayList.java:1049)
+	at RemoveDemo.main(RemoveDemo.java:12)</code></pre> <p>It never gets there. The removal succeeds, and then the <em>next</em> call to <code>next()</code> notices and throws.</p> <p>How it notices: an <code>ArrayList</code> keeps a private counter of how many structural changes have been made to it. When it hands out an iterator, the iterator copies that number. Every call to <code>next()</code> compares its copy against the list's current value, and if they differ, the list was changed behind the iterator's back and the iterator refuses to continue. That is the method named <code>checkForComodification</code> in the stack trace.</p> 
+</div></details> </div> </div> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; <code>ConcurrentModificationException</code></span></div> <div class="bd"> <p>A <code>ConcurrentModificationException</code> is thrown when a collection is structurally modified &mdash; an element added or removed &mdash; while an iterator over it is still in use. "Concurrent" here does not mean threads; a single thread doing both things is the usual cause.</p> <p>It is unchecked, so nothing forces you to catch it, and you should not want to: it is telling you the loop is wrong, not that the data is unusual.</p> </div> </div> <div class="box warn"> <div class="hd">Warning<span class="tag">&mdash; the version that does not throw is worse</span></div> <div class="bd"> <p>The check is not perfect. <code>hasNext()</code> on an <code>ArrayList</code> iterator is simply <code>cursor != size</code>, and it does <strong>not</strong> compare the modification counts. So if you remove the second-to-last element, the size drops to equal the cursor, <code>hasNext()</code> says <em>false</em>, the loop ends early, and <code>next()</code> never gets the chance to complain:</p> <pre><code class="language-java">ArrayList&lt;String&gt; a = new ArrayList&lt;&gt;();
+a.add("Ann"); a.add("Bob"); a.add("Cal"); a.add("Dee");
+for (String n : a) {
+    if (n.equals("Cal")) a.remove(n);      // Cal is second-to-last
+}
+System.out.println("no exception. list is now " + a);</code></pre> <pre class="out"><code>no exception. list is now [Ann, Bob, Dee]</code></pre> <p>This looks like it worked, and on this input it did. But <code>Dee</code> was silently never visited. Change the list slightly and you get either a skipped element or an exception, essentially at random. <strong>Do not modify a collection inside a for-each loop over it</strong> &mdash; not because it always throws, but because it sometimes does not.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the safe way, with <code>Iterator.remove()</code></span></div> <div class="bd"> <p><code>remove()</code> exists precisely for this. Because the deletion goes <em>through</em> the iterator, the iterator updates its own bookkeeping and the traversal stays valid. There is no for-each form of this &mdash; you need the explicit iterator, because you need to name it.</p> <p class="filename">SafeRemove.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+import java.util.Iterator;
+
+public class SafeRemove {
+    public static void main(String[] args) {
+        ArrayList&lt;String&gt; b = new ArrayList&lt;&gt;();
+        b.add("Ann"); b.add("Bob"); b.add("Cal"); b.add("Dee");
+
+        Iterator&lt;String&gt; it = b.iterator();
+        while (it.hasNext()) {
+            String n = it.next();
+            if (n.startsWith("B") || n.startsWith("C")) it.remove();
+        }
+        System.out.println("list is now " + b);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>list is now [Ann, Dee]</code></pre> <p>Two elements removed in one pass, no exception, nothing skipped. Note the shape: call <code>next()</code>, look at what you got, and only then call <code>it.remove()</code> &mdash; <code>remove()</code> deletes the element the most recent <code>next()</code> returned, so calling it before any <code>next()</code>, or twice in a row, throws an <code>IllegalStateException</code>.</p> <p>This is the one situation where the explicit iterator loop is not merely equivalent to a for-each loop but strictly better. Remember it as the answer to "how do I delete some elements of a list while I am looking at them".</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 23.8</div> <div class="bd"> <p>An <code>ArrayList&lt;Integer&gt;</code> holds <code>1, 2, 3, 4, 5, 6</code>. Write a loop that removes every even number, leaving <code>[1, 3, 5]</code>, and prints the result.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> A for-each loop is out &mdash; removing inside one is exactly the trap above. Use the explicit iterator, take each element with <code>next()</code>, test it, and call <code>it.remove()</code> on the ones you do not want.</p> <p class="filename">DropEvens.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+import java.util.Iterator;
+
+public class DropEvens {
+    public static void main(String[] args) {
+        ArrayList&lt;Integer&gt; nums = new ArrayList&lt;&gt;();
+        for (int i = 1; i &lt;= 6; i++) nums.add(i);
+
+        Iterator&lt;Integer&gt; it = nums.iterator();
+        while (it.hasNext()) {
+            int n = it.next();
+            if (n % 2 == 0) it.remove();
+        }
+        System.out.println(nums);
+    }
+}</code></pre> <pre class="out"><code>[1, 3, 5]</code></pre> <p><strong>Things to notice.</strong> <code>int n = it.next();</code> unboxes, so <code>n % 2</code> is ordinary <code>int</code> arithmetic. Had you written <code>Integer n = it.next();</code> that would also work &mdash; <code>n % 2</code> unboxes for the arithmetic anyway.</p> <p>There is one more trap worth naming. <code>nums.remove(2)</code> and <code>nums.remove(Integer.valueOf(2))</code> do completely different things on an <code>ArrayList&lt;Integer&gt;</code>: the first removes the element <em>at index 2</em>, the second removes the <em>value</em> 2. <code>it.remove()</code> takes no argument at all, so it sidesteps that ambiguity entirely &mdash; another reason to prefer it.</p> <p>The library also has <code>nums.removeIf(n -&gt; n % 2 == 0);</code>, which does the same job in one line. It is not on your syllabus, but if you see it in someone's code, this loop is what it is doing underneath.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 23.8</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="16" aria-label="Live coding - Quick Check 23.8">import java.util.ArrayList;
+import java.util.Iterator;
+
+public class DropEvens {
+    public static void main(String[] args) {
+        ArrayList&lt;Integer&gt; nums = new ArrayList&lt;&gt;();
+        for (int i = 1; i &lt;= 6; i++) nums.add(i);
+
+        // Remove every even number WITHOUT causing a
+        // ConcurrentModificationException, then print the list.
+        // Expected: [1, 3, 5]
+
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h3>Why an iterator is the only sane way to walk a linked structure</h3> <p>One last argument, and it is a measurable one. On an <code>ArrayList</code>, <code>get(i)</code> jumps straight to a slot &mdash; the index-based loop is fine. On a linked list, <code>get(i)</code> has to start at the head and follow <code>i</code> links, so the index-based loop restarts the walk from the beginning on every iteration. Walking <em>n</em> elements does about <em>n</em><sup>2</sup>/2 link-follows instead of <em>n</em>.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the same walk, two ways, timed</span></div> <div class="bd"> <p>Fifty thousand elements in a <code>java.util.LinkedList</code>, summed twice. Same answer both times; the only difference is how the walk is done.</p> <p class="filename">WalkCost.java</p>
+<pre><code class="language-java">import java.util.Iterator;
+
+public class WalkCost {
+    public static void main(String[] args) {
+        java.util.LinkedList&lt;Integer&gt; list = new java.util.LinkedList&lt;&gt;();
+        for (int i = 0; i &lt; 50000; i++) list.add(i);
+
+        long start = System.currentTimeMillis();
+        long sum = 0;
+        for (int i = 0; i &lt; list.size(); i++) sum += list.get(i);
+        long indexed = System.currentTimeMillis() - start;
+
+        start = System.currentTimeMillis();
+        long sum2 = 0;
+        Iterator&lt;Integer&gt; it = list.iterator();
+        while (it.hasNext()) sum2 += it.next();
+        long walked = System.currentTimeMillis() - start;
+
+        System.out.println("both sums agree: " + (sum == sum2));
+        System.out.println("index-based for loop: " + indexed + " ms");
+        System.out.println("iterator:             " + walked + " ms");
+    }
+}</code></pre> <p>Guess the ratio before you look. Timings depend on the machine, so the exact numbers below are one run on one computer and yours will differ &mdash; but the shape of the answer will not.</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>both sums agree: true
+index-based for loop: 908 ms
+iterator:             2 ms</code></pre> <p>Roughly four hundred times slower, for a loop that looks perfectly innocent. Three consecutive runs on the same machine gave 908, 820 and 899 ms for the indexed loop against 2, 4 and 2 ms for the iterator, so this is not measurement noise.</p> <p>The reason is entirely structural. <code>list.get(30000)</code> follows thirty thousand <code>getNext()</code> links, and the loop asks for <code>get(0)</code>, <code>get(1)</code>, <code>get(2)</code> and so on, redoing the whole walk each time. The iterator keeps its cursor between calls, so each <code>next()</code> is one link.</p> <p><strong>This is the practical reason the iterator exists.</strong> The encapsulation argument in &sect;1 is the reason a designer cares. This is the reason your program cares. Any time the collection might be a linked structure, walk it with an iterator or a for-each loop &mdash; never with an index.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 23.9</div> <div class="bd"> <p>Your instructor's <code>LinkedList</code> from &sect;5 has <code>size()</code> and <code>getHead()</code> but no <code>get(int)</code>.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Sketch what <code>get(int i)</code> would have to do, and say how long it takes.</p> <details class="soln"><summary></summary><div class="ans"> <p>Start at <code>head</code> and call <code>getNext()</code> <code>i</code> times, then return that node's data. There is no shortcut &mdash; a singly linked node knows only about the one after it &mdash; so the cost grows with <code>i</code>. Getting the last element of an <em>n</em>-element list costs <em>n</em> steps.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Given (a), what does <code>for (int i = 0; i &lt; list.size(); i++) System.out.println(list.get(i));</code> cost in total, and what does the for-each loop cost?</p> <details class="soln"><summary></summary><div class="ans"> <p>The indexed loop costs 0 + 1 + 2 + &hellip; + (<em>n</em>&minus;1) steps, which is about <em>n</em><sup>2</sup>/2. The for-each loop costs <em>n</em> steps, because the iterator's cursor never goes back to the head.</p> <p>For <em>n</em> = 50,000 that is about 1.25 billion link-follows against 50,000 &mdash; which is what the timing above measured.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> On an <code>ArrayList</code>, does the same argument apply?</p> <details class="soln"><summary></summary><div class="ans"> <p>No. An <code>ArrayList</code> stores its elements in an array, so <code>get(i)</code> is one array access no matter how big <code>i</code> is, and the indexed loop costs <em>n</em> steps just like the for-each loop. Both are fine.</p> <p><strong>Things to notice across all three parts.</strong> This is why the choice of loop is a real decision and not a style preference. If you write the for-each loop you are correct on <em>every</em> collection; if you write the indexed loop you are correct only on the ones that support fast random access, and nothing warns you when you are not.</p> </div></details> </div> </div> </div> <h2 id="s7"><span class="num">7.</span>A look at threads: <code>start</code>, <code>sleep</code>, <code>join</code></h2> <p>Every program you have written this semester does one thing at a time. Statement follows statement; a method call runs to completion before the caller continues. That single line of execution has a name.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; thread, multithreading</span></div> <div class="bd"> <p>A <strong>thread</strong> is a single path of execution through a program &mdash; a lightweight sub-process, the smallest unit the operating system schedules. Your programs so far have had one, called <code>main</code>.</p> <p><strong>Multithreading</strong> is running several threads at once inside one program, so that two or more parts of it make progress concurrently.</p> <p>Why you would want it: better use of a multi-core processor, better use of time that would otherwise be spent waiting on a disk or a network, an interface that stays responsive while a long job runs, and a simpler structure for problems that really are several activities at once.</p> <p>What it costs: synchronization problems, deadlocks, race conditions, and debugging that is genuinely hard because the bug may not reproduce.</p> </div> </div> <p>Java gives you two ways to make a thread, and your instructor's notes list both.</p> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; two ways to create a thread</span></div> <div class="bd"> <p><strong>Extend <code>Thread</code>.</strong></p> <ol> <li>Write a class that <code>extends Thread</code>.</li> <li>Override <code>run()</code> with the work the thread should do.</li> <li>Create an object of the class and call <code>start()</code> on it.</li> </ol> <p><strong>Implement <code>Runnable</code>.</strong></p> <ol> <li>Write a class that <code>implements Runnable</code>.</li> <li>Implement <code>run()</code>.</li> <li>Wrap it: <code>Thread t = new Thread(myRunnable);</code></li> <li>Call <code>t.start()</code>.</li> </ol> <p>The second is usually preferred, for the reason you learned in Lecture 14: Java has single inheritance, so <code>extends Thread</code> uses up your one superclass slot, while <code>implements Runnable</code> leaves the class free to extend something else. <code>Runnable</code> is an interface with exactly one method, <code>void run()</code>.</p> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; calling <code>run()</code> instead of <code>start()</code></span></div> <div class="bd"> <p><code>run()</code> is an ordinary method. If you call it, it runs like any other method call, on whatever thread you were already on. <strong>No new thread is created.</strong></p> <p><code>start()</code> is the one that asks the JVM for a new thread and arranges for <code>run()</code> to be executed on it. Calling <code>run()</code> yourself compiles cleanly, produces plausible-looking output, and gives you a completely single-threaded program.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; <code>run()</code> versus <code>start()</code>, and who is executing</span></div> <div class="bd"> <p><code>Thread.currentThread().getName()</code> reports which thread the code is running on right now. This program prints it from <code>main</code>, then from a <code>run()</code> called directly, then from a <code>run()</code> reached through <code>start()</code>.</p> <p class="filename">StartVsRun.java</p>
+<pre><code class="language-java">public class StartVsRun extends Thread {
+
+    public StartVsRun(String name) {
+        super(name);
+    }
+
+    public void run() {
+        System.out.println("  run() body is executing on thread: "
+                           + Thread.currentThread().getName());
+    }
+
+    public static void main(String[] args) {
+        System.out.println("main is running on thread: "
+                           + Thread.currentThread().getName());
+
+        System.out.println("calling run() directly:");
+        StartVsRun a = new StartVsRun("Worker-A");
+        a.run();
+
+        System.out.println("calling start():");
+        StartVsRun b = new StartVsRun("Worker-B");
+        b.start();
+    }
+}</code></pre> <p>The object <code>a</code> is named <code>Worker-A</code>. Which thread name will its <code>run()</code> report?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>main is running on thread: main
+calling run() directly:
+  run() body is executing on thread: main
+calling start():
+  run() body is executing on thread: Worker-B</code></pre> <p><code>a.run()</code> reports <strong><code>main</code></strong>, not <code>Worker-A</code>. The object is a <code>Thread</code> object and it does have a name, but no thread was ever started from it &mdash; the call was an ordinary method call and executed on the thread that made it. <code>b.start()</code> reports <code>Worker-B</code>, because that call really did create a thread and run <code>run()</code> there.</p> <p>This output was the same on every run, because there is nothing left in <code>main</code> to race against <code>Worker-B</code>. The moment two threads have work to do at the same time, that stops being true &mdash; which is the whole of the next example.</p> <p>The constructor calls <code>super(name)</code>, which is <code>Thread</code>'s one-argument constructor: it sets the thread's name. Without it the threads get automatic names like <code>Thread-0</code>, <code>Thread-1</code>.</p> 
+</div></details> </div> </div> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; thread output is not deterministic</span></div> <div class="bd"> <p>Once two threads are running, the operating system decides when each one gets the processor, and it does not have to tell you or be consistent about it. <strong>The order in which lines from different threads appear is not fixed, and can differ every time you run the same program.</strong></p> <p>Every thread output on the rest of this page is therefore <em>one representative run</em>. Run the same program yourself and you should expect something different. That is not a defect in the program; it is the thing the program is demonstrating.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; ten threads at once</span></div> <div class="bd"> <p>Your instructor's first thread example. Ten threads are created and started in a tight loop; each announces itself, sleeps a random fraction of a second, and announces that it is done.</p> <p class="filename">ThreadDemo.java</p>
+<pre><code class="language-java">public class ThreadDemo extends Thread {
+
+    public ThreadDemo(String name) {
+        super(name);
+    }
+
+    public static void main(String[] args) {
+        for (int i = 0; i &lt; 10; i++) {
+            ThreadDemo t = new ThreadDemo("T" + i);
+            t.start();
+        }
+    }
+
+    public void run() {
+        System.out.println("Thread " + Thread.currentThread().getName()
+                                     + " is starting");
+        try {
+            sleep((int) (Math.random() * 1000));
+        } catch (InterruptedException e) {
+        }
+        System.out.println("Thread " + Thread.currentThread().getName()
+                                     + " is ending");
+    }
+}</code></pre> <p>The loop starts <code>T0</code> first and <code>T9</code> last. Before you reveal: will <code>T0 is starting</code> be the first line? Will all ten <code>starting</code> lines come before any <code>ending</code> line?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <p>Here are two runs of the identical program, one after the other, on the same machine. The left-hand question has different answers in the two runs.</p> <pre class="out"><code>Thread T0 is starting
+Thread T8 is starting
+Thread T5 is starting
+Thread T7 is starting
+Thread T3 is starting
+Thread T4 is starting
+Thread T9 is starting
+Thread T6 is starting
+Thread T1 is starting
+Thread T2 is starting
+Thread T8 is ending
+Thread T3 is ending
+Thread T4 is ending
+Thread T7 is ending
+Thread T9 is ending
+Thread T0 is ending
+Thread T6 is ending
+Thread T2 is ending
+Thread T5 is ending
+Thread T1 is ending</code></pre> <pre class="out"><code>Thread T5 is starting
+Thread T9 is starting
+Thread T7 is starting
+Thread T4 is starting
+Thread T8 is starting
+Thread T1 is starting
+Thread T0 is starting
+Thread T6 is starting
+Thread T2 is starting
+Thread T3 is starting
+Thread T9 is ending
+Thread T7 is ending
+Thread T2 is ending
+Thread T4 is ending
+Thread T6 is ending
+Thread T8 is ending
+Thread T1 is ending
+Thread T5 is ending
+Thread T0 is ending
+Thread T3 is ending</code></pre> <p><strong>The starting order is not the creation order.</strong> <code>main</code> created <code>T0</code> first, but in the second run <code>T5</code> printed first. <code>start()</code> returns immediately; it asks for a thread and moves on. When that thread actually gets the processor is up to the operating system.</p> <p><strong>The ending order is not the starting order either</strong>, because each thread sleeps for a different random time. <code>T8</code> started second and ended first in the first run.</p> <p><strong>All ten <code>starting</code> lines happened to come before any <code>ending</code> line</strong> in both runs, but that is not guaranteed &mdash; it happened because starting ten threads takes far less time than the shortest random sleep. Make the sleeps shorter and you would see them interleave.</p> <p><code>sleep(ms)</code> is a <code>static</code> method of <code>Thread</code> that pauses <em>the thread that calls it</em> for at least that many milliseconds. It is declared to throw the checked <code>InterruptedException</code>, which is why every call to it in this lecture sits inside a <code>try</code>/<code>catch</code> &mdash; Lecture 20's rule, that a checked exception must be caught or declared, applies here with no exceptions.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 23.10</div> <div class="bd"> <p>A program starts three threads named <code>A</code>, <code>B</code> and <code>C</code>, in that order, and each one prints its own name once and finishes.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Is <code>A B C</code> a possible output? Is <code>C A B</code>?</p> <details class="soln"><summary></summary><div class="ans"> <p>Both are possible, and so are the other four orderings. Starting order does not determine running order. <code>A B C</code> is perhaps the most likely, because <code>A</code> had a head start, but nothing in the language promises it.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> The author replaces the three <code>start()</code> calls with <code>run()</code> calls. Now what is the output?</p> <details class="soln"><summary></summary><div class="ans"> <p>Exactly <code>A B C</code>, every single time. With <code>run()</code> there are no new threads: the three calls are three ordinary method calls made in sequence on the <code>main</code> thread, and each finishes before the next begins.</p> <p>This is precisely why the mistake is dangerous. The program looks like it works &mdash; the output is even <em>tidier</em> than the threaded version &mdash; and none of the concurrency you asked for is happening.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> How could you get the guaranteed order <code>A B C</code> <em>and</em> real threads?</p> <details class="soln"><summary></summary><div class="ans"> <p>Start each thread and then <code>join()</code> it before starting the next: <code>a.start(); a.join(); b.start(); b.join(); c.start(); c.join();</code>. <code>join()</code> blocks the calling thread until the thread it is called on has finished.</p> <p>That does give you three real threads in a guaranteed order &mdash; and no concurrency whatsoever, since only one of them is ever running. Which is the honest answer to the question: if you need a strict order, you do not want threads for that part of the work. Use <code>join()</code> to wait for results, not to sequence everything.</p> <p><strong>Things to notice across all three parts.</strong> "Possible output" questions about threads are answered by asking what the program <em>forces</em>, never by what it happened to print. Two lines printed by one thread are always in order relative to each other; two lines printed by different threads are in no order at all unless something like <code>join()</code> or a lock puts one there.</p> </div></details> </div> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; four threads drawing patterns</span></div> <div class="bd"> <p>Your instructor's second example makes the interleaving visible. Four threads are started with sizes 3, 5, 7, 9 and characters <code>#</code>, <code>$</code>, <code>*</code>, <code>@</code>. Each prints a square of its own character, one row at a time, sleeping between rows.</p> <p class="filename">Thread2.java</p>
+<pre><code class="language-java">public class Thread2 extends Thread {
+
+    int size;
+    String s;
+
+    public Thread2(int size, String s) {
+        super();
+        this.size = size;
+        this.s = s;
+    }
+
+    public static void main(String[] args) {
+        String chars[] = { "#", "$", "*", "@" };
+        for (int i = 0; i &lt; 4; i++) {
+            Thread2 t = new Thread2(3 + 2 * i, chars[i]);
+            t.start();
+        }
+    }
+
+    public void run() {
+        for (int i = 1; i &lt;= size; i++) {
+            for (int j = 1; j &lt;= size; j++)
+                System.out.print(s);
+            System.out.println();
+
+            try {
+                sleep((int) (Math.random() * 1000));
+            } catch (InterruptedException e) {
+            }
+        }
+    }
+}</code></pre> <p>Four squares, of 3, 5, 7 and 9 rows. Before you reveal: will you see four separate squares, or something else?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <p>One representative run. Yours will look different &mdash; run it twice and the two runs will not match each other either.</p> <pre class="out"><code>###
+*******
+$$$$$
+@@@@@@@@@
+###
+@@@@@@@@@
+*******
+$$$$$
+*******
+###
+@@@@@@@@@
+$$$$$
+*******
+*******
+*******
+$$$$$
+@@@@@@@@@
+*******
+$$$$$
+@@@@@@@@@
+@@@@@@@@@
+@@@@@@@@@
+@@@@@@@@@
+@@@@@@@@@</code></pre> <p>Not four squares &mdash; four squares <em>shuffled together</em>. Each thread's own rows are still in order (three <code>#</code> rows, five <code>$</code> rows, seven <code>*</code> rows, nine <code>@</code> rows, and you can count them), but the rows of different threads are interleaved arbitrarily. Near the end only the long-running <code>@</code> thread has rows left, so its last few appear consecutively.</p> <p>Notice what did <em>not</em> go wrong: no row is half <code>#</code> and half <code>$</code>. That is luck rather than a guarantee. The inner loop prints <code>size</code> characters and then a newline, and nothing stops another thread from printing between two of those characters. With a slower <code>System.out</code> or more threads you would see mixed rows.</p> <p>Getting a guarantee is the subject of the next section.</p> 
+</div></details> </div> </div> <h2 id="s8"><span class="num">8.</span>Sharing data: race conditions, <code>synchronized</code>, deadlock</h2> <p>Interleaved output is untidy. Interleaved <em>data</em> is a bug.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; race condition</span></div> <div class="bd"> <p>A <strong>race condition</strong> occurs when two or more threads access the same data at the same time, and the result depends on which of them happens to get there first.</p> <p>The classic case is <code>count++</code>. It looks like one step, but it is three: read <code>count</code>, add one, write it back. If two threads read the same value before either writes, both write the same result and one increment is silently lost.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; two threads, one counter, missing increments</span></div> <div class="bd"> <p>This version uses <code>implements Runnable</code>, the second creation style from &sect;7. Two threads each add one to a shared <code>static</code> counter one hundred thousand times, so the total ought to be exactly 200000. <code>join()</code> makes <code>main</code> wait for both before printing.</p> <p class="filename">Counter.java</p>
+<pre><code class="language-java">public class Counter implements Runnable {
+    static int count = 0;
+
+    public void run() {
+        for (int i = 0; i &lt; 100000; i++) count++;
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        Thread t1 = new Thread(new Counter());
+        Thread t2 = new Thread(new Counter());
+        t1.start();
+        t2.start();
+        t1.join();
+        t2.join();
+        System.out.println("count should be 200000, and is " + count);
+    }
+}</code></pre> <p>What number does it print?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <p>Five consecutive runs of the identical program. These numbers are representative &mdash; yours will be different numbers, and that is the entire point.</p> <pre class="out"><code>count should be 200000, and is 100000
+count should be 200000, and is 200000
+count should be 200000, and is 199923
+count should be 200000, and is 143046
+count should be 200000, and is 168143</code></pre> <p>Five runs, five answers. One of them was even correct, which is the cruellest part: a race condition can pass your testing and fail in production.</p> <p>Trace one lost increment. Both threads read <code>count</code> as 41; both compute 42; both store 42. Two increments happened, <code>count</code> went up by one. Multiply that by however often the two threads happen to overlap and you get any number between 100000 and 200000.</p> <p>Note the <code>throws InterruptedException</code> on <code>main</code>. <code>join()</code> is checked, exactly like <code>sleep</code>, and declaring it on <code>main</code> is the shortest legal way to deal with it.</p> <p>Without the two <code>join()</code> calls the program is wrong in a different way: <code>main</code> would print the counter while the threads were still incrementing it. One run of that version printed 13451 and four others printed 60416 &mdash; not the final answer, just whatever the counter happened to hold at the instant <code>main</code> looked.</p> 
+</div></details> </div> </div> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; <code>synchronized</code> and the monitor lock</span></div> <div class="bd"> <p>Every Java object has a <strong>lock</strong> (also called a monitor) associated with it. Writing</p> <pre><code class="language-java">synchronized (someObject) {
+    // ... critical section ...
+}</code></pre> <p>means: acquire that object's lock, run the block, release the lock. Only one thread can hold a given object's lock at a time, so only one thread at a time can be inside any block synchronized on that same object. Everyone else waits.</p> <p>The <code>synchronized</code> keyword can also be written on a method, which is shorthand for synchronizing the whole body on <code>this</code>.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the same counter, fixed</span></div> <div class="bd"> <p>One change from the previous program: the increment now happens inside a <code>synchronized</code> block on a shared lock object.</p> <p class="filename">SyncCounter.java</p>
+<pre><code class="language-java">public class SyncCounter implements Runnable {
+    static int count = 0;
+    static final Object lock = new Object();
+
+    public void run() {
+        for (int i = 0; i &lt; 100000; i++) {
+            synchronized (lock) {
+                count++;
+            }
+        }
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        Thread t1 = new Thread(new SyncCounter());
+        Thread t2 = new Thread(new SyncCounter());
+        t1.start();
+        t2.start();
+        t1.join();
+        t2.join();
+        System.out.println("count should be 200000, and is " + count);
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <p>Five consecutive runs:</p> <pre class="out"><code>count should be 200000, and is 200000
+count should be 200000, and is 200000
+count should be 200000, and is 200000
+count should be 200000, and is 200000
+count should be 200000, and is 200000</code></pre> <p>Correct every time. Read-add-write can no longer be split, because a thread that wants to start it must first take the lock, and the thread already inside holds it until it is done.</p> <p><code>lock</code> must be <code>static</code>, so that both <code>Counter</code> objects use the <em>same</em> lock. If you make it an instance field, each of the two objects has its own, no thread ever waits for the other, and the bug comes straight back &mdash; the code still says <code>synchronized</code> and still loses increments. <strong>Synchronizing on the wrong object is the same as not synchronizing at all.</strong></p> <p>This does cost something. Threads now spend time waiting, and the synchronized version does measurably more work per increment than the broken one. Keep critical sections small: lock around the shared data, not around the whole loop.</p> 
+</div></details> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; synchronizing the output, her way</span></div> <div class="bd"> <p>Your instructor's third example fixes the shuffled squares of &sect;7 by locking on <code>System.out</code> &mdash; a perfectly ordinary object, and one every thread can name. Sizes are 3, 5, 7 and 9.</p> <p class="filename">Thread3.java</p>
+<pre><code class="language-java">public class Thread3 extends Thread {
+
+    int size;
+
+    public Thread3(int size) {
+        super();
+        this.size = size;
+    }
+
+    public static void main(String[] args) {
+        for (int i = 3; i &lt; 10; i += 2) {
+            Thread3 t = new Thread3(i);
+            t.start();
+        }
+    }
+
+    public void run() {
+        synchronized (System.out) {
+            for (int i = 1; i &lt;= size; i++) {
+                for (int j = 1; j &lt;= size; j++)
+                    System.out.print("*");
+                System.out.println();
+
+                try {
+                    sleep((int) (Math.random() * 1000));
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+    }
+}</code></pre> <p>Compare with <code>Thread2</code>. What is now guaranteed, and what is still not?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <p>Two different runs, one after the other:</p> <pre class="out"><code>***
+***
+***
+*****
+*****
+*****
+*****
+*****
+*******
+*******
+*******
+*******
+*******
+*******
+*******
+*********
+*********
+*********
+*********
+*********
+*********
+*********
+*********
+*********</code></pre> <pre class="out"><code>*****
+*****
+*****
+*****
+*****
+*********
+*********
+*********
+*********
+*********
+*********
+*********
+*********
+*********
+*******
+*******
+*******
+*******
+*******
+*******
+*******
+***
+***
+***</code></pre> <p><strong>Guaranteed:</strong> each square is complete and unbroken. The <code>synchronized</code> block wraps the <em>entire</em> outer loop, so a thread holds the lock on <code>System.out</code> from its first row to its last, and no other thread can print in the middle. Every square is contiguous.</p> <p><strong>Not guaranteed:</strong> which square comes first. The first run printed sizes 3, 5, 7, 9; the second printed 5, 9, 7, 3. Whichever thread grabs the lock first goes first, and the rest queue up in whatever order they arrive.</p> <p>Notice the cost. The <code>sleep</code> is inside the lock, so a thread holds <code>System.out</code> while doing nothing at all, and the other three wait. This program takes as long as the sum of all four threads' sleeps, where <code>Thread2</code> took as long as the slowest one. That is the general shape of the trade: correctness through locking, paid for in lost concurrency.</p> 
+</div></details> </div> </div> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; deadlock</span></div> <div class="bd"> <p>A <strong>deadlock</strong> occurs when two or more threads are blocked forever, each waiting for a lock that another one holds. The classic two-thread shape is:</p> <ul> <li>Thread A holds resource X and waits for resource Y;</li> <li>Thread B holds resource Y and waits for resource X.</li> </ul> <p>Neither can proceed, neither will ever give up what it holds, and nothing times out. The program simply stops making progress, forever.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; her deadlock, and what it looks like</span></div> <div class="bd"> <p>Two threads, two locks. Thread 0 takes <code>locks[0]</code> and then wants <code>locks[1]</code>; thread 1 takes <code>locks[1]</code> and then wants <code>locks[0]</code>. The <code>sleep</code> in the middle is there to make sure both have taken their first lock before either asks for its second.</p> <p class="filename">DeadLock.java</p>
+<pre><code class="language-java">public class DeadLock extends Thread {
+
+    static Object[] locks = new Object[2];
+    int n;
+
+    public DeadLock(int i) {
+        n = i;
+    }
+
+    public static void main(String args[]) {
+        for (int i = 0; i &lt; 2; i++)
+            locks[i] = new Object();
+        for (int i = 0; i &lt; 2; i++) {
+            DeadLock d = new DeadLock(i);
+            d.start();
+        }
+    }
+
+    public void run() {
+        synchronized (locks[n % 2]) {
+            System.out.println("Thread " + n + " starting");
+            try {
+                sleep((int) (Math.random() * 1000));
+            } catch (InterruptedException e) {
+            }
+            synchronized(locks[(n + 1) % 2]) {
+                System.out.println("Thread " + n + " ending");
+            }
+        }
+    }
+}</code></pre> <p>There are four <code>println</code> calls' worth of output in this program. How many of them do you expect to see?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Thread 0 starting
+Thread 1 starting</code></pre> <p>Two lines, and then nothing. <strong>The program hangs.</strong> It does not crash, it does not print an error, it does not exit &mdash; the two <code>ending</code> lines never appear and the JVM never terminates. We ran it ten times and it deadlocked on every one; each run had to be killed from the outside, with a <code>timeout</code> on the command line. In a terminal you would press Ctrl+C.</p> <p>Only the order of the two lines varied between runs: sometimes <code>Thread 1 starting</code> came first.</p> <p>Walk through why. Thread 0 evaluates <code>locks[0 % 2]</code>, which is <code>locks[0]</code>, and takes it. Thread 1 evaluates <code>locks[1 % 2]</code>, which is <code>locks[1]</code>, and takes it. Both print <code>starting</code>. Both sleep. Thread 0 wakes and asks for <code>locks[(0+1) % 2]</code> = <code>locks[1]</code> &mdash; held by thread 1, so it blocks. Thread 1 wakes and asks for <code>locks[(1+1) % 2]</code> = <code>locks[0]</code> &mdash; held by thread 0, so it blocks. Each is waiting for the other, and each is holding what the other needs.</p> <table class="trace"> <tr><th>Time</th><th>Thread 0</th><th>Thread 1</th></tr> <tr><td>1</td><td>takes <code>locks[0]</code>, prints <code>starting</code></td><td>takes <code>locks[1]</code>, prints <code>starting</code></td></tr> <tr><td>2</td><td>sleeps, still holding <code>locks[0]</code></td><td>sleeps, still holding <code>locks[1]</code></td></tr> <tr><td>3</td><td>asks for <code>locks[1]</code> &mdash; blocked</td><td>asks for <code>locks[0]</code> &mdash; blocked</td></tr> <tr><td>4</td><td>blocked forever</td><td>blocked forever</td></tr> </table> <p>Notice how little it took: two locks, two threads, four lines of interesting code, and no error anywhere. Nothing is misspelled and no exception is thrown. Deadlock is not a mistake the compiler can find for you.</p> 
+</div></details> </div> </div> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; the standard cure: lock ordering</span></div> <div class="bd"> <p>The cycle exists only because the two threads take the locks in <em>opposite</em> orders. Agree on a fixed global order &mdash; always <code>locks[0]</code> before <code>locks[1]</code> &mdash; and no cycle can form, because whoever holds the lower-numbered lock is never waiting on someone who holds it.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the same program, deadlock removed</span></div> <div class="bd"> <p>Exactly one change: both threads now take <code>locks[0]</code> first and <code>locks[1]</code> second, instead of starting from <code>locks[n % 2]</code>.</p> <p class="filename">NoDeadLock.java</p>
+<pre><code class="language-java">public class NoDeadLock extends Thread {
+
+    static Object[] locks = new Object[2];
+    int n;
+
+    public NoDeadLock(int i) {
+        n = i;
+    }
+
+    public static void main(String args[]) {
+        for (int i = 0; i &lt; 2; i++)
+            locks[i] = new Object();
+        for (int i = 0; i &lt; 2; i++) {
+            NoDeadLock d = new NoDeadLock(i);
+            d.start();
+        }
+    }
+
+    public void run() {
+        synchronized (locks[0]) {              // always locks[0] first
+            System.out.println("Thread " + n + " starting");
+            try {
+                sleep((int) (Math.random() * 1000));
+            } catch (InterruptedException e) {
+            }
+            synchronized (locks[1]) {          // then always locks[1]
+                System.out.println("Thread " + n + " ending");
+            }
+        }
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Thread 0 starting
+Thread 0 ending
+Thread 1 starting
+Thread 1 ending</code></pre> <p>All four lines, and the program exits. On the six runs we made, thread 0 always won the race for <code>locks[0]</code> and went first; the reverse order &mdash; all of thread 1's lines, then all of thread 0's &mdash; is equally legal and you may well see it.</p> <p>What you will <em>not</em> see is the two threads interleaved, because whichever thread wins <code>locks[0]</code> holds it across its sleep and its inner block. The fix removes the deadlock; it does not restore concurrency. Getting both usually means holding fewer locks, or holding them for less time, and that is where a course on concurrent programming starts.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 23.11</div> <div class="bd"> <p>Two threads share a <code>static int balance = 100;</code>. Each runs <code>if (balance &gt;= 100) { balance = balance - 100; System.out.println("withdrew 100"); }</code>.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Describe an interleaving in which <code>balance</code> ends up at &minus;100.</p> <details class="soln"><summary></summary><div class="ans"> <p>Thread A tests <code>balance &gt;= 100</code> and finds it true. Before A does the subtraction, the operating system switches to thread B, which also tests <code>balance &gt;= 100</code>, finds 100, and is also true. Both then subtract 100 from a balance that only ever had 100 in it, both print <code>withdrew 100</code>, and the balance ends at &minus;100.</p> <p>The bug is that the test and the update are two separate steps with a gap between them, and the gap is where the other thread gets in.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Fix it.</p> <details class="soln"><summary></summary><div class="ans"> <p>Put the test <em>and</em> the update inside one <code>synchronized</code> block on a shared lock:</p> <pre><code class="language-java">synchronized (lock) {
+    if (balance &gt;= 100) {
+        balance = balance - 100;
+        System.out.println("withdrew 100");
+    }
+}</code></pre> <p>Now no thread can slip between the test and the subtraction, because it would have to take the lock to get in and the lock is held.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Someone "fixes" it instead by synchronizing only the assignment: <code>if (balance &gt;= 100) { synchronized (lock) { balance = balance - 100; } ... }</code>. Does that work?</p> <details class="soln"><summary></summary><div class="ans"> <p>No. The test is still outside the lock, so both threads can still pass it before either subtracts. All this version guarantees is that the two subtractions do not corrupt each other &mdash; and they were never the problem.</p> <p><strong>Things to notice across all three parts.</strong> The unit that has to be protected is not "the write". It is <em>the whole sequence that must appear to happen at once</em> &mdash; here, check-then-modify. Naming that sequence correctly is most of the work; <code>synchronized</code> is the easy part.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 23.12</div> <div class="bd"> <p>Rewrite <code>ThreadDemo</code> from &sect;7 so that it uses <code>implements Runnable</code> instead of <code>extends Thread</code>, and so that <code>main</code> prints <code>all threads finished</code> only after every thread has genuinely finished.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Three changes. First, the class implements <code>Runnable</code> and keeps its own <code>name</code> field, since it is no longer a <code>Thread</code> and cannot be given one by <code>super(name)</code>. Second, each <code>Runnable</code> gets wrapped: <code>new Thread(new Worker("T" + i))</code>. Third, to wait for all of them we must keep the <code>Thread</code> objects &mdash; put them in an array, start them all, then <code>join()</code> each one in a second loop. Starting and joining in the same loop would run them one at a time.</p> <p><code>sleep</code> is <code>static</code> on <code>Thread</code>, so it is still available as <code>Thread.sleep(...)</code> even though <code>Worker</code> no longer extends <code>Thread</code>.</p> <p class="filename">Worker.java</p>
+<pre><code class="language-java">public class Worker implements Runnable {
+    private String name;
+
+    public Worker(String name) {
+        this.name = name;
+    }
+
+    public void run() {
+        System.out.println("Thread " + name + " is starting");
+        try {
+            Thread.sleep((int) (Math.random() * 1000));
+        } catch (InterruptedException e) {
+        }
+        System.out.println("Thread " + name + " is ending");
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        Thread[] all = new Thread[5];
+        for (int i = 0; i &lt; all.length; i++) {
+            all[i] = new Thread(new Worker("T" + i));
+            all[i].start();
+        }
+        for (int i = 0; i &lt; all.length; i++) {
+            all[i].join();
+        }
+        System.out.println("all threads finished");
+    }
+}</code></pre> <p>One representative run &mdash; the first ten lines will be in a different order when you run it:</p> <pre class="out"><code>Thread T2 is starting
+Thread T4 is starting
+Thread T0 is starting
+Thread T1 is starting
+Thread T3 is starting
+Thread T0 is ending
+Thread T3 is ending
+Thread T1 is ending
+Thread T2 is ending
+Thread T4 is ending
+all threads finished</code></pre> <p><strong>Things to notice.</strong> <code>all threads finished</code> is <em>always</em> last. That is the one ordering this program does guarantee, and <code>join()</code> is what guarantees it: <code>main</code> cannot get past <code>all[i].join()</code> until thread <code>i</code> has terminated, so by the end of the second loop every thread is done.</p> <p>Joining in the same loop as starting &mdash; <code>all[i].start(); all[i].join();</code> &mdash; would compile and print <code>T0 starting</code>, <code>T0 ending</code>, <code>T1 starting</code>, <code>T1 ending</code> and so on: five threads, run strictly one after another, with no concurrency at all. Start everything first, then wait.</p> <p><code>Worker</code> here is not a <code>Thread</code>; it is a job description handed to one. That separation is the reason <code>Runnable</code> is the preferred style, and it leaves <code>Worker</code> free to extend some other class if it ever needs to.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 23.12</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="25" aria-label="Live coding - Quick Check 23.12">public class Worker implements Runnable {
+    private String name;
+
+    public Worker(String name) {
+        this.name = name;
+    }
+
+    public void run() {
+        // print "Thread &lt;name&gt; is starting", sleep a random time,
+        // then print "Thread &lt;name&gt; is ending"
+
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        Thread[] all = new Thread[5];
+
+        // 1. create and start five Threads, each wrapping a new Worker
+
+        // 2. join them all
+
+        System.out.println("all threads finished");
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="prac"><span class="num">&#9733;</span>Practice Problems</h2> <div class="box prac"> <div class="hd">Practice Problems<span class="tag">&mdash; the iterator half of the final</span></div> <div class="bd"> <p>The first three problems are the parts of your instructor's own exam questions that deal with iterators. Two of them are the second halves of the output-prediction problems whose first halves you did in Lecture 21 &mdash; you now have everything you need to finish them.</p> <p>Work them on paper. The technique is always the same: draw the collection, put a marker where each iterator's cursor sits, and move a marker exactly once for every <code>next()</code> you see.</p> </div> </div> <h3>Problem 1 &mdash; What is the output? <span class="muted">(from CSCI 212 Final - Summer 2026, Problem 2, second half)</span></h3> <p>This continues the program from Lecture 21's Problem 2. At this point in <code>main</code>, the <code>ArrayList</code> named <code>a2</code> holds <code>red</code>, <code>blue</code>, <code>green</code>, <code>yellow</code>, <code>orange</code>, and the <code>Stack</code> named <code>s</code> has just been emptied by line (e).</p> <p class="filename">Output.java</p>
+<pre><code class="language-java">s.push("cat");
+s.push("dog");
+
+Iterator&lt;String&gt; x = s.iterator();
+while(x.hasNext()) {                                        // line (f)
+    try {
+        System.out.print(x.next() + " ");
+    } catch(Exception e) {
+        System.out.println(" No such element");
+    }
+}
+System.out.println();
+
+while(!s.isEmpty()) System.out.print(s.pop() + " ");        // line (g)
+System.out.println();
+
+Iterator&lt;String&gt; y = a2.iterator();
+Iterator&lt;String&gt; z = a2.iterator();
+
+System.out.println("" + (y == z));                          // line (h)
+
+while(y.hasNext()) {                                        // line (i)
+    try {
+        System.out.print("" + y.next() + ", ");
+    } catch(Exception e) {
+        System.out.println(" No such element");
+    }
+}
+System.out.println();
+
+while(z.hasNext()) {                                        // line (j)
+    try {
+        System.out.print("" + z.next() + ", ");
+        z.next();
+    } catch(Exception e) {
+        System.out.println(" No such element");
+    }
+}
+System.out.println();</code></pre> <div class="part"> <p class="q"><span class="pl">(f)</span> What is the output from the while loop beginning on line (f)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>cat dog </code>. The stack has <code>cat</code> pushed first and <code>dog</code> on top. Iterating a <code>Stack</code> walks it bottom to top, so <code>cat</code> comes out first &mdash; the opposite of pop order.</p> <p>The <code>try</code>/<code>catch</code> never fires here: exactly one <code>next()</code> per pass, guarded by <code>hasNext()</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(g)</span> What is the output from line (g)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>dog cat </code> &mdash; the reverse of (f), and that is the whole reason (f) and (g) are printed next to each other. <code>pop</code> takes the top, and <code>dog</code> was pushed last.</p> <p>Also note that line (f) left the stack full. If iterating had consumed it, line (g) would print nothing.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(h)</span> What is the output from line (h)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>false</code>. Each call to <code>a2.iterator()</code> constructs a new iterator object, so <code>y</code> and <code>z</code> are two different objects and <code>==</code> on references is false. They walk the same list, but they are not the same walker and neither knows about the other.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(i)</span> What is the output from the while loop beginning on line (i)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>red, blue, green, yellow, orange, </code>. One <code>next()</code> per pass over the five-element list, each element followed by a comma and a space. <code>y</code> is now exhausted; <code>z</code> has not moved.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(j)</span> What is the output from the while loop beginning on line (j)?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> There are <em>two</em> <code>next()</code> calls in this body: the one inside the <code>print</code>, and a bare <code>z.next();</code> on the following line that throws its value away. So each pass consumes two elements but only prints the first of them. Five elements, two per pass: passes 1 and 2 succeed, and pass 3 runs out.</p> <table class="trace"> <tr><th>Pass</th><th><code>hasNext()</code></th><th>printed</th><th>discarded by the bare <code>next()</code></th></tr> <tr><td>1</td><td>true</td><td><code>red, </code></td><td><code>blue</code></td></tr> <tr><td>2</td><td>true</td><td><code>green, </code></td><td><code>yellow</code></td></tr> <tr><td>3</td><td>true &mdash; <code>orange</code> is left</td><td><code>orange, </code></td><td>nothing left &mdash; throws</td></tr> </table> <p>On pass 3 the <code>print</code> has already run, so <code>orange, </code> appears; then the bare <code>z.next()</code> throws a <code>NoSuchElementException</code>, the <code>catch</code> runs, and <code>println(" No such element")</code> adds the message and a newline. <code>hasNext()</code> is now false and the loop ends.</p> <p>The answer is <code>red, green, orange,  No such element</code> &mdash; and note the two spaces before <code>No</code>, one from the trailing space of <code>orange, </code> and one from the leading space of the caught message.</p> <p>Verified by running the whole program:</p> <pre class="out"><code>false true
+true
+red blue green yellow orange
+red blue green yellow orange
+green blue red
+cat dog
+dog cat
+false
+red, blue, green, yellow, orange,
+red, green, orange,  No such element</code></pre> <p><strong>Things to notice across all five parts.</strong> Four of the five marks here come from one habit: counting <code>next()</code> calls rather than loop passes. Part (j) is worth two points and is missed by students who read the loop as "print every other element" &mdash; which it almost is, except for what happens at the end.</p> <p>Note also what the <code>catch (Exception e)</code> buys the program. It turns a crash into a printed message and lets <code>main</code> continue. Your instructor uses this pattern in every version of this question, so expect a <code>No such element</code> line whenever you see two <code>next()</code> calls in one body.</p> </div></details> </div> <h3>Problem 2 &mdash; What is the output? <span class="muted">(from CSCI 212 Final - Spring 2025, Problem 2, second half)</span></h3> <p>The same question with <code>Integer</code> values. At this point <code>a2</code> holds <code>1, 2, 3, 4, 5, 7, 9</code> and the stack <code>s</code> is empty.</p> <p class="filename">OutputSpring.java</p>
+<pre><code class="language-java">s.push(7); s.push(9);
+Iterator&lt;Integer&gt; x = s.iterator();
+while (x.hasNext()) {                                       // line (f)
+    try {
+        System.out.print(x.next() + " ");
+    } catch (Exception e) { System.out.println(" No such element"); }
+}
+System.out.println();
+while(!s.isEmpty()) System.out.print(s.pop() + " ");
+System.out.println();                                       // line (g)
+
+Iterator&lt;Integer&gt; y = a2.iterator();   Iterator&lt;Integer&gt; z = a2.iterator();
+System.out.println("" + (y == z));                          // line (h)
+while (y.hasNext()) {                                       // line (i)
+    try {
+        System.out.print("" + y.next() +  ", ");
+    } catch (Exception e) { System.out.println(" No such element"); }
+}
+System.out.println();
+while (z.hasNext()) {                                       // line (j)
+    try {
+        System.out.print("" + z.next() + ", ");
+        z.next();
+    } catch (Exception e) { System.out.println(" No such element"); }
+}
+System.out.println();</code></pre> <div class="part"> <p class="q"><span class="pl">(f)</span> and <span class="pl">(g)</span> What do lines (f) and (g) print?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>7 9 </code> then <code>9 7 </code>. Identical reasoning to Problem 1: the iterator walks the stack bottom to top, <code>pop</code> takes from the top.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(h)</span> and <span class="pl">(i)</span> What do lines (h) and (i) print?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>false</code>, then <code>1, 2, 3, 4, 5, 7, 9, </code>. Two separate iterator objects; one <code>next()</code> per pass walks all seven elements.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(j)</span> What does line (j) print? This is where the two versions of the question differ.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Two <code>next()</code> calls per pass again, but now the list has <em>seven</em> elements instead of five. Seven is odd, so the same thing happens, just one pass later.</p> <table class="trace"> <tr><th>Pass</th><th>printed</th><th>discarded</th></tr> <tr><td>1</td><td><code>1, </code></td><td><code>2</code></td></tr> <tr><td>2</td><td><code>3, </code></td><td><code>4</code></td></tr> <tr><td>3</td><td><code>5, </code></td><td><code>7</code></td></tr> <tr><td>4</td><td><code>9, </code></td><td>nothing left &mdash; throws</td></tr> </table> <p>The answer is <code>1, 3, 5, 9,  No such element</code>. Verified:</p> <pre class="out"><code>false true
+true
+1 2 3 4 5 7 9
+1 2 3 4 5 7 9
+5 4 3 2 1
+7 9
+9 7
+false
+1, 2, 3, 4, 5, 7, 9,
+1, 3, 5, 9,  No such element</code></pre> <p><strong>Things to notice across all three parts.</strong> Compare the last line with Problem 1's: <code>red, green, orange,</code> against <code>1, 3, 5, 9,</code>. Same loop, same trap, different list length. Ask yourself what would happen if the list had an <em>even</em> number of elements &mdash; the answer is that no exception is thrown at all, the loop consumes them in pairs, and the <code>catch</code> never runs. That is worth checking on paper before the exam, because it is the obvious variation.</p> </div></details> </div> <h3>Problem 3 &mdash; What is the output? <span class="muted">(from Exam 3 Practice Problems, also in Final Practice Problems)</span></h3> <p>By the time this fragment runs, <code>a2</code> holds <code>3, 1, 4, 1, 5, 9, 2</code> and <code>a3</code> is a different list holding <code>9, 8, 7</code>.</p> <p class="filename">Prac3.java</p>
+<pre><code class="language-java">Iterator&lt;Integer&gt; x = a3.iterator();
+Iterator&lt;Integer&gt; y = a2.iterator(); Iterator&lt;Integer&gt; z = a2.iterator();
+
+while (x.hasNext()) {                                         // line (g)
+    try {
+        System.out.print("" + x.next());
+        x.next();
+    } catch (Exception e) { System.out.println(" No such thing"); }
+}
+
+while (x.hasNext()) {                                         // line (h)
+    try {
+        System.out.print("" + x.next() + "," + x.next() + ",");
+    } catch (Exception e) { System.out.println(" No such thing"); }
+}
+
+while (y.hasNext()) {                                         // line (i)
+    try {
+        System.out.print("" + y.next() + "," + y.next() + ",");
+    } catch (Exception e) { System.out.println(" No such thing"); }
+}
+
+System.out.println("" + (y == z));                            // line (j)</code></pre> <div class="part"> <p class="q"><span class="pl">(g)</span> What is the output from the while loop beginning on line (g)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>97 No such thing</code>. <code>a3</code> has three elements: 9, 8, 7. Pass 1 prints <code>9</code> and discards <code>8</code>. Pass 2: <code>hasNext()</code> is true because 7 is left, so it prints <code>7</code>, and then the bare <code>x.next()</code> throws. The <code>catch</code> prints <code> No such thing</code> and ends the line.</p> <p>The <code>9</code> and the <code>7</code> are adjacent because the <code>print</code> has no separator: <code>97</code>, not <code>9 7</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(h)</span> What is the output from the while loop beginning on line (h)?</p> <details class="soln"><summary></summary><div class="ans"> <p>Nothing at all. This loop uses the <em>same</em> iterator <code>x</code>, which the previous loop already drove past the end. <code>x.hasNext()</code> is false immediately, so the body never runs.</p> <p>This is the part students miss. An iterator is not reusable: once it has reached the end, it stays there. To walk <code>a3</code> again you would have to call <code>a3.iterator()</code> a second time and get a fresh one.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(i)</span> What is the output from the while loop beginning on line (i)?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> <code>y</code> walks <code>a2</code>, which has seven elements: 3, 1, 4, 1, 5, 9, 2. Two <code>next()</code> calls per pass, and this time <em>both</em> results are inside one <code>print</code>, so if the second throws, nothing at all is printed for that pass.</p> <table class="trace"> <tr><th>Pass</th><th>first <code>next()</code></th><th>second <code>next()</code></th><th>printed</th></tr> <tr><td>1</td><td>3</td><td>1</td><td><code>3,1,</code></td></tr> <tr><td>2</td><td>4</td><td>1</td><td><code>4,1,</code></td></tr> <tr><td>3</td><td>5</td><td>9</td><td><code>5,9,</code></td></tr> <tr><td>4</td><td>2</td><td>throws</td><td>nothing &mdash; the whole expression failed</td></tr> </table> <p>So the output is <code>3,1,4,1,5,9, No such thing</code>. The <code>2</code> never appears anywhere: it was consumed by the first <code>next()</code> of pass 4, and then the expression it was part of threw before <code>print</code> was ever called.</p> <p>Compare that with Problem 1 line (j), where the successful <code>next()</code> <em>was</em> printed before the failing one ran. The difference is whether the two calls are in one expression or in two statements. Look for that when you read the code.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(j)</span> What is the output from line (j)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>false</code>. <code>y</code> and <code>z</code> came from two separate calls to <code>a2.iterator()</code>, so they are two objects. Note that <code>z</code> was created at the top and never used &mdash; it is still sitting at the start of the list, completely unaffected by everything <code>y</code> did.</p> <p>Verified by running the whole program:</p> <pre class="out"><code>true false
+true
+3141592
+3
+339
+15
+97 No such thing
+3,1,4,1,5,9, No such thing
+false</code></pre> <p><strong>Things to notice across all four parts.</strong> This one question tests three separate iterator facts: an exhausted iterator stays exhausted (h), a partly consumed element can vanish without being printed (i), and two iterators from one collection are independent objects (j). If you can explain all three you can do any version of this question.</p> </div></details> </div> <div class="box warn"> <div class="hd">Warning<span class="tag">&mdash; a discrepancy in the circulating practice set</span></div> <div class="bd"> <p>The version of this problem in both <code>Exam 3 Practice Problems</code> and <code>Final Practice Problems</code> builds <code>a2</code> with the calls</p> <pre><code class="language-java">a2.add(1);
+a2.add(4);
+a2.add(5);
+a2.add(9);
+a2.add(2);
+a2.add(6);</code></pre> <p>which, on top of the <code>3</code> already there, gives the list <code>3, 1, 4, 5, 9, 2, 6</code>. Run <em>that</em> version and line (c) prints <code>3145926</code> and line (i) prints <code>3,1,4,5,9,2, No such thing</code>.</p> <p>The posted answer key gives <code>3141592</code> and <code>3,1,4,1,5,9, No such thing</code> &mdash; the digits of &pi; &mdash; which is what you get if the calls are</p> <pre><code class="language-java">a2.add(1);
+a2.add(4);
+a2.add(1);
+a2.add(5);
+a2.add(9);
+a2.add(2);</code></pre> <p>The list above uses the second version, so that the worked answers match the key you can check yourself against. Either way the <em>method</em> is identical, and that is what is being examined: count the <code>next()</code> calls, note that the list has an odd length, and work out where the loop runs out.</p> </div> </div> <h3>Problem 4 &mdash; An iterable <code>Bag</code> <span class="muted">(added for these notes)</span></h3> <p>Write a class <code>Bag&lt;T&gt;</code> that stores items in a linked chain of <code>Node&lt;T&gt;</code> objects and can be used directly in a for-each loop, so that this driver works:</p> <pre><code class="language-java">Bag&lt;String&gt; b = new Bag&lt;&gt;();
+b.add("apples");
+b.add("pears");
+b.add("plums");
+
+for (String s : b) System.out.print(s + " ");
+System.out.println();
+System.out.println("size = " + b.size());</code></pre> <p>Items may come out in any order. Give <code>Bag</code>, and the iterator class it needs.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> This is the Procedure from &sect;5 applied once more. <code>Bag</code> stores a chain of nodes and a count; <code>add</code> pushes at the head, which is one line and keeps the order question honest. <code>BagIterator</code> holds a <code>Node&lt;T&gt; current</code> cursor. The two things that make the for-each loop legal are the words <code>implements Iterable&lt;T&gt;</code> in the class header and the <code>iterator()</code> method &mdash; leave either out and the driver will not compile.</p> <p class="filename">BagIterator.java</p>
+<pre><code class="language-java">import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+public class BagIterator&lt;T&gt; implements Iterator&lt;T&gt; {
+    private Node&lt;T&gt; current;
+
+    public BagIterator(Node&lt;T&gt; head) { this.current = head; }
+
+    public boolean hasNext() { return current != null; }
+
+    public T next() {
+        if (!hasNext()) throw new NoSuchElementException();
+        T data = current.getData();
+        current = current.getNext();
+        return data;
+    }
+}</code></pre> <p class="filename">Bag.java</p>
+<pre><code class="language-java">import java.util.Iterator;
+
+public class Bag&lt;T&gt; implements Iterable&lt;T&gt; {
+    private Node&lt;T&gt; head;
+    private int size;
+
+    public void add(T item) {
+        head = new Node&lt;&gt;(item, head);
+        size++;
+    }
+
+    public int size() { return size; }
+
+    public Iterator&lt;T&gt; iterator() {
+        return new BagIterator&lt;T&gt;(head);
+    }
+
+    public static void main(String[] args) {
+        Bag&lt;String&gt; b = new Bag&lt;&gt;();
+        b.add("apples");
+        b.add("pears");
+        b.add("plums");
+
+        for (String s : b) System.out.print(s + " ");
+        System.out.println();
+        System.out.println("size = " + b.size());
+
+        // a second for-each loop over the same Bag starts over
+        for (String s : b) System.out.print(s.length() + " ");
+        System.out.println();
+    }
+}</code></pre> <pre class="out"><code>plums pears apples
+size = 3
+5 5 6</code></pre> <p><strong>Things to notice.</strong> The items come out in reverse of the order they were added, because <code>add</code> pushes at the head. That is fine &mdash; a bag makes no promise about order, and the driver was written not to care. If you wanted insertion order you would keep a <code>tail</code> reference and add there, exactly as <code>addTail</code> did in Lecture 21.</p> <p>The second for-each loop works, and starts from the beginning again. That is because <code>iterator()</code> constructs a <em>new</em> <code>BagIterator</code> every time it is called. If you had stored the cursor in <code>Bag</code> itself, the second loop would print nothing &mdash; the single most common design error when writing a first <code>Iterable</code>.</p> <p><code>BagIterator</code> is a separate public class here to keep the two jobs visibly separate. Java lets you nest it inside <code>Bag</code> as a private inner class, which is what the library does, and which has the advantage that it can see <code>Bag</code>'s private fields directly.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 4</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="27" aria-label="Live coding - Practice Problem 4">import java.util.Iterator;
+
+public class Bag&lt;T&gt; {          // 1. what needs to be added to this header?
+    private Node&lt;T&gt; head;
+    private int size;
+
+    public void add(T item) {
+        // 2. push a new Node at the head, and keep size correct
+    }
+
+    public int size() { return size; }
+
+    // 3. the method that makes the for-each loop legal
+
+    public static void main(String[] args) {
+        Bag&lt;String&gt; b = new Bag&lt;&gt;();
+        b.add("apples");
+        b.add("pears");
+        b.add("plums");
+
+        for (String s : b) System.out.print(s + " ");
+        System.out.println();
+        System.out.println("size = " + b.size());
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 5 &mdash; Fix the filter <span class="muted">(added for these notes)</span></h3> <p>This method is supposed to delete every string shorter than four characters from a list. It compiles. Explain what it actually does, and fix it.</p> <p class="filename">Filter.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+
+public class Filter {
+    public static void dropShort(ArrayList&lt;String&gt; words) {
+        for (String w : words) {
+            if (w.length() &lt; 4) words.remove(w);
+        }
+    }
+
+    public static void main(String[] args) {
+        ArrayList&lt;String&gt; a = new ArrayList&lt;&gt;();
+        a.add("ox"); a.add("cat"); a.add("horse"); a.add("emu");
+        dropShort(a);
+        System.out.println(a);
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The loop modifies <code>words</code> while a for-each loop is iterating it, so the iterator's modification count no longer matches the list's. Whether that is detected depends entirely on <em>where</em> in the list the removal happens, which is why the method is not merely wrong but unpredictably wrong. Run it first and see.</p> <pre class="out"><code>Exception in thread "main" java.util.ConcurrentModificationException
+	at java.base/java.util.ArrayList$Itr.checkForComodification(ArrayList.java:1095)
+	at java.base/java.util.ArrayList$Itr.next(ArrayList.java:1049)
+	at Filter.dropShort(Filter.java:5)
+	at Filter.main(Filter.java:13)</code></pre> <p>The fix is to remove <em>through the iterator</em>, which means naming it, which means an explicit <code>while</code> loop:</p> <p class="filename">Filter.java</p>
+<pre><code class="language-java">import java.util.ArrayList;
+import java.util.Iterator;
+
+public class Filter {
+    public static void dropShort(ArrayList&lt;String&gt; words) {
+        Iterator&lt;String&gt; it = words.iterator();
+        while (it.hasNext()) {
+            String w = it.next();
+            if (w.length() &lt; 4) it.remove();
+        }
+    }
+
+    public static void main(String[] args) {
+        ArrayList&lt;String&gt; a = new ArrayList&lt;&gt;();
+        a.add("ox"); a.add("cat"); a.add("horse"); a.add("emu");
+        dropShort(a);
+        System.out.println(a);
+    }
+}</code></pre> <pre class="out"><code>[horse]</code></pre> <p><strong>Things to notice.</strong> Three of the four words are removed in a single pass, with no exception and nothing skipped, because <code>it.remove()</code> keeps the iterator's own bookkeeping in step with the list's.</p> <p>Now the important part. Change the input to just <code>a.add("ox"); a.add("horse");</code>, so that the word to be deleted is the second-to-last &mdash; here, the first of two. The <em>broken</em> version then prints <code>[horse]</code> with no exception at all, looking entirely correct. It is the &sect;6 silent-skip case: removing the second-to-last element makes <code>hasNext()</code> return false one step early, so <code>next()</code> never gets the chance to notice. That is why "it did not crash" is no evidence that a loop like this is right.</p> <p>A second, perfectly good fix is to build a new list instead of editing the old one: loop with for-each, copy the words you want to keep into a fresh <code>ArrayList</code>, and return it. That never modifies anything it is reading, and it is usually the clearest answer when the method is allowed to return a value rather than being required to edit in place.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 5</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="22" aria-label="Live coding - Practice Problem 5">import java.util.ArrayList;
+import java.util.Iterator;
+
+public class Filter {
+    public static void dropShort(ArrayList&lt;String&gt; words) {
+        // Delete every string shorter than 4 characters.
+        // The version below throws ConcurrentModificationException -- fix it.
+
+        for (String w : words) {
+            if (w.length() &lt; 4) words.remove(w);
+        }
+    }
+
+    public static void main(String[] args) {
+        ArrayList&lt;String&gt; a = new ArrayList&lt;&gt;();
+        a.add("ox"); a.add("cat"); a.add("horse"); a.add("emu");
+        dropShort(a);
+        System.out.println(a);      // should print [horse]
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 6 &mdash; Which outputs are possible? <span class="muted">(added for these notes)</span></h3> <p>Consider this program.</p> <p class="filename">Possible.java</p>
+<pre><code class="language-java">public class Possible extends Thread {
+    private String tag;
+
+    public Possible(String tag) { this.tag = tag; }
+
+    public void run() {
+        System.out.println(tag + "1");
+        System.out.println(tag + "2");
+    }
+
+    public static void main(String[] args) {
+        Possible a = new Possible("A");
+        Possible b = new Possible("B");
+        a.start();
+        b.start();
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> Is the output <code>A1 A2 B1 B2</code> (one per line) possible? Is <code>B1 A1 A2 B2</code>? Is <code>A2 A1 B1 B2</code>?</p> <details class="soln"><summary></summary><div class="ans"> <p>The first two are possible; the third is not.</p> <p>The rule is that lines printed <em>by the same thread</em> keep their order &mdash; thread A executes its two statements in sequence, so <code>A1</code> always precedes <code>A2</code>. Lines printed by different threads have no order imposed on them at all, so any interleaving that respects <code>A1</code> before <code>A2</code> and <code>B1</code> before <code>B2</code> can occur. <code>A2 A1 ...</code> violates thread A's own program order, so it cannot happen.</p> <p>There are six possible outputs in total: the ways to interleave two ordered pairs.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Change <code>a.start(); b.start();</code> to <code>a.run(); b.run();</code>. Now which outputs are possible?</p> <details class="soln"><summary></summary><div class="ans"> <p>Exactly one: <code>A1 A2 B1 B2</code>. With <code>run()</code> there are no extra threads &mdash; <code>a.run()</code> is an ordinary method call that runs to completion on the <code>main</code> thread before <code>b.run()</code> starts.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Go back to <code>start()</code>, and add <code>synchronized (System.out)</code> around the body of <code>run()</code>. Now which outputs are possible?</p> <details class="soln"><summary></summary><div class="ans"> <p>Two: <code>A1 A2 B1 B2</code> and <code>B1 B2 A1 A2</code>. The lock makes each thread's pair atomic with respect to the other, so the pairs cannot interleave &mdash; but which thread gets the lock first is still undecided.</p> <p><strong>Things to notice across all three parts.</strong> These three answers &mdash; six outputs, one output, two outputs &mdash; are the whole of &sect;7 and &sect;8 in miniature. <code>start()</code> buys you concurrency and costs you determinism; <code>run()</code> gives up the concurrency; <code>synchronized</code> buys back as much determinism as you are willing to pay for in waiting.</p> <p>When a question asks "is this output possible", never answer by running the program. Answer by listing what the program forces: statements within a thread, and whatever the locks and <code>join()</code> calls add on top.</p> </div></details> </div> <div class="box sum" id="summary"> <div class="hd">Lecture Summary</div> <div class="bd"> <ul> <li>An <strong>iterator</strong> is an object that walks a collection one element at a time without exposing how the collection stores things. The collection builds it; you just use it.</li> <li><code>Iterator&lt;E&gt;</code> has three methods: <code>hasNext()</code> (asks, changes nothing), <code>next()</code> (returns <em>and advances</em>), and the optional <code>remove()</code>. The standard loop is <code>Iterator&lt;E&gt; it = c.iterator(); while (it.hasNext()) { E e = it.next(); ... }</code>.</li> <li><code>Iterable&lt;T&gt;</code> has one method, <code>iterator()</code>. <code>Iterable</code> is the collection; <code>Iterator</code> is the walker. Do not confuse them.</li> <li>The enhanced for loop is <strong>compiled into</strong> <code>iterator()</code>, <code>hasNext()</code> and <code>next()</code> calls. That is why it works on any <code>Iterable</code>, including a class of your own, and why declaring <code>implements Iterable&lt;T&gt;</code> &mdash; not merely having an <code>iterator()</code> method &mdash; is what makes it legal. Arrays are a separate special case.</li> <li>To write your own iterator: one cursor field, <code>hasNext()</code> tests it, <code>next()</code> reads the data, advances the cursor, and returns &mdash; in that order &mdash; and throws <code>NoSuchElementException</code> when there is nothing left.</li> <li>Two iterators from one collection are two independent objects: <code>y == z</code> is <code>false</code>, and advancing one does not move the other. An exhausted iterator stays exhausted.</li> <li>Modifying a collection while a for-each loop walks it gives a <code>ConcurrentModificationException</code> &mdash; or, worse, silently skips an element. To delete while iterating, use the explicit iterator and call <code>it.remove()</code>.</li> <li>On a linked structure, an index-based loop restarts the walk every iteration. Measured on 50,000 elements it was hundreds of times slower than the iterator.</li> <li>A <strong>thread</strong> is one path of execution. <code>extends Thread</code> or <code>implements Runnable</code>, then <code>start()</code> &mdash; never <code>run()</code>, which is just a method call on the current thread.</li> <li>Thread output order is <strong>not deterministic</strong>. Two runs of the same program can differ, and a "possible output" question is answered by what the program forces, not by what it printed once.</li> <li>A <strong>race condition</strong> is two threads touching the same data with the result depending on timing; <code>synchronized</code> on a shared lock object fixes it, and synchronizing on the wrong object fixes nothing. <code>join()</code> waits for a thread to finish.</li> <li>A <strong>deadlock</strong> is two threads each holding what the other wants. Her <code>DeadLock</code> hangs every time and has to be killed. Taking locks in a fixed global order prevents it.</li> </ul> <p><strong>Coming up in Session 28 &mdash; the Final Exam Review.</strong> That is the last session, and this lecture is the last new material of the course: from <code>System.out.println</code> in
+    Lecture 1 to classes, inheritance, polymorphism, interfaces, GUIs, exceptions, data structures,
+    generics, iterators and threads. Next time we put the whole thing back together and work
+    through the final in the format you will actually see it &mdash; so bring the parts of these
+    notes you are least sure of.</p>
+  </div>
+</div>
+
+<nav class="pagenav">
+<span class="disabled"><div class="dir">&larr; Previous</div><div class="ttl">Lecture 22 &mdash; Generics</div><div class="pending">posts Thu Dec 3</div></span>
+<span class="disabled next"><div class="dir">Next &rarr;</div><div class="ttl">Review 3 &mdash; Final Exam Review</div><div class="pending">posts Thu Dec 10</div></span>
+</nav>
+<footer class="pf">CSCI 212 &middot; Object-Oriented Programming in Java &middot; Queens College, CUNY</footer>
+</div>
+<script>
+(()=>{var ut=Object.create;var xe=Object.defineProperty;var ft=Object.getOwnPropertyDescriptor;var gt=Object.getOwnPropertyNames;var ht=Object.getPrototypeOf,dt=Object.prototype.hasOwnProperty;var pt=(e,t)=>()=>{try{return t||e((t={exports:{}}).exports,t),t.exports}catch(n){throw t=0,n}};var Et=(e,t,n,l)=>{if(t&&typeof t=="object"||typeof t=="function")for(let d of gt(t))!dt.call(e,d)&&d!==n&&xe(e,d,{get:()=>t[d],enumerable:!(l=ft(t,d))||l.enumerable});return e};var bt=(e,t,n)=>(n=e!=null?ut(ht(e)):{},Et(t||!e||!e.__esModule?xe(n,"default",{value:e,enumerable:!0}):n,e));var Ke=pt((ln,Ge)=>{function Ie(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(t=>{let n=e[t],l=typeof n;(l==="object"||l==="function")&&!Object.isFrozen(n)&&Ie(n)}),e}var Z=class{constructor(t){t.data===void 0&&(t.data={}),this.data=t.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function Ce(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function k(e,...t){let n=Object.create(null);for(let l in e)n[l]=e[l];return t.forEach(function(l){for(let d in l)n[d]=l[d]}),n}var _t="</span>",Ne=e=>!!e.scope,Mt=(e,{prefix:t})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let n=e.split(".");return[`${t}${n.shift()}`,...n.map((l,d)=>`${l}${"_".repeat(d+1)}`)].join(" ")}return`${t}${e}`},oe=class{constructor(t,n){this.buffer="",this.classPrefix=n.classPrefix,t.walk(this)}addText(t){this.buffer+=Ce(t)}openNode(t){if(!Ne(t))return;let n=Mt(t.scope,{prefix:this.classPrefix});this.span(n)}closeNode(t){Ne(t)&&(this.buffer+=_t)}value(){return this.buffer}span(t){this.buffer+=`<span class="${t}">`}},Re=(e={})=>{let t={children:[]};return Object.assign(t,e),t},ae=class e{constructor(){this.rootNode=Re(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(t){this.top.children.push(t)}openNode(t){let n=Re({scope:t});this.add(n),this.stack.push(n)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(t){return this.constructor._walk(t,this.rootNode)}static _walk(t,n){return typeof n=="string"?t.addText(n):n.children&&(t.openNode(n),n.children.forEach(l=>this._walk(t,l)),t.closeNode(n)),t}static _collapse(t){typeof t!="string"&&t.children&&(t.children.every(n=>typeof n=="string")?t.children=[t.children.join("")]:t.children.forEach(n=>{e._collapse(n)}))}},le=class extends ae{constructor(t){super(),this.options=t}addText(t){t!==""&&this.add(t)}startScope(t){this.openNode(t)}endScope(){this.closeNode()}__addSublanguage(t,n){let l=t.root;n&&(l.scope=`language:${n}`),this.add(l)}toHTML(){return new oe(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function G(e){return e?typeof e=="string"?e:e.source:null}function De(e){return B("(?=",e,")")}function Ot(e){return B("(?:",e,")*")}function wt(e){return B("(?:",e,")?")}function B(...e){return e.map(n=>G(n)).join("")}function xt(e){let t=e[e.length-1];return typeof t=="object"&&t.constructor===Object?(e.splice(e.length-1,1),t):{}}function V(...e){return"("+(xt(e).capture?"":"?:")+e.map(l=>G(l)).join("|")+")"}function ke(e){return new RegExp(e.toString()+"|").exec("").length-1}function Nt(e,t){let n=e&&e.exec(t);return n&&n.index===0}var Rt=new RegExp(V(/\[(?:[^\\\]]|\\.)*\]/,/\(\?<(?![=!])[^>]+>/,/\(\?'[^']+'/,/\(\??/,/\\([1-9][0-9]*)/,/\\./));function fe(e,{joinWith:t}){let n=0;return e.map(l=>{n+=1;let d=n,_=G(l),c="";for(;_.length>0;){let r=Rt.exec(_);if(!r){c+=_;break}c+=_.substring(0,r.index),_=_.substring(r.index+r[0].length),r[0][0]==="\\"&&r[1]?c+="\\"+String(Number(r[1])+d):(c+=r[0],(r[0]==="("||/^\(\?[<']/.test(r[0]))&&n++)}return c}).map(l=>`(${l})`).join(t)}var yt=/\b\B/,ve="[a-zA-Z]\\w*",ge="[a-zA-Z_]\\w*",Le="\\b\\d+(\\.\\d+)?",Be="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Pe="\\b(0b[01]+)",St="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",At=(e={})=>{let t=/^#![ ]*\//;return e.binary&&(e.begin=B(t,/.*\b/,e.binary,/\b.*/)),k({scope:"meta",begin:t,end:/$/,relevance:0,"on:begin":(n,l)=>{n.index!==0&&l.ignoreMatch()}},e)},K={begin:"\\\\[\\s\\S]",relevance:0},Tt={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[K]},It={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[K]},Ct={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},Q=function(e,t,n={}){let l=k({scope:"comment",begin:e,end:t,contains:[]},n);l.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let d=V("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return l.contains.push({begin:B(/[ ]+/,"(",d,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),l},Dt=Q("//","$"),kt=Q("/\\*","\\*/"),vt=Q("#","$"),Lt={scope:"number",begin:Le,relevance:0},Bt={scope:"number",begin:Be,relevance:0},Pt={scope:"number",begin:Pe,relevance:0},$t={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[K,{begin:/\[/,end:/\]/,relevance:0,contains:[K]}]},Ht={scope:"title",begin:ve,relevance:0},Ut={scope:"title",begin:ge,relevance:0},jt={begin:"\\.\\s*"+ge,relevance:0},Gt=function(e){return Object.assign(e,{"on:begin":(t,n)=>{n.data._beginMatch=t[1]},"on:end":(t,n)=>{n.data._beginMatch!==t[1]&&n.ignoreMatch()}})},X=Object.freeze({__proto__:null,APOS_STRING_MODE:Tt,BACKSLASH_ESCAPE:K,BINARY_NUMBER_MODE:Pt,BINARY_NUMBER_RE:Pe,COMMENT:Q,C_BLOCK_COMMENT_MODE:kt,C_LINE_COMMENT_MODE:Dt,C_NUMBER_MODE:Bt,C_NUMBER_RE:Be,END_SAME_AS_BEGIN:Gt,HASH_COMMENT_MODE:vt,IDENT_RE:ve,MATCH_NOTHING_RE:yt,METHOD_GUARD:jt,NUMBER_MODE:Lt,NUMBER_RE:Le,PHRASAL_WORDS_MODE:Ct,QUOTE_STRING_MODE:It,REGEXP_MODE:$t,RE_STARTERS_RE:St,SHEBANG:At,TITLE_MODE:Ht,UNDERSCORE_IDENT_RE:ge,UNDERSCORE_TITLE_MODE:Ut});function Kt(e,t){e.input[e.index-1]==="."&&t.ignoreMatch()}function mt(e,t){e.className!==void 0&&(e.scope=e.className,delete e.className)}function Wt(e,t){t&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=Kt,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function Ft(e,t){Array.isArray(e.illegal)&&(e.illegal=V(...e.illegal))}function zt(e,t){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function Yt(e,t){e.relevance===void 0&&(e.relevance=1)}var Xt=(e,t)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let n=Object.assign({},e);Object.keys(e).forEach(l=>{delete e[l]}),e.keywords=n.keywords,e.begin=B(n.beforeMatch,De(n.begin)),e.starts={relevance:0,contains:[Object.assign(n,{endsParent:!0})]},e.relevance=0,delete n.beforeMatch},Zt=["of","and","for","in","not","or","if","then","parent","list","value"],Jt="keyword";function $e(e,t,n=Jt){let l=Object.create(null);return typeof e=="string"?d(n,e.split(" ")):Array.isArray(e)?d(n,e):Object.keys(e).forEach(function(_){Object.assign(l,$e(e[_],t,_))}),l;function d(_,c){t&&(c=c.map(r=>r.toLowerCase())),c.forEach(function(r){let u=r.split("|");l[u[0]]=[_,Vt(u[0],u[1])]})}}function Vt(e,t){return t?Number(t):Qt(e)?0:1}function Qt(e){return Zt.includes(e.toLowerCase())}var ye={},L=e=>{console.error(e)},Se=(e,...t)=>{console.log(`WARN: ${e}`,...t)},H=(e,t)=>{ye[`${e}/${t}`]||(console.log(`Deprecated as of ${e}. ${t}`),ye[`${e}/${t}`]=!0)},J=new Error;function He(e,t,{key:n}){let l=0,d=e[n],_={},c={};for(let r=1;r<=t.length;r++)c[r+l]=d[r],_[r+l]=!0,l+=ke(t[r-1]);e[n]=c,e[n]._emit=_,e[n]._multi=!0}function qt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw L("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),J;if(typeof e.beginScope!="object"||e.beginScope===null)throw L("beginScope must be object"),J;He(e,e.begin,{key:"beginScope"}),e.begin=fe(e.begin,{joinWith:""})}}function en(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw L("skip, excludeEnd, returnEnd not compatible with endScope: {}"),J;if(typeof e.endScope!="object"||e.endScope===null)throw L("endScope must be object"),J;He(e,e.end,{key:"endScope"}),e.end=fe(e.end,{joinWith:""})}}function tn(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function nn(e){tn(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),qt(e),en(e)}function sn(e){function t(c,r){return new RegExp(G(c),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(r?"g":""))}class n{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(r,u){u.position=this.position++,this.matchIndexes[this.matchAt]=u,this.regexes.push([u,r]),this.matchAt+=ke(r)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let r=this.regexes.map(u=>u[1]);this.matcherRe=t(fe(r,{joinWith:"|"}),!0),this.lastIndex=0}exec(r){this.matcherRe.lastIndex=this.lastIndex;let u=this.matcherRe.exec(r);if(!u)return null;let O=u.findIndex((P,I)=>I>0&&P!==void 0),M=this.matchIndexes[O];return u.splice(0,O),Object.assign(u,M)}}class l{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(r){if(this.multiRegexes[r])return this.multiRegexes[r];let u=new n;return this.rules.slice(r).forEach(([O,M])=>u.addRule(O,M)),u.compile(),this.multiRegexes[r]=u,u}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(r,u){this.rules.push([r,u]),u.type==="begin"&&this.count++}exec(r){let u=this.getMatcher(this.regexIndex);u.lastIndex=this.lastIndex;let O=u.exec(r);if(this.resumingScanAtSamePosition()&&!(O&&O.index===this.lastIndex)){let M=this.getMatcher(0);M.lastIndex=this.lastIndex+1,O=M.exec(r)}return O&&(this.regexIndex+=O.position+1,this.regexIndex===this.count&&this.considerAll()),O}}function d(c){let r=new l;return c.contains.forEach(u=>r.addRule(u.begin,{rule:u,type:"begin"})),c.terminatorEnd&&r.addRule(c.terminatorEnd,{type:"end"}),c.illegal&&r.addRule(c.illegal,{type:"illegal"}),r}function _(c,r){let u=c;if(c.isCompiled)return u;[mt,zt,nn,Xt].forEach(M=>M(c,r)),e.compilerExtensions.forEach(M=>M(c,r)),c.__beforeBegin=null,[Wt,Ft,Yt].forEach(M=>M(c,r)),c.isCompiled=!0;let O=null;return typeof c.keywords=="object"&&c.keywords.$pattern&&(c.keywords=Object.assign({},c.keywords),O=c.keywords.$pattern,delete c.keywords.$pattern),O=O||/\w+/,c.keywords&&(c.keywords=$e(c.keywords,e.case_insensitive)),u.keywordPatternRe=t(O,!0),r&&(c.begin||(c.begin=/\B|\b/),u.beginRe=t(u.begin),!c.end&&!c.endsWithParent&&(c.end=/\B|\b/),c.end&&(u.endRe=t(u.end)),u.terminatorEnd=G(u.end)||"",c.endsWithParent&&r.terminatorEnd&&(u.terminatorEnd+=(c.end?"|":"")+r.terminatorEnd)),c.illegal&&(u.illegalRe=t(c.illegal)),c.contains||(c.contains=[]),c.contains=[].concat(...c.contains.map(function(M){return rn(M==="self"?c:M)})),c.contains.forEach(function(M){_(M,u)}),c.starts&&_(c.starts,r),u.matcher=d(u),u}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=k(e.classNameAliases||{}),_(e)}function Ue(e){return e?e.endsWithParent||Ue(e.starts):!1}function rn(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(t){return k(e,{variants:null},t)})),e.cachedVariants?e.cachedVariants:Ue(e)?k(e,{starts:e.starts?k(e.starts):null}):Object.isFrozen(e)?k(e):e}var cn="11.12.0",ue=class extends Error{constructor(t,n){super(t),this.name="HTMLInjectionError",this.html=n}},ce=Ce,Ae=k,Te=Symbol("nomatch"),on=7,je=function(e){let t=Object.create(null),n=Object.create(null),l=[],d=!0,_="Could not find the language '{}', did you forget to load/include a language module?",c={disableAutodetect:!0,name:"Plain text",contains:[]},r={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:le};function u(i){return r.noHighlightRe.test(i)}function O(i){let a=i.className+" ";a+=i.parentNode?i.parentNode.className:"";let h=r.languageDetectRe.exec(a);if(h){let E=C(h[1]);return E||(Se(_.replace("{}",h[1])),Se("Falling back to no-highlight mode for this block.",i)),E?h[1]:"no-highlight"}return a.split(/\s+/).find(E=>u(E)||C(E))}function M(i,a,h){let E="",w="";typeof a=="object"?(E=i,h=a.ignoreIllegals,w=a.language):(H("10.7.0","highlight(lang, code, ...args) has been deprecated."),H("10.7.0",`Please use highlight(code, options) instead.
+(see the highlight.js issue tracker)`),w=i,E=a),h===void 0&&(h=!0);let y={code:E,language:w};W("before:highlight",y);let D=y.result?y.result:P(y.language,y.code,h);return D.code=y.code,W("after:highlight",D),D}function P(i,a,h,E){let w=Object.create(null);function y(s,o){return s.keywords[o]}function D(){if(!f.keywords){x.addText(b);return}let s=0;f.keywordPatternRe.lastIndex=0;let o=f.keywordPatternRe.exec(b),g="";for(;o;){g+=b.substring(s,o.index);let p=A.case_insensitive?o[0].toLowerCase():o[0],N=y(f,p);if(N){let[T,at]=N;if(x.addText(g),g="",w[p]=(w[p]||0)+1,w[p]<=on&&(Y+=at),T.startsWith("_"))g+=o[0];else{let lt=A.classNameAliases[T]||T;S(o[0],lt)}}else g+=o[0];s=f.keywordPatternRe.lastIndex,o=f.keywordPatternRe.exec(b)}g+=b.substring(s),x.addText(g)}function F(){if(b==="")return;let s=null;if(typeof f.subLanguage=="string"){if(!t[f.subLanguage]){x.addText(b);return}s=P(f.subLanguage,b,!0,we[f.subLanguage]),we[f.subLanguage]=s._top}else s=$(b,f.subLanguage.length?f.subLanguage:null);f.relevance>0&&(Y+=s.relevance),x.__addSublanguage(s._emitter,s.language)}function R(){f.subLanguage!=null?F():D(),b=""}function S(s,o){s!==""&&(x.startScope(o),x.addText(s),x.endScope())}function be(s,o){let g=1,p=o.length-1;for(;g<=p;){if(!s._emit[g]){g++;continue}let N=A.classNameAliases[s[g]]||s[g],T=o[g];N?S(T,N):(b=T,D(),b=""),g++}}function _e(s,o){return s.scope&&typeof s.scope=="string"&&x.openNode(A.classNameAliases[s.scope]||s.scope),s.beginScope&&(s.beginScope._wrap?(S(b,A.classNameAliases[s.beginScope._wrap]||s.beginScope._wrap),b=""):s.beginScope._multi&&(be(s.beginScope,o),b="")),f=Object.create(s,{parent:{value:f}}),f}function Me(s,o,g){let p=Nt(s.endRe,g);if(p){if(s["on:end"]){let N=new Z(s);s["on:end"](o,N),N.isMatchIgnored&&(p=!1)}if(p){for(;s.endsParent&&s.parent;)s=s.parent;return s}}if(s.endsWithParent)return Me(s.parent,o,g)}function it(s){return f.matcher.regexIndex===0?(b+=s[0],1):(re=!0,0)}function st(s){let o=s[0],g=s.rule,p=new Z(g),N=[g.__beforeBegin,g["on:begin"]];for(let T of N)if(T&&(T(s,p),p.isMatchIgnored))return it(o);return g.skip?b+=o:(g.excludeBegin&&(b+=o),R(),!g.returnBegin&&!g.excludeBegin&&(b=o)),_e(g,s),g.returnBegin?0:o.length}function rt(s){let o=s[0],g=a.substring(s.index),p=Me(f,s,g);if(!p)return Te;let N=f;f.endScope&&f.endScope._wrap?(R(),S(o,f.endScope._wrap)):f.endScope&&f.endScope._multi?(R(),be(f.endScope,s)):N.skip?b+=o:(N.returnEnd||N.excludeEnd||(b+=o),R(),N.excludeEnd&&(b=o));do f.scope&&x.closeNode(),!f.skip&&!f.subLanguage&&(Y+=f.relevance),f=f.parent;while(f!==p.parent);return p.starts&&_e(p.starts,s),N.returnEnd?0:o.length}function ct(){let s=[];for(let o=f;o!==A;o=o.parent)o.scope&&s.unshift(o.scope);s.forEach(o=>x.openNode(o))}let z={};function Oe(s,o){let g=o&&o[0];if(b+=s,g==null)return R(),0;if(z.type==="begin"&&o.type==="end"&&z.index===o.index&&g===""){if(b+=a.slice(o.index,o.index+1),!d){let p=new Error(`0 width match regex (${i})`);throw p.languageName=i,p.badRule=z.rule,p}return 1}if(z=o,o.type==="begin")return st(o);if(o.type==="illegal"&&!h){let p=new Error('Illegal lexeme "'+g+'" for mode "'+(f.scope||"<unnamed>")+'"');throw p.mode=f,p}else if(o.type==="end"){let p=rt(o);if(p!==Te)return p}if(o.type==="illegal"&&g==="")return o.index===a.length||(b+=`
+`),1;if(se>1e5&&se>o.index*3)throw new Error("potential infinite loop, way more iterations than matches");return b+=g,g.length}let A=C(i);if(!A)throw L(_.replace("{}",i)),new Error('Unknown language: "'+i+'"');let ot=sn(A),ie="",f=E||ot,we={},x=new r.__emitter(r);ct();let b="",Y=0,v=0,se=0,re=!1;try{if(A.__emitTokens)A.__emitTokens(a,x);else{for(f.matcher.considerAll();;){se++,re?re=!1:f.matcher.considerAll(),f.matcher.lastIndex=v;let s=f.matcher.exec(a);if(!s)break;let o=a.substring(v,s.index),g=Oe(o,s);v=s.index+g}Oe(a.substring(v))}return x.finalize(),ie=x.toHTML(),{language:i,value:ie,relevance:Y,illegal:!1,_emitter:x,_top:f}}catch(s){if(s.message&&s.message.includes("Illegal"))return{language:i,value:ce(a),illegal:!0,relevance:0,_illegalBy:{message:s.message,index:v,context:a.slice(v-100,v+100),mode:s.mode,resultSoFar:ie},_emitter:x};if(d)return{language:i,value:ce(a),illegal:!1,relevance:0,errorRaised:s,_emitter:x,_top:f};throw s}}function I(i){let a={value:ce(i),illegal:!1,relevance:0,_top:c,_emitter:new r.__emitter(r)};return a._emitter.addText(i),a}function $(i,a){a=a||r.languages||Object.keys(t);let h=I(i),E=a.filter(C).filter(Ee).map(R=>P(R,i,!1));E.unshift(h);let w=E.sort((R,S)=>{if(R.relevance!==S.relevance)return S.relevance-R.relevance;if(R.language&&S.language){if(C(R.language).supersetOf===S.language)return 1;if(C(S.language).supersetOf===R.language)return-1}return 0}),[y,D]=w,F=y;return F.secondBest=D,F}function te(i,a,h){let E=a&&n[a]||h;i.classList.add("hljs"),i.classList.add(`language-${E}`)}function ne(i){let a=null,h=O(i);if(u(h))return;if(W("before:highlightElement",{el:i,language:h}),i.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",i);return}if(i.children.length>0&&(r.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("(see the highlight.js security wiki)"),console.warn("The element with unescaped HTML:"),console.warn(i)),r.throwUnescapedHTML))throw new ue("One of your code blocks includes unescaped HTML.",i.innerHTML);a=i;let E=a.textContent,w=h?M(E,{language:h,ignoreIllegals:!0}):$(E);i.innerHTML=w.value,i.dataset.highlighted="yes",te(i,h,w.language),i.result={language:w.language,re:w.relevance,relevance:w.relevance},w.secondBest&&(i.secondBest={language:w.secondBest.language,relevance:w.secondBest.relevance}),W("after:highlightElement",{el:i,result:w,text:E})}function Ye(i){r=Ae(r,i)}let Xe=()=>{m(),H("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function Ze(){m(),H("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let de=!1;function m(){function i(){m()}if(document.readyState==="loading"){de||window.addEventListener("DOMContentLoaded",i,!1),de=!0;return}document.querySelectorAll(r.cssSelector).forEach(ne)}function Je(i,a){let h=null;try{h=a(e)}catch(E){if(L("Language definition for '{}' could not be registered.".replace("{}",i)),d)L(E);else throw E;h=c}h.name||(h.name=i),t[i]=h,h.rawDefinition=a.bind(null,e),h.aliases&&pe(h.aliases,{languageName:i})}function Ve(i){delete t[i];for(let a of Object.keys(n))n[a]===i&&delete n[a]}function Qe(){return Object.keys(t)}function C(i){return i=(i||"").toLowerCase(),t[i]||t[n[i]]}function pe(i,{languageName:a}){typeof i=="string"&&(i=[i]),i.forEach(h=>{n[h.toLowerCase()]=a})}function Ee(i){let a=C(i);return a&&!a.disableAutodetect}function qe(i){i["before:highlightBlock"]&&!i["before:highlightElement"]&&(i["before:highlightElement"]=a=>{i["before:highlightBlock"](Object.assign({block:a.el},a))}),i["after:highlightBlock"]&&!i["after:highlightElement"]&&(i["after:highlightElement"]=a=>{i["after:highlightBlock"](Object.assign({block:a.el},a))})}function et(i){qe(i),l.push(i)}function tt(i){let a=l.indexOf(i);a!==-1&&l.splice(a,1)}function W(i,a){let h=i;l.forEach(function(E){E[h]&&E[h](a)})}function nt(i){return H("10.7.0","highlightBlock will be removed entirely in v12.0"),H("10.7.0","Please use highlightElement now."),ne(i)}Object.assign(e,{highlight:M,highlightAuto:$,highlightAll:m,highlightElement:ne,highlightBlock:nt,configure:Ye,initHighlighting:Xe,initHighlightingOnLoad:Ze,registerLanguage:Je,unregisterLanguage:Ve,listLanguages:Qe,getLanguage:C,registerAliases:pe,autoDetection:Ee,inherit:Ae,addPlugin:et,removePlugin:tt}),e.debugMode=function(){d=!1},e.safeMode=function(){d=!0},e.versionString=cn,e.regex={concat:B,lookahead:De,either:V,optional:wt,anyNumberOfTimes:Ot};for(let i in X)typeof X[i]=="object"&&Ie(X[i]);return Object.assign(e,X),e},U=je({});U.newInstance=()=>je({});Ge.exports=U;U.HighlightJS=U;U.default=U});var me=bt(Ke(),1);var he=me.default;var j="[0-9](_*[0-9])*",q=`\\.(${j})`,ee="[0-9a-fA-F](_*[0-9a-fA-F])*",We={className:"number",variants:[{begin:`(\\b(${j})((${q})|\\.)?|(${q}))[eE][+-]?(${j})[fFdD]?\\b`},{begin:`\\b(${j})((${q})[fFdD]?\\b|\\.([fFdD]\\b)?)`},{begin:`(${q})[fFdD]?\\b`},{begin:`\\b(${j})[fFdD]\\b`},{begin:`\\b0[xX]((${ee})\\.?|(${ee})?\\.(${ee}))[pP][+-]?(${j})[fFdD]?\\b`},{begin:"\\b(0|[1-9](_*[0-9])*)[lL]?\\b"},{begin:`\\b0[xX](${ee})[lL]?\\b`},{begin:"\\b0(_*[0-7])*[lL]?\\b"},{begin:"\\b0[bB][01](_*[01])*[lL]?\\b"}],relevance:0};function Fe(e,t,n){return n===-1?"":e.replace(t,l=>Fe(e,t,n-1))}function ze(e){let t=e.regex,n="[\xC0-\u02B8a-zA-Z_$][\xC0-\u02B8a-zA-Z_$0-9]*",l="(?:(?:\\s*\\[\\s*])+)?",d=n+"<@@@>"+l,c="(?:"+("\\?(?:\\s+(?:extends|super)\\s+"+d+")?")+"|"+d+")",r=Fe("(?:\\s*<\\s*"+c+"(?:\\s*,\\s*"+c+")*\\s*>)?",/<@@@>/g,2),I={keyword:["synchronized","abstract","private","var","static","if","const ","for","while","strictfp","finally","protected","import","native","final","void","enum","else","break","transient","catch","instanceof","volatile","case","assert","package","default","public","try","switch","continue","throws","protected","public","private","module","requires","exports","do","sealed","yield","permits","goto","when"],literal:["false","true","null"],type:["char","boolean","long","float","int","byte","short","double"],built_in:["super","this"]},$={className:"meta",begin:"@"+n,contains:[{begin:/\(/,end:/\)/,contains:["self"]}]},te={className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[e.C_BLOCK_COMMENT_MODE],endsParent:!0};return{name:"Java",aliases:["jsp"],keywords:I,illegal:/<\/|#/,contains:[e.COMMENT("/\\*\\*","\\*/",{relevance:0,contains:[{begin:/\w+@/,relevance:0},{className:"doctag",begin:"@[A-Za-z]+"}]}),{begin:/import java\.[a-z]+\./,keywords:"import",relevance:2},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE,{begin:/"""/,end:/"""/,className:"string",contains:[e.BACKSLASH_ESCAPE]},e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,{match:[/\b(?:class|interface|enum|extends|implements|new)/,/\s+/,n],className:{1:"keyword",3:"title.class"}},{match:/non-sealed/,scope:"keyword"},{beginKeywords:"new throw return else yield assert",relevance:0},{begin:[n,t.concat(r,l,/\s+/),n,l,/\s*/,/=(?!=)/],className:{1:"type",3:"variable",6:"operator"}},{begin:[/record/,/\s+/,n],className:{1:"keyword",3:"title.class"},contains:[te,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},{begin:[n,t.concat(r,l,/\s+/),n,/\s*(?=\()/],className:{1:"type",3:"title.function"},keywords:I,contains:[{className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[$,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,We,e.C_BLOCK_COMMENT_MODE]},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},We,$]}}he.registerLanguage("java",ze);window.hljs=he;})();
+</script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---- 1. syntax highlighting -------------------------------------- */
+  function highlight() {
+    if (!window.hljs) return;
+    var blocks = document.querySelectorAll('pre code.language-java');
+    for (var i = 0; i < blocks.length; i++) {
+      try { window.hljs.highlightElement(blocks[i]); } catch (e) {}
+    }
+  }
+
+  /* ---- 2. every solution / reveal starts closed --------------------- */
+  function closeAll() {
+    var d = document.querySelectorAll('details.soln');
+    for (var i = 0; i < d.length; i++) { d[i].open = false; }
+  }
+
+  /* ---- 3. show all / hide all -------------------------------------- */
+  function wireToolbar() {
+    var show = document.getElementById('showAll');
+    var hide = document.getElementById('hideAll');
+    function setAll(v) {
+      var d = document.querySelectorAll('details.soln');
+      for (var i = 0; i < d.length; i++) { d[i].open = v; }
+    }
+    if (show) show.addEventListener('click', function () { setAll(true); });
+    if (hide) hide.addEventListener('click', function () { setAll(false); });
+  }
+
+  /* ---- 4. live-coding editors -------------------------------------- */
+  var INDENT = '    ';
+
+  function wireEditors() {
+    var eds = document.querySelectorAll('.editor');
+    for (var i = 0; i < eds.length; i++) { wireOne(eds[i]); }
+  }
+
+  function wireOne(box) {
+    var ta = box.querySelector('textarea');
+    if (!ta) return;
+    var starter = ta.value;
+
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Tab' || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+      ev.preventDefault();
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+
+      if (s === e && !ev.shiftKey) {
+        ta.value = v.slice(0, s) + INDENT + v.slice(e);
+        ta.selectionStart = ta.selectionEnd = s + INDENT.length;
+        return;
+      }
+      /* block indent / outdent over the selected lines */
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var le = v.indexOf('\n', e);
+      if (le === -1) le = v.length;
+      var seg = v.slice(ls, le);
+      var lines = seg.split('\n');
+      var delta0 = 0, total = 0;
+
+      for (var i = 0; i < lines.length; i++) {
+        if (ev.shiftKey) {
+          var m = lines[i].match(/^(\t| {1,4})/);
+          if (m) {
+            lines[i] = lines[i].slice(m[0].length);
+            if (i === 0) delta0 = -m[0].length;
+            total -= m[0].length;
+          }
+        } else {
+          lines[i] = INDENT + lines[i];
+          if (i === 0) delta0 = INDENT.length;
+          total += INDENT.length;
+        }
+      }
+      ta.value = v.slice(0, ls) + lines.join('\n') + v.slice(le);
+      ta.selectionStart = Math.max(ls, s + delta0);
+      ta.selectionEnd = Math.max(ta.selectionStart, e + total);
+    });
+
+    /* keep the indent of the current line when Enter is pressed */
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Enter' || ev.shiftKey || ev.ctrlKey || ev.metaKey) return;
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+      if (s !== e) return;
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var lead = (v.slice(ls, s).match(/^[ \t]*/) || [''])[0];
+      var extra = /[{(\[]\s*$/.test(v.slice(ls, s)) ? INDENT : '';
+      if (!lead && !extra) return;
+      ev.preventDefault();
+      var ins = '\n' + lead + extra;
+      ta.value = v.slice(0, s) + ins + v.slice(e);
+      ta.selectionStart = ta.selectionEnd = s + ins.length;
+    });
+
+    var rst = box.querySelector('[data-act="reset"]');
+    if (rst) rst.addEventListener('click', function () {
+      ta.value = starter;
+      ta.focus();
+      flash(box, 'Reset to starter code');
+    });
+
+    var cpy = box.querySelector('[data-act="copy"]');
+    if (cpy) cpy.addEventListener('click', function () {
+      var done = function () { flash(box, 'Copied — paste it into your IDE'); };
+      var fail = function () { flash(box, 'Copy failed — select the text and press Ctrl/Cmd+C'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value).then(done, function () { legacy(ta, done, fail); });
+      } else {
+        legacy(ta, done, fail);
+      }
+    });
+  }
+
+  function legacy(ta, done, fail) {
+    try {
+      var st = ta.selectionStart, en = ta.selectionEnd;
+      ta.select();
+      var ok = document.execCommand('copy');
+      ta.selectionStart = st; ta.selectionEnd = en;
+      ok ? done() : fail();
+    } catch (e) { fail(); }
+  }
+
+  function flash(box, msg) {
+    var f = box.querySelector('.foot');
+    if (!f) return;
+    if (f.getAttribute('data-base') === null || f.getAttribute('data-base') === undefined) {
+      f.setAttribute('data-base', f.textContent);
+    }
+    f.textContent = msg;
+    window.setTimeout(function () { f.textContent = f.getAttribute('data-base'); }, 2200);
+  }
+
+  /* ---- go ----------------------------------------------------------- */
+  function init() {
+    highlight();
+    closeAll();
+    wireToolbar();
+    wireEditors();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  /* belt and braces: some browsers restore <details> state on soft reload */
+  window.addEventListener('pageshow', closeAll);
+})();
+</script>
+</body>
+</html>

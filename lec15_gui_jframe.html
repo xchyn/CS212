@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class 17 — GUI I: Windows, JFrame and Events | CSCI 212</title>
+<style>
+:root{
+  --ink:#0f172a; --ink2:#334155; --muted:#64748b; --line:#e2e8f0;
+  --bg:#ffffff; --bg2:#f8fafc;
+  --obj:#4f46e5; --def:#2563eb; --ex:#059669; --alg:#7c3aed;
+  --key:#b45309; --warn:#dc2626; --qc:#0891b2; --prac:#be185d; --sum:#475569;
+  --edit:#ea580c; --edit-bg:#fff7ed;
+  --code-bg:#0d1117; --code-bd:#000000;   /* read-only listings: black */
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 22px 80px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  background:#0f172a;color:#e2e8f0;font-size:13.5px;
+  border-bottom:3px solid var(--obj);
+}
+.topbar .inner{max-width:900px;margin:0 auto;padding:10px 22px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.topbar a{color:#e2e8f0;text-decoration:none;border-bottom:1px solid transparent}
+.topbar a:hover{border-bottom-color:#94a3b8}
+.topbar .course{font-weight:700;letter-spacing:.02em}
+.topbar .sep{color:#475569}
+.topbar .spacer{flex:1}
+
+/* ---------- title block ---------- */
+.titleblock{padding:34px 0 10px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.eyebrow{
+  font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--obj);margin-bottom:8px;
+}
+.titleblock h1{font-size:33px;line-height:1.2;margin:0 0 10px;letter-spacing:-.015em}
+.titleblock .sub{margin:0;color:var(--muted);font-size:17px;line-height:1.5}
+
+h2{
+  font-size:24px;margin:46px 0 14px;padding-bottom:8px;
+  border-bottom:2px solid var(--line);letter-spacing:-.01em;scroll-margin-top:14px;
+}
+h2 .num{color:var(--obj);font-weight:800;margin-right:11px}
+h3{font-size:18.5px;margin:30px 0 10px;color:var(--ink)}
+h4{font-size:16px;margin:20px 0 8px;color:var(--ink2)}
+p{margin:12px 0}
+ul,ol{margin:12px 0;padding-left:26px}
+li{margin:6px 0}
+a{color:var(--def)}
+hr{border:0;border-top:1px solid var(--line);margin:30px 0}
+strong{color:var(--ink)}
+.muted{color:var(--muted)}
+
+/* ---------- table of contents ---------- */
+.toc{
+  background:var(--bg2);border:1px solid var(--line);border-radius:9px;
+  padding:15px 20px 16px;margin:22px 0;
+}
+.toc .th{
+  font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px;
+}
+.toc ol{margin:0;padding-left:22px;columns:2;column-gap:30px}
+.toc li{margin:3px 0;font-size:14.5px;break-inside:avoid}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+
+/* ---------- show all / hide all ---------- */
+.tools{
+  display:flex;gap:9px;align-items:center;flex-wrap:wrap;
+  padding:11px 15px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:9px;margin:22px 0;font-size:13.5px;
+}
+.tools .lab{font-weight:700;color:var(--ink2)}
+.tools button{
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  background:#fff;color:var(--ink2);border:1px solid #cbd5e1;
+  border-radius:6px;padding:4px 12px;
+}
+.tools button:hover{background:var(--obj);border-color:var(--obj);color:#fff}
+.tools .muted{font-size:12.5px}
+
+/* ---------- boxes ---------- */
+.box{border:1px solid var(--line);border-left:5px solid var(--muted);border-radius:8px;margin:22px 0;overflow:hidden;background:#fff}
+.box>.hd{
+  padding:9px 16px;font-size:12.5px;font-weight:700;
+  letter-spacing:.075em;text-transform:uppercase;color:#fff;background:var(--muted);
+}
+.box>.hd .tag{margin-left:5px;font-weight:500;text-transform:none;letter-spacing:0;opacity:.92;font-size:13px}
+.box>.bd{padding:4px 18px 14px}
+.box>.bd>:first-child{margin-top:12px}
+.box>.bd>:last-child{margin-bottom:2px}
+
+.box.obj{border-left-color:var(--obj)}  .box.obj>.hd{background:var(--obj)}
+.box.def{border-left-color:var(--def)}  .box.def>.hd{background:var(--def)}
+.box.ex{border-left-color:var(--ex)}    .box.ex>.hd{background:var(--ex)}
+.box.alg{border-left-color:var(--alg)}  .box.alg>.hd{background:var(--alg)}
+.box.key{border-left-color:var(--key)}  .box.key>.hd{background:var(--key)}
+.box.warn{border-left-color:var(--warn)}.box.warn>.hd{background:var(--warn)}
+.box.qc{border-left-color:var(--qc)}    .box.qc>.hd{background:var(--qc)}
+.box.prac{border-left-color:var(--prac)}.box.prac>.hd{background:var(--prac)}
+.box.sum{border-left-color:var(--sum)}  .box.sum>.hd{background:var(--sum)}
+
+.box.obj{background:#f5f5ff}
+.box.qc{background:#f0fbfe}
+.box.warn{background:#fff7f7}
+.box.key{background:#fffbf2}
+.box.sum{background:#f8fafc}
+
+/* ---------- code ---------- */
+/* Read-only listings sit on black, matching CSCI 211, so a code block is never
+   mistaken for the editable live-coding box. */
+pre{
+  margin:14px 0;padding:13px 15px;overflow-x:auto;
+  background:var(--code-bg);border:1px solid var(--code-bd);border-radius:8px;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;color:#c9d1d9;
+}
+pre code{font-family:inherit;font-size:inherit;background:none;padding:0;border:0;color:inherit;display:block}
+code{
+  font-family:var(--mono);font-size:.9em;background:#eef2f7;
+  border:1px solid #e2e8f0;border-radius:4px;padding:1px 5px;color:#0b3a5b;
+}
+.filename{
+  font-family:var(--mono);font-size:12px;color:#475569;
+  margin:16px 0 -9px;font-weight:600;
+}
+
+/* comparison block: another language, never syntax-highlighted. Dark like the
+   Java listings, but desaturated and dashed so it reads as "not this course". */
+pre.cmp{background:#161b22;border-style:dashed;border-color:#3f4650;color:#9aa4b2}
+pre.cmp code{color:#9aa4b2}
+
+/* shell commands you type */
+pre.sh{background:#1e293b;border-color:#1e293b;color:#e2e8f0;position:relative;padding-top:26px}
+pre.sh code{color:#e2e8f0}
+pre.sh::before{
+  content:"Terminal";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#86efac;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* output / terminal blocks */
+pre.out{background:#111d33;border-color:#111d33;color:#e2e8f0;position:relative;padding-top:26px}
+pre.out code{color:#e2e8f0}
+pre.out::before{
+  content:"Output";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#7dd3fc;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+pre.err{background:#1f1416;border-color:#7f1d1d;color:#fecdd3;padding-top:26px;position:relative}
+pre.err code{color:#fecdd3}
+pre.err::before{
+  content:"Compiler message";position:absolute;top:5px;left:15px;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:#fda4af;font-weight:700;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+/* ---- highlight.js, GitHub-dark palette (hand-written, no external file) ---- */
+.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-template-tag,
+.hljs-template-variable,.hljs-type,.hljs-variable.language_{color:#ff7b72}
+.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#d2a8ff}
+.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,
+.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id,.hljs-variable{color:#79c0ff}
+.hljs-meta .hljs-string,.hljs-regexp,.hljs-string{color:#a5d6ff}
+.hljs-built_in,.hljs-symbol{color:#ffa657}
+.hljs-code,.hljs-comment,.hljs-formula{color:#8b949e;font-style:italic}
+.hljs-name,.hljs-quote,.hljs-selector-pseudo,.hljs-selector-tag{color:#7ee787}
+.hljs-subst{color:#c9d1d9}
+.hljs-section{color:#1f6feb;font-weight:700}
+.hljs-bullet{color:#f2cc60}
+.hljs-emphasis{color:#c9d1d9;font-style:italic}
+.hljs-strong{color:#c9d1d9;font-weight:700}
+
+/* ---------- trace tables ---------- */
+table{border-collapse:collapse;margin:16px 0;font-size:14px;width:100%}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--bg2);font-weight:700;font-size:13px}
+table.trace td:first-child,table.trace th:first-child{white-space:nowrap}
+table code{font-size:.88em}
+
+/* ---------- multi-part questions ---------- */
+.part{margin:16px 0;padding-left:14px;border-left:2px solid #cbd5e1}
+.part .q{margin:0 0 8px}
+.part .pl{font-weight:700;color:var(--qc);margin-right:6px}
+
+/* ---------- collapsible solutions ---------- */
+details.soln{margin:10px 0 4px}
+details.soln>summary{
+  list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  font-size:12.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:#fff;background:var(--sum);border-radius:6px;padding:5px 13px;
+  user-select:none;
+}
+details.soln>summary::-webkit-details-marker{display:none}
+details.soln>summary::before{content:"\25B6";font-size:9px;transition:transform .15s}
+details.soln[open]>summary::before{transform:rotate(90deg)}
+details.soln>summary::after{content:"Show Answer"}
+details.soln[open]>summary::after{content:"Hide Answer"}
+details.soln>summary:hover{filter:brightness(1.18)}
+
+details.soln.reveal>summary{background:var(--ex)}
+details.soln.reveal>summary::after{content:"Show Output & Explanation"}
+details.soln.reveal[open]>summary::after{content:"Hide Output & Explanation"}
+details.soln.reveal.noout>summary::after{content:"Show Explanation"}
+details.soln.reveal.noout[open]>summary::after{content:"Hide Explanation"}
+
+.ans{
+  margin-top:11px;padding:2px 16px 10px;background:#fff;
+  border:1px solid var(--line);border-left:3px solid var(--sum);border-radius:7px;
+}
+details.soln.reveal .ans{border-left-color:var(--ex)}
+.ans>:first-child{margin-top:12px}
+.ans>:last-child{margin-bottom:6px}
+
+/* ---------- live coding editor ---------- */
+.editor{
+  margin:18px 0;border:2px dashed var(--edit);border-radius:9px;
+  background:var(--edit-bg);overflow:hidden;
+}
+.editor .ehd{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:7px 13px;background:var(--edit);color:#fff;
+  font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+}
+.editor .ehd .etitle{flex:1}
+.editor .ehd button{
+  font:inherit;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  cursor:pointer;background:rgba(255,255,255,.16);color:#fff;
+  border:1px solid rgba(255,255,255,.5);border-radius:5px;padding:3px 10px;
+}
+.editor .ehd button:hover{background:#fff;color:var(--edit)}
+.editor textarea{
+  display:block;width:100%;border:0;outline:0;resize:vertical;
+  padding:12px 15px;background:var(--edit-bg);color:#431407;
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;
+  tab-size:4;-moz-tab-size:4;min-height:150px;
+}
+.editor textarea:focus{background:#fff}
+.editor .foot{
+  padding:5px 13px 7px;font-size:11.5px;color:#9a3412;background:#ffedd5;
+  border-top:1px solid #fed7aa;
+}
+
+/* ---------- prev/next nav ---------- */
+.pagenav{display:flex;gap:14px;margin:52px 0 0;flex-wrap:wrap}
+.pagenav a,.pagenav span.disabled{
+  flex:1 1 260px;display:block;text-decoration:none;
+  border:1px solid var(--line);border-radius:9px;padding:12px 16px;background:#fff;
+}
+.pagenav a:hover{border-color:var(--obj);background:var(--bg2)}
+.pagenav .dir{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.pagenav .ttl{font-size:15px;font-weight:600;color:var(--ink);margin-top:3px}
+.pagenav .next{text-align:right}
+.pagenav span.disabled{opacity:.4}
+.pagenav span.disabled .ttl{color:var(--muted)}
+
+footer.pf{
+  margin-top:40px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--muted);text-align:center;
+}
+
+/* ---------- index page ---------- */
+table.sched{font-size:14.5px}
+table.sched th{background:#0f172a;color:#fff;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+table.sched td:first-child{white-space:nowrap;font-weight:700;color:var(--muted);width:60px}
+table.sched tr.examrow td{background:#fff1f2}
+table.sched tr.revrow td{background:#fffbeb}
+table.sched a{font-weight:600;text-decoration:none}
+table.sched a:hover{text-decoration:underline}
+
+
+/* ---------- release gating ---------- */
+.pending{
+  margin-top:4px;font-size:11.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:#b45309;
+}
+.pagenav span.disabled .pending{color:#b45309}
+table.sched tr.pendingrow td{background:#fcfcfd}
+table.sched .unrel{color:var(--muted)}
+table.sched .pending{display:block;margin-top:2px}
+table.sched td.cn{white-space:nowrap;width:52px;font-weight:700;color:var(--muted)}
+table.sched td.dt{white-space:nowrap;width:104px;color:var(--muted);font-size:13.5px}
+table.sched tr.offrow td{background:#f1f5f9;color:var(--muted);font-style:italic}
+.refcard{
+  display:block;text-decoration:none;border:1px solid var(--line);
+  border-left:5px solid var(--alg);border-radius:9px;padding:13px 17px;
+  margin:22px 0;background:#faf9ff;
+}
+.refcard:hover{background:#f5f3ff;border-color:var(--alg)}
+.refcard .rl{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--alg)}
+.refcard .rt{font-size:16px;font-weight:600;color:var(--ink);margin-top:3px}
+.refcard .rd{font-size:14px;color:var(--muted);margin-top:4px}
+
+/* ---------- print ---------- */
+@media print{
+  .topbar,.tools,.pagenav,.pending{display:none !important}
+  html,body{width:100%;font-size:10pt}
+  .wrap{max-width:100%;width:100%;padding:0}
+  /* a wide <pre> must wrap rather than widen the page and clip every other
+     element at the paper edge */
+  /* Screen shows code on black; paper does not. Restore a dark-on-light palette
+     for print only, or the dark theme's light tokens vanish on white. */
+  pre{white-space:pre-wrap;overflow:visible;overflow-wrap:anywhere;font-size:8.6pt;
+      background:#f8fafc !important;color:#24292e !important;border-color:#cbd5e1 !important;
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  pre code{color:#24292e !important}
+  pre.cmp{background:#fff !important;color:#475569 !important;border-color:#94a3b8 !important}
+  pre.cmp code{color:#475569 !important}
+  pre .hljs-doctag,pre .hljs-keyword,pre .hljs-meta .hljs-keyword,pre .hljs-template-tag,
+  pre .hljs-template-variable,pre .hljs-type,pre .hljs-variable.language_{color:#d73a49 !important}
+  pre .hljs-title,pre .hljs-title.class_,pre .hljs-title.class_.inherited__,
+  pre .hljs-title.function_{color:#6f42c1 !important}
+  pre .hljs-attr,pre .hljs-attribute,pre .hljs-literal,pre .hljs-meta,pre .hljs-number,
+  pre .hljs-operator,pre .hljs-selector-attr,pre .hljs-selector-class,pre .hljs-selector-id,
+  pre .hljs-variable{color:#005cc5 !important}
+  pre .hljs-meta .hljs-string,pre .hljs-regexp,pre .hljs-string{color:#032f62 !important}
+  pre .hljs-built_in,pre .hljs-symbol{color:#e36209 !important}
+  pre .hljs-code,pre .hljs-comment,pre .hljs-formula{color:#6a737d !important}
+  pre .hljs-name,pre .hljs-quote,pre .hljs-selector-pseudo,
+  pre .hljs-selector-tag{color:#22863a !important}
+  pre .hljs-subst,pre .hljs-emphasis,pre .hljs-strong{color:#24292e !important}
+  .filename{color:#475569 !important}
+  table{table-layout:fixed;width:100%;word-wrap:break-word;overflow-wrap:anywhere}
+  .box,.toc{max-width:100%}
+  a{color:var(--ink);text-decoration:none}
+  .box,.part,pre,table,.editor{break-inside:avoid;page-break-inside:avoid}
+  h2{break-after:avoid;page-break-after:avoid}
+  details.soln>summary{display:none !important}
+  details.soln:not([open])>.ans{display:none !important}
+  details.soln::before{
+    content:"Answer withheld — see the online notes.";
+    display:block;font-size:9pt;font-style:italic;color:#64748b;margin:6px 0;
+  }
+  details.soln[open]::before{content:""}
+  .editor textarea{display:none !important}
+  .editor{border:1.5px solid #fdba74 !important;background:#fff;border-style:solid}
+  .editor .ehd{background:#fff !important;color:#9a3412 !important;border-bottom:1px solid #fdba74}
+  .editor .ehd button{display:none}
+  .editor .foot{display:none}
+  .editor::after{content:"";display:block;height:2.1in;background:#fff}
+  pre.out,pre.sh{background:#f1f5f9 !important;color:#0f172a !important;border-color:#94a3b8 !important}
+  pre.err{background:#fef2f2 !important;color:#7f1d1d !important;border-color:#fca5a5 !important}
+  pre.out code,pre.sh code{color:#0f172a !important}
+  pre.err code{color:#7f1d1d !important}
+  pre.out::before,pre.sh::before{color:#475569}
+  pre.err::before{color:#b91c1c}
+  .box>.hd{color:#000;background:#fff !important;border-bottom:1px solid #cbd5e1}
+}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="inner">
+<span class="course">CSCI 212</span>
+<span class="sep">|</span>
+<a href="index.html">Course index</a>
+<span class="sep">|</span>
+<span>Class 17 of 28</span>
+<span class="sep">|</span>
+<span>Thursday, October 29</span>
+<span class="spacer"></span>
+<span>Queens College, CUNY</span>
+</div></div>
+<div class="wrap">
+<div class="titleblock">
+  <div class="eyebrow">Session 17 &middot; Lecture 15</div>
+  <h1>GUI I: Windows, JFrame and Events</h1>
+  <p class="sub">The first program in this course that has no <code>println</code> in it &mdash; and the moment interfaces stop being theory and start being the thing that makes a button work.</p> </div> <div class="box obj"> <div class="hd">Learning Objectives</div> <div class="bd"> <p>By the end of today's session you should be able to:</p> <ol> <li>Name the standard elements of a graphical user interface &mdash; window, menu, button, text field, label &mdash; and say what a <em>component</em> and a <em>container</em> are.</li> <li>Say which of <code>javax.swing</code>, <code>java.awt</code> and <code>java.awt.event</code> each of <code>JFrame</code>, <code>Color</code> and <code>WindowListener</code> comes from, and write the right <code>import</code>.</li> <li>Create a window in four lines by instantiating a <code>JFrame</code> and calling <code>setSize</code> and <code>setVisible(true)</code>.</li> <li>Explain what <code>setDefaultCloseOperation</code> does, name its four constants, and predict what happens when you leave it out.</li> <li>Write a class that <code>extends JFrame</code> and sets itself up in its own constructor, and say why that is the pattern every exam question uses.</li> <li>Add a <code>JLabel</code> to a frame through <code>getContentPane()</code>, and set the frame's title and the content pane's background color.</li> <li>Identify the three parts of any Java event &mdash; the <em>source</em>, the <em>event object</em>, and the <em>listener</em> &mdash; and explain why the listener is always an interface.</li> <li>Implement <code>WindowListener</code> directly, read the compiler error you get when you write only one of its seven methods, and explain what problem <code>WindowAdapter</code> was invented to solve.</li> </ol> </div> </div> <div class="toc"> <div class="th">On this page</div> <ol> <li><a href="#s1">What a GUI is, and the words for its parts</a></li> <li><a href="#s2">Swing, AWT, and the three packages</a></li> <li><a href="#s3">Your first window</a></li> <li><a href="#s4">Closing the window</a></li> <li><a href="#s5">The normal pattern: a class that extends JFrame</a></li> <li><a href="#s6">The content pane: putting something in the window</a></li> <li><a href="#s7">The event model: source, event, listener</a></li> <li><a href="#s8">WindowListener, all seven methods, and WindowAdapter</a></li> <li><a href="#prac">Practice Problems</a></li> <li><a href="#summary">Lecture Summary</a></li> </ol> </div> <div class="tools"> <span class="lab">Answers</span> <button id="showAll" type="button">Show all</button> <button id="hideAll" type="button">Hide all</button> <span class="muted">&mdash; every worked-example output and every solution is hidden when the page loads. Work it out first, then reveal.</span> </div> <hr> <h2 id="s1"><span class="num">1.</span>What a GUI is, and the words for its parts</h2> <p>Last time you learned two things that probably felt abstract. An <strong>abstract class</strong> can declare a method with no body and force every subclass to write one. An <strong>interface</strong> is a pure list of method headers that any class can promise to fulfil, and a class that says <code>implements Runnable</code> is signing a contract: <em>I will supply every method on that list.</em></p> <p>Today is the payoff. Everything you are about to write &mdash; every button that responds to a click, every window that notices you pressed its close box &mdash; works by you writing a class that <code>implements</code> an interface Java already defined. That is the entire mechanism. Keep the word <em>interface</em> in your head for the next fifty minutes; by &sect;7 it will be doing all the work.</p> <p>Every program you have written so far has talked to the user through a scrolling stream of text. That is a <em>console</em> program. The other kind is the kind you actually use all day.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; graphical user interface</span></div> <div class="bd"> <p>A <strong>GUI</strong> (graphical user interface, pronounced "gooey") is a visual way for users to interact with programs. Instead of typing at a prompt and reading lines of text, the user looks at a picture on the screen and clicks, types and drags.</p> <p>The standard elements are:</p> <ul> <li><strong>Windows</strong> &mdash; portions of the screen containing GUI components.</li> <li><strong>Menus</strong> &mdash; lists of choices.</li> <li><strong>Buttons</strong> &mdash; clickable elements to perform actions.</li> <li><strong>Text fields</strong> &mdash; areas for entering or displaying text.</li> <li><strong>Labels</strong> &mdash; text descriptions for other components.</li> </ul> </div> </div> <p>Three more words are worth pinning down now, because Java's class names are built out of them and the exam questions use them without explanation.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; component, container, frame, panel</span></div> <div class="bd"> <p>A <strong>component</strong> is any single GUI element that can be added to something: a button, a label, a text field. In Java these are the classes whose names start with <code>J</code> &mdash; <code>JButton</code>, <code>JLabel</code>, <code>JTextField</code>.</p> <p>A <strong>container</strong> is a component that can hold other components. This is the important idea: a container <em>is</em> a component, so containers can be put inside other containers, and a GUI is a tree.</p> <p>A <strong>frame</strong> is the top-level container &mdash; a real window with a title bar, a border, and minimise/maximise/close buttons drawn by the operating system. In Java the class is <code>JFrame</code>, and it is the subject of the rest of this lecture.</p> <p>A <strong>panel</strong> is a plain rectangular container with no decoration, used to group components inside a frame. The class is <code>JPanel</code>. We only name it today; it becomes central next lecture.</p> </div> </div> <div class="box key"> <div class="hd">Key Idea</div> <div class="bd"> <p>A console program decides the order of events: it prints, then reads, then prints. A GUI program does not. It puts a window on the screen and then <em>waits</em>. The user decides what happens next, and in what order. Your job stops being "write the sequence" and becomes "write what to do <em>when</em>". That is called <strong>event-driven programming</strong>, and it is the real subject of the next five lectures.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 15.1</div> <div class="bd"> <p>Open any window on your own computer &mdash; a text editor, a browser's settings dialog &mdash; and name one thing in it that is a menu, one that is a button, one that is a text field, and one that is a label. Then answer: is the window itself a component, a container, or both?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Use the definitions literally. A menu is a list of choices; a button is clicked to perform an action; a text field is somewhere you type; a label is text that describes something else and that you cannot type into.</p> <p>In a browser's find bar, for example: <em>File / Edit / View</em> across the top is the menu, <em>Find Next</em> is a button, the box you type your search into is a text field, and the word <em>Find:</em> printed beside that box is a label. The label is the one people get wrong &mdash; the giveaway is that clicking it does nothing and you cannot type into it.</p> <p><strong>The window is both.</strong> It is a component (it can be moved, resized, shown, hidden) and it is a container (it holds the menu, the button, the field and the label). That is not a trick answer; it is the whole design. Because a container is also a component, containers nest, and a GUI is a tree of components with the frame at its root.</p> <p><strong>Things to notice.</strong> Every one of these has a Java class waiting for it: <code>JMenu</code>, <code>JButton</code>, <code>JTextField</code>, <code>JLabel</code>, <code>JFrame</code>. Learning the vocabulary now means that when an exam question says "the GUI has three buttons across the bottom" you already know it is asking for three <code>JButton</code> objects.</p> </div></details> </div> </div> <h2 id="s2"><span class="num">2.</span>Swing, AWT, and the three packages</h2> <p>Java's GUI story has two layers, and you need both. The older one is AWT; the newer one is Swing, which is built on top of it. In practice you write Swing components and import a few AWT support classes, and the imports look inconsistent until you know why.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; Swing and AWT</span></div> <div class="bd"> <p><strong>Swing</strong> is a GUI toolkit for Java providing platform-independent GUI components. Swing draws its own buttons and menus in Java code, so a Swing program looks the same everywhere &mdash; the same WORA promise from Lecture 1, applied to pixels.</p> <p><strong>AWT</strong> is the <em>Abstract Window Toolkit</em>, the original Java GUI library. It provides the basic GUI machinery Swing is built on: the notion of a component, a container, a layout, a color, and the whole event system.</p> </div> </div> <p>That split is exactly why your import lines come from three different places:</p> <table> <tr><th>Package</th><th>What lives there</th><th>Examples you will use today</th></tr> <tr><td><code>javax.swing</code></td><td>The core Swing components. Class names start with <code>J</code>.</td><td><code>JFrame</code>, <code>JLabel</code>, <code>JButton</code>, <code>JPanel</code>, <code>JTextField</code></td></tr> <tr><td><code>java.awt</code></td><td>Basic GUI functionality inherited from AWT.</td><td><code>Color</code>, <code>Container</code>, <code>BorderLayout</code></td></tr> <tr><td><code>java.awt.event</code></td><td>Event classes and listener interfaces.</td><td><code>WindowEvent</code>, <code>WindowListener</code>, <code>WindowAdapter</code>, <code>ActionListener</code></td></tr> </table> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; the x in javax</span></div> <div class="bd"> <p>It is <code>javax.swing</code>, with an <code>x</code>, and <code>java.awt</code>, without one. Writing <code>import java.swing.JFrame;</code> produces a <code>package java.swing does not exist</code> error that students stare at for five minutes because the line <em>looks</em> right. The <code>x</code> is a historical marker: Swing arrived as an extension to Java rather than part of the original core, and the name stuck.</p> <p>It is also <code>java.awt.event</code> in the singular, not <code>java.awt.events</code>.</p> </div> </div> <p>You will see <code>import javax.swing.*;</code> in a lot of code, including on the exams. The star imports every class in the package. It is convenient and it is what most GUI code does, because a real window needs six or eight Swing classes. Naming them one at a time, the way the examples in this lecture do, is clearer while you are learning which class lives where.</p> <div class="box qc"> <div class="hd">Quick Check 15.2</div> <div class="bd"> <p>For each class, give the single <code>import</code> line you would write.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>JLabel</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>import javax.swing.JLabel;</code> &mdash; it starts with <code>J</code>, so it is a Swing component.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>Color</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>import java.awt.Color;</code> &mdash; a color is not a component, it is basic drawing machinery, so it lives in AWT. There is no <code>JColor</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>WindowEvent</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>import java.awt.event.WindowEvent;</code> &mdash; every event class and every listener interface is in <code>java.awt.event</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>Container</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>import java.awt.Container;</code> &mdash; this one surprises people, because you get a <code>Container</code> by calling <code>getContentPane()</code> on a Swing <code>JFrame</code>. But <code>Container</code> is the old AWT class that <code>JFrame</code> ultimately inherits from, and Swing never renamed it.</p> <p><strong>Things to notice across all four parts.</strong> The rule that gets you 90% of the way: <em>if the class name starts with a capital <code>J</code>, it is <code>javax.swing</code>; if it ends in <code>Event</code> or <code>Listener</code> or <code>Adapter</code>, it is <code>java.awt.event</code>; otherwise try <code>java.awt</code>.</em> When in doubt, <code>import javax.swing.*;</code> and <code>import java.awt.*;</code> and <code>import java.awt.event.*;</code> covers everything in this course &mdash; and note that the star is not recursive, so <code>java.awt.*</code> does <em>not</em> bring in <code>java.awt.event</code>.</p> </div></details> </div> </div> </div> <h2 id="s3"><span class="num">3.</span>Your first window</h2> <p>A <code>JFrame</code> is an ordinary Java object. You make one with <code>new</code>, you call methods on it, and one of those methods puts it on the screen. There is no special syntax anywhere.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; JFrame</span></div> <div class="bd"> <p><strong><code>JFrame</code></strong> is the main window class in Swing: it provides the framework for a GUI application. A <code>JFrame</code></p> <ul> <li>represents a top-level window with a title and a border,</li> <li>can contain other Swing components,</li> <li>has a <em>content pane</em> where components are added, and</li> <li>supports window events &mdash; open, close, resize and so on.</li> </ul> </div> </div> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; the three calls every window needs</span></div> <div class="bd"> <ol> <li><strong>Create it.</strong> <code>JFrame gui = new JFrame();</code> &mdash; the window exists as an object, but nothing is on the screen yet.</li> <li><strong>Size it.</strong> <code>gui.setSize(width, height);</code> &mdash; width first, then height, both in pixels. A frame you never size has width and height of zero.</li> <li><strong>Show it.</strong> <code>gui.setVisible(true);</code> &mdash; this is the line that makes the window appear. Nothing you do before it is visible to the user; everything after it happens to a window already on the screen.</li> </ol> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; a window in four lines</span></div> <div class="bd"> <p>This is the smallest useful Swing program there is. Read it and notice what is <em>not</em> there: no <code>println</code>, no loop, no <code>return</code>, and nothing that looks like it keeps the program alive.</p> <p class="filename">Example1.java</p>
+<pre><code class="language-java">import javax.swing.JFrame;
+
+public class Example1 {
+   public static void main(String args[]) {
+      JFrame gui = new JFrame();     // Create a new JFrame window
+      gui.setSize(500, 600);         // Set window dimensions (width, height)
+      gui.setVisible(true);          // Make the window visible
+   }
+}</code></pre> <p>Before you open the toggle, answer two questions on paper. What does the window look like? And once <code>main</code> reaches its closing brace, does the program end?</p> <details class="soln reveal noout"><summary></summary><div class="ans">
+ <p>A blank window appears, 500 pixels wide and 600 pixels tall, positioned at the top-left corner of the screen. Its title bar is empty, because we never called <code>setTitle</code>. The inside is a plain empty area in whatever the default background color of your system is. The exact look of the title bar and its buttons is drawn by your operating system, so a Mac, a Windows machine and a Linux desktop each decorate the same frame differently.</p> <p class="filename">What the window looks like &mdash; a sketch, not a screenshot</p>
+<pre class="cmp"><code>+-------------------------------------------------+
+|                                     _   []   X  |   &lt;- title bar, title is empty
++-------------------------------------------------+
+|                                                 |
+|                                                 |
+|                                                 |
+|            (empty content area)                 |
+|                                                 |
+|                                                 |
+|                                                 |
+|                                                 |
++-------------------------------------------------+
+ |&lt;------------- 500 pixels wide ---------------&gt;|
+               600 pixels tall</code></pre> <p><strong>And no, the program does not end.</strong> <code>main</code> finishes and returns immediately, but the program keeps running and the window stays on the screen. This is the first genuinely new thing in the lecture. Calling <code>setVisible(true)</code> caused Java to start another thread &mdash; the <em>event dispatch thread</em> &mdash; whose whole job is to sit in a loop waiting for mouse clicks and key presses and to deliver them to your components. A Java program does not exit while a non-daemon thread like that is still alive, so the program outlives <code>main</code>.</p> <p>That single sentence is all you need about the event dispatch thread today. It matters for one practical reason: everything that touches a Swing component after the window is showing runs on that thread, which is why a slow calculation inside a button handler freezes the whole interface. We come back to threads properly in Lecture 23.</p> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Warning<span class="tag">&mdash; running a GUI program where there is no screen</span></div> <div class="bd"> <p>A Swing program needs a display. If you run one over a plain SSH connection, or inside a server or container with no graphical environment, <code>new JFrame()</code> cannot succeed and Java tells you so at that exact line:</p> <pre class="out"><code>Exception in thread "main" java.awt.HeadlessException:
+No X11 DISPLAY variable was set,
+or no headful library support was found,
+but this program performed an operation which requires it.
+	at java.desktop/java.awt.GraphicsEnvironment.checkHeadless(GraphicsEnvironment.java:164)
+	at java.desktop/java.awt.Window.&lt;init&gt;(Window.java:553)
+	at java.desktop/java.awt.Frame.&lt;init&gt;(Frame.java:428)
+	at java.desktop/java.awt.Frame.&lt;init&gt;(Frame.java:393)
+	at java.desktop/javax.swing.JFrame.&lt;init&gt;(JFrame.java:180)
+	at Example1.main(Example1.java:5)</code></pre> <p>Read the bottom of the stack trace upward and it tells you the whole story: <code>Example1.main</code> called the <code>JFrame</code> constructor, which called the <code>Frame</code> constructor, which called the <code>Window</code> constructor, which asked "is there a screen?" and gave up. This is not a bug in your code. Run the same class on your own laptop and the window appears. It is worth seeing once so that you recognise the word <em>headless</em> when it turns up.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 15.3</div> <div class="bd"> <p>Each of these is a variation on <code>Example1</code>. Say what the user sees.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> You delete the line <code>gui.setVisible(true);</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p>Nothing appears at all, and the program ends immediately. The <code>JFrame</code> object was created in memory and sized, but a window that is never made visible is never shown and never becomes <em>displayable</em>, so no event dispatch thread starts. <code>main</code> returns and the JVM has nothing left to do.</p> <p>This is the single most common "my GUI does not work" bug, and it produces no error message of any kind &mdash; which is exactly what makes it hard.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> You delete the line <code>gui.setSize(500, 600);</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p>A window does appear, but it has width 0 and height 0. On most systems you get a tiny stub in the corner of the screen &mdash; sometimes just the title bar and its buttons, sometimes almost nothing you can see or click. The program is running perfectly; it simply drew a window with no area.</p> <p>Later you will meet <code>pack()</code>, which sizes a frame automatically to just fit whatever is inside it. Until then, always call <code>setSize</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> You swap the last two lines, so <code>setVisible(true)</code> comes before <code>setSize(500, 600)</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p>You end up with the same 500 by 600 window, because <code>setSize</code> works on a visible window too &mdash; it just resizes it. On a fast machine you would not notice, though in principle the window flashes at its zero size first and is then resized.</p> <p><strong>Things to notice across all three parts.</strong> <code>setVisible(true)</code> is a switch, not a "finish and display" command. The window is a live object the whole time, and every method you call on it applies immediately, whether it is on the screen or not. The convention of setting everything up first and calling <code>setVisible(true)</code> last exists so that the user never sees a half-built window &mdash; not because Java requires it.</p> </div></details> </div> </div> </div> <h2 id="s4"><span class="num">4.</span>Closing the window</h2> <p>Run <code>Example1</code>, click the close box in the corner of the window, and something odd happens. The window disappears &mdash; and the program is still running. On most systems you will find it still listed in your task manager, or your IDE will still be showing a red stop button. Nothing you did was wrong; that is Swing's default behavior, and it is a deliberate one.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; setDefaultCloseOperation</span></div> <div class="bd"> <p><code>setDefaultCloseOperation(int operation)</code> tells a <code>JFrame</code> what to do when the user clicks its close box. There are four constants, all inherited into <code>JFrame</code>:</p> <table> <tr><th>Constant</th><th>Value</th><th>What happens on close</th></tr> <tr><td><code>JFrame.DO_NOTHING_ON_CLOSE</code></td><td>0</td><td>Nothing. The window stays. Use this when a listener of yours will decide.</td></tr> <tr><td><code>JFrame.HIDE_ON_CLOSE</code></td><td>1</td><td>The window is hidden but not destroyed. <strong>This is the default.</strong></td></tr> <tr><td><code>JFrame.DISPOSE_ON_CLOSE</code></td><td>2</td><td>The window is hidden and its screen resources are released.</td></tr> <tr><td><code>JFrame.EXIT_ON_CLOSE</code></td><td>3</td><td>The whole application exits, as if you had called <code>System.exit(0)</code>.</td></tr> </table> </div> </div> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; why hiding is not stopping</span></div> <div class="bd"> <p>The default is <code>HIDE_ON_CLOSE</code> because Swing cannot know whether your one visible window <em>is</em> your application. A real program may have five windows open, or may want to ask "save your changes?" first. So Swing does the only safe thing: it takes the window off the screen and leaves your program alive to decide what that meant.</p> <p>A hidden window is still a live, displayable object, so the event dispatch thread keeps running, so the JVM never exits. That is the whole explanation for the program that will not die.</p> </div> </div> <p>The fix is one line, and it belongs in every window you write from now on:</p> <p class="filename">CloseDemo.java</p>
+<pre><code class="language-java">import javax.swing.JFrame;
+import javax.swing.JLabel;
+
+public class CloseDemo extends JFrame {
+   public CloseDemo() {
+      super("Close Demo");
+      setSize(300, 200);
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      getContentPane().add(new JLabel("  Close me and the program really stops."));
+   }
+
+   public static void main(String args[]) {
+      CloseDemo gui = new CloseDemo();
+      gui.setVisible(true);
+   }
+}</code></pre> <p>Two details in there are new and are explained properly in &sect;5 and &sect;6: the class <code>extends JFrame</code> and sets itself up in its own constructor, and <code>super("Close Demo")</code> passes a title straight to the <code>JFrame</code> constructor. Everything else you have already seen.</p> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; EXIT_ON_CLOSE is a sledgehammer</span></div> <div class="bd"> <p><code>EXIT_ON_CLOSE</code> ends the entire JVM. In a program with one window that is exactly right. In a program with three windows open, closing any one of them kills the other two without warning. If you want a window to close and the rest of the program to survive, use <code>DISPOSE_ON_CLOSE</code> instead &mdash; and note that once the last displayable window has been disposed, the event dispatch thread finishes and the program ends on its own.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 15.4</div> <div class="bd"> <p>A student writes a <code>JFrame</code> program, runs it from the command line, clicks the close box, and gets their shell prompt back. Their friend writes what looks like the same program, clicks the close box, and the terminal just sits there until they press Ctrl-C. Give one plausible difference between the two programs.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The window vanished in both cases, so the difference is not about showing or hiding &mdash; it is about whether anything was left alive afterwards.</p> <p>The first student called <code>setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</code> (or <code>DISPOSE_ON_CLOSE</code> on their only window, which amounts to the same thing here). The second student left it out, so the default <code>HIDE_ON_CLOSE</code> applied: the window was hidden but never destroyed, it is still displayable, the event dispatch thread is still looping, and the JVM will not exit.</p> <p>A second plausible answer that is just as good: the first student registered a <code>WindowListener</code> whose <code>windowClosing</code> method calls <code>System.exit(0)</code>. That is the older technique, and it is what your instructor's <code>WindowDestroyer</code> class does &mdash; we build it in &sect;8.</p> <p><strong>Things to notice.</strong> "The window went away" and "the program stopped" are two completely separate events in Swing, and the whole point of <code>setDefaultCloseOperation</code> is that you choose the relationship between them. Get in the habit of asking, for any window you write: what should happen to the <em>program</em> when the user closes <em>this</em> window?</p> </div></details> </div> </div> <h2 id="s5"><span class="num">5.</span>The normal pattern: a class that extends JFrame</h2> <p><code>Example1</code> builds its window out in the open, inside <code>main</code>. That is fine for four lines. It stops being fine the moment the window has a title, a background color, three labels, two buttons and a listener &mdash; because then <code>main</code> is forty lines long, and if you want a second window just like it you have to copy all forty.</p> <p>So there are two ways to use <code>JFrame</code>, and only one of them scales.</p> <table> <tr><th></th><th>Instantiate a <code>JFrame</code> (<code>Example1</code>)</th><th>Extend <code>JFrame</code> (<code>FirstWindow</code>)</th></tr> <tr><td>Declaration</td><td><code>JFrame gui = new JFrame();</code></td><td><code>public class FirstWindow extends JFrame</code></td></tr> <tr><td>Where the setup code lives</td><td>In <code>main</code>, calling methods <em>on</em> <code>gui</code></td><td>In the constructor, calling methods on <em>itself</em></td></tr> <tr><td>Making a second one</td><td>Copy every line again</td><td><code>new FirstWindow()</code></td></tr> <tr><td>Adding your own fields and methods</td><td>Impossible &mdash; <code>JFrame</code> is not yours</td><td>Normal inheritance</td></tr> <tr><td>Used for</td><td>A throwaway demo</td><td>Every real program, and every exam question</td></tr> </table> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; "is a window" versus "has a window"</span></div> <div class="bd"> <p>Writing <code>class FirstWindow extends JFrame</code> says <em>a FirstWindow is a kind of window</em>. Everything you learned about inheritance in Lecture 12 applies unchanged: <code>FirstWindow</code> inherits <code>setSize</code>, <code>setTitle</code>, <code>setVisible</code>, <code>getContentPane</code> and about three hundred other methods, and inside the constructor you call them with no receiver at all &mdash; <code>setSize(WIDTH, HEIGHT);</code> means <code>this.setSize(WIDTH, HEIGHT);</code>.</p> <p>That dropped <code>this.</code> is what confuses people most on first reading. There is no object named <code>gui</code> any more. The object is the one being constructed.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; FirstWindow, and two of them at once</span></div> <div class="bd"> <p>Here is the pattern in full. Two files: one class that <em>is</em> the window, and one tiny class whose <code>main</code> creates it. Read the constructor line by line and notice that every method call in it is an inherited <code>JFrame</code> method being called on <code>this</code>.</p> <p class="filename">FirstWindow.java</p>
+<pre><code class="language-java">import javax.swing.JFrame;
+import javax.swing.JLabel;
+
+public class FirstWindow extends JFrame {
+   public static final int WIDTH = 300;
+   public static final int HEIGHT = 200;
+
+   public FirstWindow() {
+      super();                      // Call the JFrame constructor
+      setSize(WIDTH, HEIGHT);       // Set window size
+
+      // Add content to the window
+      JLabel myLabel = new JLabel("Please don't click that button!");
+      getContentPane().add(myLabel);
+
+      // Add a window listener for the close button
+      WindowDestroyer listener = new WindowDestroyer();
+      addWindowListener(listener);
+   }
+}</code></pre> <p class="filename">FirstWindowDemo.java</p>
+<pre><code class="language-java">public class FirstWindowDemo {
+   public static void main(String args[]) {
+      FirstWindow window1 = new FirstWindow();
+      window1.setVisible(true);
+
+      FirstWindow window2 = new FirstWindow();
+      window2.setVisible(true);
+   }
+}</code></pre> <p><code>WindowDestroyer</code> is the class we write in &sect;8; for now, take it on trust that it is a listener that ends the program when the window is closed. Before you reveal: how many windows appear, and where is the label's text inside each one?</p> <details class="soln reveal noout"><summary></summary><div class="ans">
+ <p><strong>Two</strong> windows appear, each 300 pixels wide and 200 tall, each with an empty title bar (<code>FirstWindow</code> never calls <code>setTitle</code>), each showing the text <em>Please don't click that button!</em>. They land on top of one another at the top-left corner of the screen, because neither one was told where to go &mdash; so at first glance it looks like one window, and you have to drag the top one aside to find the second.</p> <p>The label's text sits at the <strong>left edge, vertically centered</strong>. That is worth knowing precisely, because it surprises everybody who expects it in the middle. Two separate rules combine to produce it, and both are explained in &sect;6.</p> <p class="filename">What each window looks like &mdash; a sketch, not a screenshot</p>
+<pre class="cmp"><code>+-------------------------------------------+
+|                             _   []   X    |  &lt;- empty title
++-------------------------------------------+
+|                                           |
+|                                           |
+|Please don't click that button!            |  &lt;- text is left-aligned,
+|                                           |     vertically centered
+|                                           |
++-------------------------------------------+
+ |&lt;---------- 300 pixels wide ------------&gt;|
+             200 pixels tall</code></pre> <p><strong>Two design points to take away.</strong></p> <ul> <li><strong><code>WIDTH</code> and <code>HEIGHT</code> are <code>public static final int</code>.</strong> They are constants belonging to the class, not to any one window, which is exactly what <code>static</code> meant in Lecture 9. Any other code can write <code>FirstWindow.WIDTH</code> to find out how wide these windows are, and there is one place to change if you want them bigger.</li> <li><strong><code>super();</code> is optional here and written anyway.</strong> Java inserts a call to the no-argument superclass constructor automatically if you do not write one, so this line changes nothing. It is there for the reader: it says out loud "a <code>JFrame</code> is being built first, and then I customise it". If you wanted a title you would write <code>super("First Window");</code> instead, calling the <code>JFrame(String)</code> constructor &mdash; and then it would not be optional.</li> </ul> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 15.5</div> <div class="bd"> <p>Rewrite <code>Example1</code> &mdash; the 500 by 600 blank window from &sect;3 &mdash; using the <code>extends JFrame</code> pattern instead. Put the size in two named constants, do the setup in a constructor, and keep <code>main</code> down to two lines. Call the class <code>BigWindow</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Move each line of the old <code>main</code> into the right home. The <code>new JFrame()</code> disappears entirely &mdash; the object being constructed <em>is</em> the frame. <code>setSize</code> moves into the constructor and loses its <code>gui.</code> prefix. <code>setVisible(true)</code> stays in <code>main</code>, because a constructor should build an object, not display it. That separation is the convention every exam answer follows: <em>the constructor sets the window up; <code>main</code> shows it.</em></p> <p class="filename">BigWindow.java</p>
+<pre><code class="language-java">import javax.swing.JFrame;
+
+public class BigWindow extends JFrame {
+   public static final int WIDTH = 500;
+   public static final int HEIGHT = 600;
+
+   public BigWindow() {
+      super();
+      setSize(WIDTH, HEIGHT);
+   }
+
+   public static void main(String args[]) {
+      BigWindow gui = new BigWindow();
+      gui.setVisible(true);
+   }
+}</code></pre> <p><strong>Things to notice.</strong> <code>main</code> can live inside <code>BigWindow</code> itself, as it does here, or in a separate demo class the way <code>FirstWindowDemo</code> does. Both are common; her <code>SecondWindow</code> in &sect;6 puts <code>main</code> inside the window class, and the exam questions do too. Keeping <code>main</code> out of the window class is slightly cleaner design, because a class that <em>is</em> a window arguably should not also be a program, but nothing breaks either way.</p> <p>Notice also what did <em>not</em> move: <code>setVisible(true)</code>. Putting it at the end of the constructor would work, and you will see code that does it &mdash; but then the window appears the instant you write <code>new BigWindow()</code>, which makes it impossible to build a window now and show it later.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 15.5</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="12" aria-label="Live coding - Quick Check 15.5">import javax.swing.JFrame;
+
+public class BigWindow extends JFrame {
+    // 1. Two public static final int constants: WIDTH 500, HEIGHT 600.
+
+    // 2. A constructor that calls super() and sizes the window.
+
+    // 3. A main that creates a BigWindow and makes it visible.
+
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 15.6</div> <div class="bd"> <p>Inside the <code>FirstWindow</code> constructor the line is <code>setSize(WIDTH, HEIGHT);</code> with no object in front of it. In <code>Example1</code> the same call was <code>gui.setSize(500, 600);</code>.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Which object is being resized by the call in the constructor, and where is <code>setSize</code> defined?</p> <details class="soln"><summary></summary><div class="ans"> <p>The object being constructed &mdash; <code>this</code>. A call with no receiver is shorthand for <code>this.setSize(WIDTH, HEIGHT);</code>. <code>setSize</code> is not defined in <code>FirstWindow</code> at all; it is inherited, ultimately from <code>java.awt.Component</code>, through <code>JFrame</code>. Inheritance means <code>FirstWindow</code> has it just as surely as if you had typed it.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Could you write <code>gui.setSize(...)</code> inside the constructor instead?</p> <details class="soln"><summary></summary><div class="ans"> <p>No &mdash; there is no variable called <code>gui</code> anywhere in <code>FirstWindow</code>. That name only existed in <code>Example1</code>'s <code>main</code>. This is the mental switch the pattern demands: you stop holding a window in a variable and start <em>being</em> one.</p> <p><strong>Things to notice across both parts.</strong> If you ever genuinely need to refer to the window as an object from inside its own constructor &mdash; and you will, in &sect;7, when a listener needs to know which window it belongs to &mdash; the word is <code>this</code>. <code>addWindowListener(this);</code> is a perfectly ordinary line in a class that is both a window and its own listener, and it is exactly what the exam questions ask you to write.</p> </div></details> </div> </div> </div> <h2 id="s6"><span class="num">6.</span>The content pane: putting something in the window</h2> <p>You cannot add a component straight to a <code>JFrame</code>. Underneath the frame's decorations there are several layers &mdash; a place for a menu bar, a glass pane for overlays &mdash; and the one you want has a name.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; the content pane</span></div> <div class="bd"> <p>The <strong>content pane</strong> is the container inside a <code>JFrame</code> where components are added. You get it by calling <code>getContentPane()</code>, which returns a <code>java.awt.Container</code>, and then you call <code>add</code> on that:</p> <pre><code class="language-java">JLabel label = new JLabel("Hello, World!");
+getContentPane().add(label);</code></pre> <p>You can also keep it in a variable, which is tidier when you are going to use it more than once:</p> <pre><code class="language-java">Container contentPane = getContentPane();
+contentPane.add(label);
+contentPane.setBackground(Color.BLUE);</code></pre> </div> </div> <p>Here are the <code>JFrame</code> methods worth memorising. Everything in this lecture and the next four is built out of them.</p> <table> <tr><th>Method</th><th>What it does</th></tr> <tr><td><code>setSize(width, height)</code></td><td>Sets the dimensions of the frame, in pixels.</td></tr> <tr><td><code>setVisible(boolean)</code></td><td>Shows or hides the frame.</td></tr> <tr><td><code>setTitle(String)</code></td><td>Sets the text displayed in the frame's title bar.</td></tr> <tr><td><code>getContentPane()</code></td><td>Returns the content pane, where components are added.</td></tr> <tr><td><code>setDefaultCloseOperation(int)</code></td><td>Says what the close box should do.</td></tr> <tr><td><code>addWindowListener(WindowListener)</code></td><td>Registers a window event listener.</td></tr> </table> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; SecondWindow: a title, a color, two constructors</span></div> <div class="bd"> <p>This is <code>FirstWindow</code> with three additions: a title, a background color, and a second constructor that lets the caller choose the color. Notice that both constructors do almost exactly the same work &mdash; that duplication is a real design smell, and we will come back to it after you reveal.</p> <p class="filename">SecondWindow.java</p>
+<pre><code class="language-java">import java.awt.Color;
+import java.awt.Container;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
+public class SecondWindow extends JFrame {
+   public static final int WIDTH = 300;
+   public static final int HEIGHT = 200;
+
+   public SecondWindow() {
+      super();
+      setSize(WIDTH, HEIGHT);
+      Container contentPane = getContentPane();
+      JLabel myLabel = new JLabel("Now available in color!");
+      setTitle("Second Window");              // Set the window title
+      contentPane.add(myLabel);
+      contentPane.setBackground(Color.BLUE);  // Set the background color
+      addWindowListener(new WindowDestroyer());
+   }
+
+   public SecondWindow(Color customColor) {
+      super();
+      setSize(WIDTH, HEIGHT);
+      Container contentPane = getContentPane();
+      JLabel myLabel = new JLabel("Now available in color!");
+      setTitle("Second Window");
+      contentPane.add(myLabel);
+      contentPane.setBackground(customColor); // Use a custom color
+      addWindowListener(new WindowDestroyer());
+   }
+
+   public static void main(String args[]) {
+      SecondWindow window1 = new SecondWindow();
+      window1.setVisible(true);
+
+      SecondWindow window2 = new SecondWindow(Color.PINK);
+      window2.setVisible(true);
+   }
+}</code></pre> <p>Before you reveal: two windows again. What is different about them, and what is the same? And where exactly does the text appear this time?</p> <details class="soln reveal noout"><summary></summary><div class="ans">
+ <p>Two windows, both 300 by 200, both titled <em>Second Window</em>, both showing <em>Now available in color!</em> at the left edge, vertically centered. The first has a blue interior; the second is pink. They overlap at the top-left corner of the screen, so you have to drag one aside to see both.</p> <p class="filename">What the first window looks like &mdash; a sketch, not a screenshot</p>
+<pre class="cmp"><code>+-------------------------------------------+
+| Second Window               _   []   X    |  &lt;- setTitle put this here
++-------------------------------------------+
+|###########################################|
+|###########################################|
+|#Now available in color!####################|  &lt;- white text would be
+|###########################################|     invisible; the label
+|###########################################|     text is drawn in black
++-------------------------------------------+
+    # = blue, from contentPane.setBackground(Color.BLUE)</code></pre> <p><strong>Why the text is at the left, and why the color shows through.</strong> Two separate rules, and this is the place to learn both.</p> <ol> <li>A frame's content pane starts out using a <strong><code>BorderLayout</code></strong>. Adding a single component with no further instructions puts it in the center region, and <code>BorderLayout</code> stretches whatever is in the center to fill all the available space. So the <code>JLabel</code> really does occupy the entire content pane &mdash; it is 300 pixels wide.</li> <li>A <code>JLabel</code> draws its <em>text</em> at its leading edge horizontally and centered vertically by default. So the label fills the pane, but the words sit at the label's left edge, halfway down. That is why the text is neither centered nor in the corner.</li> </ol> <p>And the background is visible because a <code>JLabel</code> is <em>not opaque</em> by default: it paints its text and lets whatever is behind it show through. Had you called <code>myLabel.setOpaque(true)</code> and given the label its own background, you would see a colored rectangle exactly the size of the pane instead.</p> <p>Layout managers are the entire subject of the next lecture. Today all you need is the consequence: <em>a lone component added to a content pane fills it.</em></p> <p><strong>The duplication.</strong> Those two constructors are identical except for one argument. The clean fix is the one from Lecture 7 &mdash; have the no-argument constructor call the other one:</p> <pre><code class="language-java">public SecondWindow() {
+   this(Color.BLUE);     // delegate to the constructor below
+}
+
+public SecondWindow(Color customColor) {
+   super();
+   setSize(WIDTH, HEIGHT);
+   Container contentPane = getContentPane();
+   JLabel myLabel = new JLabel("Now available in color!");
+   setTitle("Second Window");
+   contentPane.add(myLabel);
+   contentPane.setBackground(customColor);
+   addWindowListener(new WindowDestroyer());
+}</code></pre> <p><code>this(...)</code> calls another constructor of the same class and, like <code>super(...)</code>, must be the very first statement. Nineteen lines become nine, and a change to the window now has one place to happen instead of two.</p> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; setBackground on the frame</span></div> <div class="bd"> <p><code>setBackground(Color.BLUE);</code> inside a <code>JFrame</code> subclass compiles perfectly &mdash; <code>JFrame</code> inherits <code>setBackground</code> from <code>Component</code> &mdash; and then nothing changes on screen. The frame's own background is completely covered by its content pane, so you never see it. The color has to go on the thing that is actually visible:</p> <pre><code class="language-java">getContentPane().setBackground(Color.BLUE);     // right</code></pre> <p>This is a compile-clean, error-free, silently-wrong bug, which is the worst kind. When a color does not appear, the first question is always <em>which component am I actually painting?</em></p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 15.7</div> <div class="bd"> <p>Write a complete class <code>StudentInfo</code> that <code>extends JFrame</code> and produces a window 400 pixels by 120, titled <em>Student Info</em>, with a yellow interior and a label reading <code>CSCI 212 - Object-Oriented Programming in Java</code>. Clicking the close box must end the program. Include a <code>main</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> This is <code>SecondWindow</code> with different values, plus the close-operation line from &sect;4 instead of a listener. Work through the checklist: class header, two constants, constructor calling <code>super()</code>, <code>setTitle</code>, <code>setSize</code>, <code>setDefaultCloseOperation</code>, get the content pane, set its background, add a label, and a two-line <code>main</code>. Imports: <code>JFrame</code> and <code>JLabel</code> from <code>javax.swing</code>, <code>Color</code> and <code>Container</code> from <code>java.awt</code>.</p> <p class="filename">StudentInfo.java</p>
+<pre><code class="language-java">import java.awt.Color;
+import java.awt.Container;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
+public class StudentInfo extends JFrame {
+   public static final int WIDTH = 400;
+   public static final int HEIGHT = 120;
+
+   public StudentInfo() {
+      super();
+      setTitle("Student Info");
+      setSize(WIDTH, HEIGHT);
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+      Container contentPane = getContentPane();
+      contentPane.setBackground(Color.YELLOW);
+      contentPane.add(new JLabel("  CSCI 212 - Object-Oriented Programming in Java"));
+   }
+
+   public static void main(String args[]) {
+      StudentInfo gui = new StudentInfo();
+      gui.setVisible(true);
+   }
+}</code></pre> <p><strong>Things to notice.</strong> The two leading spaces in the label text are a cheap trick to stop the words touching the left edge of the window, and you will see it in real code. The proper fixes &mdash; a border, or a layout manager that leaves a margin &mdash; arrive in the next two lectures.</p> <p><code>setTitle("Student Info")</code> and <code>super("Student Info")</code> do the same job; you may use either, but not both. <code>super(...)</code> must be the first statement in the constructor, so if you want the title set there it goes on line one.</p> <p>Compare the label text with what happens if you widen the window: the label stretches with it, because it is in the center of a <code>BorderLayout</code>, but the words stay pinned to the left. Resizing the window is a good way to see the difference between where a component <em>is</em> and where its text is <em>drawn</em>.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 15.7</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="22" aria-label="Live coding - Quick Check 15.7">import java.awt.Color;
+import java.awt.Container;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
+public class StudentInfo extends JFrame {
+    // 1. Constants: WIDTH 400, HEIGHT 120.
+
+    public StudentInfo() {
+        super();
+        // 2. Title "Student Info", size, EXIT_ON_CLOSE.
+
+        // 3. Get the content pane, make it yellow, add the label.
+
+    }
+
+    // 4. main: build one and show it.
+
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 15.8</div> <div class="bd"> <p><code>FirstWindowDemo</code> creates two <code>FirstWindow</code> objects, and each one registers its own <code>WindowDestroyer</code>, which calls <code>System.exit(0)</code>. The user closes one of the two windows. What happens to the other?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Follow the call. Closing window 1 fires a window event, which is delivered to window 1's listener, which calls <code>System.exit(0)</code>.</p> <p><strong>Both windows disappear and the whole program ends.</strong> <code>System.exit(0)</code> does not close a window &mdash; it shuts down the entire JVM. It does not matter that window 2 was never touched, or that it has its own separate listener object; there is one JVM and it is gone.</p> <p>To close only the window the user actually clicked, ask the event which window it came from:</p> <p class="filename">WindowCloser.java</p>
+<pre><code class="language-java">import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+public class WindowCloser extends WindowAdapter {
+   public void windowClosing(WindowEvent e) {
+      e.getWindow().dispose();   // close only the window that fired the event
+   }
+}</code></pre> <p><strong>Things to notice.</strong> This is the first time the <code>WindowEvent</code> parameter has been used for anything. Up to now <code>e</code> has been ignored, and it looked like decoration. It is not: <code>e.getWindow()</code> tells the listener <em>which</em> window this event came from, which is exactly what lets a single listener object serve several windows.</p> <p>With <code>dispose()</code>, closing one window leaves the other running. Close the second one too and the program ends by itself &mdash; once the last displayable window is disposed there is nothing left for the event dispatch thread to do, and the JVM exits. So you get the behavior most people actually want, without ever calling <code>System.exit</code>.</p> </div></details> </div> </div> <h2 id="s7"><span class="num">7.</span>The event model: source, event, listener</h2> <p>Now the part that makes GUIs work, and the part that makes Lecture 14 worth having sat through.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; event, event source, listener</span></div> <div class="bd"> <p>An <strong>event</strong> is an object that represents an action &mdash; a button click, a key press, a request to close a window. It is a real Java object of a real class, such as <code>WindowEvent</code> or <code>ActionEvent</code>, and it carries information about what happened.</p> <p>The <strong>event source</strong> is the component the action happened to: the button that was clicked, the window whose close box was pressed. A source <em>fires</em> events.</p> <p>A <strong>listener</strong> is an object that has agreed to be told when those events happen. A listener class implements a <em>listener interface</em> &mdash; <code>WindowListener</code>, <code>ActionListener</code> &mdash; and the interface's methods are the ones the source will call.</p> <p><strong>Registration</strong> connects the two: <code>addWindowListener(listener)</code> tells the frame "when you fire a window event, call this object".</p> </div> </div> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; the event flow, in four steps</span></div> <div class="bd"> <ol> <li>The user interacts with a GUI component.</li> <li>The component <em>fires</em> an event &mdash; it constructs an event object describing what happened.</li> <li>The event is passed to every registered event listener.</li> <li>The listener's event-handling method processes the event.</li> </ol> </div> </div> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; this is why interfaces exist</span></div> <div class="bd"> <p>The people who wrote <code>JFrame</code> in 1998 needed to call a method in a class you had not written yet. They could not know its name, its package, or what else it does. What they could do was publish a <em>list of method headers</em> &mdash; <code>windowClosing(WindowEvent)</code> and six others &mdash; and require that anything you hand to <code>addWindowListener</code> implements that list.</p> <p>That is an <strong>interface</strong>, and this is what interfaces are <em>for</em>. In Lecture 14 an interface was a way to promise behavior. Here it is a way for library code written twenty-five years ago to call code you write this afternoon. <code>addWindowListener</code> takes a parameter of type <code>WindowListener</code>, and by Lecture 13's rules your <code>WindowDestroyer</code> object can be passed for it, and dynamic binding sends the call to <em>your</em> body.</p> </div> </div> <p>Put the three roles against the concrete example and the whole mechanism fits in one table:</p> <table> <tr><th>Role</th><th>In <code>FirstWindow</code></th><th>What it is</th></tr> <tr><td>Event source</td><td>The <code>FirstWindow</code> object</td><td>A <code>JFrame</code>, which knows how to fire window events</td></tr> <tr><td>Event object</td><td>The <code>WindowEvent</code> handed to <code>windowClosing</code></td><td>An object describing what happened; <code>e.getWindow()</code> says where</td></tr> <tr><td>Listener interface</td><td><code>WindowListener</code></td><td>Seven method headers, no bodies</td></tr> <tr><td>Listener object</td><td>The <code>WindowDestroyer</code></td><td>Your class, implementing that interface</td></tr> <tr><td>Registration</td><td><code>addWindowListener(listener)</code></td><td>The line that connects source to listener</td></tr> </table> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; writing the listener but never registering it</span></div> <div class="bd"> <p>A listener class that is never passed to <code>addWindowListener</code> (or <code>addActionListener</code>) does absolutely nothing. It compiles, it is correct, and it is never called, because nothing ever told the source it existed. When a button "does not work", the first thing to check is not the handler &mdash; it is whether the registration line is there.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 15.9</div> <div class="bd"> <p>A program has a window whose close box, when clicked, should print <code>Goodbye</code> and then quit. Identify each of the following, by name where the name exists.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> The event source.</p> <details class="soln"><summary></summary><div class="ans"> <p>The window itself &mdash; the <code>JFrame</code> (or your subclass of it). The source is always the component the user acted on.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> The event object, and its class.</p> <details class="soln"><summary></summary><div class="ans"> <p>A <code>WindowEvent</code>, from <code>java.awt.event</code>, created by the frame at the moment of the click and passed as the argument <code>e</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> The listener interface, and the one method that has to contain your <code>Goodbye</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p>The interface is <code>WindowListener</code>, and the method is <code>public void windowClosing(WindowEvent e)</code>. That is the method fired when the user <em>requests</em> a close, which is the moment you want &mdash; not <code>windowClosed</code>, which is fired after the window has already gone.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> The line that connects (a) to (c), and where in the program it goes.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>addWindowListener(new Goodbyer());</code> (or whatever you called the class), written inside the frame's constructor. It is a method on the source, and its argument is the listener.</p> <p><strong>Things to notice across all four parts.</strong> Every event in Swing has the same four pieces, and once you can name them for windows you can name them for buttons without being taught: the source is a <code>JButton</code>, the event object is an <code>ActionEvent</code>, the interface is <code>ActionListener</code> with its single method <code>actionPerformed(ActionEvent e)</code>, and the registration is <code>addActionListener(...)</code>. That is next lecture, and it will feel like revision.</p> </div></details> </div> </div> </div> <h2 id="s8"><span class="num">8.</span>WindowListener, all seven methods, and WindowAdapter</h2> <p>So a listener implements an interface. Let us actually do it, without shortcuts, and see what it costs.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; WindowListener</span></div> <div class="bd"> <p><strong><code>WindowListener</code></strong> is an interface in the <code>java.awt.event</code> package containing <strong>seven</strong> abstract methods, one for each thing that can happen to a window. Each of them receives a <code>WindowEvent</code> describing the event:</p> <table> <tr><th>Method</th><th>Fired when</th></tr> <tr><td><code>windowOpened(WindowEvent)</code></td><td>the window is made visible for the first time</td></tr> <tr><td><code>windowClosing(WindowEvent)</code></td><td>the user <em>asks</em> to close it (the close box)</td></tr> <tr><td><code>windowClosed(WindowEvent)</code></td><td>the window has been disposed of</td></tr> <tr><td><code>windowIconified(WindowEvent)</code></td><td>the window is minimised</td></tr> <tr><td><code>windowDeiconified(WindowEvent)</code></td><td>the window is restored from minimised</td></tr> <tr><td><code>windowActivated(WindowEvent)</code></td><td>the window becomes the active one</td></tr> <tr><td><code>windowDeactivated(WindowEvent)</code></td><td>the window stops being the active one</td></tr> </table> <p><strong>Any class directly implementing <code>WindowListener</code> must provide implementations for all seven.</strong> That is not a Swing rule, it is the plain rule about interfaces from Lecture 14: implementing an interface means implementing every method on it.</p> </div> </div> <p>Try it the honest way. You want a class that quits the program when the window closes, so you write the method you care about:</p> <p class="filename">WindowDestroyer.java</p>
+<pre><code class="language-java">import java.awt.event.WindowListener;
+import java.awt.event.WindowEvent;
+
+public class WindowDestroyer implements WindowListener {
+   public void windowClosing(WindowEvent e) {
+      System.exit(0);
+   }
+}</code></pre> <p>And <code>javac</code> refuses:</p> <pre class="err"><code>WindowDestroyer.java:4: error: WindowDestroyer is not abstract and does not override abstract method windowDeactivated(WindowEvent) in WindowListener
+public class WindowDestroyer implements WindowListener {
+       ^
+1 error</code></pre> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; read that error carefully</span></div> <div class="bd"> <p>It names only one missing method, <code>windowDeactivated</code>, because the compiler stops at the first one it notices. Six are missing. And notice the phrase <em>is not abstract</em>: the compiler is telling you your two legal options. Either implement everything, or declare the class <code>abstract</code> and let a subclass finish the job. This is exactly the error from Lecture 14 &mdash; the same message you got when a concrete subclass forgot to override an abstract method &mdash; and it is worth recognising it here so that GUIs feel like a continuation rather than a new subject.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the long way, then the short way</span></div> <div class="bd"> <p>First, an honest implementation of all seven methods. To make it observable, each one announces itself rather than doing something invisible.</p> <p class="filename">NoisyListener.java</p>
+<pre><code class="language-java">import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+
+public class NoisyListener implements WindowListener {
+   public void windowOpened(WindowEvent e)      { System.out.println("windowOpened"); }
+   public void windowClosing(WindowEvent e)     { System.out.println("windowClosing"); }
+   public void windowClosed(WindowEvent e)      { System.out.println("windowClosed"); }
+   public void windowIconified(WindowEvent e)   { System.out.println("windowIconified"); }
+   public void windowDeiconified(WindowEvent e) { System.out.println("windowDeiconified"); }
+   public void windowActivated(WindowEvent e)   { System.out.println("windowActivated"); }
+   public void windowDeactivated(WindowEvent e) { System.out.println("windowDeactivated"); }
+}</code></pre> <p>A listener is an ordinary object, so you do not need a window to try one out. This driver creates the listener and calls its seven methods itself, in the order a real session might produce them. Passing <code>null</code> is safe here only because none of the methods looks at <code>e</code>.</p> <p class="filename">ListenerProbe.java</p>
+<pre><code class="language-java">import java.awt.event.WindowListener;
+
+public class ListenerProbe {
+   public static void main(String args[]) {
+      WindowListener listener = new NoisyListener();
+
+      listener.windowOpened(null);
+      listener.windowActivated(null);
+      listener.windowIconified(null);
+      listener.windowDeiconified(null);
+      listener.windowDeactivated(null);
+      listener.windowClosing(null);
+      listener.windowClosed(null);
+   }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>windowOpened
+windowActivated
+windowIconified
+windowDeiconified
+windowDeactivated
+windowClosing
+windowClosed</code></pre> <p>Nothing surprising &mdash; and that is the point. There is no magic in a listener. It is a plain object with seven plain methods, and the only thing Swing adds is that a real frame calls them for you at the right moments instead of a <code>main</code> calling them in a row.</p> <p>Look at the declaration in the driver: <code>WindowListener listener = new NoisyListener();</code>. Static type <code>WindowListener</code>, dynamic type <code>NoisyListener</code> &mdash; Lecture 13 exactly. This is the whole reason <code>addWindowListener</code> can accept a class that did not exist when it was written.</p> 
+</div></details> <p>Now count what that cost: <strong>seven methods, six of which you did not want.</strong> Every window-closing class in every Java program would carry six empty bodies. Someone noticed, and put a class in the library to carry them for you.</p> <p class="filename">QuietListener.java</p>
+<pre><code class="language-java">import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+public class QuietListener extends WindowAdapter {
+   public void windowClosing(WindowEvent e) {
+      System.out.println("windowClosing  (this is where System.exit(0) would go)");
+   }
+}</code></pre> <p>That class is four lines, and it is still a full <code>WindowListener</code>. Here is the proof: the same driver, calling all seven methods on it. Predict the output before you reveal &mdash; how many lines?</p> <p class="filename">AdapterProbe.java</p>
+<pre><code class="language-java">import java.awt.event.WindowListener;
+
+public class AdapterProbe {
+   public static void main(String args[]) {
+      WindowListener listener = new QuietListener();
+
+      listener.windowOpened(null);
+      listener.windowActivated(null);
+      listener.windowIconified(null);
+      listener.windowDeiconified(null);
+      listener.windowDeactivated(null);
+      listener.windowClosing(null);
+      listener.windowClosed(null);
+
+      System.out.println("Seven calls made; six of them did nothing at all.");
+   }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>windowClosing  (this is where System.exit(0) would go)
+Seven calls made; six of them did nothing at all.</code></pre> <p>All seven calls compiled and all seven ran. Six of them landed in inherited methods with empty bodies and returned immediately. The line <code>WindowListener listener = new QuietListener();</code> compiles because <code>QuietListener</code> really is a <code>WindowListener</code> &mdash; it inherits that promise from <code>WindowAdapter</code>.</p> 
+</div></details> </div> </div> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; WindowAdapter</span></div> <div class="bd"> <p><strong><code>WindowAdapter</code></strong> is an abstract class in <code>java.awt.event</code> that implements <code>WindowListener</code> with empty method bodies. It is a <em>convenience class</em>: it exists so you do not have to implement all seven methods when you only need one or two.</p> <ul> <li>Classes extend <code>WindowAdapter</code> and override only the methods they need.</li> <li>It is not meant to be instantiated directly &mdash; it is a base class.</li> <li>The method overridden most often by far is <code>windowClosing</code>.</li> <li>It is Java's standard example of the <strong>Adapter design pattern</strong>: a class that sits between a fat interface and the small piece of it you actually care about.</li> </ul> </div> </div> <p>So the version you will actually write &mdash; and the one in your instructor's notes &mdash; is this:</p> <p class="filename">WindowDestroyer.java</p>
+<pre><code class="language-java">import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+public class WindowDestroyer extends WindowAdapter {
+   public void windowClosing(WindowEvent e) {
+      System.exit(0);  // Terminate the program when the window is closed
+   }
+}</code></pre> <p>That is the class <code>FirstWindow</code> and <code>SecondWindow</code> have been using since &sect;5. Swap <code>System.exit(0)</code> for <code>e.getWindow().dispose()</code> and the same class closes just the one window instead of the whole application &mdash; both versions appear in the course code, and which one is right depends entirely on whether your program has one window or several.</p> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; extends versus implements</span></div> <div class="bd"> <p>It is <code>extends WindowAdapter</code> and <code>implements WindowListener</code>. <code>WindowAdapter</code> is a class, so you extend it; <code>WindowListener</code> is an interface, so you implement it. Writing <code>implements WindowAdapter</code> gives <code>error: interface expected here</code>, and <code>extends WindowListener</code> gives <code>error: no interface expected here</code>.</p> <p>There is a real cost to the adapter, too: because <code>WindowAdapter</code> is a class, extending it uses up your one superclass. A class that already <code>extends JFrame</code> cannot also extend <code>WindowAdapter</code>. That is why a frame that wants to be its own listener has to write <code>implements WindowListener</code> and supply all seven methods &mdash; or, much more commonly, use a small separate class or an inner class, as you will see in the practice problems.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 15.10</div> <div class="bd"> <p>Predict the exact output of this program. <code>Logger</code> extends <code>WindowAdapter</code>, <code>Counter</code> extends <code>Logger</code>, and <code>main</code> calls six listener methods on one <code>Counter</code> object.</p> <p class="filename">EventTrace.java</p>
+<pre><code class="language-java">import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+
+class Logger extends WindowAdapter {
+    public void windowOpened(WindowEvent e)  { System.out.println("Logger: opened"); }
+    public void windowClosing(WindowEvent e) { System.out.println("Logger: closing"); }
+}
+
+class Counter extends Logger {
+    private int n = 0;
+    public void windowClosing(WindowEvent e) {
+        n++;
+        System.out.println("Counter: closing attempt " + n);
+    }
+    public void windowClosed(WindowEvent e)  { System.out.println("Counter: closed"); }
+}
+
+public class EventTrace {
+    public static void main(String args[]) {
+        WindowListener listener = new Counter();
+
+        listener.windowOpened(null);       // line (a)
+        listener.windowActivated(null);    // line (b)
+        listener.windowClosing(null);      // line (c)
+        listener.windowClosing(null);      // line (d)
+        listener.windowClosed(null);       // line (e)
+        listener.windowIconified(null);    // line (f)
+
+        System.out.println("done");
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> For each of the six calls, walk <em>up</em> from the dynamic type <code>Counter</code> until you find a body: <code>Counter</code> first, then <code>Logger</code>, then <code>WindowAdapter</code>. <code>WindowAdapter</code> always has a body, and it is always empty, so every call resolves to something &mdash; the only question is whether it prints.</p> <table class="trace"> <tr><th>Line</th><th>Method</th><th>Body found in</th><th>Prints</th></tr> <tr><td>(a)</td><td><code>windowOpened</code></td><td><code>Logger</code></td><td><code>Logger: opened</code></td></tr> <tr><td>(b)</td><td><code>windowActivated</code></td><td><code>WindowAdapter</code> (empty)</td><td>nothing</td></tr> <tr><td>(c)</td><td><code>windowClosing</code></td><td><code>Counter</code> &mdash; overrides <code>Logger</code></td><td><code>Counter: closing attempt 1</code></td></tr> <tr><td>(d)</td><td><code>windowClosing</code></td><td><code>Counter</code>, same object, <code>n</code> is now 2</td><td><code>Counter: closing attempt 2</code></td></tr> <tr><td>(e)</td><td><code>windowClosed</code></td><td><code>Counter</code></td><td><code>Counter: closed</code></td></tr> <tr><td>(f)</td><td><code>windowIconified</code></td><td><code>WindowAdapter</code> (empty)</td><td>nothing</td></tr> </table> <pre class="out"><code>Logger: opened
+Counter: closing attempt 1
+Counter: closing attempt 2
+Counter: closed
+done</code></pre> <p><strong>Things to notice.</strong> Five lines from six calls plus a <code>done</code> &mdash; two calls printed nothing at all, and that silence is <code>WindowAdapter</code> doing its job.</p> <p><code>Logger: closing</code> never appears. <code>Counter</code> overrides <code>windowClosing</code>, and the dynamic type wins, exactly as in Lecture 13. If you wanted both messages, <code>Counter.windowClosing</code> would have to call <code>super.windowClosing(e);</code> explicitly.</p> <p>The counter reaching 2 is the point of lines (c) and (d): <code>listener</code> is one object, so the field <code>n</code> persists between calls. That is precisely how the "are you sure?" behavior in Practice Problem 2 is built.</p> </div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 15.11</div> <div class="bd"> <p>Suppose <code>WindowAdapter</code> did not exist. Write <code>LongWindowDestroyer</code>, a class that <code>implements WindowListener</code> directly and does the same job as <code>WindowDestroyer</code>: quit the program when the window is closed, and nothing else.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> One real method and six that must exist but must do nothing. Write the one you care about first so a reader sees it immediately, then the six stubs with a comment saying why they are there. Empty braces are a complete, legal method body.</p> <p class="filename">LongWindowDestroyer.java</p>
+<pre><code class="language-java">import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+
+public class LongWindowDestroyer implements WindowListener {
+   public void windowClosing(WindowEvent e) {
+      System.exit(0);
+   }
+
+   // The six methods we do not care about. They must still be here.
+   public void windowOpened(WindowEvent e)      { }
+   public void windowClosed(WindowEvent e)      { }
+   public void windowIconified(WindowEvent e)   { }
+   public void windowDeiconified(WindowEvent e) { }
+   public void windowActivated(WindowEvent e)   { }
+   public void windowDeactivated(WindowEvent e) { }
+}</code></pre> <p><strong>Things to notice.</strong> Every method must be <code>public</code>. Interface methods are implicitly public, and Java will not let you implement one with weaker access &mdash; leave <code>public</code> off and you get <code>attempting to assign weaker access privileges; was public</code>, which is a confusing message for a missing keyword.</p> <p>Compare this file with the four-line <code>WindowDestroyer</code> that extends <code>WindowAdapter</code>. The two are interchangeable everywhere: both can be passed to <code>addWindowListener</code>, because both <em>are</em> <code>WindowListener</code> objects. <code>WindowAdapter</code> did not add any ability, it removed typing &mdash; and typing you do not do is typing you cannot get wrong.</p> <p>This is also the version you are forced back into when your class already extends something else. A <code>JFrame</code> subclass that wants to listen to itself writes <code>public class MyWindow extends JFrame implements WindowListener</code> and supplies all seven methods, because its one <code>extends</code> slot is already spent.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 15.11</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="13" aria-label="Live coding - Quick Check 15.11">import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+
+public class LongWindowDestroyer implements WindowListener {
+    // 1. windowClosing: System.exit(0).
+
+    // 2. The other six methods, with empty bodies.
+    //    windowOpened, windowClosed, windowIconified,
+    //    windowDeiconified, windowActivated, windowDeactivated
+
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 15.12</div> <div class="bd"> <p>Two questions about which method to override, and one about which tool to reach for.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> You want to ask "save your changes?" when the user clicks the close box. Which of the seven methods do you override, and why not the other close-sounding one?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>windowClosing</code>. It fires when the user <em>requests</em> a close, before anything has happened, so you still have a window to put a question in and you can decide not to close after all. <code>windowClosed</code> fires <em>after</em> the window has been disposed of &mdash; by then it is far too late to ask.</p> <p>You also need <code>setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);</code>, or Swing's default behavior hides the window out from under your question.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> You want to pause a game whenever its window is minimised and resume when it is restored. Which methods?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>windowIconified</code> to pause and <code>windowDeiconified</code> to resume. This is the case that justifies the seven-method interface: the other six methods are not padding, they are events somebody really does need.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> For part (b), would you extend <code>WindowAdapter</code> or implement <code>WindowListener</code>?</p> <details class="soln"><summary></summary><div class="ans"> <p>Extend <code>WindowAdapter</code> and override just those two. You need two of seven methods, so the adapter saves you five empty bodies &mdash; that is precisely the situation it was designed for.</p> <p>The only reason to go back to <code>implements WindowListener</code> is that you have already spent your <code>extends</code> on something else, most often <code>JFrame</code> itself.</p> <p><strong>Things to notice across all three parts.</strong> The decision procedure is always the same two questions. <em>Which of the seven events is the moment I care about?</em> &mdash; get that wrong and your code runs at the wrong time or not at all. Then: <em>is my class free to extend <code>WindowAdapter</code>?</em> &mdash; if yes, extend it; if no, implement the interface and write the stubs.</p> </div></details> </div> </div> </div> <h2 id="prac"><span class="num">&#9733;</span>Practice Problems</h2> <div class="box prac"> <div class="hd">Practice Problems<span class="tag">&mdash; exam-style, Lecture 15 material only</span></div> <div class="bd"> <p>GUI questions on the CSCI 212 exams are almost always "write this class" rather than "predict this output", and they are worth ten or fifteen points each. That means they are marked from the code you write on paper, so the details matter: the import lines, the class header, <code>super()</code>, <code>setSize</code>, <code>setVisible(true)</code>, and the registration line. Work these on paper before you type them.</p> <p>Problems 1 and 2 are your instructor's own. Problems 3, 4 and 5 target the three things most likely to cost you marks: the close-operation rule, the seven-method interface, and the difference between a window existing and a window being visible.</p> </div> </div> <h3>Problem 1 &mdash; The red square <span class="muted">(from CSCI 212 Final, Summer 2026; the same question appears on the Spring 2025 Final)</span></h3> <p>A program validates some user input. When the input is bad it calls a method <code>redSquare</code>, which "creates and displays a GUI with a red background color and the window size (50, 50) to signal a user error." Write the method <code>redSquare</code>. Then write the complete class needed to run it.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Read the sentence as a checklist and notice how short it is: a window (<code>new JFrame()</code>), a size (<code>setSize(50, 50)</code>), a red background, and displayed (<code>setVisible(true)</code>). Nothing is said about a title, a label, a listener or a close operation, so do not invent them. The one decision is <em>what</em> to make red, and &sect;6 already answered it: paint the content pane, not the frame.</p> <p>The method must be <code>static</code>, because the question describes it being called from another static method with no object around.</p> <p class="filename">RedSquare.java</p>
+<pre><code class="language-java">import java.awt.Color;
+
+import javax.swing.JFrame;
+
+public class RedSquare {
+   public static void redSquare() {
+      JFrame frame = new JFrame();
+      frame.setSize(50, 50);
+      frame.getContentPane().setBackground(Color.RED);
+      frame.setVisible(true);
+   }
+
+   public static void main(String args[]) {
+      redSquare();
+   }
+}</code></pre> <p>Running it puts a small red square in the corner of the screen. Its title bar is empty and is very nearly as tall as the square itself, since 50 pixels is not much window:</p> <p class="filename">What appears &mdash; a sketch, not a screenshot</p>
+<pre class="cmp"><code>+---------------+
+|     _  []  X  |
++---------------+
+|###############|
+|###############|
++---------------+
+  50 x 50 pixels, # = red</code></pre> <p><strong>The alternative answer, also from the rubric.</strong> Instead of coloring the content pane, put a red <code>JPanel</code> inside it:</p> <p class="filename">RedSquare2.java</p>
+<pre><code class="language-java">import java.awt.Color;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+public class RedSquare2 {
+   public static void redSquare() {
+      JFrame frame = new JFrame();
+      frame.setSize(50, 50);
+      JPanel panel = new JPanel();
+      panel.setBackground(Color.RED);
+      frame.getContentPane().add(panel);
+      frame.setVisible(true);
+   }
+
+   public static void main(String args[]) {
+      redSquare();
+   }
+}</code></pre> <p>Both are accepted. The second works for the reason &sect;6 gave: the single component added to a <code>BorderLayout</code> content pane is stretched to fill it, so the red panel covers everything. It is the version you would extend if you later wanted the square to contain something.</p> <p><strong>Things to notice.</strong> This is a five-point question and every point is a line you either wrote or did not. The one people lose is <code>setVisible(true)</code> &mdash; a method called <code>redSquare</code> that creates a red square and never shows it scores nothing, and produces no error to warn you.</p> <p>Notice too that this question uses <code>new JFrame()</code> directly rather than the <code>extends JFrame</code> pattern. That is the right call here: <code>redSquare</code> is a throwaway error indicator, not a class with a life of its own. Both patterns are on the exams, and the wording tells you which &mdash; "write the function that displays..." means a plain <code>JFrame</code>, while "<code>public class Foo extends JFrame</code>" printed at the top of the question means the other one.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 1</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="16" aria-label="Live coding - Practice Problem 1">import java.awt.Color;
+
+import javax.swing.JFrame;
+
+public class RedSquare {
+    // Create and display a 50 x 50 window with a red background.
+    public static void redSquare() {
+
+    }
+
+    public static void main(String args[]) {
+        redSquare();
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 2 &mdash; "Are you sure!" <span class="muted">(from Exam 2 Practice Problems &mdash; the window-listener half)</span></h3> <p>The original question says: <em>"Modify the program that you wrote for the last gui by adding a windowListener to modify the behavior of the close window button. The first time it is pressed the Gui should display the message </em>Are you sure!<em> in red. The second time it is pressed, the Gui should display </em>Are you really sure!<em> and the third time it is pressed the program should exit. (One tricky issue to solve is how to prevent the gui window from disappearing when the close window button is clicked the first two times.)"</em></p> <p>The GUI it refers to is built with layout managers and menus we have not met yet, so attach the same behavior to a window you <em>can</em> build today: a single frame, 400 by 150, titled <em>Are You Sure?</em>, containing one <code>JLabel</code>. Solve the tricky issue.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Three things have to be true at once.</p> <ul> <li>The listener must <strong>count</strong>, so it needs a field that survives between clicks. Quick Check 15.10 showed exactly this: one listener object, one field, incremented each time.</li> <li>The listener must <strong>change the label</strong>, so it needs a reference to the label. The neat way is to make the listener an <em>inner class</em> of the frame &mdash; an inner class can see the outer object's private fields directly. That is what your instructor's solution does.</li> <li>The tricky issue: by default Swing hides the frame the first time the close box is clicked, so there would be no window left to show the message in. The answer is <strong><code>setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);</code></strong> &mdash; the one constant that means "the close box does nothing at all; my listener decides".</li> </ul> <p class="filename">AreYouSure.java</p>
+<pre><code class="language-java">import java.awt.Color;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
+public class AreYouSure extends JFrame {
+   public static final int WIDTH = 400;
+   public static final int HEIGHT = 150;
+
+   private JLabel message;
+   private int closeAttempts = 0;
+
+   public AreYouSure() {
+      super("Are You Sure?");
+      setSize(WIDTH, HEIGHT);
+
+      // Without this line the window would vanish on the very first click.
+      setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+
+      message = new JLabel("  Try to close this window.");
+      getContentPane().add(message);
+
+      addWindowListener(new Confirmer());
+   }
+
+   // An inner class, so that it can see message and closeAttempts.
+   private class Confirmer extends WindowAdapter {
+      public void windowClosing(WindowEvent e) {
+         closeAttempts++;
+         if (closeAttempts == 1) {
+            message.setText("  Are you sure!");
+            message.setForeground(Color.RED);
+         } else if (closeAttempts == 2) {
+            message.setText("  Are you really sure!");
+         } else {
+            System.exit(0);
+         }
+      }
+   }
+
+   public static void main(String args[]) {
+      AreYouSure gui = new AreYouSure();
+      gui.setVisible(true);
+   }
+}</code></pre> <p>Click the close box and the label turns red and reads <em>Are you sure!</em>; the window stays. Click again and it reads <em>Are you really sure!</em> in the same red. Click a third time and the program exits.</p> <p class="filename">The window after the first click &mdash; a sketch, not a screenshot</p>
+<pre class="cmp"><code>+---------------------------------------------+
+| Are You Sure?                  _   []   X   |  &lt;- clicking X ran windowClosing
++---------------------------------------------+
+|                                             |
+|  Are you sure!                              |  &lt;- now drawn in red
+|                                             |
++---------------------------------------------+
+              400 x 150 pixels</code></pre> <p><strong>Things to notice.</strong> <code>setForeground</code> sets the color of a component's text; <code>setBackground</code> sets the color behind it. The question says the message is displayed <em>in red</em>, so it is <code>setForeground(Color.RED)</code> on the label. Note it is only set once &mdash; the second message inherits it, because setting a color changes the component, not that one string.</p> <p><strong>Why an inner class.</strong> <code>Confirmer</code> needs <code>message</code> and <code>closeAttempts</code>, both private to <code>AreYouSure</code>. Written as a separate top-level class it could not see either, and you would have to pass the label into its constructor and keep the counter inside it. That works and is a perfectly good answer; the inner class is shorter and is what the posted solution uses. What you cannot do is make <code>AreYouSure</code> itself the listener by writing <code>extends WindowAdapter</code> &mdash; it already extends <code>JFrame</code>, and Java allows one superclass.</p> <p><strong>The two lines everybody forgets.</strong> <code>DO_NOTHING_ON_CLOSE</code> and <code>addWindowListener(new Confirmer());</code>. Without the first, the window disappears on click one and the rest is invisible. Without the second, the listener class is perfect and never runs.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 2</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="28" aria-label="Live coding - Practice Problem 2">import java.awt.Color;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
+public class AreYouSure extends JFrame {
+    private JLabel message;
+    private int closeAttempts = 0;
+
+    public AreYouSure() {
+        super("Are You Sure?");
+        // 1. Size 400 x 150, and stop the close box doing anything by itself.
+
+        // 2. Create the label, add it to the content pane.
+
+        // 3. Register the listener.
+
+    }
+
+    // 4. An inner class extending WindowAdapter that counts the clicks.
+
+    public static void main(String args[]) {
+        AreYouSure gui = new AreYouSure();
+        gui.setVisible(true);
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 3 &mdash; Find the three errors <span class="muted">(added for these notes)</span></h3> <p>The following file is meant to display a 300 by 200 window containing the label <code>Hello</code>, where clicking the close box ends the program. Exactly 3 of the numbered lines have errors, and one further error is not on a numbered line at all. Identify each error and give a corrected version. Lines without a number are correct as written.</p> <p class="filename">BrokenWindow.java</p>
+<pre><code class="language-java">import javax.swing.JFrame;
+
+public class BrokenWindow extends JFrame {
+    public BrokenWindow() {
+        super();
+        setSize(300, 200);                            // line 1
+        JLabel label = new JLabel("Hello");           // line 2
+        add.getContentPane(label);                    // line 3
+        setDefaultCloseOperation(EXIT_ON_CLOSE);      // line 4
+    }
+
+    public static void main(String args[]) {
+        BrokenWindow w = new BrokenWindow();          // line 5
+        w.setVisible();                               // line 6
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Compile it in your head in the order <code>javac</code> does: first the names (is every class imported?), then the calls (does this method exist, and do the arguments match?). Do not be distracted by line 4, which looks unusual but is fine.</p> <p><strong>Error 1 &mdash; the import, which is not a numbered line.</strong> Only <code>JFrame</code> is imported, so <code>JLabel</code> on line 2 is an unknown name. This produces two error messages from one mistake, one for the type and one for the constructor:</p> <pre class="err"><code>BrokenWindow.java:7: error: cannot find symbol
+        JLabel label = new JLabel("Hello");           // line 2
+        ^
+  symbol:   class JLabel
+  location: class BrokenWindow
+BrokenWindow.java:7: error: cannot find symbol
+        JLabel label = new JLabel("Hello");           // line 2
+                           ^
+  symbol:   class JLabel
+  location: class BrokenWindow</code></pre> <p>Corrected: add <code>import javax.swing.JLabel;</code> (or replace both imports with <code>import javax.swing.*;</code>). Line 2 itself is correct.</p> <p><strong>Error 2 &mdash; line 3.</strong> The method name and the object have been swapped. <code>add.getContentPane(label)</code> reads as "the variable <code>add</code>, call <code>getContentPane</code> on it", and there is no variable called <code>add</code>:</p> <pre class="err"><code>BrokenWindow.java:8: error: cannot find symbol
+        add.getContentPane(label);                    // line 3
+        ^
+  symbol:   variable add
+  location: class BrokenWindow</code></pre> <p>Corrected: <code>getContentPane().add(label);</code> &mdash; get the container first, then add to it.</p> <p><strong>Error 3 &mdash; line 6.</strong> <code>setVisible</code> needs to be told <em>what</em> to set the visibility to:</p> <pre class="err"><code>BrokenWindow.java:14: error: method setVisible in class Window cannot be applied to given types;
+        w.setVisible();                               // line 6
+         ^
+  required: boolean
+  found:    no arguments
+  reason: actual and formal argument lists differ in length</code></pre> <p>Corrected: <code>w.setVisible(true);</code></p> <p><strong>Line 4 is correct.</strong> <code>EXIT_ON_CLOSE</code> with no <code>JFrame.</code> prefix compiles fine inside a subclass of <code>JFrame</code>, because the constant is inherited. <code>JFrame.EXIT_ON_CLOSE</code> is clearer and is what most code writes, but the bare name is not an error.</p> <p>With all three fixed:</p> <p class="filename">FixedWindow.java</p>
+<pre><code class="language-java">import javax.swing.JFrame;
+import javax.swing.JLabel;
+
+public class FixedWindow extends JFrame {
+    public FixedWindow() {
+        super();
+        setSize(300, 200);                            // line 1
+        JLabel label = new JLabel("Hello");           // line 2
+        getContentPane().add(label);                  // line 3
+        setDefaultCloseOperation(EXIT_ON_CLOSE);      // line 4
+    }
+
+    public static void main(String args[]) {
+        FixedWindow w = new FixedWindow();            // line 5
+        w.setVisible(true);                           // line 6
+    }
+}</code></pre> <p><strong>Things to notice.</strong> <code>javac</code> reported four messages for three mistakes. One missing import produced two of them, because both the declared type and the constructor call are unknown names. Counting error messages is not the same as counting errors, and this is the usual reason why.</p> <p>The <code>setVisible()</code> message is worth reading closely: <code>required: boolean</code>, <code>found: no arguments</code>. When the compiler tells you what it required and what it found, the fix is nearly always written in the message.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 3</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="18" aria-label="Live coding - Practice Problem 3">import javax.swing.JFrame;
+
+public class BrokenWindow extends JFrame {
+    public BrokenWindow() {
+        super();
+        setSize(300, 200);                            // line 1
+        JLabel label = new JLabel("Hello");           // line 2
+        add.getContentPane(label);                    // line 3
+        setDefaultCloseOperation(EXIT_ON_CLOSE);      // line 4
+    }
+
+    public static void main(String args[]) {
+        BrokenWindow w = new BrokenWindow();          // line 5
+        w.setVisible();                               // line 6
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 4 &mdash; Short answer <span class="muted">(added for these notes)</span></h3> <p>Five one-or-two-sentence questions of the kind that open a GUI exam problem.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Why must a class that implements <code>WindowListener</code> write seven methods, when a class that extends <code>WindowAdapter</code> can write one?</p> <details class="soln"><summary></summary><div class="ans"> <p>Implementing an interface means implementing every method it declares, and <code>WindowListener</code> declares seven abstract methods. <code>WindowAdapter</code> is a class that has <em>already</em> implemented all seven, with empty bodies; extending it means you inherit those seven implementations and need only override the ones you want to change.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Name the four constants you can pass to <code>setDefaultCloseOperation</code> and say what each one does.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>DO_NOTHING_ON_CLOSE</code> &mdash; the close box does nothing, leaving the decision to a listener. <code>HIDE_ON_CLOSE</code> &mdash; the window is hidden but not destroyed; this is the default. <code>DISPOSE_ON_CLOSE</code> &mdash; the window is hidden and its resources released. <code>EXIT_ON_CLOSE</code> &mdash; the entire application exits.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> A student's window appears but their <code>JLabel</code> does not. They wrote <code>add(myLabel);</code>. Is that the bug?</p> <details class="soln"><summary></summary><div class="ans"> <p>No &mdash; that one actually works. Since Java 5, <code>JFrame.add</code> quietly forwards to the content pane, so <code>add(myLabel)</code> and <code>getContentPane().add(myLabel)</code> do the same thing. Older textbooks and older exam papers insist on the longer form, and it is the one to write in an exam answer because it is what the marking scheme expects, but it is not the cause of a missing label.</p> <p>Look elsewhere: was <code>setSize</code> called, is the label being added <em>after</em> the window became visible, or is a second component overwriting it in the same <code>BorderLayout</code> region?</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> Why can a class that already extends <code>JFrame</code> not also extend <code>WindowAdapter</code>, and what do you do instead?</p> <details class="soln"><summary></summary><div class="ans"> <p>Java has single inheritance: one <code>extends</code>, and <code>JFrame</code> has taken it. The alternatives are to write <code>implements WindowListener</code> on the frame and supply all seven methods, or to keep the listener in a separate class &mdash; either a top-level class or an inner class, which is what Practice Problem 2 does.</p> <p>Note that <code>implements</code> is not limited in the same way: a class may implement any number of interfaces, which is precisely why <code>public class P1 extends JFrame implements ActionListener</code> is a legal and extremely common class header.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> Give the three lines, in order, that turn a bare <code>JFrame</code> variable into a window on the screen.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>JFrame gui = new JFrame();</code>, then <code>gui.setSize(w, h);</code>, then <code>gui.setVisible(true);</code>.</p> <p><strong>Things to notice across all five parts.</strong> Every one of these is a sentence from &sect;4 to &sect;8 turned into a question, and every one of them has appeared on a GUI exam problem as the part that decides whether the rest of your code can score. Learn the three-line incantation in (e) until you can write it without thinking; then the exam question is only about what you put <em>between</em> lines two and three.</p> </div></details> </div> <h3>Problem 5 &mdash; What is the output? <span class="muted">(added for these notes)</span></h3> <p>This program never opens a window. It builds two listeners and calls their methods directly, which is a perfectly ordinary thing to do to an object. Give the exact output.</p> <p class="filename">ListenerQuiz.java</p>
+<pre><code class="language-java">import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+
+class Base extends WindowAdapter {
+    public void windowOpened(WindowEvent e)  { System.out.println("Base opened"); }
+    public void windowClosing(WindowEvent e) { System.out.println("Base closing"); }
+}
+
+class Derived extends Base {
+    private int count = 0;
+    public void windowClosing(WindowEvent e) {
+        count++;
+        System.out.println("Derived closing " + count);
+    }
+    public void windowActivated(WindowEvent e) {
+        System.out.println("Derived activated");
+        windowClosing(e);
+    }
+}
+
+public class ListenerQuiz {
+    public static void main(String args[]) {
+        WindowListener a = new Base();
+        WindowListener b = new Derived();
+
+        a.windowOpened(null);        // line (a)
+        a.windowActivated(null);     // line (b)
+        b.windowOpened(null);        // line (c)
+        b.windowActivated(null);     // line (d)
+        b.windowClosing(null);       // line (e)
+        b.windowIconified(null);     // line (f)
+    }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> What is printed at line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Base opened</code>. <code>a</code> refers to a <code>Base</code>, which overrides <code>windowOpened</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What is printed at line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p>Nothing. <code>Base</code> does not override <code>windowActivated</code>, so the call lands in <code>WindowAdapter</code>'s empty body and returns.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> What is printed at line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Base opened</code>. <code>Derived</code> does not override <code>windowOpened</code>, so the search goes up one level and finds <code>Base</code>'s version. Inheritance, not the adapter, supplies this one.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> What is printed at line (d)? There are two lines here.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Derived activated</code> and then <code>Derived closing 1</code>. <code>windowActivated</code> prints and then calls <code>windowClosing(e)</code> on the same object, which runs <code>Derived</code>'s version and increments <code>count</code> from 0 to 1.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> What is printed at line (e)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>Derived closing 2</code>. Same object, so <code>count</code> is still 1 when the method starts and becomes 2. <code>Base closing</code> never appears &mdash; <code>Derived</code> overrides it, and the dynamic type decides.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(f)</span> What is printed at line (f)? Then write out the complete output of the program.</p> <details class="soln"><summary></summary><div class="ans"> <p>Nothing at line (f) &mdash; neither <code>Derived</code> nor <code>Base</code> overrides <code>windowIconified</code>, so <code>WindowAdapter</code>'s empty body runs. The whole program prints five lines:</p> <pre class="out"><code>Base opened
+Base opened
+Derived activated
+Derived closing 1
+Derived closing 2</code></pre> <p><strong>Things to notice across all six parts.</strong> Six of the twelve calls printed nothing, and every silent one was <code>WindowAdapter</code> absorbing an event nobody cared about. That is the adapter's entire job, seen from the inside.</p> <p>The method-resolution rule is the one from Lecture 13, unchanged: start at the object's dynamic type and walk up until you find a body. What GUIs add is a guarantee that the walk always terminates in something, because <code>WindowAdapter</code> sits at the bottom with a body for every method. That is why a listener can never fail to handle an event &mdash; at worst it handles it by doing nothing.</p> <p>Line (d) is the trap. Calling <code>windowClosing(e)</code> from inside another method is an ordinary method call on <code>this</code>, and it dispatches on the dynamic type just like any other. Two of the six calls in <code>main</code> produced output from <code>windowClosing</code>, and that is why the counter reads 2 and not 1.</p> </div></details> </div> <div class="box sum" id="summary"> <div class="hd">Lecture Summary</div> <div class="bd"> <ul> <li>A <strong>GUI</strong> is built from windows, menus, buttons, text fields and labels. A <strong>component</strong> is any one of them; a <strong>container</strong> is a component that holds other components; a <strong>frame</strong> is the top-level container, and in Java it is a <code>JFrame</code>.</li> <li>Three packages: <code>javax.swing</code> for the <code>J</code> classes, <code>java.awt</code> for <code>Color</code> and <code>Container</code>, <code>java.awt.event</code> for every <code>Event</code>, <code>Listener</code> and <code>Adapter</code>.</li> <li>The three lines that make a window: <code>new JFrame()</code>, <code>setSize(w, h)</code>, <code>setVisible(true)</code>. <code>main</code> may finish afterwards &mdash; the event dispatch thread keeps the program alive.</li> <li><code>setDefaultCloseOperation</code> decides what the close box means. The default is <code>HIDE_ON_CLOSE</code>, which is why a program you thought you closed is still running. Use <code>EXIT_ON_CLOSE</code> for a one-window program and <code>DO_NOTHING_ON_CLOSE</code> when a listener of yours will decide.</li> <li>Two ways to use <code>JFrame</code>: instantiate one for a throwaway demo, or write a class that <strong><code>extends JFrame</code></strong> and configures itself in its own constructor. The second is the pattern for every real program and every exam question.</li> <li>Components go in the <strong>content pane</strong>: <code>getContentPane().add(label)</code>. A lone component added there fills it, because the content pane starts out with a <code>BorderLayout</code>.</li> <li>Every Java event has three parts &mdash; an <strong>event source</strong> that fires it, an <strong>event object</strong> describing it, and a <strong>listener</strong> that handles it &mdash; plus a registration call, <code>addWindowListener</code>, that connects source to listener.</li> <li>A listener is an <strong>interface you implement</strong>. That is what Lecture 14 was for: <code>addWindowListener</code> takes a <code>WindowListener</code>, and your class satisfying that interface is the whole mechanism by which library code calls yours.</li> <li><code>WindowListener</code> has <strong>seven</strong> methods and you must write all seven. <code>WindowAdapter</code> is an abstract class that implements them all with empty bodies, so <code>extends WindowAdapter</code> plus one overridden <code>windowClosing</code> gives you <code>WindowDestroyer</code> in four lines.</li> </ul> <p><strong>Coming up in Lecture 16.</strong> Every window so far has held exactly one thing, and we quietly relied on it filling the frame. Next time we put several components in one window and take control of where they go, with <em>layout managers</em> &mdash; <code>FlowLayout</code>, <code>BorderLayout</code> and <code>GridLayout</code> &mdash; and we add the component the whole event model was really invented for: a <code>JButton</code> that runs your code when it is clicked.</p>
+  </div>
+</div>
+
+<nav class="pagenav">
+<span class="disabled"><div class="dir">&larr; Previous</div><div class="ttl">Lecture 14 &mdash; Abstract Classes and Interfaces</div><div class="pending">posts Tue Oct 27</div></span>
+<span class="disabled next"><div class="dir">Next &rarr;</div><div class="ttl">Lecture 16 &mdash; GUI II: Layout Managers and Buttons</div><div class="pending">posts Tue Nov 3</div></span>
+</nav>
+<footer class="pf">CSCI 212 &middot; Object-Oriented Programming in Java &middot; Queens College, CUNY</footer>
+</div>
+<script>
+(()=>{var ut=Object.create;var xe=Object.defineProperty;var ft=Object.getOwnPropertyDescriptor;var gt=Object.getOwnPropertyNames;var ht=Object.getPrototypeOf,dt=Object.prototype.hasOwnProperty;var pt=(e,t)=>()=>{try{return t||e((t={exports:{}}).exports,t),t.exports}catch(n){throw t=0,n}};var Et=(e,t,n,l)=>{if(t&&typeof t=="object"||typeof t=="function")for(let d of gt(t))!dt.call(e,d)&&d!==n&&xe(e,d,{get:()=>t[d],enumerable:!(l=ft(t,d))||l.enumerable});return e};var bt=(e,t,n)=>(n=e!=null?ut(ht(e)):{},Et(t||!e||!e.__esModule?xe(n,"default",{value:e,enumerable:!0}):n,e));var Ke=pt((ln,Ge)=>{function Ie(e){return e instanceof Map?e.clear=e.delete=e.set=function(){throw new Error("map is read-only")}:e instanceof Set&&(e.add=e.clear=e.delete=function(){throw new Error("set is read-only")}),Object.freeze(e),Object.getOwnPropertyNames(e).forEach(t=>{let n=e[t],l=typeof n;(l==="object"||l==="function")&&!Object.isFrozen(n)&&Ie(n)}),e}var Z=class{constructor(t){t.data===void 0&&(t.data={}),this.data=t.data,this.isMatchIgnored=!1}ignoreMatch(){this.isMatchIgnored=!0}};function Ce(e){return e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")}function k(e,...t){let n=Object.create(null);for(let l in e)n[l]=e[l];return t.forEach(function(l){for(let d in l)n[d]=l[d]}),n}var _t="</span>",Ne=e=>!!e.scope,Mt=(e,{prefix:t})=>{if(e.startsWith("language:"))return e.replace("language:","language-");if(e.includes(".")){let n=e.split(".");return[`${t}${n.shift()}`,...n.map((l,d)=>`${l}${"_".repeat(d+1)}`)].join(" ")}return`${t}${e}`},oe=class{constructor(t,n){this.buffer="",this.classPrefix=n.classPrefix,t.walk(this)}addText(t){this.buffer+=Ce(t)}openNode(t){if(!Ne(t))return;let n=Mt(t.scope,{prefix:this.classPrefix});this.span(n)}closeNode(t){Ne(t)&&(this.buffer+=_t)}value(){return this.buffer}span(t){this.buffer+=`<span class="${t}">`}},Re=(e={})=>{let t={children:[]};return Object.assign(t,e),t},ae=class e{constructor(){this.rootNode=Re(),this.stack=[this.rootNode]}get top(){return this.stack[this.stack.length-1]}get root(){return this.rootNode}add(t){this.top.children.push(t)}openNode(t){let n=Re({scope:t});this.add(n),this.stack.push(n)}closeNode(){if(this.stack.length>1)return this.stack.pop()}closeAllNodes(){for(;this.closeNode(););}toJSON(){return JSON.stringify(this.rootNode,null,4)}walk(t){return this.constructor._walk(t,this.rootNode)}static _walk(t,n){return typeof n=="string"?t.addText(n):n.children&&(t.openNode(n),n.children.forEach(l=>this._walk(t,l)),t.closeNode(n)),t}static _collapse(t){typeof t!="string"&&t.children&&(t.children.every(n=>typeof n=="string")?t.children=[t.children.join("")]:t.children.forEach(n=>{e._collapse(n)}))}},le=class extends ae{constructor(t){super(),this.options=t}addText(t){t!==""&&this.add(t)}startScope(t){this.openNode(t)}endScope(){this.closeNode()}__addSublanguage(t,n){let l=t.root;n&&(l.scope=`language:${n}`),this.add(l)}toHTML(){return new oe(this,this.options).value()}finalize(){return this.closeAllNodes(),!0}};function G(e){return e?typeof e=="string"?e:e.source:null}function De(e){return B("(?=",e,")")}function Ot(e){return B("(?:",e,")*")}function wt(e){return B("(?:",e,")?")}function B(...e){return e.map(n=>G(n)).join("")}function xt(e){let t=e[e.length-1];return typeof t=="object"&&t.constructor===Object?(e.splice(e.length-1,1),t):{}}function V(...e){return"("+(xt(e).capture?"":"?:")+e.map(l=>G(l)).join("|")+")"}function ke(e){return new RegExp(e.toString()+"|").exec("").length-1}function Nt(e,t){let n=e&&e.exec(t);return n&&n.index===0}var Rt=new RegExp(V(/\[(?:[^\\\]]|\\.)*\]/,/\(\?<(?![=!])[^>]+>/,/\(\?'[^']+'/,/\(\??/,/\\([1-9][0-9]*)/,/\\./));function fe(e,{joinWith:t}){let n=0;return e.map(l=>{n+=1;let d=n,_=G(l),c="";for(;_.length>0;){let r=Rt.exec(_);if(!r){c+=_;break}c+=_.substring(0,r.index),_=_.substring(r.index+r[0].length),r[0][0]==="\\"&&r[1]?c+="\\"+String(Number(r[1])+d):(c+=r[0],(r[0]==="("||/^\(\?[<']/.test(r[0]))&&n++)}return c}).map(l=>`(${l})`).join(t)}var yt=/\b\B/,ve="[a-zA-Z]\\w*",ge="[a-zA-Z_]\\w*",Le="\\b\\d+(\\.\\d+)?",Be="(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)",Pe="\\b(0b[01]+)",St="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~",At=(e={})=>{let t=/^#![ ]*\//;return e.binary&&(e.begin=B(t,/.*\b/,e.binary,/\b.*/)),k({scope:"meta",begin:t,end:/$/,relevance:0,"on:begin":(n,l)=>{n.index!==0&&l.ignoreMatch()}},e)},K={begin:"\\\\[\\s\\S]",relevance:0},Tt={scope:"string",begin:"'",end:"'",illegal:"\\n",contains:[K]},It={scope:"string",begin:'"',end:'"',illegal:"\\n",contains:[K]},Ct={begin:/\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/},Q=function(e,t,n={}){let l=k({scope:"comment",begin:e,end:t,contains:[]},n);l.contains.push({scope:"doctag",begin:"[ ]*(?=(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):)",end:/(TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):/,excludeBegin:!0,relevance:0});let d=V("I","a","is","so","us","to","at","if","in","it","on",/[A-Za-z]+['](d|ve|re|ll|t|s|n)/,/[A-Za-z]+[-][a-z]+/,/[A-Za-z][a-z]{2,}/);return l.contains.push({begin:B(/[ ]+/,"(",d,/[.]?[:]?([.][ ]|[ ])/,"){3}")}),l},Dt=Q("//","$"),kt=Q("/\\*","\\*/"),vt=Q("#","$"),Lt={scope:"number",begin:Le,relevance:0},Bt={scope:"number",begin:Be,relevance:0},Pt={scope:"number",begin:Pe,relevance:0},$t={scope:"regexp",begin:/\/(?=[^/\n]*\/)/,end:/\/[gimuy]*/,contains:[K,{begin:/\[/,end:/\]/,relevance:0,contains:[K]}]},Ht={scope:"title",begin:ve,relevance:0},Ut={scope:"title",begin:ge,relevance:0},jt={begin:"\\.\\s*"+ge,relevance:0},Gt=function(e){return Object.assign(e,{"on:begin":(t,n)=>{n.data._beginMatch=t[1]},"on:end":(t,n)=>{n.data._beginMatch!==t[1]&&n.ignoreMatch()}})},X=Object.freeze({__proto__:null,APOS_STRING_MODE:Tt,BACKSLASH_ESCAPE:K,BINARY_NUMBER_MODE:Pt,BINARY_NUMBER_RE:Pe,COMMENT:Q,C_BLOCK_COMMENT_MODE:kt,C_LINE_COMMENT_MODE:Dt,C_NUMBER_MODE:Bt,C_NUMBER_RE:Be,END_SAME_AS_BEGIN:Gt,HASH_COMMENT_MODE:vt,IDENT_RE:ve,MATCH_NOTHING_RE:yt,METHOD_GUARD:jt,NUMBER_MODE:Lt,NUMBER_RE:Le,PHRASAL_WORDS_MODE:Ct,QUOTE_STRING_MODE:It,REGEXP_MODE:$t,RE_STARTERS_RE:St,SHEBANG:At,TITLE_MODE:Ht,UNDERSCORE_IDENT_RE:ge,UNDERSCORE_TITLE_MODE:Ut});function Kt(e,t){e.input[e.index-1]==="."&&t.ignoreMatch()}function mt(e,t){e.className!==void 0&&(e.scope=e.className,delete e.className)}function Wt(e,t){t&&e.beginKeywords&&(e.begin="\\b("+e.beginKeywords.split(" ").join("|")+")(?!\\.)(?=\\b|\\s)",e.__beforeBegin=Kt,e.keywords=e.keywords||e.beginKeywords,delete e.beginKeywords,e.relevance===void 0&&(e.relevance=0))}function Ft(e,t){Array.isArray(e.illegal)&&(e.illegal=V(...e.illegal))}function zt(e,t){if(e.match){if(e.begin||e.end)throw new Error("begin & end are not supported with match");e.begin=e.match,delete e.match}}function Yt(e,t){e.relevance===void 0&&(e.relevance=1)}var Xt=(e,t)=>{if(!e.beforeMatch)return;if(e.starts)throw new Error("beforeMatch cannot be used with starts");let n=Object.assign({},e);Object.keys(e).forEach(l=>{delete e[l]}),e.keywords=n.keywords,e.begin=B(n.beforeMatch,De(n.begin)),e.starts={relevance:0,contains:[Object.assign(n,{endsParent:!0})]},e.relevance=0,delete n.beforeMatch},Zt=["of","and","for","in","not","or","if","then","parent","list","value"],Jt="keyword";function $e(e,t,n=Jt){let l=Object.create(null);return typeof e=="string"?d(n,e.split(" ")):Array.isArray(e)?d(n,e):Object.keys(e).forEach(function(_){Object.assign(l,$e(e[_],t,_))}),l;function d(_,c){t&&(c=c.map(r=>r.toLowerCase())),c.forEach(function(r){let u=r.split("|");l[u[0]]=[_,Vt(u[0],u[1])]})}}function Vt(e,t){return t?Number(t):Qt(e)?0:1}function Qt(e){return Zt.includes(e.toLowerCase())}var ye={},L=e=>{console.error(e)},Se=(e,...t)=>{console.log(`WARN: ${e}`,...t)},H=(e,t)=>{ye[`${e}/${t}`]||(console.log(`Deprecated as of ${e}. ${t}`),ye[`${e}/${t}`]=!0)},J=new Error;function He(e,t,{key:n}){let l=0,d=e[n],_={},c={};for(let r=1;r<=t.length;r++)c[r+l]=d[r],_[r+l]=!0,l+=ke(t[r-1]);e[n]=c,e[n]._emit=_,e[n]._multi=!0}function qt(e){if(Array.isArray(e.begin)){if(e.skip||e.excludeBegin||e.returnBegin)throw L("skip, excludeBegin, returnBegin not compatible with beginScope: {}"),J;if(typeof e.beginScope!="object"||e.beginScope===null)throw L("beginScope must be object"),J;He(e,e.begin,{key:"beginScope"}),e.begin=fe(e.begin,{joinWith:""})}}function en(e){if(Array.isArray(e.end)){if(e.skip||e.excludeEnd||e.returnEnd)throw L("skip, excludeEnd, returnEnd not compatible with endScope: {}"),J;if(typeof e.endScope!="object"||e.endScope===null)throw L("endScope must be object"),J;He(e,e.end,{key:"endScope"}),e.end=fe(e.end,{joinWith:""})}}function tn(e){e.scope&&typeof e.scope=="object"&&e.scope!==null&&(e.beginScope=e.scope,delete e.scope)}function nn(e){tn(e),typeof e.beginScope=="string"&&(e.beginScope={_wrap:e.beginScope}),typeof e.endScope=="string"&&(e.endScope={_wrap:e.endScope}),qt(e),en(e)}function sn(e){function t(c,r){return new RegExp(G(c),"m"+(e.case_insensitive?"i":"")+(e.unicodeRegex?"u":"")+(r?"g":""))}class n{constructor(){this.matchIndexes={},this.regexes=[],this.matchAt=1,this.position=0}addRule(r,u){u.position=this.position++,this.matchIndexes[this.matchAt]=u,this.regexes.push([u,r]),this.matchAt+=ke(r)+1}compile(){this.regexes.length===0&&(this.exec=()=>null);let r=this.regexes.map(u=>u[1]);this.matcherRe=t(fe(r,{joinWith:"|"}),!0),this.lastIndex=0}exec(r){this.matcherRe.lastIndex=this.lastIndex;let u=this.matcherRe.exec(r);if(!u)return null;let O=u.findIndex((P,I)=>I>0&&P!==void 0),M=this.matchIndexes[O];return u.splice(0,O),Object.assign(u,M)}}class l{constructor(){this.rules=[],this.multiRegexes=[],this.count=0,this.lastIndex=0,this.regexIndex=0}getMatcher(r){if(this.multiRegexes[r])return this.multiRegexes[r];let u=new n;return this.rules.slice(r).forEach(([O,M])=>u.addRule(O,M)),u.compile(),this.multiRegexes[r]=u,u}resumingScanAtSamePosition(){return this.regexIndex!==0}considerAll(){this.regexIndex=0}addRule(r,u){this.rules.push([r,u]),u.type==="begin"&&this.count++}exec(r){let u=this.getMatcher(this.regexIndex);u.lastIndex=this.lastIndex;let O=u.exec(r);if(this.resumingScanAtSamePosition()&&!(O&&O.index===this.lastIndex)){let M=this.getMatcher(0);M.lastIndex=this.lastIndex+1,O=M.exec(r)}return O&&(this.regexIndex+=O.position+1,this.regexIndex===this.count&&this.considerAll()),O}}function d(c){let r=new l;return c.contains.forEach(u=>r.addRule(u.begin,{rule:u,type:"begin"})),c.terminatorEnd&&r.addRule(c.terminatorEnd,{type:"end"}),c.illegal&&r.addRule(c.illegal,{type:"illegal"}),r}function _(c,r){let u=c;if(c.isCompiled)return u;[mt,zt,nn,Xt].forEach(M=>M(c,r)),e.compilerExtensions.forEach(M=>M(c,r)),c.__beforeBegin=null,[Wt,Ft,Yt].forEach(M=>M(c,r)),c.isCompiled=!0;let O=null;return typeof c.keywords=="object"&&c.keywords.$pattern&&(c.keywords=Object.assign({},c.keywords),O=c.keywords.$pattern,delete c.keywords.$pattern),O=O||/\w+/,c.keywords&&(c.keywords=$e(c.keywords,e.case_insensitive)),u.keywordPatternRe=t(O,!0),r&&(c.begin||(c.begin=/\B|\b/),u.beginRe=t(u.begin),!c.end&&!c.endsWithParent&&(c.end=/\B|\b/),c.end&&(u.endRe=t(u.end)),u.terminatorEnd=G(u.end)||"",c.endsWithParent&&r.terminatorEnd&&(u.terminatorEnd+=(c.end?"|":"")+r.terminatorEnd)),c.illegal&&(u.illegalRe=t(c.illegal)),c.contains||(c.contains=[]),c.contains=[].concat(...c.contains.map(function(M){return rn(M==="self"?c:M)})),c.contains.forEach(function(M){_(M,u)}),c.starts&&_(c.starts,r),u.matcher=d(u),u}if(e.compilerExtensions||(e.compilerExtensions=[]),e.contains&&e.contains.includes("self"))throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");return e.classNameAliases=k(e.classNameAliases||{}),_(e)}function Ue(e){return e?e.endsWithParent||Ue(e.starts):!1}function rn(e){return e.variants&&!e.cachedVariants&&(e.cachedVariants=e.variants.map(function(t){return k(e,{variants:null},t)})),e.cachedVariants?e.cachedVariants:Ue(e)?k(e,{starts:e.starts?k(e.starts):null}):Object.isFrozen(e)?k(e):e}var cn="11.12.0",ue=class extends Error{constructor(t,n){super(t),this.name="HTMLInjectionError",this.html=n}},ce=Ce,Ae=k,Te=Symbol("nomatch"),on=7,je=function(e){let t=Object.create(null),n=Object.create(null),l=[],d=!0,_="Could not find the language '{}', did you forget to load/include a language module?",c={disableAutodetect:!0,name:"Plain text",contains:[]},r={ignoreUnescapedHTML:!1,throwUnescapedHTML:!1,noHighlightRe:/^(no-?highlight)$/i,languageDetectRe:/\blang(?:uage)?-([\w-]+)\b/i,classPrefix:"hljs-",cssSelector:"pre code",languages:null,__emitter:le};function u(i){return r.noHighlightRe.test(i)}function O(i){let a=i.className+" ";a+=i.parentNode?i.parentNode.className:"";let h=r.languageDetectRe.exec(a);if(h){let E=C(h[1]);return E||(Se(_.replace("{}",h[1])),Se("Falling back to no-highlight mode for this block.",i)),E?h[1]:"no-highlight"}return a.split(/\s+/).find(E=>u(E)||C(E))}function M(i,a,h){let E="",w="";typeof a=="object"?(E=i,h=a.ignoreIllegals,w=a.language):(H("10.7.0","highlight(lang, code, ...args) has been deprecated."),H("10.7.0",`Please use highlight(code, options) instead.
+(see the highlight.js issue tracker)`),w=i,E=a),h===void 0&&(h=!0);let y={code:E,language:w};W("before:highlight",y);let D=y.result?y.result:P(y.language,y.code,h);return D.code=y.code,W("after:highlight",D),D}function P(i,a,h,E){let w=Object.create(null);function y(s,o){return s.keywords[o]}function D(){if(!f.keywords){x.addText(b);return}let s=0;f.keywordPatternRe.lastIndex=0;let o=f.keywordPatternRe.exec(b),g="";for(;o;){g+=b.substring(s,o.index);let p=A.case_insensitive?o[0].toLowerCase():o[0],N=y(f,p);if(N){let[T,at]=N;if(x.addText(g),g="",w[p]=(w[p]||0)+1,w[p]<=on&&(Y+=at),T.startsWith("_"))g+=o[0];else{let lt=A.classNameAliases[T]||T;S(o[0],lt)}}else g+=o[0];s=f.keywordPatternRe.lastIndex,o=f.keywordPatternRe.exec(b)}g+=b.substring(s),x.addText(g)}function F(){if(b==="")return;let s=null;if(typeof f.subLanguage=="string"){if(!t[f.subLanguage]){x.addText(b);return}s=P(f.subLanguage,b,!0,we[f.subLanguage]),we[f.subLanguage]=s._top}else s=$(b,f.subLanguage.length?f.subLanguage:null);f.relevance>0&&(Y+=s.relevance),x.__addSublanguage(s._emitter,s.language)}function R(){f.subLanguage!=null?F():D(),b=""}function S(s,o){s!==""&&(x.startScope(o),x.addText(s),x.endScope())}function be(s,o){let g=1,p=o.length-1;for(;g<=p;){if(!s._emit[g]){g++;continue}let N=A.classNameAliases[s[g]]||s[g],T=o[g];N?S(T,N):(b=T,D(),b=""),g++}}function _e(s,o){return s.scope&&typeof s.scope=="string"&&x.openNode(A.classNameAliases[s.scope]||s.scope),s.beginScope&&(s.beginScope._wrap?(S(b,A.classNameAliases[s.beginScope._wrap]||s.beginScope._wrap),b=""):s.beginScope._multi&&(be(s.beginScope,o),b="")),f=Object.create(s,{parent:{value:f}}),f}function Me(s,o,g){let p=Nt(s.endRe,g);if(p){if(s["on:end"]){let N=new Z(s);s["on:end"](o,N),N.isMatchIgnored&&(p=!1)}if(p){for(;s.endsParent&&s.parent;)s=s.parent;return s}}if(s.endsWithParent)return Me(s.parent,o,g)}function it(s){return f.matcher.regexIndex===0?(b+=s[0],1):(re=!0,0)}function st(s){let o=s[0],g=s.rule,p=new Z(g),N=[g.__beforeBegin,g["on:begin"]];for(let T of N)if(T&&(T(s,p),p.isMatchIgnored))return it(o);return g.skip?b+=o:(g.excludeBegin&&(b+=o),R(),!g.returnBegin&&!g.excludeBegin&&(b=o)),_e(g,s),g.returnBegin?0:o.length}function rt(s){let o=s[0],g=a.substring(s.index),p=Me(f,s,g);if(!p)return Te;let N=f;f.endScope&&f.endScope._wrap?(R(),S(o,f.endScope._wrap)):f.endScope&&f.endScope._multi?(R(),be(f.endScope,s)):N.skip?b+=o:(N.returnEnd||N.excludeEnd||(b+=o),R(),N.excludeEnd&&(b=o));do f.scope&&x.closeNode(),!f.skip&&!f.subLanguage&&(Y+=f.relevance),f=f.parent;while(f!==p.parent);return p.starts&&_e(p.starts,s),N.returnEnd?0:o.length}function ct(){let s=[];for(let o=f;o!==A;o=o.parent)o.scope&&s.unshift(o.scope);s.forEach(o=>x.openNode(o))}let z={};function Oe(s,o){let g=o&&o[0];if(b+=s,g==null)return R(),0;if(z.type==="begin"&&o.type==="end"&&z.index===o.index&&g===""){if(b+=a.slice(o.index,o.index+1),!d){let p=new Error(`0 width match regex (${i})`);throw p.languageName=i,p.badRule=z.rule,p}return 1}if(z=o,o.type==="begin")return st(o);if(o.type==="illegal"&&!h){let p=new Error('Illegal lexeme "'+g+'" for mode "'+(f.scope||"<unnamed>")+'"');throw p.mode=f,p}else if(o.type==="end"){let p=rt(o);if(p!==Te)return p}if(o.type==="illegal"&&g==="")return o.index===a.length||(b+=`
+`),1;if(se>1e5&&se>o.index*3)throw new Error("potential infinite loop, way more iterations than matches");return b+=g,g.length}let A=C(i);if(!A)throw L(_.replace("{}",i)),new Error('Unknown language: "'+i+'"');let ot=sn(A),ie="",f=E||ot,we={},x=new r.__emitter(r);ct();let b="",Y=0,v=0,se=0,re=!1;try{if(A.__emitTokens)A.__emitTokens(a,x);else{for(f.matcher.considerAll();;){se++,re?re=!1:f.matcher.considerAll(),f.matcher.lastIndex=v;let s=f.matcher.exec(a);if(!s)break;let o=a.substring(v,s.index),g=Oe(o,s);v=s.index+g}Oe(a.substring(v))}return x.finalize(),ie=x.toHTML(),{language:i,value:ie,relevance:Y,illegal:!1,_emitter:x,_top:f}}catch(s){if(s.message&&s.message.includes("Illegal"))return{language:i,value:ce(a),illegal:!0,relevance:0,_illegalBy:{message:s.message,index:v,context:a.slice(v-100,v+100),mode:s.mode,resultSoFar:ie},_emitter:x};if(d)return{language:i,value:ce(a),illegal:!1,relevance:0,errorRaised:s,_emitter:x,_top:f};throw s}}function I(i){let a={value:ce(i),illegal:!1,relevance:0,_top:c,_emitter:new r.__emitter(r)};return a._emitter.addText(i),a}function $(i,a){a=a||r.languages||Object.keys(t);let h=I(i),E=a.filter(C).filter(Ee).map(R=>P(R,i,!1));E.unshift(h);let w=E.sort((R,S)=>{if(R.relevance!==S.relevance)return S.relevance-R.relevance;if(R.language&&S.language){if(C(R.language).supersetOf===S.language)return 1;if(C(S.language).supersetOf===R.language)return-1}return 0}),[y,D]=w,F=y;return F.secondBest=D,F}function te(i,a,h){let E=a&&n[a]||h;i.classList.add("hljs"),i.classList.add(`language-${E}`)}function ne(i){let a=null,h=O(i);if(u(h))return;if(W("before:highlightElement",{el:i,language:h}),i.dataset.highlighted){console.log("Element previously highlighted. To highlight again, first unset `dataset.highlighted`.",i);return}if(i.children.length>0&&(r.ignoreUnescapedHTML||(console.warn("One of your code blocks includes unescaped HTML. This is a potentially serious security risk."),console.warn("(see the highlight.js security wiki)"),console.warn("The element with unescaped HTML:"),console.warn(i)),r.throwUnescapedHTML))throw new ue("One of your code blocks includes unescaped HTML.",i.innerHTML);a=i;let E=a.textContent,w=h?M(E,{language:h,ignoreIllegals:!0}):$(E);i.innerHTML=w.value,i.dataset.highlighted="yes",te(i,h,w.language),i.result={language:w.language,re:w.relevance,relevance:w.relevance},w.secondBest&&(i.secondBest={language:w.secondBest.language,relevance:w.secondBest.relevance}),W("after:highlightElement",{el:i,result:w,text:E})}function Ye(i){r=Ae(r,i)}let Xe=()=>{m(),H("10.6.0","initHighlighting() deprecated.  Use highlightAll() now.")};function Ze(){m(),H("10.6.0","initHighlightingOnLoad() deprecated.  Use highlightAll() now.")}let de=!1;function m(){function i(){m()}if(document.readyState==="loading"){de||window.addEventListener("DOMContentLoaded",i,!1),de=!0;return}document.querySelectorAll(r.cssSelector).forEach(ne)}function Je(i,a){let h=null;try{h=a(e)}catch(E){if(L("Language definition for '{}' could not be registered.".replace("{}",i)),d)L(E);else throw E;h=c}h.name||(h.name=i),t[i]=h,h.rawDefinition=a.bind(null,e),h.aliases&&pe(h.aliases,{languageName:i})}function Ve(i){delete t[i];for(let a of Object.keys(n))n[a]===i&&delete n[a]}function Qe(){return Object.keys(t)}function C(i){return i=(i||"").toLowerCase(),t[i]||t[n[i]]}function pe(i,{languageName:a}){typeof i=="string"&&(i=[i]),i.forEach(h=>{n[h.toLowerCase()]=a})}function Ee(i){let a=C(i);return a&&!a.disableAutodetect}function qe(i){i["before:highlightBlock"]&&!i["before:highlightElement"]&&(i["before:highlightElement"]=a=>{i["before:highlightBlock"](Object.assign({block:a.el},a))}),i["after:highlightBlock"]&&!i["after:highlightElement"]&&(i["after:highlightElement"]=a=>{i["after:highlightBlock"](Object.assign({block:a.el},a))})}function et(i){qe(i),l.push(i)}function tt(i){let a=l.indexOf(i);a!==-1&&l.splice(a,1)}function W(i,a){let h=i;l.forEach(function(E){E[h]&&E[h](a)})}function nt(i){return H("10.7.0","highlightBlock will be removed entirely in v12.0"),H("10.7.0","Please use highlightElement now."),ne(i)}Object.assign(e,{highlight:M,highlightAuto:$,highlightAll:m,highlightElement:ne,highlightBlock:nt,configure:Ye,initHighlighting:Xe,initHighlightingOnLoad:Ze,registerLanguage:Je,unregisterLanguage:Ve,listLanguages:Qe,getLanguage:C,registerAliases:pe,autoDetection:Ee,inherit:Ae,addPlugin:et,removePlugin:tt}),e.debugMode=function(){d=!1},e.safeMode=function(){d=!0},e.versionString=cn,e.regex={concat:B,lookahead:De,either:V,optional:wt,anyNumberOfTimes:Ot};for(let i in X)typeof X[i]=="object"&&Ie(X[i]);return Object.assign(e,X),e},U=je({});U.newInstance=()=>je({});Ge.exports=U;U.HighlightJS=U;U.default=U});var me=bt(Ke(),1);var he=me.default;var j="[0-9](_*[0-9])*",q=`\\.(${j})`,ee="[0-9a-fA-F](_*[0-9a-fA-F])*",We={className:"number",variants:[{begin:`(\\b(${j})((${q})|\\.)?|(${q}))[eE][+-]?(${j})[fFdD]?\\b`},{begin:`\\b(${j})((${q})[fFdD]?\\b|\\.([fFdD]\\b)?)`},{begin:`(${q})[fFdD]?\\b`},{begin:`\\b(${j})[fFdD]\\b`},{begin:`\\b0[xX]((${ee})\\.?|(${ee})?\\.(${ee}))[pP][+-]?(${j})[fFdD]?\\b`},{begin:"\\b(0|[1-9](_*[0-9])*)[lL]?\\b"},{begin:`\\b0[xX](${ee})[lL]?\\b`},{begin:"\\b0(_*[0-7])*[lL]?\\b"},{begin:"\\b0[bB][01](_*[01])*[lL]?\\b"}],relevance:0};function Fe(e,t,n){return n===-1?"":e.replace(t,l=>Fe(e,t,n-1))}function ze(e){let t=e.regex,n="[\xC0-\u02B8a-zA-Z_$][\xC0-\u02B8a-zA-Z_$0-9]*",l="(?:(?:\\s*\\[\\s*])+)?",d=n+"<@@@>"+l,c="(?:"+("\\?(?:\\s+(?:extends|super)\\s+"+d+")?")+"|"+d+")",r=Fe("(?:\\s*<\\s*"+c+"(?:\\s*,\\s*"+c+")*\\s*>)?",/<@@@>/g,2),I={keyword:["synchronized","abstract","private","var","static","if","const ","for","while","strictfp","finally","protected","import","native","final","void","enum","else","break","transient","catch","instanceof","volatile","case","assert","package","default","public","try","switch","continue","throws","protected","public","private","module","requires","exports","do","sealed","yield","permits","goto","when"],literal:["false","true","null"],type:["char","boolean","long","float","int","byte","short","double"],built_in:["super","this"]},$={className:"meta",begin:"@"+n,contains:[{begin:/\(/,end:/\)/,contains:["self"]}]},te={className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[e.C_BLOCK_COMMENT_MODE],endsParent:!0};return{name:"Java",aliases:["jsp"],keywords:I,illegal:/<\/|#/,contains:[e.COMMENT("/\\*\\*","\\*/",{relevance:0,contains:[{begin:/\w+@/,relevance:0},{className:"doctag",begin:"@[A-Za-z]+"}]}),{begin:/import java\.[a-z]+\./,keywords:"import",relevance:2},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE,{begin:/"""/,end:/"""/,className:"string",contains:[e.BACKSLASH_ESCAPE]},e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,{match:[/\b(?:class|interface|enum|extends|implements|new)/,/\s+/,n],className:{1:"keyword",3:"title.class"}},{match:/non-sealed/,scope:"keyword"},{beginKeywords:"new throw return else yield assert",relevance:0},{begin:[n,t.concat(r,l,/\s+/),n,l,/\s*/,/=(?!=)/],className:{1:"type",3:"variable",6:"operator"}},{begin:[/record/,/\s+/,n],className:{1:"keyword",3:"title.class"},contains:[te,e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},{begin:[n,t.concat(r,l,/\s+/),n,/\s*(?=\()/],className:{1:"type",3:"title.function"},keywords:I,contains:[{className:"params",begin:/\(/,end:/\)/,keywords:I,relevance:0,contains:[$,e.APOS_STRING_MODE,e.QUOTE_STRING_MODE,We,e.C_BLOCK_COMMENT_MODE]},e.C_LINE_COMMENT_MODE,e.C_BLOCK_COMMENT_MODE]},We,$]}}he.registerLanguage("java",ze);window.hljs=he;})();
+</script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---- 1. syntax highlighting -------------------------------------- */
+  function highlight() {
+    if (!window.hljs) return;
+    var blocks = document.querySelectorAll('pre code.language-java');
+    for (var i = 0; i < blocks.length; i++) {
+      try { window.hljs.highlightElement(blocks[i]); } catch (e) {}
+    }
+  }
+
+  /* ---- 2. every solution / reveal starts closed --------------------- */
+  function closeAll() {
+    var d = document.querySelectorAll('details.soln');
+    for (var i = 0; i < d.length; i++) { d[i].open = false; }
+  }
+
+  /* ---- 3. show all / hide all -------------------------------------- */
+  function wireToolbar() {
+    var show = document.getElementById('showAll');
+    var hide = document.getElementById('hideAll');
+    function setAll(v) {
+      var d = document.querySelectorAll('details.soln');
+      for (var i = 0; i < d.length; i++) { d[i].open = v; }
+    }
+    if (show) show.addEventListener('click', function () { setAll(true); });
+    if (hide) hide.addEventListener('click', function () { setAll(false); });
+  }
+
+  /* ---- 4. live-coding editors -------------------------------------- */
+  var INDENT = '    ';
+
+  function wireEditors() {
+    var eds = document.querySelectorAll('.editor');
+    for (var i = 0; i < eds.length; i++) { wireOne(eds[i]); }
+  }
+
+  function wireOne(box) {
+    var ta = box.querySelector('textarea');
+    if (!ta) return;
+    var starter = ta.value;
+
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Tab' || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+      ev.preventDefault();
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+
+      if (s === e && !ev.shiftKey) {
+        ta.value = v.slice(0, s) + INDENT + v.slice(e);
+        ta.selectionStart = ta.selectionEnd = s + INDENT.length;
+        return;
+      }
+      /* block indent / outdent over the selected lines */
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var le = v.indexOf('\n', e);
+      if (le === -1) le = v.length;
+      var seg = v.slice(ls, le);
+      var lines = seg.split('\n');
+      var delta0 = 0, total = 0;
+
+      for (var i = 0; i < lines.length; i++) {
+        if (ev.shiftKey) {
+          var m = lines[i].match(/^(\t| {1,4})/);
+          if (m) {
+            lines[i] = lines[i].slice(m[0].length);
+            if (i === 0) delta0 = -m[0].length;
+            total -= m[0].length;
+          }
+        } else {
+          lines[i] = INDENT + lines[i];
+          if (i === 0) delta0 = INDENT.length;
+          total += INDENT.length;
+        }
+      }
+      ta.value = v.slice(0, ls) + lines.join('\n') + v.slice(le);
+      ta.selectionStart = Math.max(ls, s + delta0);
+      ta.selectionEnd = Math.max(ta.selectionStart, e + total);
+    });
+
+    /* keep the indent of the current line when Enter is pressed */
+    ta.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Enter' || ev.shiftKey || ev.ctrlKey || ev.metaKey) return;
+      var s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+      if (s !== e) return;
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      var lead = (v.slice(ls, s).match(/^[ \t]*/) || [''])[0];
+      var extra = /[{(\[]\s*$/.test(v.slice(ls, s)) ? INDENT : '';
+      if (!lead && !extra) return;
+      ev.preventDefault();
+      var ins = '\n' + lead + extra;
+      ta.value = v.slice(0, s) + ins + v.slice(e);
+      ta.selectionStart = ta.selectionEnd = s + ins.length;
+    });
+
+    var rst = box.querySelector('[data-act="reset"]');
+    if (rst) rst.addEventListener('click', function () {
+      ta.value = starter;
+      ta.focus();
+      flash(box, 'Reset to starter code');
+    });
+
+    var cpy = box.querySelector('[data-act="copy"]');
+    if (cpy) cpy.addEventListener('click', function () {
+      var done = function () { flash(box, 'Copied — paste it into your IDE'); };
+      var fail = function () { flash(box, 'Copy failed — select the text and press Ctrl/Cmd+C'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value).then(done, function () { legacy(ta, done, fail); });
+      } else {
+        legacy(ta, done, fail);
+      }
+    });
+  }
+
+  function legacy(ta, done, fail) {
+    try {
+      var st = ta.selectionStart, en = ta.selectionEnd;
+      ta.select();
+      var ok = document.execCommand('copy');
+      ta.selectionStart = st; ta.selectionEnd = en;
+      ok ? done() : fail();
+    } catch (e) { fail(); }
+  }
+
+  function flash(box, msg) {
+    var f = box.querySelector('.foot');
+    if (!f) return;
+    if (f.getAttribute('data-base') === null || f.getAttribute('data-base') === undefined) {
+      f.setAttribute('data-base', f.textContent);
+    }
+    f.textContent = msg;
+    window.setTimeout(function () { f.textContent = f.getAttribute('data-base'); }, 2200);
+  }
+
+  /* ---- go ----------------------------------------------------------- */
+  function init() {
+    highlight();
+    closeAll();
+    wireToolbar();
+    wireEditors();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  /* belt and braces: some browsers restore <details> state on soft reload */
+  window.addEventListener('pageshow', closeAll);
+})();
+</script>
+</body>
+</html>
