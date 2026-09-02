@@ -419,7 +419,7 @@ int add(int x, int y) { return x + y; }</code></pre> <p><strong>Things to notice
         ^
 1 error</code></pre> <p>"Static context" means <code>main</code>. The message is telling you that <code>main</code>, having no object, cannot reach a method that needs one. The fix at this stage is always the same: add <code>static</code> to the method you are trying to call.</p> <div class="box qc"> <div class="hd">Quick Check 2.2</div> <div class="bd"> <p>Write the title line only &mdash; no body &mdash; for each of these methods. Each is a static method of the same class.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> A method <code>perimeter</code> that is given the length and width of a rectangle as decimals and gives back the perimeter.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>public static double perimeter(double length, double width)</code></p> <p>Both dimensions can be fractional, so <code>double</code>; the answer is also fractional, so the return type is <code>double</code>. Every parameter needs its own type &mdash; writing <code>(double length, width)</code> is a syntax error in Java, even though the two share a type.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> A method <code>printLine</code> that is given a whole number <code>n</code> and prints a row of <code>n</code> stars. It gives nothing back.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>public static void printLine(int n)</code></p> <p>"Gives nothing back" is the definition of <code>void</code>. A method that prints and a method that returns are different things: this one does its work by side effect, and calling it in an expression would be an error.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> A method <code>isEven</code> that is given a whole number and answers yes or no.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>public static boolean isEven(int n)</code></p> <p>"Answers yes or no" means <code>boolean</code>, not an <code>int</code> that is 0 or 1. Java will not let you use that <code>int</code> as a condition anyway &mdash; see Lecture 1.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> A method <code>repeat</code> that is given a piece of text and a whole number <code>n</code>, and gives back that text written out <code>n</code> times in a row.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>public static String repeat(String text, int n)</code></p> <p><strong>Things to notice across all four parts.</strong> Deriving a title line is a two-question routine, and it is worth doing in this order every time:</p> <ol> <li><em>What does it need?</em> One type and one name per value, in the order the caller will supply them. That is the parameter list.</li> <li><em>What does it give back?</em> That is the return type &mdash; or <code>void</code> if the answer is "nothing".</li> </ol> <p>The <code>public static</code> on the front is fixed for now, so the whole job is those two questions. Practice Problem 1 is the exam version of this exercise, worked backwards from calls instead of from descriptions.</p> </div></details> </div> <div class="editor">
   <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 2.2</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
-  <textarea spellcheck="false" rows="16" aria-label="Live coding - Quick Check 2.2">public class Shapes {
+  <textarea spellcheck="false" rows="19" aria-label="Live coding - Quick Check 2.2">public class Shapes {
 
     // (a) title line for perimeter, then a body that returns 2*(length + width)
 
@@ -427,10 +427,13 @@ int add(int x, int y) { return x + y; }</code></pre> <p><strong>Things to notice
 
     // (c) title line for isEven, then a body
 
+    // (d) title line for repeat, then a body that returns text written n times
+
     public static void main(String args[]) {
         System.out.println(perimeter(3.0, 4.5));
         printLine(5);
         System.out.println(isEven(7));
+        System.out.println(repeat("ab", 3));
     }
 }</textarea>
   <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
