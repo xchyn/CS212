@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Class 1 — Welcome to Java: Overview and First Programs | CSCI 212</title>
+<title>Class 2 — Methods, Overloading and Recursion | CSCI 212</title>
 <style>
 :root{
   --ink:#0f172a; --ink2:#334155; --muted:#64748b; --line:#e2e8f0;
@@ -361,17 +361,17 @@ table.sched tr.offrow td{background:#f1f5f9;color:var(--muted);font-style:italic
 <span class="sep">|</span>
 <a href="index.html">Course index</a>
 <span class="sep">|</span>
-<span>Class 1 of 28</span>
+<span>Class 2 of 28</span>
 <span class="sep">|</span>
-<span>Tuesday, September 1</span>
+<span>Thursday, September 3</span>
 <span class="spacer"></span>
 <span>Queens College, CUNY</span>
 </div></div>
 <div class="wrap">
 <div class="titleblock">
-  <div class="eyebrow">Session 1 &middot; Lecture 1</div>
-  <h1>Welcome to Java: Overview and First Programs</h1>
-  <p class="sub">What Java is, why it looks the way it does, and how to get a program from a text file to a running result.</p>
+  <div class="eyebrow">Session 2 &middot; Lecture 2</div>
+  <h1>Methods, Overloading and Recursion</h1>
+  <p class="sub">How to break a program into named pieces, how two methods can share one name, and how a method can call itself.</p>
 </div>
 
 <div class="box obj">
@@ -379,402 +379,684 @@ table.sched tr.offrow td{background:#f1f5f9;color:var(--muted);font-style:italic
   <div class="bd">
     <p>By the end of today's session you should be able to:</p>
     <ol>
-      <li>Explain what the Java Virtual Machine is and why the same compiled program runs on Windows, macOS and Linux without being recompiled.</li>
-      <li>Write the standard Java program skeleton from memory &mdash; the <code>class</code> header and the <code>main</code> method &mdash; and say what each word in it means.</li> <li>Compile a program with <code>javac</code> and run it with <code>java</code>, and explain why those are two separate commands.</li> <li>Read a <code>javac</code> error message and locate the line it is complaining about.</li> <li>Name the eight primitive types and choose an appropriate one for a given piece of data.</li> <li>Predict the result of integer division and explain why <code>7 / 3</code> is <code>2</code>.</li> <li>Predict what <code>+</code> does when one of its operands is a <code>String</code>, and place parentheses to control it.</li> <li>Write <code>for</code>, <code>while</code> and <code>if</code> statements in Java and explain how they differ from the C++ versions you already know.</li> </ol> </div> </div> <div class="toc"> <div class="th">On this page</div> <ol> <li><a href="#s1">What Java is, and what makes it different</a></li> <li><a href="#s2">The shape of a Java program</a></li> <li><a href="#s3">Compiling and running</a></li> <li><a href="#s4">The eight primitive types</a></li> <li><a href="#s5">Arithmetic, and the division trap</a></li> <li><a href="#s6">Printing, and what <code>+</code> really does</a></li> <li><a href="#s7">Loops and decisions</a></li> <li><a href="#prac">Practice Problems</a></li> <li><a href="#summary">Lecture Summary</a></li> </ol> </div> <div class="tools"> <span class="lab">Answers</span> <button id="showAll" type="button">Show all</button> <button id="hideAll" type="button">Hide all</button> <span class="muted">&mdash; every worked-example output and every solution is hidden when the page loads. Work it out first, then reveal.</span> </div> <hr> <h2 id="s1"><span class="num">1.</span>What Java is, and what makes it different</h2> <p>You already know how to program. In CSCI 111 you wrote variables, loops, decisions, arrays and functions in C++. Almost none of that knowledge is going to be thrown away this semester &mdash; a <code>for</code> loop in Java looks exactly like a <code>for</code> loop in C++. What changes is the world the code lives in.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; Java</span></div> <div class="bd"> <p><strong>Java</strong> is a high-level, object-oriented programming language created by James Gosling at Sun Microsystems and released in 1995. It was designed around the principle <em>"write once, run anywhere"</em> (WORA): a Java program is compiled once, and the result runs unchanged on any machine that has a Java Virtual Machine.</p> <p>Java is used for Android apps, desktop applications, web back-ends and large enterprise systems. It is one of the most widely deployed languages in the world, which is a large part of why it is the language of this course.</p> </div> </div> <p>The WORA promise is the single most important design decision in Java, and everything else follows from it. To understand it you need one more term.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; bytecode and the JVM</span></div> <div class="bd"> <p>When you compile C++, the compiler produces <strong>machine code</strong> &mdash; instructions for one specific processor and one specific operating system. An executable built on a Mac will not run on Windows.</p> <p>When you compile Java, the compiler produces <strong>bytecode</strong> instead: instructions for an imaginary computer. Bytecode is stored in a <code>.class</code> file. The <strong>Java Virtual Machine (JVM)</strong> is a program that reads bytecode and carries out those instructions on your real machine. There is a JVM for Windows, one for macOS, one for Linux, one for Android. They all read the same bytecode.</p> </div> </div> <div class="box key"> <div class="hd">Key Idea</div> <div class="bd"> <p>C++ says: <em>compile it separately for every machine.</em> Java says: <em>compile it once, and ship a different JVM to every machine.</em> Your <code>.class</code> file is the thing that travels; the JVM is the thing that already lives on the target computer.</p> </div> </div> <p>Four more features of Java follow from that same design, and they are worth naming now because we will keep bumping into them:</p> <ul> <li><strong>Object-oriented.</strong> Java is thoroughly object-oriented. Apart from the eight primitive types we meet in &sect;4, <em>everything</em> in Java is an object. There is no such thing as a free-floating function in Java &mdash; every method lives inside a class. That is why even "hello world" needs a class around it.</li> <li><strong>Simplicity.</strong> Java's syntax is deliberately modelled on C and C++, but the low-level facilities are gone: no pointer arithmetic, no manual <code>delete</code>, no header files, no preprocessor.</li> <li><strong>Automatic memory management.</strong> Java has a <em>garbage collector</em>. You create objects with <code>new</code>; you never free them. When nothing refers to an object any more, the collector reclaims it. The whole category of memory-leak bugs you had to worry about in C++ largely disappears.</li> <li><strong>Security.</strong> Because your code runs inside the JVM rather than directly on the hardware, the JVM can check what it is doing &mdash; array bounds, type safety, access permissions &mdash; and stop it.</li> </ul> <p>Here is the shape of the semester. The left column is CSCI 111 material you already have; the right column is what this course is actually about.</p> <table> <tr><th>Programming fundamentals (from CSCI 111)</th><th>Object-oriented programming (CSCI 212)</th></tr> <tr><td>Variables, data types</td><td>Classes</td></tr> <tr><td>Input and output</td><td>Objects</td></tr> <tr><td>Arithmetic</td><td>Abstraction</td></tr> <tr><td>Decisions</td><td>Encapsulation</td></tr> <tr><td>Loops</td><td>Inheritance</td></tr> <tr><td>Arrays</td><td>Polymorphism</td></tr> <tr><td>Methods / functions</td><td>Abstract classes and interfaces</td></tr> <tr><td></td><td>Exceptions, generics, data structures</td></tr> </table> <p>The first handful of lectures translate the left column into Java. Everything from Lecture 7 onward is the right column.</p> <div class="box qc"> <div class="hd">Quick Check 1.1</div> <div class="bd"> <p>Your friend compiles a Java program on a Windows laptop and emails you the <code>.class</code> file. You have a Mac. Will it run? What would the answer be if it had been a C++ program compiled to an <code>.exe</code>?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The question is really "what is inside the file, and who reads it?" Decide what each compiler produced, then decide whether your machine has something that can read it.</p> <p><strong>The Java case: yes, it runs.</strong> <code>javac</code> on Windows produced bytecode, not Windows machine code. Bytecode is instructions for the JVM, and your Mac has a macOS JVM. You type <code>java ClassName</code> and the macOS JVM reads exactly the same bytecode the Windows JVM would have read.</p> <p><strong>The C++ case: no, it does not run.</strong> The <code>.exe</code> contains machine code addressed to an x86 processor <em>and</em> Windows operating-system calls. Your Mac has no idea what to do with it. To run that program you would need the C++ source code and a compiler on your own machine.</p> <p><strong>Things to notice.</strong> The Java program is not magic &mdash; something platform-specific still had to be written. It is just that Oracle wrote it (the JVM), once per platform, instead of you writing it. Notice also what has to already be on your Mac: not the Java compiler, just the JVM. That is why a user who runs your program needs a Java <em>runtime</em>, while you as a developer need a Java <em>development kit</em>.</p> </div></details> </div> </div> <h2 id="s2"><span class="num">2.</span>The shape of a Java program</h2> <p>In C++ you could write a function that belonged to nothing in particular. Java does not allow that. Every method must be inside a class, so the smallest legal Java program is still a class.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; class, method, main</span></div> <div class="bd"> <p>A <strong>class</strong> is a named container for data and methods. For the next few lectures we will use classes purely as a place to park our code; from Lecture 7 onward they become the centre of everything.</p> <p>A <strong>method</strong> is Java's word for a function. The difference from C++ is not behaviour, it is location: a method always lives inside a class.</p> <p><strong><code>main</code></strong> is the method the JVM calls when you run a program. Its signature is fixed &mdash; if you get one word wrong, the program compiles but will not start.</p> </div> </div> <p>Here is the template. Memorise it; you will type it several hundred times this semester.</p> <p class="filename">Example.java</p>
-<pre><code class="language-java">public class Example {
-    public static void main(String args[]) {
+      <li>Explain why every Java function is a <em>method</em>, why methods live inside a class, and why at this stage they are all declared <code>static</code>.</li> <li>Write the title line of a method from a description of what it is called with and what it gives back: <code>public static returnType name(parameters)</code>.</li> <li>Given a call such as <code>speedLimit(x, z[1])</code> used where an <code>int</code> is expected, deduce the best title line for the method being called.</li> <li>Distinguish a <code>void</code> method from one that returns a value, and predict the compiler error you get when you confuse them.</li> <li>Call a method from <code>main</code>, from another method in the same class, and from a different class using <code>ClassName.method(...)</code>.</li> <li>Explain what <strong>overloading</strong> is, say which of two overloaded methods a given call selects, and recognise an overload that will not compile.</li> <li>Write a recursive method with a correct base case, and trace one by hand down to the base case and back up.</li> <li>Diagnose a <code>StackOverflowError</code> as a missing or unreachable base case.</li> </ol> </div> </div> <div class="toc"> <div class="th">On this page</div> <ol> <li><a href="#s1">From <code>main</code> to methods</a></li> <li><a href="#s2">The title line, word by word</a></li> <li><a href="#s3">Returning a value, or not</a></li> <li><a href="#s4">Calling a method: arguments, copies and order</a></li> <li><a href="#s5">Method overloading</a></li> <li><a href="#s6">Calling a method in another class</a></li> <li><a href="#s7">Recursion</a></li> <li><a href="#s8">Making recursion safe</a></li> <li><a href="#prac">Practice Problems</a></li> <li><a href="#summary">Lecture Summary</a></li> </ol> </div> <div class="tools"> <span class="lab">Answers</span> <button id="showAll" type="button">Show all</button> <button id="hideAll" type="button">Hide all</button> <span class="muted">&mdash; every worked-example output and every solution is hidden when the page loads. Work it out first, then reveal.</span> </div> <hr> <h2 id="s1"><span class="num">1.</span>From <code>main</code> to methods</h2> <p>Last time we established the skeleton every Java program starts from &mdash; a <code>public class</code> with a <code>public static void main(String args[])</code> inside it &mdash; and we filled that <code>main</code> with variables, arithmetic, loops and <code>if</code> statements. Everything we wrote lived in one method. That works for ten lines. It does not work for a hundred.</p> <p>In CSCI 111 the fix was to write a function. Java has the same idea under a different name, and with one structural difference you already met in Lecture 1: there are no free-floating functions in Java. Every function belongs to a class.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; method</span></div> <div class="bd"> <p>A <strong>method</strong> is Java's word for a function: a named, reusable block of code that you can call, optionally hand some values to, and optionally get a value back from.</p> <p>The only structural difference from a C++ function is <em>location</em>. A method is always written inside a class body, between the braces of the <code>class</code> declaration &mdash; never above it, never outside it. <code>main</code> is itself a method; it is not special except that the JVM knows to call it first.</p> </div> </div> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; and it is nearly a quotation</span></div> <div class="bd"> <p>In Java, functions are also called <strong>methods</strong>, and at this stage of the course they are all declared <code>static</code>. We will unpick exactly what <code>static</code> buys us in &sect;2, and we will come back to non-static methods once we have objects to attach them to, from Lecture 7 onward.</p> </div> </div> <p>Here is the smallest possible example: one method that prints a greeting, and a <code>main</code> that calls it three times.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; one method, three calls</span></div> <div class="bd"> <p>Two methods are defined in this class, <code>sayHello</code> and <code>main</code>. Only one of them is run by the JVM directly. Before you open the toggle, decide how many lines this prints and in what order the two method bodies execute.</p> <p class="filename">Hello2.java</p>
+<pre><code class="language-java">public class Hello2 {
+    public static void sayHello() {
+        System.out.println("Hello");
+    }
 
-    }
-}</code></pre> <p>Read it word by word, because every word is doing a job:</p> <table> <tr><th>Word</th><th>What it means</th></tr> <tr><td><code>public</code></td><td>Visible to code outside this class. The JVM is outside your class, so <code>main</code> must be public or the JVM cannot call it.</td></tr> <tr><td><code>class Example</code></td><td>Declares a class named <code>Example</code>. <strong>The file must be named <code>Example.java</code>.</strong></td></tr> <tr><td><code>static</code></td><td>The method belongs to the class itself, not to any object of the class. This matters because when the JVM starts there are no objects yet &mdash; it has nothing to call <code>main</code> <em>on</em>. We come back to <code>static</code> properly in Lecture 9.</td></tr> <tr><td><code>void</code></td><td><code>main</code> returns nothing. (In C++ you wrote <code>return 0;</code>. Java does not want it.)</td></tr> <tr><td><code>String args[]</code></td><td>An array of the command-line arguments. You may ignore it for now, but it must be in the signature.</td></tr> </table> <div class="box warn"> <div class="hd">Common Mistake</div> <div class="bd"> <p><code>String args[]</code> and <code>String[] args</code> mean exactly the same thing, and both are legal. What is <em>not</em> optional is the parameter itself. If you write <code>public static void main()</code> the program will compile perfectly and then refuse to run, because the JVM looks for a <code>main</code> that takes a <code>String</code> array and finds none. A compile that succeeds is not proof that the program starts.</p> </div> </div> <p>Now the smallest useful program. This is the Java translation of the first C++ program you ever wrote.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; hello, in both languages</span></div> <div class="bd"> <p>For comparison, here is the CSCI 111 version you already know. It is here only so you can see what maps onto what &mdash; we will not write any more C++ after this lecture.</p> <p class="filename">C++ (CSCI 111) &mdash; for comparison only</p>
-<pre class="cmp"><code>// example1.cpp
-#include &lt;iostream&gt;
-using namespace std;
-int main() {
-    cout &lt;&lt; "Hello ";
-    cout &lt;&lt; "CSCI 212" &lt;&lt; endl;
-    return 0;
-}</code></pre> <p>And the Java version. Note that there is no <code>#include</code>, no <code>using namespace</code>, and no <code>return 0</code>. <code>System.out</code> is the standard output stream; it is always available.</p> <p class="filename">Example1.java</p>
-<pre><code class="language-java">public class Example1 {
     public static void main(String args[]) {
-        System.out.print("Hello ");
-        System.out.println("CSCI 212");
-    }
-}</code></pre> <p>Before you open the toggle: how many lines does this print?</p> <details class="soln reveal"><summary></summary><div class="ans">
- <pre class="out"><code>Hello CSCI 212</code></pre> <p>One line. <code>print</code> writes its argument and stops. <code>println</code> writes its argument <em>and then a newline</em>. So the two calls land on the same line, and the line ends because the second call was <code>println</code>.</p> <table class="trace"> <tr><th>C++</th><th>Java</th></tr> <tr><td><code>cout &lt;&lt; x</code></td><td><code>System.out.print(x)</code></td></tr> <tr><td><code>cout &lt;&lt; x &lt;&lt; endl</code></td><td><code>System.out.println(x)</code></td></tr> <tr><td><code>#include &lt;iostream&gt;</code></td><td>nothing needed</td></tr> <tr><td><code>return 0;</code> at the end of <code>main</code></td><td>nothing needed &mdash; <code>main</code> is <code>void</code></td></tr> </table> 
-</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 1.2</div> <div class="bd"> <p>Consider this program.</p> <pre><code class="language-java">public class PrintDemo {
-    public static void main(String args[]) {
-        System.out.print("A");
-        System.out.print("B");
-        System.out.println("C");
-        System.out.println("D");
-        System.out.print("E");
-        System.out.println();
-        System.out.println("F");
-    }
-}</code></pre> <p>Write down the exact output, line by line, before you look.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Track a single "current line" as you read downward. A <code>print</code> appends to it. A <code>println</code> appends to it and then ends the line. An empty <code>println()</code> just ends the line.</p> <pre class="out"><code>ABC
-D
-E
-F</code></pre> <p><strong>Things to notice.</strong> <code>System.out.println()</code> with no argument is the Java equivalent of <code>cout &lt;&lt; endl;</code> on its own &mdash; it is how you produce a line break after a series of <code>print</code> calls, and it is how you produce a blank line. Students most often trip on the <code>E</code> line: <code>print("E")</code> alone would have left <code>E</code> dangling with no newline, and the following <code>println("F")</code> would have produced <code>EF</code> on one line. The bare <code>println()</code> is what separates them.</p> </div></details> </div> </div> <h2 id="s3"><span class="num">3.</span>Compiling and running</h2> <p>In C++ there was one step you cared about: turn source into an executable, then run the executable. Java splits this differently, and the two commands have confusingly similar names.</p> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; from source file to output</span></div> <div class="bd"> <ol> <li>Save your source in a file whose name matches the public class exactly, including capitalisation: class <code>Example1</code> goes in <code>Example1.java</code>.</li> <li><strong>Compile.</strong> Run <code>javac Example1.java</code>. If it succeeds it prints nothing at all and creates <code>Example1.class</code>. Silence means success.</li> <li><strong>Run.</strong> Run <code>java Example1</code>. Note carefully: the <em>class name</em>, with no <code>.java</code> and no <code>.class</code> extension. You are telling the JVM which class to look for, not which file to open.</li> </ol> </div> </div> <p>Side by side with the C++ workflow you already know:</p> <table> <tr><th></th><th>C++ (CSCI 111)</th><th>Java (CSCI 212)</th></tr> <tr><td>Compile</td><td><code>g++ example1.cpp -o example1</code></td><td><code>javac Example1.java</code></td></tr> <tr><td>Produces</td><td><code>example1</code> &mdash; machine code</td><td><code>Example1.class</code> &mdash; bytecode</td></tr> <tr><td>Run</td><td><code>./example1</code></td><td><code>java Example1</code></td></tr> </table> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; the file name must match the class name</span></div> <div class="bd"> <p>This is the single most common first-week error, and the compiler is unusually helpful about it. Save a class called <code>Greeting</code> in a file called <code>Hello.java</code> and <code>javac Hello.java</code> answers:</p> <pre class="err"><code>Hello.java:1: error: class Greeting is public, should be declared in a file named Greeting.java
-public class Greeting {
-       ^
-1 error</code></pre> <p>The rule applies to <em>public</em> classes, and it is case-sensitive: <code>example1.java</code> will not do for class <code>Example1</code>. Read the message &mdash; it tells you the exact file name it wants.</p> </div> </div> <p>You will see a lot of <code>javac</code> messages this semester, so start reading them properly now. Every one has the same four parts: the file and line number, the word <code>error</code>, a description, and a caret <code>^</code> pointing at the offending column. Here is the most common one of all:</p> <pre class="err"><code>Semi.java:3: error: ';' expected
-        System.out.println("one")
-                                 ^
-1 error</code></pre> <div class="box qc"> <div class="hd">Quick Check 1.3</div> <div class="bd"> <p>You have written a class called <code>Average</code> and saved it as <code>Average.java</code>.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> You type <code>javac Average.java</code> and nothing at all is printed. Did it work?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Ask what the compiler prints on success versus on failure.</p> <p>Yes, it worked. <code>javac</code> is silent on success; the only evidence is the new file <code>Average.class</code> sitting next to your source. If there had been a problem you would have seen at least one <code>error:</code> line and a count.</p> <p><strong>Things to notice.</strong> This unnerves people coming from environments that say "Build succeeded". Get used to checking for the <code>.class</code> file, or just move straight on to running it.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> You then type <code>java Average.java</code>. What is wrong with that command?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Recall what the argument to <code>java</code> denotes.</p> <p>The argument to <code>java</code> is a <em>class name</em>, not a file name, so the correct command is <code>java Average</code>. Writing <code>java Average.java</code> asks the JVM to find a class literally named <code>java</code> inside a package called <code>Average</code>.</p> <p><strong>Things to notice.</strong> Modern JDKs will actually accept <code>java Average.java</code> &mdash; single-file source mode compiles and runs in one step. That is convenient but it is not what we are doing here, and it will confuse you when you move to a project with more than one file. Learn the two-step version: <code>javac Average.java</code> then <code>java Average</code>.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 1.4</div> <div class="bd"> <p>Write a complete program, saved as <code>Intro.java</code>, that prints your name on one line and <code>CSCI 212</code> on the next &mdash; without using <code>println</code> at all. Use only <code>System.out.print</code>.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> <code>println</code> does two things: print the argument, then end the line. If we are only allowed <code>print</code>, we have to produce the line break ourselves. Java uses the same escape sequence C++ does: <code>\n</code> inside a string literal is a newline character.</p> <p class="filename">Intro.java</p>
-<pre><code class="language-java">public class Intro {
-    public static void main(String args[]) {
-        System.out.print("Xinying Chyn");
-        System.out.print("\n");
-        System.out.print("CSCI 212");
-        System.out.print("\n");
-    }
-}</code></pre> <pre class="out"><code>Xinying Chyn
-CSCI 212</code></pre> <p><strong>Things to notice.</strong> You could also fold the newline into one string: <code>System.out.print("Xinying Chyn\nCSCI 212\n");</code> prints exactly the same two lines from a single call. Both are correct. The point of the exercise is that <code>println(x)</code> is nothing more than <code>print(x)</code> followed by <code>print("\n")</code> &mdash; there is no magic in it. The other escape sequences carry over from C++ too: <code>\t</code> tab, <code>\"</code> a literal quote, <code>\\</code> a literal backslash.</p> </div></details> <div class="editor">
-  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 1.4</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
-  <textarea spellcheck="false" rows="9" aria-label="Live coding - Quick Check 1.4">public class Intro {
-    public static void main(String args[]) {
-        // Print your name, then CSCI 212 on the next line.
-        // You may only use System.out.print
-
-    }
-}</textarea>
-  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
-</div> </div> </div> <h2 id="s4"><span class="num">4.</span>The eight primitive types</h2> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; primitive type</span></div> <div class="bd"> <p>A <strong>primitive type</strong> is one of eight built-in types that hold a plain value directly, rather than a reference to an object. They are the only things in Java that are not objects, and their names are all lowercase &mdash; that lowercase is how you spot a primitive at a glance.</p> </div> </div> <p>They come in four families: whole numbers, decimals, a single character, and a truth value.</p> <table> <tr><th>Type</th><th>Family</th><th>Size</th><th>Range or values</th></tr> <tr><td><code>byte</code></td><td>integer</td><td>8 bits</td><td>&minus;128 to 127</td></tr> <tr><td><code>short</code></td><td>integer</td><td>16 bits</td><td>&minus;32,768 to 32,767</td></tr> <tr><td><code>int</code></td><td>integer</td><td>32 bits</td><td>&minus;2,147,483,648 to 2,147,483,647</td></tr> <tr><td><code>long</code></td><td>integer</td><td>64 bits</td><td>about &plusmn;9.2 &times; 10<sup>18</sup></td></tr> <tr><td><code>float</code></td><td>decimal</td><td>32 bits</td><td>about 7 significant digits</td></tr> <tr><td><code>double</code></td><td>decimal</td><td>64 bits</td><td>about 15 significant digits</td></tr> <tr><td><code>char</code></td><td>character</td><td>16 bits</td><td>one Unicode character, written in single quotes: <code>'J'</code></td></tr> <tr><td><code>boolean</code></td><td>truth value</td><td>&mdash;</td><td><code>true</code> or <code>false</code> only</td></tr> </table> <p>Two differences from C++ are worth flagging immediately.</p> <ul> <li><strong>The sizes are fixed.</strong> In C++, <code>int</code> is "whatever is natural on this machine". In Java an <code>int</code> is <em>always</em> 32 bits, on every platform. That is part of the WORA promise: arithmetic must give the same answer everywhere.</li> <li><strong><code>boolean</code> is not a number.</strong> In C++ you could write <code>if (n)</code> and rely on nonzero meaning true. Java refuses. A condition must be an actual <code>boolean</code>.</li> </ul> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; all eight, and their limits</span></div> <div class="bd"> <p>Each primitive type has a matching <em>wrapper class</em> that carries useful constants; <code>Integer.MAX_VALUE</code> is the largest value an <code>int</code> can hold. Notice the <code>L</code> suffix on the <code>long</code> literal and the <code>f</code> suffix on the <code>float</code> literal &mdash; without them Java reads <code>9000000000</code> as an <code>int</code> (too big) and <code>3.14</code> as a <code>double</code> (too wide).</p> <p class="filename">PrimitiveDemo.java</p>
-<pre><code class="language-java">public class PrimitiveDemo {
-    public static void main(String args[]) {
-        byte    b = 100;
-        short   s = 30000;
-        int     i = 2000000000;
-        long    l = 9000000000L;
-        float   f = 3.14f;
-        double  d = 3.141592653589793;
-        char    c = 'J';
-        boolean t = true;
-
-        System.out.println("byte    " + b + "   max " + Byte.MAX_VALUE);
-        System.out.println("short   " + s + " max " + Short.MAX_VALUE);
-        System.out.println("int     " + i + " max " + Integer.MAX_VALUE);
-        System.out.println("long    " + l + " max " + Long.MAX_VALUE);
-        System.out.println("float   " + f);
-        System.out.println("double  " + d);
-        System.out.println("char    " + c + "   as a number " + (int) c);
-        System.out.println("boolean " + t);
+        sayHello();
+        sayHello();
+        sayHello();
     }
 }</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
- <pre class="out"><code>byte    100   max 127
-short   30000 max 32767
-int     2000000000 max 2147483647
-long    9000000000 max 9223372036854775807
-float   3.14
-double  3.141592653589793
-char    J   as a number 74
-boolean true</code></pre> <p>The line that surprises people is the <code>char</code> one. A <code>char</code> <em>is</em> a number &mdash; it stores the Unicode code point, and <code>'J'</code> is 74. Printing it normally shows the character; casting it to <code>int</code> shows the number. Keep that fact in mind, because it explains a puzzle in &sect;6.</p> 
-</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 1.5</div> <div class="bd"> <p>Choose the most appropriate primitive type for each of the following, and say why.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> A student's age in whole years.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>int</code>. A <code>byte</code> would technically fit any human age (max 127) but there is nothing to gain: you are not storing millions of them, and using <code>byte</code> invites arithmetic surprises. <code>int</code> is the default choice for whole numbers in Java, and you should need a reason to pick anything else.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> A GPA such as 3.47.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>double</code>. It has a fractional part, so it must be <code>float</code> or <code>double</code>, and <code>double</code> is Java's default for decimals &mdash; an unadorned literal like <code>3.47</code> <em>is</em> a <code>double</code>. Choosing <code>float</code> means writing <code>3.47f</code> everywhere and getting roughly seven digits of precision instead of fifteen, for no benefit.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Whether a student has submitted an assignment.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>boolean</code>. It has exactly two states. Resist the C habit of using an <code>int</code> that is <code>0</code> or <code>1</code>; Java will not let you use that <code>int</code> as a condition anyway.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> A student's letter grade, one of A, B, C, D, F.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>char</code>, written with <em>single</em> quotes: <code>char grade = 'A';</code>. Double quotes would make it a <code>String</code>, which is a whole different kind of thing &mdash; an object, not a primitive &mdash; and we take that up in Lecture 4.</p> <p><strong>Things to notice across all four parts.</strong> The question "which type?" is really two questions: what shape is the data (whole? fractional? one character? yes/no?), and only then, how big does it need to be. Answer them in that order and you will almost always land on <code>int</code>, <code>double</code>, <code>char</code> or <code>boolean</code> &mdash; which is exactly as it should be. <code>byte</code>, <code>short</code>, <code>float</code> and <code>long</code> exist for specific reasons (memory-constrained arrays, values beyond two billion) that you will rarely hit in this course.</p> </div></details> </div> </div> </div> <h2 id="s5"><span class="num">5.</span>Arithmetic, and the division trap</h2> <p>The operators are the ones you already know: <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>%</code>, and the shorthands <code>+=</code>, <code>-=</code>, <code>++</code>, <code>--</code>. There is one rule about <code>/</code> that causes more wrong answers on exams than anything else in the first month.</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; the type of the operands decides the operation</span></div> <div class="bd"> <p>If <em>both</em> operands of <code>/</code> are integers, Java performs <strong>integer division</strong>: it divides and throws the remainder away. If <em>either</em> operand is a <code>double</code>, Java performs real division. The type of the result is decided by the operands, never by what you are about to assign it to.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; eight divisions</span></div> <div class="bd"> <p>Predict every line before you reveal. Pay particular attention to the last two.</p> <p class="filename">DivisionDemo.java</p>
-<pre><code class="language-java">public class DivisionDemo {
+ <pre class="out"><code>Hello
+Hello
+Hello</code></pre> <p>The JVM starts at <code>main</code>. It reaches <code>sayHello();</code>, jumps into the body of <code>sayHello</code>, runs the one <code>println</code> there, and then comes back to exactly where it left off in <code>main</code>. That happens three times. Defining <code>sayHello</code> above <code>main</code> in the file did <em>not</em> make it run first &mdash; nothing runs until it is called.</p> <p>Notice what we have bought for three lines of typing: if the greeting has to change, there is exactly one place to change it. That is the entire argument for methods, and it only gets stronger as the method gets longer.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 2.1</div> <div class="bd"> <p>In <code>Hello2.java</code> above, <code>sayHello</code> is written <em>before</em> <code>main</code>. In the class notes' <code>MyFunctions.java</code> &mdash; which we will see in full in &sect;5 &mdash; the method <code>add</code> is written <em>after</em> <code>main</code>, and <code>main</code> calls it anyway. Does the order of the method definitions in the file matter? What would C++ have required?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Ask what the compiler knows, and when it knows it.</p> <p><strong>Order does not matter in Java.</strong> The compiler reads the entire class body before it checks any method call, so by the time it looks at <code>add(111, 212)</code> inside <code>main</code> it already knows every method the class declares. You may write your methods in whatever order reads best &mdash; alphabetical, most-important-first, or <code>main</code> at the top so a reader sees the story before the details.</p> <p><strong>C++ was stricter.</strong> A C++ compiler reads top to bottom in one pass, so a function had to be either defined before its first use or announced first with a prototype:</p> <p class="filename">C++ (CSCI 111) &mdash; for comparison only</p>
+<pre class="cmp"><code>int add(int x, int y);      // prototype, needed before main can call add
+
+int main() {
+    cout &lt;&lt; add(111, 212) &lt;&lt; endl;
+    return 0;
+}
+
+int add(int x, int y) { return x + y; }</code></pre> <p><strong>Things to notice.</strong> Java has no prototypes and no header files at all &mdash; the class body <em>is</em> the declaration. This is one of the ways Java's designers simplified C++, and it is why you will never see a <code>.h</code> file in this course.</p> </div></details> </div> </div> <h2 id="s2"><span class="num">2.</span>The title line, word by word</h2> <p>The first line of a method &mdash; everything up to the opening brace &mdash; is the part you have to get exactly right, and it is the part the exam asks about most often. The class notes give it as a template:</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; title line (signature)</span></div> <div class="bd"> <p>The <strong>title line</strong> of a static method has this shape:</p> <p class="filename">The template</p>
+<pre class="cmp"><code>public static result_type method_name ( define_parameters ) { … }</code></pre> <p>You may also hear it called the method's <strong>signature</strong>. It is the method's contract with the rest of the program: what it is called, what it must be handed, and what it hands back.</p> </div> </div> <p>Take a real one and read every word:</p> <pre><code class="language-java">public static String sayHelloTo(String name) {
+    return "Hello, " + name + "!";
+}</code></pre> <table> <tr><th>Word</th><th>What it is doing</th></tr> <tr><td><code>public</code></td><td>The <em>access modifier</em>. <code>public</code> means any class may call this method. <code>private</code> would mean only code inside this same class may call it &mdash; you will see <code>private</code> on the exam problems in the practice section.</td></tr> <tr><td><code>static</code></td><td>The method belongs to the <strong>class itself</strong>, not to any object. You call it without first creating anything. Everything we write for the next several lectures is <code>static</code>.</td></tr> <tr><td><code>String</code></td><td>The <strong>return type</strong>: the type of the value this method hands back to whoever called it. If it hands nothing back, the return type is the keyword <code>void</code>.</td></tr> <tr><td><code>sayHelloTo</code></td><td>The <strong>method name</strong>. Java convention is <code>lowerCamelCase</code>, starting with a verb: <code>sayHello</code>, <code>numDigits</code>, <code>rowSum</code>.</td></tr> <tr><td><code>(String name)</code></td><td>The <strong>parameter list</strong>: for each value the method expects, a type and a name, separated by commas. Empty parentheses mean the method takes nothing &mdash; but the parentheses are never optional.</td></tr> </table> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; parameter vs. argument</span></div> <div class="bd"> <p>A <strong>parameter</strong> is the variable named in the title line: the <code>name</code> in <code>sayHelloTo(String name)</code>. It exists only inside the method.</p> <p>An <strong>argument</strong> is the actual value written at the call: the <code>"CSCI 212"</code> in <code>sayHelloTo("CSCI 212")</code>.</p> <p>The two are matched up left to right, by position, and the types must be compatible. Names never have to match anything &mdash; the caller has no idea what the method's parameters are called.</p> </div> </div> <p>Now the word that always gets skipped: <code>static</code>. Lecture 1 said <code>main</code> must be <code>static</code> because when the JVM starts there are no objects for it to call <code>main</code> on. The same reasoning applies to every method we call from <code>main</code>.</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; static means "call it on the class"</span></div> <div class="bd"> <p>A <code>static</code> method can be called using only the name of its class. A non-static method must be called <em>on an object</em>, and we do not know how to make an object yet &mdash; that is Lecture 7. Until then, every method you write gets <code>static</code>, because <code>main</code> is <code>static</code> and a <code>static</code> method has no object to work with.</p> </div> </div> <p>Leave <code>static</code> off and the compiler tells you so in a sentence that is worth memorising, because you will meet it many times:</p> <p class="filename">NoStatic.java</p>
+<pre><code class="language-java">public class NoStatic {
+    public void sayHello() {              // static is missing
+        System.out.println("Hello");
+    }
+
     public static void main(String args[]) {
-        System.out.println(7 / 3);
-        System.out.println(7 % 3);
-        System.out.println(7.0 / 3);
-        System.out.println(7 / 3.0);
-        System.out.println((double) 7 / 3);
-        System.out.println((double) (7 / 3));
-        System.out.println(-7 / 3);
-        System.out.println(-7 % 3);
+        sayHello();
+    }
+}</code></pre> <pre class="err"><code>NoStatic.java:7: error: non-static method sayHello() cannot be referenced from a static context
+        sayHello();
+        ^
+1 error</code></pre> <p>"Static context" means <code>main</code>. The message is telling you that <code>main</code>, having no object, cannot reach a method that needs one. The fix at this stage is always the same: add <code>static</code> to the method you are trying to call.</p> <div class="box qc"> <div class="hd">Quick Check 2.2</div> <div class="bd"> <p>Write the title line only &mdash; no body &mdash; for each of these methods. Each is a static method of the same class.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> A method <code>perimeter</code> that is given the length and width of a rectangle as decimals and gives back the perimeter.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>public static double perimeter(double length, double width)</code></p> <p>Both dimensions can be fractional, so <code>double</code>; the answer is also fractional, so the return type is <code>double</code>. Every parameter needs its own type &mdash; writing <code>(double length, width)</code> is a syntax error in Java, even though the two share a type.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> A method <code>printLine</code> that is given a whole number <code>n</code> and prints a row of <code>n</code> stars. It gives nothing back.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>public static void printLine(int n)</code></p> <p>"Gives nothing back" is the definition of <code>void</code>. A method that prints and a method that returns are different things: this one does its work by side effect, and calling it in an expression would be an error.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> A method <code>isEven</code> that is given a whole number and answers yes or no.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>public static boolean isEven(int n)</code></p> <p>"Answers yes or no" means <code>boolean</code>, not an <code>int</code> that is 0 or 1. Java will not let you use that <code>int</code> as a condition anyway &mdash; see Lecture 1.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> A method <code>repeat</code> that is given a piece of text and a whole number <code>n</code>, and gives back that text written out <code>n</code> times in a row.</p> <details class="soln"><summary></summary><div class="ans"> <p><code>public static String repeat(String text, int n)</code></p> <p><strong>Things to notice across all four parts.</strong> Deriving a title line is a two-question routine, and it is worth doing in this order every time:</p> <ol> <li><em>What does it need?</em> One type and one name per value, in the order the caller will supply them. That is the parameter list.</li> <li><em>What does it give back?</em> That is the return type &mdash; or <code>void</code> if the answer is "nothing".</li> </ol> <p>The <code>public static</code> on the front is fixed for now, so the whole job is those two questions. Practice Problem 1 is the exam version of this exercise, worked backwards from calls instead of from descriptions.</p> </div></details> </div> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 2.2</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="19" aria-label="Live coding - Quick Check 2.2">public class Shapes {
+
+    // (a) title line for perimeter, then a body that returns 2*(length + width)
+
+    // (b) title line for printLine, then a body that prints n stars
+
+    // (c) title line for isEven, then a body
+
+    // (d) title line for repeat, then a body that returns text written n times
+
+    public static void main(String args[]) {
+        System.out.println(perimeter(3.0, 4.5));
+        printLine(5);
+        System.out.println(isEven(7));
+        System.out.println(repeat("ab", 3));
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s3"><span class="num">3.</span>Returning a value, or not</h2> <p>Every method falls into one of two camps, and mixing them up is the most common method-related error there is.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; void methods and value-returning methods</span></div> <div class="bd"> <p>A <strong><code>void</code> method</strong> hands nothing back. A call to it is a complete statement on its own: <code>sayHello();</code>. It cannot appear inside a larger expression, because there is no value there to use.</p> <p>A <strong>value-returning method</strong> declares a real type &mdash; <code>int</code>, <code>double</code>, <code>boolean</code>, <code>String</code> &mdash; and must execute a <code>return</code> statement carrying a value of that type. A call to it <em>is</em> a value: you can print it, assign it, or pass it on to another method.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the two kinds, side by side</span></div> <div class="bd"> <p>These two methods are from the class notes. <code>sayHello</code> prints; <code>sayHelloTo</code> builds a <code>String</code> and returns it without printing anything. The middle line of <code>main</code> is the interesting one &mdash; it calls <code>sayHelloTo</code> and does not print the result.</p> <p class="filename">ReturnDemo.java</p>
+<pre><code class="language-java">public class ReturnDemo {
+    public static void sayHello() {
+        System.out.println("Hello");
+    }
+
+    public static String sayHelloTo(String name) {
+        return "Hello, " + name + "!";
+    }
+
+    public static void main(String args[]) {
+        sayHello();
+        sayHelloTo("CSCI 212");
+        System.out.println(sayHelloTo("CSCI 212"));
+    }
+}</code></pre> <p>Three calls, but how many lines of output?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Hello
+Hello, CSCI 212!</code></pre> <p>Two lines, from three calls. The middle call ran perfectly happily: it built the <code>String</code> <code>"Hello, CSCI 212!"</code>, returned it &mdash; and nobody caught it, so it was discarded on the spot. <code>sayHelloTo</code> never prints; printing is the caller's job.</p> <p>That is not a compile error and Java gives you no warning about it. It is, however, almost always a bug, and it is worth training your eye: <strong>a value-returning call standing alone as a statement is a value being thrown away.</strong></p> <table class="trace"> <tr><th>Call</th><th>What comes back</th><th>What the caller does with it</th></tr> <tr><td><code>sayHello()</code></td><td>nothing (<code>void</code>)</td><td>nothing to do &mdash; the printing already happened inside</td></tr> <tr><td><code>sayHelloTo("CSCI 212")</code></td><td>a <code>String</code></td><td>ignores it; nothing is printed</td></tr> <tr><td><code>System.out.println(sayHelloTo("CSCI 212"))</code></td><td>a <code>String</code></td><td>hands it to <code>println</code>, which prints it</td></tr> </table> 
+</div></details> </div> </div> <p>Going the other way &mdash; trying to use a <code>void</code> call as if it had a value &mdash; is a compile error, and a clearly worded one:</p> <p class="filename">VoidUsed.java</p>
+<pre><code class="language-java">public class VoidUsed {
+    public static void sayHello() {
+        System.out.println("Hello");
+    }
+
+    public static void main(String args[]) {
+        System.out.println(sayHello());       // sayHello hands back nothing
+    }
+}</code></pre> <pre class="err"><code>VoidUsed.java:7: error: 'void' type not allowed here
+        System.out.println(sayHello());
+                                   ^
+1 error</code></pre> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; promising a value and not delivering one</span></div> <div class="bd"> <p>If the title line names a return type, <em>every</em> path through the method must reach a <code>return</code> carrying a value of that type. Printing is not returning:</p> <pre><code class="language-java">public static int twice(int n) {
+    System.out.println(2 * n);        // prints, but returns nothing
+}</code></pre> <pre class="err"><code>NoReturn.java:4: error: missing return statement
+    }
+    ^
+1 error</code></pre> <p>Note where the caret points: at the closing brace. The compiler is saying "I reached the end of the method and no value had been returned." The fix is <code>return 2 * n;</code> &mdash; and if you actually wanted the printing behaviour, change the return type to <code>void</code> instead.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 2.3</div> <div class="bd"> <p>For each line, say whether it compiles, and if it does not, what the compiler objects to. Assume both methods from <code>ReturnDemo</code> above are in scope.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>String s = sayHelloTo("Ana");</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compiles. <code>sayHelloTo</code> returns a <code>String</code> and <code>s</code> is a <code>String</code>, so the value has somewhere to go. This is the normal way to use a value-returning method.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>sayHello("Ana");</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Does not compile. <code>sayHello</code> was declared with an empty parameter list, so it accepts no arguments. The compiler says <code>method sayHello in class ReturnDemo cannot be applied to given types</code>, and adds <code>reason: actual and formal argument lists differ in length</code>. The number of arguments must match the number of parameters exactly &mdash; Java has no default arguments.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>int n = sayHelloTo("Ana");</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Does not compile. A <code>String</code> cannot be stored in an <code>int</code>; the message is <code>incompatible types: String cannot be converted to int</code>. The return type in the title line is a promise the compiler checks at every call site.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>System.out.println("Greeting: " + sayHelloTo("Ana"));</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Compiles, and prints <code>Greeting: Hello, Ana!</code>. The call is an expression of type <code>String</code>, so it can sit on either side of a <code>+</code> exactly like a literal would.</p> <p><strong>Things to notice across all four parts.</strong> Two independent things get checked at every call: the <em>arguments</em> going in (count and types) and the <em>returned value</em> coming out (its type versus what you do with it). Part (b) fails on the way in, part (c) on the way out. When you read a <code>javac</code> complaint about a method call, first work out which of the two directions it is talking about &mdash; that alone usually tells you what to fix.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 2.4</div> <div class="bd"> <p>This program has two errors on the numbered lines. Say what each one is, and predict which of them <code>javac</code> reports first.</p> <p class="filename">Broken.java</p>
+<pre><code class="language-java">public class Broken {
+    public void greet(String name) {              // line 1
+        System.out.println("Hi, " + name);
+    }
+
+    public static int square(int n) {
+        n * n;                                    // line 2
+    }
+
+    public static void main(String args[]) {
+        greet("CSCI 212");                        // line 3
+        System.out.println(square(7));            // line 4
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Check each method against its own title line first, then check each call against the method it names.</p> <p><strong>Error 1 &mdash; line 1.</strong> <code>greet</code> is not <code>static</code>, but <code>main</code> is, so line 3 cannot reach it.</p> <p><strong>Error 2 &mdash; line 2.</strong> <code>n * n;</code> is not a statement &mdash; computing a value and doing nothing with it is not something Java lets you write &mdash; and even if it were, <code>square</code> promises an <code>int</code> and never returns one.</p> <p><strong>Which comes first?</strong> The one on line 2. A malformed statement is a <em>syntax</em> error, and the parser stops as soon as it cannot make sense of the text, before it ever gets round to checking whether calls are legal:</p> <pre class="err"><code>Broken.java:7: error: not a statement
+        n * n;                                    // line 2
+          ^
+1 error</code></pre> <p>Fix line 2 to <code>return n * n;</code>, recompile, and only now does the second problem surface:</p> <pre class="err"><code>Broken.java:11: error: non-static method greet(String) cannot be referenced from a static context
+        greet("CSCI 212");                        // line 3
+        ^
+1 error</code></pre> <p>With <code>static</code> added to <code>greet</code> as well, the program compiles and runs:</p> <pre class="out"><code>Hi, CSCI 212
+49</code></pre> <p><strong>Things to notice.</strong> Getting a brand-new error after fixing one is normal and does not mean your fix was wrong. Syntax errors mask everything after them, so work top-down and recompile often rather than trying to spot every problem in one reading.</p> </div></details> </div> </div> <h2 id="s4"><span class="num">4.</span>Calling a method: arguments, copies and order</h2> <p>A call does three things in a fixed order: it evaluates the arguments, it copies them into the parameters, and then it runs the body. Two consequences follow, and both show up on exams.</p> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; what happens at a call</span></div> <div class="bd"> <ol> <li>Each argument expression is evaluated, left to right. If an argument is itself a method call, that inner call runs to completion first.</li> <li>The resulting values are <strong>copied</strong> into the parameters. The parameters are brand-new local variables belonging to the called method.</li> <li>The body runs. When it finishes &mdash; by reaching <code>return</code>, or by falling off the end of a <code>void</code> method &mdash; control goes back to the caller, carrying the returned value if there is one.</li> <li>Every local variable of the method, parameters included, disappears.</li> </ol> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; when does each call actually happen?</span></div> <div class="bd"> <p>Each call announces itself, so the output records the order in which things really happened. The last line has a call nested inside a call. Work out the full output before revealing &mdash; there are seven lines.</p> <p class="filename">Trace.java</p>
+<pre><code class="language-java">public class Trace {
+    public static int twice(int n) {
+        System.out.println("twice called with " + n);
+        return 2 * n;
+    }
+
+    public static void show(int n) {
+        System.out.println("show: " + n);
+    }
+
+    public static void main(String args[]) {
+        int a = twice(5);
+        show(a);
+        show(twice(a));
+        System.out.println(twice(twice(1)));
     }
 }</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
- <pre class="out"><code>2
-1
-2.3333333333333335
-2.3333333333333335
-2.3333333333333335
-2.0
--2
--1</code></pre> <table class="trace"> <tr><th>Expression</th><th>Result</th><th>Why</th></tr> <tr><td><code>7 / 3</code></td><td><code>2</code></td><td>Both <code>int</code>. Integer division; the 0.333 is discarded, not rounded.</td></tr> <tr><td><code>7 % 3</code></td><td><code>1</code></td><td>The remainder that <code>/</code> threw away.</td></tr> <tr><td><code>7.0 / 3</code></td><td><code>2.3333333333333335</code></td><td>One operand is a <code>double</code>, so the <code>3</code> is promoted and real division happens.</td></tr> <tr><td><code>7 / 3.0</code></td><td><code>2.3333333333333335</code></td><td>Same thing; it does not matter which side the <code>double</code> is on.</td></tr> <tr><td><code>(double) 7 / 3</code></td><td><code>2.3333333333333335</code></td><td>The cast binds tighter than <code>/</code>, so this is <code>(7.0) / 3</code>. This is the standard fix.</td></tr> <tr><td><code>(double) (7 / 3)</code></td><td><code>2.0</code></td><td><strong>The trap.</strong> The parentheses force integer division to happen <em>first</em>; casting 2 to a <code>double</code> afterwards cannot recover the lost third.</td></tr> <tr><td><code>-7 / 3</code></td><td><code>-2</code></td><td>Java truncates toward zero, so &minus;2.33 becomes &minus;2, not &minus;3.</td></tr> <tr><td><code>-7 % 3</code></td><td><code>-1</code></td><td>The remainder takes the sign of the left operand.</td></tr> </table> <p>The tail <code>...35</code> on 2.3333333333333335 is not a mistake in the notes. A <code>double</code> stores a binary fraction, and one third is not exactly representable in binary, any more than it is in decimal. Java prints enough digits to identify the stored value uniquely, and those digits include the error. This is normal floating-point behaviour and it is the same in C++.</p> 
-</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; averaging integers</span></div> <div class="bd"> <p>The classic version of this bug is an average:</p> <pre><code class="language-java">int a = 90, b = 85, c = 78;
-double average = (a + b + c) / 3;      // WRONG: prints 84.0</code></pre> <p>Declaring <code>average</code> as a <code>double</code> changes nothing. By the time the assignment happens, <code>(a + b + c) / 3</code> has already been computed as the <code>int</code> 84. The fix is to make one operand a <code>double</code> <em>inside</em> the expression:</p> <pre><code class="language-java">double average = (a + b + c) / 3.0;    // right: 84.33333333333333</code></pre> <p>Writing <code>3.0</code> instead of <code>3</code> is the smallest possible fix, and it is the one to reach for. <code>(double) (a + b + c) / 3</code> also works.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 1.6</div> <div class="bd"> <p>Give the exact value and the type of each expression.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>17 / 5</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>3</code>, an <code>int</code>. Both operands are integers, so the 0.4 is discarded.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>17 % 5</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>2</code>, an <code>int</code>. 17 = 3&times;5 + 2.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>17 / 5.0</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>3.4</code>, a <code>double</code>. The right operand is a <code>double</code>, so the left is promoted and real division happens.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>(double) (17 / 5)</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>3.0</code>, a <code>double</code>. The parentheses make the integer division happen first; the cast then widens the <code>int</code> 3 into the <code>double</code> 3.0. The 0.4 was gone before the cast ever ran.</p> <p><strong>Things to notice.</strong> Parts (c) and (d) are the whole lesson: the cast has to be applied to an <em>operand</em>, not to the finished result. When you see a cast in someone's code, look immediately at what is inside its parentheses.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 1.7</div> <div class="bd"> <p>Write a complete program <code>Average.java</code> that stores three test scores in three <code>int</code> variables and prints their average as a decimal. Then add a second line that prints what you would have got with integer division, so you can see the difference.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Sum the three <code>int</code> values &mdash; that part is genuinely integer arithmetic and should be. The division is where the type has to change, so divide by <code>3.0</code> rather than <code>3</code>. For the second line, deliberately divide by <code>3</code> and store the result in an <code>int</code> so the truncation is visible.</p> <p class="filename">Average.java</p>
-<pre><code class="language-java">public class Average {
-    public static void main(String args[]) {
-        int a = 90, b = 85, c = 78;
-
-        double average = (a + b + c) / 3.0;
-        System.out.println("The average is " + average);
-
-        int wrong = (a + b + c) / 3;
-        System.out.println("Integer division gives " + wrong);
+ <pre class="out"><code>twice called with 5
+show: 10
+twice called with 10
+show: 20
+twice called with 1
+twice called with 2
+4</code></pre> <table class="trace"> <tr><th>Statement</th><th>What runs, in order</th></tr> <tr><td><code>int a = twice(5);</code></td><td><code>twice(5)</code> runs and prints its line; it returns 10, which is stored in <code>a</code>.</td></tr> <tr><td><code>show(a);</code></td><td><code>a</code> is already 10, so there is nothing to evaluate; <code>show</code> prints <code>show: 10</code>.</td></tr> <tr><td><code>show(twice(a));</code></td><td>The argument is evaluated <em>first</em>: <code>twice(10)</code> prints its line and returns 20. Only then does <code>show</code> start, printing <code>show: 20</code>.</td></tr> <tr><td><code>System.out.println(twice(twice(1)));</code></td><td>Innermost first: <code>twice(1)</code> prints and returns 2; then <code>twice(2)</code> prints and returns 4; then <code>println</code> prints <code>4</code>.</td></tr> </table> <p>The rule to carry away: <em>arguments are fully evaluated before the method they belong to begins</em>. Read a nested call from the inside out, exactly as you would read nested parentheses in arithmetic.</p> 
+</div></details> </div> </div> <p>Step 2 of the procedure said the arguments are <em>copied</em>. That word is doing a lot of work.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; a method cannot change its caller's variable</span></div> <div class="bd"> <p><code>doubleValue</code> assigns to its parameter <code>x</code>. The question is whether <code>n</code> back in <code>main</code> changes too.</p> <p class="filename">ValueDemo.java</p>
+<pre><code class="language-java">public class ValueDemo {
+    public static void doubleValue(int x) {
+        x = 2 * x;
+        System.out.println("Inside the method, x is " + x);
     }
-}</code></pre> <pre class="out"><code>The average is 84.33333333333333
-Integer division gives 84</code></pre> <p><strong>Things to notice.</strong> The sum 253 divided by 3 is 84.33..., so integer division loses a third of a point &mdash; small here, but the same bug in a program that averages a hundred assignments quietly costs students real grade points. Notice also that <code>84.33333333333333</code> has fourteen 3s, not fifteen: <code>double</code> gives you about fifteen significant digits in total, and the leading <code>84.</code> uses two of them. Later, when we want to print money or a GPA to two places, we will use <code>DecimalFormat</code> instead of showing every digit.</p> </div></details> <div class="editor">
-  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 1.7</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
-  <textarea spellcheck="false" rows="12" aria-label="Live coding - Quick Check 1.7">public class Average {
+
     public static void main(String args[]) {
-        int a = 90, b = 85, c = 78;
-
-        // 1. Print the average as a decimal.
-
-        // 2. Print what integer division would have given.
-
-    }
-}</textarea>
-  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
-</div> </div> </div> <h2 id="s6"><span class="num">6.</span>Printing, and what <code>+</code> really does</h2> <p>In C++ you chained values onto <code>cout</code> with <code>&lt;&lt;</code>. Java has no such operator for output. Instead you build one <code>String</code> and hand it to <code>println</code>, and you build it with <code>+</code>.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; string concatenation</span></div> <div class="bd"> <p>The <code>+</code> operator is <strong>overloaded</strong>. If both operands are numbers it adds them. If <em>either</em> operand is a <code>String</code>, it converts the other one to text and joins them &mdash; this is called <strong>concatenation</strong>. And <code>+</code> evaluates strictly left to right.</p> </div> </div> <p>Those two facts together &mdash; overloaded meaning, left-to-right order &mdash; produce results that look wrong until you trace them one step at a time.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; six uses of one operator</span></div> <div class="bd"> <p>Predict all six lines. At least one of them will surprise you.</p> <p class="filename">ConcatDemo.java</p>
-<pre><code class="language-java">public class ConcatDemo {
-    public static void main(String args[]) {
-        System.out.println("Sum: " + 1 + 2);
-        System.out.println("Sum: " + (1 + 2));
-        System.out.println(1 + 2 + " is the sum");
-        System.out.println('A' + 1);
-        System.out.println("" + 'A' + 1);
-        System.out.println(1 + 2 + "3" + 4 + 5);
+        int n = 10;
+        doubleValue(n);
+        System.out.println("Back in main, n is " + n);
     }
 }</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
- <pre class="out"><code>Sum: 12
-Sum: 3
-3 is the sum
-66
-A1
-3345</code></pre> <table class="trace"> <tr><th>Expression</th><th>Left-to-right trace</th><th>Result</th></tr> <tr><td><code>"Sum: " + 1 + 2</code></td><td><code>"Sum: " + 1</code> is a <code>String</code> <code>"Sum: 1"</code>; then <code>+ 2</code> appends the 2</td><td><code>Sum: 12</code></td></tr> <tr><td><code>"Sum: " + (1 + 2)</code></td><td>parentheses force <code>1 + 2</code> to be numeric addition first</td><td><code>Sum: 3</code></td></tr> <tr><td><code>1 + 2 + " is the sum"</code></td><td><code>1 + 2</code> are both numbers, so they add to 3; only then does a <code>String</code> appear</td><td><code>3 is the sum</code></td></tr> <tr><td><code>'A' + 1</code></td><td>no <code>String</code> anywhere, and a <code>char</code> is a number: 65 + 1</td><td><code>66</code></td></tr> <tr><td><code>"" + 'A' + 1</code></td><td>the empty <code>String</code> makes the first <code>+</code> a concatenation, so <code>'A'</code> becomes text</td><td><code>A1</code></td></tr> <tr><td><code>1 + 2 + "3" + 4 + 5</code></td><td><code>1+2</code> = 3 numerically; <code>3 + "3"</code> = <code>"33"</code>; then <code>"334"</code>, then <code>"3345"</code></td><td><code>3345</code></td></tr> </table> <p>The rule that explains every row: <em>scan left to right, and at each <code>+</code> ask whether a <code>String</code> has appeared yet.</em> Before the first <code>String</code>, <code>+</code> means addition. From the first <code>String</code> onward, everything is concatenation and there is no way back.</p> 
-</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake</div> <div class="bd"> <p><code>System.out.println("Total: " + a + b);</code> almost never means what its author intended. If <code>a</code> is 9 and <code>b</code> is 4 it prints <code>Total: 94</code>, not <code>Total: 13</code>. Whenever you are concatenating a label onto a computed value, put the computation in parentheses: <code>"Total: " + (a + b)</code>.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 1.8</div> <div class="bd"> <p>Let <code>int x = 5, y = 3;</code>. Give the exact output of each statement.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>System.out.println(x + y + "!");</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>8!</code> &mdash; <code>x + y</code> are both <code>int</code>, so they add to 8 before any <code>String</code> is met.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>System.out.println("!" + x + y);</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>!53</code> &mdash; the <code>String</code> comes first, so both <code>+</code> operators concatenate.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>System.out.println("!" + (x + y));</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>!8</code> &mdash; the parentheses are evaluated first, giving the number 8, which is then concatenated.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>System.out.println(x + y + x + "!" + x + y + x);</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>13!535</code>. Trace it: <code>5 + 3</code> = 8, <code>8 + 5</code> = 13 (all numeric so far), then <code>13 + "!"</code> = <code>"13!"</code>, and from there <code>"13!5"</code>, <code>"13!53"</code>, <code>"13!535"</code>.</p> <p><strong>Things to notice across all four parts.</strong> The same three variables in the same order give four different answers depending on where the <code>String</code> sits. This is exactly the kind of question that appears on Exam 1 as a line-by-line "what is the output" problem, and the reliable technique is always the same: put your finger on the leftmost <code>+</code> and work rightward, writing down the running value and its type at each step.</p> </div></details> </div> </div> </div> <h2 id="s7"><span class="num">7.</span>Loops and decisions</h2> <p>This is the shortest section in the lecture, and that is the point: <code>for</code>, <code>while</code>, <code>do-while</code>, <code>if</code>, <code>else</code> and <code>switch</code> are written in Java exactly as you wrote them in C++. The braces, the semicolons in the <code>for</code> header, the <code>else if</code> chain &mdash; all identical.</p> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; the one real difference</span></div> <div class="bd"> <p>A Java condition must be a <code>boolean</code>. Two C++ habits stop working:</p> <ul> <li><code>if (n)</code> meaning "if n is nonzero" &mdash; not legal in Java. Write <code>if (n != 0)</code>.</li> <li><code>if (n = 5)</code> &mdash; the classic typo for <code>==</code>. In C++ this compiles and is always true. In Java the compiler catches it, because <code>n = 5</code> produces an <code>int</code> and an <code>int</code> is not a <code>boolean</code>:</li> </ul> <pre class="err"><code>Asg.java:4: error: incompatible types: int cannot be converted to boolean
-        if (n = 5) System.out.println("five");
-              ^
-1 error</code></pre> <p>This is a small example of a large theme: Java's type system is deliberately stricter than C++'s, and the payoff is that a whole class of bugs becomes a compile error instead of a wrong answer at 2am.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; the harmonic sum, ported from CSCI 111</span></div> <div class="bd"> <p>This is the C++ program from your CSCI 111 notes, alongside its Java translation. It exercises division, a <code>for</code> loop, a <code>while</code> loop and an <code>if</code>/<code>else</code>, so it is a complete tour of the lecture in one file.</p> <p class="filename">C++ (CSCI 111) &mdash; for comparison only</p>
-<pre class="cmp"><code>#include &lt;iostream&gt;
-using namespace std;
-int main() {
-    cout &lt;&lt; "7 / 3 = " &lt;&lt; 7/3 &lt;&lt; endl;
-    cout &lt;&lt; "7.0 / 3 = " &lt;&lt; 7.0/3 &lt;&lt; endl;
-    double sum = 0.0;
-    for (int i = 1; i &lt;= 100; i++) sum += 1.0 / i;
-    cout &lt;&lt; "The sum of first 100 reciprocals is: " &lt;&lt; sum &lt;&lt; endl;
-    int n = 101;
-    while (sum &lt; 10) {
-        sum += 1.0 / n;
-        n++;
+ <pre class="out"><code>Inside the method, x is 20
+Back in main, n is 10</code></pre> <p><code>n</code> is unchanged. What was passed was the <em>value</em> 10, copied into a fresh variable called <code>x</code> that belongs to <code>doubleValue</code>. Assigning to <code>x</code> overwrites the copy and leaves the original alone. When the method returns, <code>x</code> ceases to exist.</p> <p>This is called <strong>pass by value</strong>, and Java does it for every argument, always. There is no C++ <code>&amp;</code> reference parameter in Java and no way to ask for one.</p> <p>So how does a method give something back? Only through its return value:</p> <pre><code class="language-java">public static int doubled(int x) {
+    return 2 * x;
+}
+// at the call site:
+n = doubled(n);        // this is how n changes</code></pre> <p>One honest caveat, flagged now and settled properly in Lecture 8: when the argument is an <em>object</em> rather than a primitive, the value being copied is a reference to that object, and the method <em>can</em> change what the object contains &mdash; though it still cannot make the caller's variable point at something different. Her exam problems test exactly that distinction. For today, every argument is a primitive or a <code>String</code>, and the picture above is the whole story.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 2.5</div> <div class="bd"> <p>What does this program print? Be careful: there are two different variables called <code>n</code>.</p> <pre><code class="language-java">public class ScopeDemo {
+    public static int bump(int n) {
+        n = n + 1;
+        return n;
     }
-    cout &lt;&lt; "We need " &lt;&lt; n &lt;&lt; " reciprocals to get a sum of 10" &lt;&lt; endl;
-    if (n % 2 == 0) cout &lt;&lt; n &lt;&lt; " is even." &lt;&lt; endl;
-    else cout &lt;&lt; n &lt;&lt; " is odd." &lt;&lt; endl;
-    return 0;
-}</code></pre> <p class="filename">Example2.java</p>
-<pre><code class="language-java">public class Example2 {
-    public static void main(String args[]) {
-        System.out.println("7 / 3 = " + 7/3);
-        System.out.println("7.0 / 3 = " + 7.0/3);
 
-        double sum = 0.0;
-        for (int i = 1; i &lt;= 100; i++)
-            sum += 1.0 / i;
-        System.out.println("The sum of first 100 reciprocals is: " + sum);
-
-        int n = 101;
-        while (sum &lt; 10) {
-            sum += 1.0 / n;
-            n++;
-        }
-        System.out.println("We need " + n + " reciprocals to get a sum of 10");
-        if (n % 2 == 0) System.out.println(n + " is even.");
-        else System.out.println(n + " is odd.");
-    }
-}</code></pre> <p>Two questions before you reveal. First: is the second line going to print <code>2.33</code> or something longer? Second: roughly how big will <code>n</code> be?</p> <details class="soln reveal"><summary></summary><div class="ans">
- <pre class="out"><code>7 / 3 = 2
-7.0 / 3 = 2.3333333333333335
-The sum of first 100 reciprocals is: 5.187377517639621
-We need 12368 reciprocals to get a sum of 10
-12368 is even.</code></pre> <p>Three things worth pulling out.</p> <ul> <li><strong><code>sum += 1.0 / i</code>, not <code>1 / i</code>.</strong> If that had been <code>1 / i</code>, then for every <code>i</code> greater than 1 integer division would give 0, and the sum would come out as a flat 1.0. Writing the numerator as <code>1.0</code> is the entire difference between a correct program and a silently wrong one.</li> <li><strong>The harmonic series grows brutally slowly.</strong> One hundred terms only reach about 5.19. Getting to 10 takes 12,368 terms &mdash; more than a hundred times as many for less than double the sum. That is the logarithm at work.</li> <li><strong><code>n</code> is 12368 when the loop stops</strong>, and 12368 is even, so the <code>if</code> takes the first branch. Note that the loop increments <code>n</code> after adding, so at exit <code>n</code> is one past the last term used &mdash; a classic off-by-one worth being deliberate about.</li> </ul> 
-</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 1.9</div> <div class="bd"> <p>What does this print? Be careful with the second loop.</p> <pre><code class="language-java">public class LoopDemo {
-    public static void main(String args[]) {
-        for (int i = 1; i &lt;= 5; i++) System.out.print(i * i + " ");
-        System.out.println();
-
-        int n = 1;
-        while (n &lt; 100) n = n * 3;
-        System.out.println("First power of 3 at least 100: " + n);
-
-        int count = 0;
-        for (int i = 1; i &lt;= 30; i++) {
-            if (i % 3 == 0 &amp;&amp; i % 5 == 0) count++;
-        }
-        System.out.println("Multiples of 15 up to 30: " + count);
-    }
-}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Take the three pieces separately. The <code>for</code> loop prints five squares on one line. The <code>while</code> loop multiplies by 3 until the value reaches 100 &mdash; run the powers: 1, 3, 9, 27, 81, 243. It exits the first time the condition fails, so the answer is the first power of 3 that is <em>not</em> less than 100. The counting loop needs <code>i</code> divisible by both 3 and 5, which means divisible by 15.</p> <pre class="out"><code>1 4 9 16 25
-First power of 3 at least 100: 243
-Multiples of 15 up to 30: 2</code></pre> <p><strong>Things to notice.</strong> <code>81</code> is less than 100, so the loop body runs once more and jumps to 243 &mdash; it overshoots, and that is correct behaviour for <code>while (n &lt; 100)</code>. If you wanted the last power below 100 you would have to remember the previous value.</p> <p>In the first line, <code>i * i + " "</code> works because <code>*</code> binds tighter than <code>+</code>, so the square is computed before the space is concatenated. Had you written <code>"" + i * i</code> it would still be fine, but <code>i + i + " "</code> would print the double, not the square.</p> <p>The multiples are 15 and 30, so <code>count</code> is 2. Java's <code>&amp;&amp;</code> short-circuits exactly as C++'s does: if <code>i % 3 == 0</code> is false, <code>i % 5 == 0</code> is never evaluated.</p> </div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 1.10</div> <div class="bd"> <p>Adapt the harmonic-sum program. Write <code>Harmonic.java</code> that finds how many terms of 1 + 1/2 + 1/3 + &hellip; are needed before the sum first exceeds 5, and prints both the number of terms and the sum at that moment. Start the count at zero rather than hard-coding 100 terms first.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> A <code>while</code> loop is right here because we do not know in advance how many iterations we need &mdash; that is the thing we are trying to find out. Keep two variables: the running <code>sum</code> and the number of <code>terms</code> used so far. Loop while the sum has not yet passed 5. Increment <code>terms</code> <em>before</em> adding <code>1.0 / terms</code>, so the divisor is never zero and <code>terms</code> ends up holding exactly the number of terms added.</p> <p class="filename">Harmonic.java</p>
-<pre><code class="language-java">public class Harmonic {
-    public static void main(String args[]) {
-        double sum = 0.0;
-        int terms = 0;
-
-        while (sum &lt;= 5.0) {
-            terms++;
-            sum += 1.0 / terms;
-        }
-
-        System.out.println("Terms needed: " + terms);
-        System.out.println("Sum is now:   " + sum);
-    }
-}</code></pre> <pre class="out"><code>Terms needed: 83
-Sum is now:   5.002068272680166</code></pre> <p><strong>Things to notice.</strong> The order inside the loop matters. Incrementing first means <code>terms</code> counts the term just added, so no adjustment is needed after the loop. Had you written <code>sum += 1.0 / terms; terms++;</code> you would divide by zero on the first pass &mdash; and because these are <code>double</code> values, Java would not even throw an error: <code>1.0 / 0</code> is <code>Infinity</code>, and the loop would exit immediately with a nonsense answer. Integer division by zero throws an exception; floating-point division by zero does not. That difference will catch you again in Lecture 20.</p> <p>Choosing <code>sum &lt;= 5.0</code> rather than <code>sum &lt; 5.0</code> matters only in the unlikely event the sum lands exactly on 5. Using <code>while (sum &lt; 5.0)</code> here gives the same 83 terms.</p> </div></details> <div class="editor">
-  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 1.10</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
-  <textarea spellcheck="false" rows="12" aria-label="Live coding - Quick Check 1.10">public class Harmonic {
-    public static void main(String args[]) {
-        double sum = 0.0;
-        int terms = 0;
-
-        // Keep adding 1/1, 1/2, 1/3, ... until sum passes 5.
-        // Then print how many terms it took, and the sum.
-
-    }
-}</textarea>
-  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
-</div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 1.11</div> <div class="bd"> <p>Each of these three lines has a problem. Say what the compiler will tell you, or if it compiles, what goes wrong at run time.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>int n = 3.5;</code></p> <details class="soln"><summary></summary><div class="ans"> <p>A compile error. <code>3.5</code> is a <code>double</code>, and squeezing a <code>double</code> into an <code>int</code> would throw away the fractional part, so Java refuses to do it silently:</p> <pre class="err"><code>Lossy.java:3: error: incompatible types: possible lossy conversion from double to int
-        int n = 3.5;
-                ^
-1 error</code></pre> <p>If you genuinely want the truncation, say so with a cast: <code>int n = (int) 3.5;</code> gives 3.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>if (count = 5) System.out.println("five");</code></p> <details class="soln"><summary></summary><div class="ans"> <p>A compile error, and a welcome one. <code>count = 5</code> is an assignment whose value is the <code>int</code> 5, and Java will not treat an <code>int</code> as a condition:</p> <pre class="err"><code>Asg.java:4: error: incompatible types: int cannot be converted to boolean
-        if (n = 5) System.out.println("five");
-              ^
-1 error</code></pre> <p>The author meant <code>==</code>. In C++ this same typo compiles cleanly, always takes the <code>if</code> branch, and quietly overwrites <code>count</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>double half = 1 / 2;</code></p> <details class="soln"><summary></summary><div class="ans"> <p>This one compiles. That is exactly why it is dangerous. <code>1 / 2</code> is integer division giving <code>0</code>, and widening the <code>int</code> 0 to a <code>double</code> is perfectly legal, so <code>half</code> becomes <code>0.0</code>. There is no warning and no error &mdash; just a wrong answer.</p> <p>Write <code>1 / 2.0</code>, or <code>1.0 / 2</code>.</p> <p><strong>Things to notice across all three parts.</strong> Two of these three the compiler catches for you; the third it does not. That is the shape of most real debugging. When a number comes out as <code>0</code> or <code>0.0</code> and you cannot see why, look for an integer division you did not intend &mdash; it is the first thing to check, every time.</p> </div></details> </div> </div> </div> <h2 id="prac"><span class="num">&#9733;</span>Practice Problems</h2> <div class="box prac"> <div class="hd">Practice Problems<span class="tag">&mdash; exam-style, Lecture 1 material only</span></div> <div class="bd"> <p>These four are written in the format of the CSCI 212 exams: a line-by-line output prediction, a complete program, a find-the-errors question, and a translation. Work them on paper first &mdash; the exam is closed book and there is no compiler in the room.</p> </div> </div> <h3>Problem 1 &mdash; What is the output?</h3> <p>Consider the following Java program.</p> <p class="filename">Output1.java</p>
-<pre><code class="language-java">public class Output1 {
-    public static void main(String args[]) {
-        int a = 9, b = 4;
-        double x = 9;
-        char g = 'B';
-
-        System.out.println(a / b);              // line (a)
-        System.out.println(a % b);              // line (b)
-        System.out.println(x / b);              // line (c)
-        System.out.println(a / (double) b);     // line (d)
-        System.out.println((double) (a / b));   // line (e)
-        System.out.println("a/b = " + a / b);   // line (f)
-        System.out.println("a/b = " + a + b);   // line (g)
-        System.out.println(g + 1);              // line (h)
-        System.out.println("" + g + 1);         // line (i)
-
-        int n = 0, s = 0;
-        while (s &lt; 10) { n++; s += n; }
-        System.out.println(n + " " + s);        // line (j)
-    }
-}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> What is the output at line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>2</code>. Both <code>a</code> and <code>b</code> are <code>int</code>, so integer division: 9 &divide; 4 = 2 remainder 1.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What is the output at line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>1</code>. The remainder that line (a) discarded.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> What is the output at line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>2.25</code>. <code>x</code> is a <code>double</code>, so <code>b</code> is promoted and real division happens. 9.0 &divide; 4 is exactly 2.25 &mdash; a quarter is representable in binary, so there is no trailing noise here.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> What is the output at line (d)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>2.25</code>. The cast applies to <code>b</code> alone, so this is 9 &divide; 4.0.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> What is the output at line (e)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>2.0</code>. The parentheses make <code>a / b</code> an integer division that yields 2; the cast then widens 2 to 2.0. Compare this line with (d) &mdash; same symbols, different parentheses, different answer.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(f)</span> What is the output at line (f)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>a/b = 2</code>. <code>/</code> binds tighter than <code>+</code>, so <code>a / b</code> is computed as the <code>int</code> 2 first, and only then concatenated.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(g)</span> What is the output at line (g)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>a/b = 94</code>. There is no arithmetic here at all. Left to right: <code>"a/b = " + a</code> is already a <code>String</code>, so <code>+ b</code> just appends the character <code>4</code> after the character <code>9</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(h)</span> What is the output at line (h)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>67</code>. No <code>String</code> is involved, and a <code>char</code> is a number: <code>'B'</code> is 66, so <code>'B' + 1</code> is 67. Java prints it as a number because the type of the expression is <code>int</code>, not <code>char</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(i)</span> What is the output at line (i)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>B1</code>. The empty <code>String</code> at the front turns the first <code>+</code> into a concatenation, so <code>'B'</code> is converted to text as the character <code>B</code>, and then <code>1</code> is appended.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(j)</span> What is the output at line (j)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>4 10</code>. Trace the loop: it accumulates 1, 3, 6, 10 into <code>s</code> while <code>n</code> goes 1, 2, 3, 4. After <code>s</code> becomes 10 the condition <code>s &lt; 10</code> is false and the loop stops, leaving <code>n</code> at 4.</p> <table class="trace"> <tr><th>Iteration</th><th><code>n</code> after <code>n++</code></th><th><code>s</code> after <code>s += n</code></th><th><code>s &lt; 10</code>?</th></tr> <tr><td>1</td><td>1</td><td>1</td><td>yes</td></tr> <tr><td>2</td><td>2</td><td>3</td><td>yes</td></tr> <tr><td>3</td><td>3</td><td>6</td><td>yes</td></tr> <tr><td>4</td><td>4</td><td>10</td><td>no &mdash; exit</td></tr> </table> <p><strong>Things to notice across the whole problem.</strong> Lines (d) and (e) differ only in parentheses; lines (f) and (g) differ only in parentheses that are not there. On an exam these pairs are worth a point each and cost nothing but care. Build the habit of annotating the type of each subexpression as you read: writing a small <code>int</code> or <code>String</code> above each <code>+</code> turns this from a memory exercise into bookkeeping.</p> </div></details> </div> <h3>Problem 2 &mdash; Write a complete program</h3> <p>Write a complete Java program in <code>Squares.java</code> that prints the squares of the integers 1 through 10 on a single line separated by spaces, and then, on separate lines, their total and their average. The average must be printed as a decimal.</p> <p>A sample output of this program:</p> <pre class="out"><code>1 4 9 16 25 36 49 64 81 100
-Total:   385
-Average: 38.5</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> One <code>for</code> loop does both jobs: print each square with <code>print</code> (not <code>println</code>, so they stay on one line) and accumulate into a running total. After the loop, a bare <code>println()</code> closes the line. The total is a genuine <code>int</code>, so keep it as one. The average is a total divided by 10 and must not be integer division &mdash; write <code>10.0</code>.</p> <p class="filename">Squares.java</p>
-<pre><code class="language-java">public class Squares {
-    public static void main(String args[]) {
-        int total = 0;
-        for (int i = 1; i &lt;= 10; i++) {
-            System.out.print(i * i + " ");
-            total += i * i;
-        }
-        System.out.println();
-        System.out.println("Total:   " + total);
-        System.out.println("Average: " + total / 10.0);
-    }
-}</code></pre> <pre class="out"><code>1 4 9 16 25 36 49 64 81 100
-Total:   385
-Average: 38.5</code></pre> <p><strong>Things to notice.</strong> There is a trailing space after <code>100</code> because every square is followed by <code>" "</code>. That matches the sample output, but if you wanted to avoid it you would print the separator <em>before</em> every square except the first.</p> <p><code>total / 10.0</code> gives 38.5 exactly. Had you written <code>total / 10</code> you would have got <code>38</code> &mdash; and because <code>385 / 10</code> is 38.5, this is a case where the truncation loses a visible half-point rather than a rounding error you might not notice.</p> <p>Computing <code>i * i</code> twice is slightly wasteful; a local <code>int sq = i * i;</code> inside the loop would be cleaner. At this scale it makes no measurable difference, but the habit of naming a value you use more than once is worth forming now.</p> </div></details> <div class="editor">
-  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 2</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
-  <textarea spellcheck="false" rows="12" aria-label="Live coding - Practice Problem 2">public class Squares {
-    public static void main(String args[]) {
-        int total = 0;
-
-        // Loop 1..10: print each square on one line, and add it to total.
-
-        // Then print the total and the average (as a decimal).
-
-    }
-}</textarea>
-  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
-</div> <h3>Problem 3 &mdash; Find the three errors</h3> <p>Consider the following Java code, saved in a file called <code>Grades.java</code>. Exactly 3 of the numbered lines have errors. Identify the 3 different errors by giving the numbers of the incorrect lines. For each error also give a corrected version of the line. Any line without a number is correct as written and is not to be changed. Make sure that your corrections lead to the indicated output.</p> <p class="filename">Grades.java</p>
-<pre><code class="language-java">public class Grades {
-    public static void main(String args[]) {
-        int count = 0;
-        int total = 0.0;                              // line 1
-        for (int i = 1; i &lt;= 5; i++) {
-            total = total + i * 10                    // line 2
-            count++;                                  // line 3
-        }
-        System.out.println("count = " + count);       // line 4
-        // The output from the last line should be:  count = 5
-        if (count = 5)                                // line 5
-            System.out.println("total = " + total);   // line 6
-        // The output from the last line should be:  total = 150
-    }
-}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Read for three separate kinds of trouble: a type that does not fit, a missing piece of punctuation, and a condition that is not a <code>boolean</code>. Do not be distracted by lines 3, 4 and 6 &mdash; they are correct, and the required output tells you they must stay as they are.</p> <p><strong>Error 1 &mdash; line 1.</strong> <code>int total = 0.0;</code> tries to put a <code>double</code> into an <code>int</code>.</p> <pre class="err"><code>error: incompatible types: possible lossy conversion from double to int
-        int total = 0.0;
-                    ^</code></pre> <p>Corrected: <code>int total = 0;</code></p> <p>(Declaring <code>double total = 0.0;</code> would also compile, but then line 6 would print <code>total = 150.0</code>, which is not the required output. The stated output is what decides between the two fixes.)</p> <p><strong>Error 2 &mdash; line 2.</strong> The statement has no semicolon.</p> <pre class="err"><code>Grades.java:6: error: ';' expected
-            total = total + i * 10                    // line 2
-                                  ^
-1 error</code></pre> <p>Corrected: <code>total = total + i * 10;</code></p> <p><strong>Error 3 &mdash; line 5.</strong> <code>if (count = 5)</code> assigns rather than compares, and an <code>int</code> is not a condition.</p> <pre class="err"><code>error: incompatible types: int cannot be converted to boolean
-        if (count = 5)
-                  ^</code></pre> <p>Corrected: <code>if (count == 5)</code></p> <p>With all three fixed:</p> <p class="filename">Grades.java</p>
-<pre><code class="language-java">public class Grades {
-    public static void main(String args[]) {
-        int count = 0;
-        int total = 0;                                // line 1
-        for (int i = 1; i &lt;= 5; i++) {
-            total = total + i * 10;                   // line 2
-            count++;                                  // line 3
-        }
-        System.out.println("count = " + count);       // line 4
-        if (count == 5)                               // line 5
-            System.out.println("total = " + total);   // line 6
-    }
-}</code></pre> <pre class="out"><code>count = 5
-total = 150</code></pre> <p><strong>Things to notice.</strong> <code>javac</code> reported only <em>one</em> error when this file was first compiled &mdash; the missing semicolon on line 2. A syntax error early in the file stops the parser, so the other two problems were not even reached. Fixing one error and recompiling only to be handed a brand-new error is completely normal; it does not mean your fix was wrong.</p> <p>The loop adds 10 + 20 + 30 + 40 + 50 = 150, and <code>count</code> reaches 5, so both stated outputs are consistent with the corrections. Always check your fixes against the required output the way we just did &mdash; on an exam that is what separates a defensible answer from a guess.</p> </div></details> <div class="editor">
-  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 3</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
-  <textarea spellcheck="false" rows="15" aria-label="Live coding - Practice Problem 3">public class Grades {
-    public static void main(String args[]) {
-        int count = 0;
-        int total = 0.0;                              // line 1
-        for (int i = 1; i &lt;= 5; i++) {
-            total = total + i * 10                    // line 2
-            count++;                                  // line 3
-        }
-        System.out.println("count = " + count);       // line 4
-        if (count = 5)                                // line 5
-            System.out.println("total = " + total);   // line 6
-    }
-}</textarea>
-  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
-</div> <h3>Problem 4 &mdash; Translate from CSCI 111</h3> <p>Below is a C++ program of the kind you wrote in CSCI 111. Write the equivalent complete Java program in <code>Countdown.java</code>. It must produce the same output.</p> <p class="filename">C++ (CSCI 111) &mdash; translate this</p>
-<pre class="cmp"><code>#include &lt;iostream&gt;
-using namespace std;
-int main() {
-    int n = 5;
-    while (n &gt; 0) {
-        cout &lt;&lt; n &lt;&lt; "... ";
-        n--;
-    }
-    cout &lt;&lt; "liftoff!" &lt;&lt; endl;
-    int evens = 0;
-    for (int i = 1; i &lt;= 20; i++)
-        if (i % 2 == 0) evens++;
-    cout &lt;&lt; "Even numbers from 1 to 20: " &lt;&lt; evens &lt;&lt; endl;
-    cout &lt;&lt; "Half of them is " &lt;&lt; evens / 2.0 &lt;&lt; endl;
-    return 0;
-}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Work through the differences mechanically rather than rewriting from scratch. Drop <code>#include</code> and <code>using namespace</code>. Wrap everything in a <code>public class Countdown</code> whose file is <code>Countdown.java</code>. Turn <code>int main()</code> into <code>public static void main(String args[])</code> and delete <code>return 0;</code>. Replace every <code>cout &lt;&lt; ... &lt;&lt; endl</code> with a <code>println</code> whose argument is a single <code>String</code> built with <code>+</code>, and every <code>cout &lt;&lt;</code> without <code>endl</code> with a <code>print</code>. The loops, the <code>if</code>, and the arithmetic transfer unchanged.</p> <p class="filename">Countdown.java</p>
-<pre><code class="language-java">public class Countdown {
     public static void main(String args[]) {
         int n = 5;
-        while (n &gt; 0) {
-            System.out.print(n + "... ");
-            n--;
-        }
-        System.out.println("liftoff!");
-
-        int evens = 0;
-        for (int i = 1; i &lt;= 20; i++)
-            if (i % 2 == 0) evens++;
-        System.out.println("Even numbers from 1 to 20: " + evens);
-        System.out.println("Half of them is " + evens / 2.0);
+        int m = bump(n);
+        System.out.println(n + " " + m);
+        n = bump(bump(n));
+        System.out.println(n + " " + m);
     }
-}</code></pre> <pre class="out"><code>5... 4... 3... 2... 1... liftoff!
-Even numbers from 1 to 20: 10
-Half of them is 5.0</code></pre> <p><strong>Things to notice.</strong> <code>System.out.print(n + "... ")</code> is the direct translation of <code>cout &lt;&lt; n &lt;&lt; "... "</code>, and it works because <code>n</code> is joined to a <code>String</code>. If you had written two separate calls, <code>print(n)</code> then <code>print("... ")</code>, the output would be identical &mdash; either is fine.</p> <p>The last line is the one to be careful with. <code>evens / 2.0</code> prints <code>5.0</code>; <code>evens / 2</code> would print <code>5</code>. Both are arithmetically right here because 10 is even, but the <em>types</em> differ, and the C++ original prints <code>5</code> because <code>cout</code> drops the trailing <code>.0</code> on a whole <code>double</code>. This is a genuine difference in output formatting between the two languages, not a translation error &mdash; Java always shows a <code>double</code> with a decimal point.</p> <p>Notice too that the <code>for</code> loop body is a bare <code>if</code> with no braces, which is legal in both languages. It is also how single-statement bodies get accidentally broken when someone adds a second line later. Bracing every loop body is a habit worth having.</p> </div></details> <div class="box sum" id="summary"> <div class="hd">Lecture Summary</div> <div class="bd"> <ul> <li>Java compiles to <strong>bytecode</strong>, not machine code. The <strong>JVM</strong> reads bytecode, and that is what makes one compiled program run everywhere.</li> <li>Everything lives in a class. The skeleton is <code>public class Name { public static void main(String args[]) { } }</code>, and the file must be called <code>Name.java</code>.</li> <li>Two commands, not one: <code>javac Name.java</code> compiles (silence means success), <code>java Name</code> runs. The second takes a class name, not a file name.</li> <li>Eight primitive types. Default to <code>int</code>, <code>double</code>, <code>char</code>, <code>boolean</code> unless you have a reason not to. Sizes are fixed on every platform.</li> <li>If both operands of <code>/</code> are integers you get <strong>integer division</strong>. Fix it by making one operand a <code>double</code> &mdash; inside the expression, not at the assignment.</li> <li><code>+</code> means addition until the first <code>String</code> appears, and concatenation from then on. Parenthesise the arithmetic you actually want.</li> <li>Loops and decisions are exactly as in C++, except that a condition must be a real <code>boolean</code> &mdash; which is why Java catches <code>if (n = 5)</code> and C++ does not.</li> </ul> <p><strong>Coming up in Lecture 2.</strong> Right now everything we write lives inside <code>main</code>. Next time we break programs into <em>methods</em> &mdash; Java's word for functions &mdash; learn why they are nearly always declared <code>static</code> at this stage, see how two methods can
-    share one name through overloading, and write our first recursive method.</p>
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Keep two columns: <code>main</code>'s <code>n</code>, and the parameter <code>n</code> that lives only for the duration of one call. They share a name and share nothing else.</p> <pre class="out"><code>5 6
+7 6</code></pre> <table class="trace"> <tr><th>Statement</th><th><code>main</code>'s <code>n</code></th><th><code>m</code></th><th>What happened</th></tr> <tr><td><code>int n = 5;</code></td><td>5</td><td>&mdash;</td><td></td></tr> <tr><td><code>int m = bump(n);</code></td><td>5</td><td>6</td><td>The copy inside <code>bump</code> became 6; <code>main</code>'s <code>n</code> never moved.</td></tr> <tr><td>first <code>println</code></td><td>5</td><td>6</td><td>prints <code>5 6</code></td></tr> <tr><td><code>n = bump(bump(n));</code></td><td>7</td><td>6</td><td>Inner <code>bump(5)</code> returns 6; outer <code>bump(6)</code> returns 7; the assignment is what changes <code>n</code>.</td></tr> <tr><td>second <code>println</code></td><td>7</td><td>6</td><td>prints <code>7 6</code></td></tr> </table> <p><strong>Things to notice.</strong> Reusing the name <code>n</code> for the parameter is legal and common, and it is exactly what makes this question tricky. Inside <code>bump</code>, the name <code>n</code> refers to the parameter and there is no way to reach <code>main</code>'s <code>n</code> at all &mdash; a method sees only its own parameters and its own local variables.</p> <p>The line that does change <code>main</code>'s <code>n</code> is <code>n = bump(...)</code>. The assignment, not the call, is what does the work. If you write <code>bump(n);</code> on its own, nothing at all happens to <code>n</code>, and Java will not warn you.</p> </div></details> </div> </div> <h2 id="s5"><span class="num">5.</span>Method overloading</h2> <p>In Lecture 1 we noticed that <code>+</code> means two different things depending on its operands: addition between numbers, concatenation as soon as a <code>String</code> appears. Java lets you do the same thing with methods you write yourself.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; overloading</span></div> <div class="bd"> <p><strong>Overloading</strong> is defining two or more methods in the same class with the <em>same name</em> but <em>different parameter lists</em>. The compiler decides which one a given call means by looking at the number and types of the arguments.</p> <p>"Different parameter lists" means a different number of parameters, or different types, or the same types in a different order. It does <strong>not</strong> mean different parameter <em>names</em>, and it does <strong>not</strong> mean a different return type.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; MyFunctions.java, the class notes' example in full</span></div> <div class="bd"> <p>This is the complete first example from the class notes. It has four methods besides <code>main</code>, and two of them are called <code>add</code>. Notice that <code>add</code> is defined <em>after</em> <code>main</code> and called from inside it, which as Quick Check 2.1 established is perfectly fine.</p> <p>Predict all four lines of output. The fourth is the one to think hardest about.</p> <p class="filename">MyFunctions.java</p>
+<pre><code class="language-java">public class MyFunctions {
+    public static void sayHello() {
+        System.out.println("Hello");
+    }
+
+    public static String sayHelloTo(String name) {
+        return "Hello, " + name + "!";
+    }
+
+    public static void main(String args[]) {
+        sayHello();
+        System.out.println(sayHelloTo("CSCI 212"));
+        System.out.println(add(111, 212));
+        System.out.println(add(2.71, 3.14));
+    }
+
+    public static int add(int x, int y) {
+        return x+y;
+    }
+
+    public static double add(double x, double y) {
+        return x+y;
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Hello
+Hello, CSCI 212!
+323
+5.85</code></pre> <p><code>add(111, 212)</code> has two <code>int</code> arguments, so it selects <code>public static int add(int, int)</code> and the result is the <code>int</code> <code>323</code>. <code>add(2.71, 3.14)</code> has two <code>double</code> arguments, so it selects the <code>double</code> version and prints <code>5.85</code> &mdash; with a decimal point, because a <code>double</code> always prints with one.</p> <p>Both are called <code>add</code>. Nothing at the call site says which one you want; the argument types say it for you. That is the whole idea.</p> <table class="trace"> <tr><th>Call</th><th>Argument types</th><th>Method selected</th><th>Result</th></tr> <tr><td><code>add(111, 212)</code></td><td><code>int</code>, <code>int</code></td><td><code>add(int, int)</code></td><td><code>323</code></td></tr> <tr><td><code>add(2.71, 3.14)</code></td><td><code>double</code>, <code>double</code></td><td><code>add(double, double)</code></td><td><code>5.85</code></td></tr> </table> <p>You have already been using overloaded methods without noticing: <code>System.out.println</code> is overloaded a dozen ways &mdash; one version for <code>int</code>, one for <code>double</code>, one for <code>char</code>, one for <code>String</code>, one that takes nothing at all. That is why <code>println</code> accepts anything you hand it, and why <code>println()</code> with empty parentheses is legal.</p> 
+</div></details> </div> </div> <p>What happens when the argument types match <em>neither</em> version exactly? Java does not give up; it looks for a version it can reach by widening.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; which overload wins?</span></div> <div class="bd"> <p>The same two <code>add</code> methods, called five ways. Only the first two are exact matches. Predict all five lines, and predict the <em>type</em> of each result as well as its value.</p> <p class="filename">AddDemo.java</p>
+<pre><code class="language-java">public class AddDemo {
+    public static int add(int x, int y) {
+        return x + y;
+    }
+
+    public static double add(double x, double y) {
+        return x + y;
+    }
+
+    public static void main(String args[]) {
+        System.out.println(add(111, 212));
+        System.out.println(add(2.71, 3.14));
+        System.out.println(add(3, 4.5));
+        System.out.println(add('A', 'B'));
+        System.out.println(add(2L, 3L));
+    }
+}</code></pre> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>323
+5.85
+7.5
+131
+5.0</code></pre> <table class="trace"> <tr><th>Call</th><th>Why</th><th>Result</th></tr> <tr><td><code>add(111, 212)</code></td><td>Exact match for <code>add(int, int)</code>.</td><td><code>323</code></td></tr> <tr><td><code>add(2.71, 3.14)</code></td><td>Exact match for <code>add(double, double)</code>.</td><td><code>5.85</code></td></tr> <tr><td><code>add(3, 4.5)</code></td><td>No exact match. <code>add(int, int)</code> is impossible &mdash; 4.5 is not an <code>int</code>. <code>add(double, double)</code> works if the <code>3</code> is widened to <code>3.0</code>, and widening <code>int</code> to <code>double</code> is always safe, so Java does it.</td><td><code>7.5</code></td></tr> <tr><td><code>add('A', 'B')</code></td><td>No exact match. A <code>char</code> widens to <code>int</code> more readily than to <code>double</code>, so <code>add(int, int)</code> is chosen and the code points 65 and 66 are added.</td><td><code>131</code></td></tr> <tr><td><code>add(2L, 3L)</code></td><td>A <code>long</code> will not fit in an <code>int</code>, so <code>add(int, int)</code> is out. It does widen to <code>double</code>, so the <code>double</code> version runs and prints with a decimal point.</td><td><code>5.0</code></td></tr> </table> <p>The selection rule, stated once: <strong>an exact match wins; failing that, Java picks the version reachable by the smallest safe widening; if nothing is reachable, or two are equally good, it is a compile error.</strong> You will not be asked to recite the full rule, but you should be able to do the first two steps for calls like these.</p> <p>Line four is the reason Lecture 1 spent time on <code>'A'</code> being the number 65. <code>char</code> is an integer type, and here that fact chooses which method runs.</p> 
+</div></details> </div> </div> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; the return type is not part of the deal</span></div> <div class="bd"> <p>Two methods whose parameter lists are identical are the same method as far as Java is concerned, no matter what they return:</p> <pre><code class="language-java">public static int add(int x, int y) {
+    return x + y;
+}
+
+public static double add(int x, int y) {     // same parameters — not an overload
+    return x + y;
+}</code></pre> <pre class="err"><code>BadOverload.java:6: error: method add(int,int) is already defined in class BadOverload
+    public static double add(int x, int y) {
+                         ^
+1 error</code></pre> <p>The reason is easy to see from the caller's side. In <code>add(1, 2);</code> written as a statement, the return value is discarded, so there would be nothing at all to tell the two apart. Renaming the parameters does not help either &mdash; <code>add(int a, int b)</code> is still <code>add(int, int)</code>.</p> </div> </div> <div class="box qc"> <div class="hd">Quick Check 2.6</div> <div class="bd"> <p>A class contains exactly these three methods:</p> <pre><code class="language-java">public static int f(int a)                { return 1; }
+public static int f(double a)             { return 2; }
+public static int f(int a, int b)         { return 3; }</code></pre> <p>What does each call return?</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>f(7)</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>1</code>. Exact match on <code>f(int)</code>. The <code>f(double)</code> version could also be reached by widening, but an exact match always wins.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>f(7.0)</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>2</code>. <code>7.0</code> is a <code>double</code>; there is an exact match. Narrowing a <code>double</code> to an <code>int</code> is never done automatically, so <code>f(int)</code> is not a candidate.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>f(7, 8)</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>3</code>. The argument <em>count</em> is checked first, and only one method takes two arguments.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>f('x')</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>1</code>. There is no <code>f(char)</code>, so Java widens. A <code>char</code> widens to <code>int</code> and also to <code>double</code>, but <code>int</code> is the nearer of the two, so <code>f(int)</code> is selected.</p> <p><strong>Things to notice across all four parts.</strong> The compiler works through a short checklist for every call: <em>how many arguments? are any of them an exact type match? if not, what is the smallest widening that reaches a candidate?</em> If you can run that checklist you can answer any overloading question on the exam. And note that all three methods here return <code>int</code> &mdash; the return type played no part in any of the four answers, because it never does.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 2.7</div> <div class="bd"> <p>Which of these pairs may legally appear together in one class? For the illegal ones, say what the compiler will object to.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>public static void p(int n)</code> and <code>public static void p(double n)</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Legal. Different parameter types, so they are distinguishable at every call site.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>public static void p(int n)</code> and <code>public static void p(int value)</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Illegal &mdash; <code>method p(int) is already defined</code>. Parameter names are private to the method body; the caller never writes them and the compiler ignores them when comparing signatures.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>public static int p(int n)</code> and <code>public static void p(int n)</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Illegal, for the same reason. The return type is not part of what distinguishes two methods.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>public static void p(int a, double b)</code> and <code>public static void p(double a, int b)</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Legal. The <em>order</em> of the types differs, so <code>p(1, 2.0)</code> and <code>p(1.0, 2)</code> each pick out exactly one of them.</p> <p><strong>Things to notice across all four parts.</strong> Ask one question: <em>could the compiler always tell, from the argument list alone, which one I meant?</em> In (b) and (c) it could not, so they are rejected. A useful footnote on (d): <code>p(1, 2)</code> with two <code>int</code> arguments would be <em>ambiguous</em> &mdash; each version needs exactly one widening, so neither is better, and that call would be a compile error even though the two declarations themselves are fine.</p> </div></details> </div> </div> </div> <h2 id="s6"><span class="num">6.</span>Calling a method in another class</h2> <p>So far every call has been to a method in the same class, written with just its name. A <code>static</code> method of a <em>different</em> class is called by putting the class name in front.</p> <div class="box alg"> <div class="hd">Procedure<span class="tag">&mdash; the three ways a static method gets called</span></div> <div class="bd"> <ol> <li><strong>From <code>main</code> or another method of the same class:</strong> <code>method_name(arguments)</code>.</li> <li><strong>From a different class:</strong> <code>class_of_the_method.method_name(arguments)</code>.</li> <li><strong>From itself.</strong> A method that calls itself is a <em>recursive</em> method, and that is &sect;7.</li> </ol> </div> </div> <p>You have been doing case 2 since your very first program without thinking about it. <code>Math</code> is an ordinary class in the Java library, full of <code>static</code> methods, and you reach them exactly this way:</p> <p class="filename">MathDemo.java</p>
+<pre><code class="language-java">public class MathDemo {
+    public static void main(String args[]) {
+        System.out.println(Math.sqrt(16.0));
+        System.out.println(Math.max(3, 7));
+        System.out.println(Math.max(3.5, 7.25));
+        System.out.println(Math.abs(-2.5));
+        System.out.println(Math.pow(2, 10));
+    }
+}</code></pre> <pre class="out"><code>4.0
+7
+7.25
+2.5
+1024.0</code></pre> <p>Two things to pull out of that. <code>Math.max</code> is <em>overloaded</em> &mdash; the second call returns the <code>int</code> <code>7</code> and the third returns the <code>double</code> <code>7.25</code>, from two different methods that share a name. And <code>Math.pow</code> always returns a <code>double</code>, which is why 2 to the tenth prints as <code>1024.0</code> and not <code>1024</code>. When a library method surprises you like that, its return type is the first thing to check.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; two files, one program</span></div> <div class="bd"> <p>Here is the class notes' second example. <code>RecursiveFunctions</code> uses a method it does not own: <code>sayHelloTo</code> belongs to <code>MyFunctions</code> from &sect;5, so the call has to name the class. Both files sit in the same folder; <code>MyFunctions.java</code> is unchanged from the listing above, repeated here for reference.</p> <p class="filename">MyFunctions.java</p>
+<pre><code class="language-java">public class MyFunctions {
+    public static void sayHello() {
+        System.out.println("Hello");
+    }
+
+    public static String sayHelloTo(String name) {
+        return "Hello, " + name + "!";
+    }
+
+    public static void main(String args[]) {
+        sayHello();
+        System.out.println(sayHelloTo("CSCI 212"));
+        System.out.println(add(111, 212));
+        System.out.println(add(2.71, 3.14));
+    }
+
+    public static int add(int x, int y) {
+        return x+y;
+    }
+
+    public static double add(double x, double y) {
+        return x+y;
+    }
+}</code></pre> <p class="filename">RecursiveFunctions.java</p>
+<pre><code class="language-java">public class RecursiveFunctions {
+    public static void main(String args[]) {
+        System.out.println(MyFunctions.sayHelloTo("Recursion"));
+        System.out.println(numDigits(31415926));
+    }
+
+    public static int numDigits(int n) {
+        if (n &lt; 10 &amp;&amp; n &gt; -10) return 1;
+        return numDigits(n/10) + 1;
+    }
+}</code></pre> <p>Compile both files and run the second one:</p> <p class="filename">Terminal</p>
+<pre class="cmp"><code>javac MyFunctions.java RecursiveFunctions.java
+java RecursiveFunctions</code></pre> <p>Before revealing: <code>MyFunctions</code> has a <code>main</code> of its own. Does running <code>java RecursiveFunctions</code> execute it?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>Hello, Recursion!
+8</code></pre> <p>No. <code>java RecursiveFunctions</code> tells the JVM which class's <code>main</code> to start, and only that one runs. <code>MyFunctions.main</code> is dead code in this run; we borrowed <code>sayHelloTo</code> from that class and nothing else. Having a <code>main</code> in more than one class is completely normal &mdash; it is a handy way to give each class its own little test harness.</p> <p>Two details of the first line are worth naming. <code>MyFunctions.sayHelloTo("Recursion")</code> is the class name, a dot, the method name, the arguments &mdash; the same shape as <code>Math.sqrt(16.0)</code>, and the same shape as <code>System.out.println</code>, though that last one has an extra step we will explain in Lecture 7. And <code>sayHelloTo</code> is <code>public</code>; had it been <code>private</code>, <code>RecursiveFunctions</code> could not have touched it.</p> <p>The second line, <code>numDigits</code>, is called with no class name in front, because it belongs to <code>RecursiveFunctions</code> itself. It is also the subject of the next section.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 2.8</div> <div class="bd"> <p><code>MyFunctions</code> and <code>RecursiveFunctions</code> are both in your folder, compiled.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Inside <code>RecursiveFunctions.main</code>, you write <code>sayHelloTo("Ana");</code> with no class name. What happens?</p> <details class="soln"><summary></summary><div class="ans"> <p>A compile error: <code>cannot find symbol</code> &mdash; <code>method sayHelloTo(String)</code>. A bare method name is looked for in the current class only, and <code>RecursiveFunctions</code> has no method by that name. You must write <code>MyFunctions.sayHelloTo("Ana")</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Inside <code>MyFunctions.main</code>, would <code>MyFunctions.add(1, 2)</code> be legal?</p> <details class="soln"><summary></summary><div class="ans"> <p>Yes. Qualifying a <code>static</code> call with its own class name is always allowed; it is just redundant. Java programmers leave it off inside the class and put it on outside, which is exactly what the class notes do.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> You type <code>java MyFunctions</code> instead. What is printed?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>MyFunctions</code>'s own <code>main</code> runs, printing its four lines:</p> <pre class="out"><code>Hello
+Hello, CSCI 212!
+323
+5.85</code></pre> <p><strong>Things to notice across all three parts.</strong> The dot in <code>MyFunctions.sayHelloTo</code> is not decoration &mdash; it answers the question "where do I go looking for this method?" Leave it off and the search covers only the current class; put it on and the search goes to the class you named. The very same syntax is what <code>Math.sqrt</code> and <code>Integer.parseInt</code> have been using all along.</p> </div></details> </div> </div> </div> <h2 id="s7"><span class="num">7.</span>Recursion</h2> <p>A method may call any method, and there is nothing in that rule that excludes itself.</p> <div class="box def"> <div class="hd">Definition<span class="tag">&mdash; recursion, base case, recursive case</span></div> <div class="bd"> <p>A <strong>recursive</strong> method is one that calls itself. Every correct recursive method has two parts:</p> <ul> <li>A <strong>base case</strong>: an input small or simple enough to answer outright, with no further call.</li> <li>A <strong>recursive case</strong>: which answers the current input in terms of the answer to a <em>strictly smaller</em> input, obtained by calling itself.</li> </ul> <p>"Strictly smaller" is what makes the process finish: each call must move measurably closer to the base case.</p> </div> </div> <p>The class notes' example counts the digits of an integer, and it is four lines long:</p> <pre><code class="language-java">public static int numDigits(int n) {
+    if (n &lt; 10 &amp;&amp; n &gt; -10) return 1;
+    return numDigits(n/10) + 1;
+}</code></pre> <p>Read it as two English sentences. <em>A number with only one digit has one digit.</em> That is the base case: anything strictly between &minus;10 and 10 has a single digit, so return 1. <em>Otherwise, chop the last digit off and the answer is one more than the answer for what is left.</em> That is the recursive case: <code>n/10</code> is integer division, which discards the final digit, and the <code>+ 1</code> counts the digit we just removed.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; numDigits(31415926), traced by the program itself</span></div> <div class="bd"> <p>To make the descent and the return visible, here is the same method with a <code>println</code> at the top and one just before it returns. Nothing else has changed.</p> <p class="filename">NumDigitsTrace.java</p>
+<pre><code class="language-java">public class NumDigitsTrace {
+    public static int numDigits(int n) {
+        System.out.println("entering numDigits(" + n + ")");
+        if (n &lt; 10 &amp;&amp; n &gt; -10) {
+            System.out.println("base case reached, returning 1");
+            return 1;
+        }
+        int result = numDigits(n / 10) + 1;
+        System.out.println("numDigits(" + n + ") returns " + result);
+        return result;
+    }
+
+    public static void main(String args[]) {
+        System.out.println("answer = " + numDigits(31415926));
+    }
+}</code></pre> <p>How many "entering" lines will there be, and in what order do the "returns" lines come out?</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>entering numDigits(31415926)
+entering numDigits(3141592)
+entering numDigits(314159)
+entering numDigits(31415)
+entering numDigits(3141)
+entering numDigits(314)
+entering numDigits(31)
+entering numDigits(3)
+base case reached, returning 1
+numDigits(31) returns 2
+numDigits(314) returns 3
+numDigits(3141) returns 4
+numDigits(31415) returns 5
+numDigits(314159) returns 6
+numDigits(3141592) returns 7
+numDigits(31415926) returns 8
+answer = 8</code></pre> <p>This is the shape of every recursion: a descent all the way down, then a climb all the way back up. Eight calls go down, one digit shorter each time; the base case supplies the 1; and the answer is assembled on the way back, each level adding its own <code>+ 1</code>.</p> <p>Notice that the returns come out in the <em>reverse</em> order of the calls. The outermost call was the first to start and the last to finish, because it is stuck waiting at <code>numDigits(n / 10) + 1</code> until everything underneath it is done. Eight copies of the method are part-finished at the moment the base case fires, each with its own <code>n</code>.</p> <p>On paper, the trace table is the tool to use:</p> <table class="trace"> <tr><th>Call</th><th><code>n</code></th><th>Base case?</th><th>Waits for</th><th>Returns</th></tr> <tr><td>1</td><td>31415926</td><td>no</td><td><code>numDigits(3141592)</code></td><td>7 + 1 = 8</td></tr> <tr><td>2</td><td>3141592</td><td>no</td><td><code>numDigits(314159)</code></td><td>6 + 1 = 7</td></tr> <tr><td>3</td><td>314159</td><td>no</td><td><code>numDigits(31415)</code></td><td>5 + 1 = 6</td></tr> <tr><td>4</td><td>31415</td><td>no</td><td><code>numDigits(3141)</code></td><td>4 + 1 = 5</td></tr> <tr><td>5</td><td>3141</td><td>no</td><td><code>numDigits(314)</code></td><td>3 + 1 = 4</td></tr> <tr><td>6</td><td>314</td><td>no</td><td><code>numDigits(31)</code></td><td>2 + 1 = 3</td></tr> <tr><td>7</td><td>31</td><td>no</td><td><code>numDigits(3)</code></td><td>1 + 1 = 2</td></tr> <tr><td>8</td><td>3</td><td><strong>yes</strong></td><td>nothing</td><td>1</td></tr> </table> <p>Fill the first four columns going down, then the last column going up. That is the exam technique, and it works for every recursive-output question you will be asked.</p> 
+</div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 2.9</div> <div class="bd"> <p>Using the same <code>numDigits</code> from the class notes, what does each of these return? Two of them are edge cases worth checking deliberately.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>numDigits(7)</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>1</code>. The base case fires immediately &mdash; 7 is between &minus;10 and 10 &mdash; and no recursive call ever happens. A recursive method whose first call hits the base case is just an ordinary method.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>numDigits(0)</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>1</code>. Zero is written with one digit, so this is the right answer, and it comes out of the base case for free. Zero is exactly the input that breaks a carelessly written digit counter, so it is always worth testing.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>numDigits(-4321)</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>4</code>. This is why the base case is written <code>n &lt; 10 &amp;&amp; n &gt; -10</code> rather than just <code>n &lt; 10</code>. Integer division truncates toward zero, so the sequence is &minus;4321, &minus;432, &minus;43, &minus;4, and &minus;4 satisfies <code>n &gt; -10</code>, giving 4. The minus sign is not counted as a digit.</p> <p>Had the base case been only <code>if (n &lt; 10) return 1;</code>, a negative <code>n</code> would have matched it at once and every negative number would report 1 digit. The two-sided test is doing real work.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>numDigits(-31415926)</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>8</code>, by the same reasoning as (c) &mdash; the same eight steps as the positive case, with a minus sign along for the ride. Verified by running it:</p> <pre class="out"><code>1
+1
+4
+8</code></pre> <p><strong>Things to notice across all four parts.</strong> When you are handed a recursive method, test the base case first with the smallest legal input, then the sign, then a typical value. Most recursion bugs live in the base case, not in the recursive step &mdash; the recursive step is usually the part people get right.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 2.10</div> <div class="bd"> <p>Write a static method <code>digitSum</code> that returns the sum of the digits of a non-negative <code>int</code>. <code>digitSum(31415926)</code> must return 31, and <code>digitSum(7)</code> must return 7. Model it directly on <code>numDigits</code>: same base case, a different recursive step.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> <code>numDigits</code> threw the last digit away and counted it as <code>+ 1</code>. Here we want the digit itself, and <code>n % 10</code> is exactly that &mdash; the remainder after dividing by 10. So the recursive case is "the digit sum of everything but the last digit, plus the last digit". The base case changes too: a one-digit number's digit sum is the number itself, not 1.</p> <p class="filename">Digits.java</p>
+<pre><code class="language-java">public class Digits {
+    public static int digitSum(int n) {
+        if (n &lt; 10 &amp;&amp; n &gt; -10) return n;
+        return digitSum(n / 10) + n % 10;
+    }
+
+    public static void main(String args[]) {
+        System.out.println(digitSum(31415926));
+        System.out.println(digitSum(7));
+        System.out.println(digitSum(1000));
+    }
+}</code></pre> <pre class="out"><code>31
+7
+1</code></pre> <p><strong>Things to notice.</strong> The two operators are a pair and you will use them together constantly: <code>n / 10</code> removes the last digit, <code>n % 10</code> <em>is</em> the last digit. Between them you can take any integer apart one digit at a time, which is what her exam problem <code>evenUp</code> needs as well.</p> <p><code>digitSum(1000)</code> is 1, and that is correct &mdash; 1 + 0 + 0 + 0. If you are unsure of a recursive method, hand it an input whose answer you can check on your fingers.</p> <p>Every recursion in this lecture can also be written as a loop, and this one is a three-liner: <code>while (n &gt; 0) { sum += n % 10; n /= 10; }</code>. Recursion is not faster here. What it buys you is that the method reads like the definition of the problem, with no loop variable to manage &mdash; and for problems on trees and sorted searching, later in the course, the recursive version is the only one that stays readable.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 2.10</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="13" aria-label="Live coding - Quick Check 2.10">public class Digits {
+
+    // Write digitSum here. Base case: a one-digit number.
+    // Recursive case: use n / 10 and n % 10.
+
+
+    public static void main(String args[]) {
+        System.out.println(digitSum(31415926));   // should print 31
+        System.out.println(digitSum(7));          // should print 7
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> </div> </div> <h2 id="s8"><span class="num">8.</span>Making recursion safe</h2> <p>Two things go wrong with recursion, and they are worth meeting on purpose rather than at 2am.</p> <div class="box warn"> <div class="hd">Common Mistake<span class="tag">&mdash; no base case, or one that is never reached</span></div> <div class="bd"> <p>Delete the base case from <code>numDigits</code> and the recursive step is still perfectly sensible &mdash; it just never stops:</p> <p class="filename">NoBase.java</p>
+<pre><code class="language-java">public class NoBase {
+    public static int numDigits(int n) {
+        return numDigits(n / 10) + 1;        // base case deleted
+    }
+
+    public static void main(String args[]) {
+        System.out.println(numDigits(31415926));
+    }
+}</code></pre> <p>It compiles without complaint &mdash; the compiler does not attempt to work out whether a recursion terminates. Running it gives:</p> <pre class="err"><code>Exception in thread "main" java.lang.StackOverflowError
+	at NoBase.numDigits(NoBase.java:3)
+	at NoBase.numDigits(NoBase.java:3)
+	at NoBase.numDigits(NoBase.java:3)
+	at NoBase.numDigits(NoBase.java:3)</code></pre> <p>The listing goes on for thousands of identical lines; the exact number depends on your machine, so yours will differ. What matters is the diagnosis. Each unfinished call occupies a slot on the JVM's <em>call stack</em>; the stack has a finite size; a recursion that never reaches its base case fills it and the JVM gives up.</p> <p>Note that <code>n</code> reaches 0 quickly here and then stays there forever, because <code>0 / 10</code> is 0. The calls are not getting smaller any more. <strong><code>StackOverflowError</code> almost always means: missing base case, or a recursive call that does not make the problem smaller.</strong> Those are the two things to check, in that order.</p> </div> </div> <p>The second problem has nothing to do with recursion as such, but recursive methods run into it early because they are so often written on numbers that grow fast.</p> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; recursive factorial, and where it stops being true</span></div> <div class="bd"> <p>Factorial is the textbook recursion: 1! is 1, and n! is n times (n&minus;1)!. Written straight out of that definition:</p> <p class="filename">Factorial.java</p>
+<pre><code class="language-java">public class Factorial {
+    public static int factorial(int n) {
+        if (n &lt;= 1) return 1;
+        return n * factorial(n - 1);
+    }
+
+    public static void main(String args[]) {
+        for (int i = 1; i &lt;= 13; i++)
+            System.out.println(i + "! = " + factorial(i));
+    }
+}</code></pre> <p>Every one of those thirteen lines prints. Are all thirteen of them correct? Lecture 1 has the clue you need.</p> <details class="soln reveal"><summary></summary><div class="ans">
+ <pre class="out"><code>1! = 1
+2! = 2
+3! = 6
+4! = 24
+5! = 120
+6! = 720
+7! = 5040
+8! = 40320
+9! = 362880
+10! = 3628800
+11! = 39916800
+12! = 479001600
+13! = 1932053504</code></pre> <p>The first twelve are right. The thirteenth is nonsense: 13! is 6,227,020,800, and what was printed is 1,932,053,504. Nothing failed and nothing was reported &mdash; 13! simply does not fit in an <code>int</code>, whose maximum is 2,147,483,647, so the arithmetic wrapped around silently.</p> <p>The recursion is not at fault; <code>12! = 479001600</code> proves it works. The fault is the choice of return type. Changing <code>int</code> to <code>long</code> in both places buys you up to 20!, and beyond that you would need <code>java.math.BigInteger</code>.</p> <p>Two more things about this method:</p> <ul> <li><strong>The base case is <code>n &lt;= 1</code>, not <code>n == 1</code>.</strong> Written <code>n == 1</code>, a call with <code>n</code> of 0 or negative would skip the base case entirely, count down past it and overflow the stack. Prefer a base case that catches everything at or below the boundary.</li> <li><strong>Depth versus size.</strong> <code>factorial(13)</code> makes only thirteen nested calls, which is nothing. Recursion depth and numeric overflow are separate concerns, and here it is the numbers that break first.</li> </ul> 
+</div></details> </div> </div> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; the recursion checklist</span></div> <div class="bd"> <p>Before you run a recursive method, check three things.</p> <ol> <li><strong>Is there a base case?</strong> Some input must return without calling again.</li> <li><strong>Does every recursive call get closer to it?</strong> Smaller number, shorter remaining work &mdash; something must be strictly decreasing.</li> <li><strong>Does the recursive case combine the sub-answer correctly?</strong> The <code>+ 1</code> in <code>numDigits</code>, the <code>n *</code> in <code>factorial</code>. This is where the arithmetic bugs live.</li> </ol> </div> </div> <div class="box qc"> <div class="hd">Quick Check 2.11</div> <div class="bd"> <p>Each of these methods is broken. Say which of the three checklist items it fails, and what happens when you run it.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>public static int count(int n) { return count(n - 1) + 1; }</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Fails item 1: there is no base case at all. It compiles, then throws <code>StackOverflowError</code> for every input. Note that the calls <em>are</em> getting smaller &mdash; that is not enough on its own, because there is nothing for them to stop at.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>public static int f(int n) { if (n == 0) return 0; return f(n) + 1; }</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Fails item 2. There is a base case, but <code>f(n)</code> calls itself with the same <code>n</code>, so nothing ever changes and <code>n == 0</code> never becomes true for any non-zero input. Same symptom: <code>StackOverflowError</code>. <code>f(0)</code> happens to work, which is the sort of thing that makes this bug survive a careless test.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>public static int fact(int n) { if (n &lt;= 1) return 1; return factorial(n - 1); }</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Fails item 3 &mdash; and item 1, in a way that is easy to miss. It terminates and it returns a value, so there is no crash: it just returns 1 for every input, because the <code>n *</code> was left out of the combining step. Worse, the recursive call names <code>factorial</code> rather than <code>fact</code>, so unless a method called <code>factorial</code> also exists this will not even compile.</p> <p><strong>Things to notice across all three parts.</strong> Only two of the three failure modes announce themselves. A missing or unreachable base case crashes loudly, which is annoying but honest. A wrong combining step returns a plausible-looking number and says nothing &mdash; which is why item 3 of the checklist should be tested with an input whose answer you already know.</p> </div></details> </div> </div> </div> <div class="box qc"> <div class="hd">Quick Check 2.12</div> <div class="bd"> <p>What does this print? Trace it with a table before you look &mdash; there are only four calls, and the trick is the order in which the two <code>println</code>s inside the method run relative to the recursive call.</p> <pre><code class="language-java">public class Countdown {
+    public static void go(int n) {
+        System.out.println("down " + n);
+        if (n &gt; 1) go(n - 1);
+        System.out.println("up " + n);
+    }
+
+    public static void main(String args[]) {
+        go(4);
+    }
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> The first <code>println</code> runs on the way <em>down</em>, before the recursive call. The second runs on the way <em>up</em>, after the recursive call has completely finished. So the "down" lines come out in the order the calls start and the "up" lines in the reverse order &mdash; exactly the pattern the <code>NumDigitsTrace</code> output showed in &sect;7.</p> <pre class="out"><code>down 4
+down 3
+down 2
+down 1
+up 1
+up 2
+up 3
+up 4</code></pre> <table class="trace"> <tr><th>Call</th><th><code>n</code></th><th>Prints on the way down</th><th>Calls</th><th>Prints on the way up</th></tr> <tr><td>1</td><td>4</td><td><code>down 4</code></td><td><code>go(3)</code></td><td><code>up 4</code> (last)</td></tr> <tr><td>2</td><td>3</td><td><code>down 3</code></td><td><code>go(2)</code></td><td><code>up 3</code></td></tr> <tr><td>3</td><td>2</td><td><code>down 2</code></td><td><code>go(1)</code></td><td><code>up 2</code></td></tr> <tr><td>4</td><td>1</td><td><code>down 1</code></td><td>nothing &mdash; base case</td><td><code>up 1</code> (first)</td></tr> </table> <p><strong>Things to notice.</strong> The base case here is the <code>if</code> guarding the recursive call, rather than an early <code>return</code>. Both styles are common; what matters is that some input stops the descent.</p> <p>Move the second <code>println</code> above the <code>if</code> and you get all eight lines in a different order; delete it and you get a plain countdown. Where you put the work relative to the recursive call is the whole difference between processing something on the way in and processing it on the way out, and it is the single most useful thing to understand about recursion before we meet trees and linked lists in Lecture 21.</p> </div></details> </div> </div> <h2 id="prac"><span class="num">&#9733;</span>Practice Problems</h2> <div class="box prac"> <div class="hd">Practice Problems<span class="tag">&mdash; the exam's favourite topic</span></div> <div class="bd"> <p>Methods are the most heavily examined single topic in this course, and the same four question formats come back every time: <em>write the best title lines</em>, <em>what is the output</em>, <em>write blocks of code to match given title lines</em>, and <em>predict what this recursive method computes</em>. Problems 1 to 5 are taken from the CSCI 212 practice package; Problem 6 is written in the same format for extra drill.</p> <p>A few of these reach forward into arrays and <code>String</code> methods, which are Lectures 3 and 4. Where they do, the part of the problem that belongs to <em>today</em> is the title line and the method structure &mdash; work those out first, and take the array or <code>String</code> detail on trust for now.</p> </div> </div> <h3>Problem 1 &mdash; Write the best title lines <span class="muted">(from Exam 1 Practice Problems)</span></h3> <p>Write the best title lines for the functions that are called by the following main program. Do not supply the blocks for the functions.</p> <p class="filename">P1.java</p>
+<pre><code class="language-java">public class P1 {
+   public static void main(String args[]) {
+      int x = 2, y = 3, z[] = new int[4];
+      boolean a = true, b = false, c[] = new boolean[4];
+      String s = "Hello", t = "goodbye", u[][] = new String[4][5];
+      for (int i = 0; i &lt; 4; i++) c[i] = data(x, y, 2.5);    // (a)
+      setToFive(z, c);
+      System.out.println(z[1]);                              // (b) prints 5
+      System.out.println(speedLimit(x, z[1]));               // (c) prints 55
+      System.out.println(numberStrings(4, u, 5));            // (d) prints 20
+      f(numberStrings(0, u, 0), data(y, x, f(20, a || b)));  // (e)
+   }
+}</code></pre> <p>For reference while you work: <code>int z[]</code> declares an array of <code>int</code>, whose type is written <code>int[]</code>; <code>String u[][]</code> declares a two-dimensional array of <code>String</code>, whose type is <code>String[][]</code>. That is all you need from Lecture 3 to answer this.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> Title line for <code>data</code>, as called at the line marked (a).</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Read the arguments left to right for the parameter list, then look at what the caller does with the result for the return type.</p> <p>The call is <code>data(x, y, 2.5)</code>, so the parameters are <code>int</code>, <code>int</code>, <code>double</code>. The result is assigned to <code>c[i]</code>, and <code>c</code> is a <code>boolean[]</code>, so the return type is <code>boolean</code>.</p> <p><code>public static boolean data(int x, int y, double z)</code></p> <p>The literal <code>2.5</code> is a <code>double</code>, not a <code>float</code> &mdash; an unadorned decimal literal in Java is always a <code>double</code>. Declaring the third parameter <code>float</code> would make the call fail to compile.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> Title line for <code>setToFive</code>, as called at the line marked (b).</p> <details class="soln"><summary></summary><div class="ans"> <p><code>public static void setToFive(int[] z, boolean[] c)</code></p> <p>The arguments are <code>z</code> (an <code>int[]</code>) and <code>c</code> (a <code>boolean[]</code>). The call <code>setToFive(z, c);</code> stands alone as a statement, so nothing is done with a returned value and <code>void</code> is the best answer.</p> <p>Note that this method evidently <em>does</em> change the caller's array &mdash; the next line prints 5. That is not a contradiction of &sect;4: the array reference is still copied, but both copies point at the same array. Lecture 8 makes this precise.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> Title line for <code>speedLimit</code>, as called at the line marked (c).</p> <details class="soln"><summary></summary><div class="ans"> <p><code>public static int speedLimit(int x, int y)</code></p> <p><code>x</code> is an <code>int</code> and <code>z[1]</code> is an element of an <code>int[]</code>, so also an <code>int</code>. The result is handed to <code>println</code> and the comment says it prints <code>55</code> with no decimal point, so <code>int</code> is the best return type. <code>double</code> would have printed <code>55.0</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> Title line for <code>numberStrings</code>, as called at the line marked (d).</p> <details class="soln"><summary></summary><div class="ans"> <p><code>public static int numberStrings(int a, String[][] u, int b)</code></p> <p>The middle argument <code>u</code> was declared <code>String u[][]</code>, so its type is <code>String[][]</code>. The printed value is <code>20</code>, a whole number with no decimal point, so the return type is <code>int</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> Title line for <code>f</code>, as called at the line marked (e).</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> There are two calls to <code>f</code> on this line, and they must both be satisfied by one title line. Work out the parameter list from either of them, then use the <em>inner</em> call to pin down the return type.</p> <p>Parameters, from the inner call <code>f(20, a || b)</code>: an <code>int</code> and a <code>boolean</code>, since <code>a || b</code> is a <code>boolean</code> expression. The outer call <code>f(numberStrings(0, u, 0), data(...))</code> agrees &mdash; <code>numberStrings</code> returns an <code>int</code> and <code>data</code> returns a <code>boolean</code>.</p> <p>Return type: this is the part that catches people. The outer call sits alone as a statement, so its result is discarded, and <code>void</code> looks tempting. But look where the <em>inner</em> call's result goes: into <code>data(y, x, ...)</code> as the third argument, and part (a) established that <code>data</code>'s third parameter is a <code>double</code>. A <code>void</code> method produces no value at all, so it cannot be an argument to anything.</p> <p><code>public static double f(int a, boolean b)</code></p> <p>Try it with <code>void</code> and the compiler is blunt about it:</p> <pre class="err"><code>P1.java:11: error: 'void' type not allowed here
+        f(numberStrings(0, u, 0), data(y, x, f(20, a || b)));  // (e)
+                                              ^
+1 error</code></pre> <p><strong>Things to notice across all five parts.</strong> The routine is the same every time, and it is worth writing out on the exam paper:</p> <ol> <li>Copy the argument types, in order &mdash; that is the parameter list.</li> <li>Find where the returned value <em>goes</em>. Assigned to a <code>boolean[]</code> element? Return <code>boolean</code>. Printed as <code>55</code>? Return <code>int</code>. Used as a <code>double</code> argument? Return <code>double</code>. Not used at all? <code>void</code>.</li> </ol> <p>Step 2 is where the marks are. Read past the call to whatever consumes it, and beware a call that is consumed in one place and discarded in another &mdash; the consuming use is the one that decides. (<code>public static int f(int a, boolean b)</code> would also compile here, since an <code>int</code> widens to a <code>double</code>; <code>double</code> is the more direct answer.)</p> </div></details> </div> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 1</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="21" aria-label="Live coding - Practice Problem 1">public class P1 {
+   // Write the five title lines here, each with a body that just returns
+   // something of the right type, then compile to check your answers.
+
+
+
+
+   public static void main(String args[]) {
+      int x = 2, y = 3, z[] = new int[4];
+      boolean a = true, b = false, c[] = new boolean[4];
+      String s = "Hello", t = "goodbye", u[][] = new String[4][5];
+      for (int i = 0; i &lt; 4; i++) c[i] = data(x, y, 2.5);    // (a)
+      setToFive(z, c);
+      System.out.println(z[1]);                              // (b) prints 5
+      System.out.println(speedLimit(x, z[1]));               // (c) prints 55
+      System.out.println(numberStrings(4, u, 5));            // (d) prints 20
+      f(numberStrings(0, u, 0), data(y, x, f(20, a || b)));  // (e)
+   }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 2 &mdash; What is the output? <span class="muted">(from Exam 1 Practice Problems)</span></h3> <p>Consider the following Java program.</p> <p class="filename">P2.java</p>
+<pre><code class="language-java">public class P2 {
+   public static int F(int x[], int c) {
+      if (c &lt; 3)
+         return 0;
+      return x[c - 1] + F(x, c - 1);
+   }
+
+   public static int G(int a, int b) {
+      b = b - a;
+      a = b + a;
+      return a;
+   }
+
+   public static void main(String args[]) {
+      int a = 4, b = 1;
+      int x[] = { 3, 1, 4, 1, 5 };
+      String s = "Problem Number 2";
+      System.out.println(x[2 + 2] + x[2]);             // line (a)
+      System.out.println(s.substring(2, 3));           // line (b)
+      System.out.println(s.substring(s.indexOf("b"))); // line (c)
+      System.out.println("" + G(b, a) + a + b);        // line (d)
+      System.out.println(F(x, 5));                     // line (e)
+   }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> What is the output at line (a)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>9</code>. Array indexing counts from 0, so <code>x[4]</code> is <code>5</code> and <code>x[2]</code> is <code>4</code>. Both are <code>int</code>, and there is no <code>String</code> anywhere in the expression, so <code>+</code> adds: 5 + 4 = 9. Note that the index <code>2 + 2</code> is evaluated first, exactly like an argument to a method.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What is the output at line (b)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>o</code>. <code>substring(2, 3)</code> takes the characters from index 2 up to <em>but not including</em> index 3 &mdash; that is, one character. <code>"Problem Number 2"</code> has <code>P</code> at 0, <code>r</code> at 1 and <code>o</code> at 2. <code>String</code> methods are Lecture 4; the half-open range is the thing to remember.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> What is the output at line (c)?</p> <details class="soln"><summary></summary><div class="ans"> <p><code>blem Number 2</code>. This is a nested call, so evaluate the inside first: <code>s.indexOf("b")</code> is the index of the first <code>b</code>, which is 3 (<code>P</code>, <code>r</code>, <code>o</code>, <code>b</code>). Then <code>s.substring(3)</code> with one argument takes everything from index 3 to the end.</p> <p>The lower-case <code>b</code> in <code>"Problem"</code> is the first one; the <code>N</code> of <code>"Number"</code> is capital, and matching is case-sensitive.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> What is the output at line (d)?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Evaluate <code>G(b, a)</code> first &mdash; the argument is evaluated before <code>println</code> starts &mdash; then apply Lecture 1's left-to-right <code>+</code> rule.</p> <p><code>G(b, a)</code> is <code>G(1, 4)</code>, so inside <code>G</code> the parameter <code>a</code> is 1 and the parameter <code>b</code> is 4. Watch the swap: the arguments are passed in the order written, not by name.</p> <table class="trace"> <tr><th>Statement in <code>G</code></th><th><code>a</code></th><th><code>b</code></th></tr> <tr><td>on entry</td><td>1</td><td>4</td></tr> <tr><td><code>b = b - a;</code></td><td>1</td><td>3</td></tr> <tr><td><code>a = b + a;</code></td><td>4</td><td>3</td></tr> <tr><td><code>return a;</code></td><td colspan="2">returns 4</td></tr> </table> <p>Back in <code>main</code>, <code>a</code> is still 4 and <code>b</code> is still 1 &mdash; <code>G</code> changed its own copies only. So the expression is <code>"" + 4 + 4 + 1</code>. The empty <code>String</code> makes the first <code>+</code> a concatenation, and from there everything concatenates: <code>4</code>, then <code>44</code>, then <code>441</code>.</p> <p>Output: <code>441</code>.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> What is the output at line (e)?</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> <code>F</code> is recursive. Build the trace table going down to the base case, then fill in the returns going back up.</p> <p>The base case is <code>c &lt; 3</code>, returning 0. The recursive case adds <code>x[c - 1]</code> and calls with <code>c - 1</code>, so <code>c</code> decreases by one each time and the base case is certainly reached. The array is <code>{ 3, 1, 4, 1, 5 }</code>.</p> <table class="trace"> <tr><th>Call</th><th><code>c</code></th><th>Base case?</th><th><code>x[c - 1]</code></th><th>Returns</th></tr> <tr><td>1</td><td>5</td><td>no</td><td><code>x[4]</code> = 5</td><td>5 + 5 = 10</td></tr> <tr><td>2</td><td>4</td><td>no</td><td><code>x[3]</code> = 1</td><td>1 + 4 = 5</td></tr> <tr><td>3</td><td>3</td><td>no</td><td><code>x[2]</code> = 4</td><td>4 + 0 = 4</td></tr> <tr><td>4</td><td>2</td><td><strong>yes</strong></td><td>&mdash;</td><td>0</td></tr> </table> <p>Output: <code>10</code>. It is the sum of <code>x[2]</code>, <code>x[3]</code> and <code>x[4]</code> &mdash; the last three elements &mdash; because the base case cuts the recursion off before <code>x[1]</code> and <code>x[0]</code> are reached.</p> <p><strong>Things to notice across the whole problem.</strong> Line (d) and line (e) are the two method questions, and they test opposite things. Line (d) is about parameters being <em>copies</em>: <code>G</code> reassigns both of its parameters and <code>main</code> sees no change. Line (e) is about recursion: build the table, go down, come back up.</p> <p>A trap worth naming in (d): <code>G(b, a)</code> passes <code>b</code> into the parameter named <code>a</code>. Whenever a method's parameter names happen to match the caller's variable names, cover the caller's names with your hand and work only with the values.</p> </div></details> </div> <h3>Problem 3 &mdash; Write blocks of code <span class="muted">(from Exam 1 Practice Problems)</span></h3> <p>Write blocks of code to perform the functions used in the following main program. Your blocks must match the given title lines. Each block should be a short function of only a few lines.</p> <p class="filename">P3.java</p>
+<pre><code class="language-java">public class P3 {
+   public static void main(String args[]) {
+      int a[][] = { {1, 2, 3, 4}, {0, 1, 2, 3} };
+      int b[] = {3, 1, 4, 1};
+      int x = 1, y = 2;
+      String s = "hello";
+   // (a) Return true if at least one of x and y is positive. Here Yes is printed
+      if (positive(x, y)) System.out.println( "Yes" );
+   // (b) Return the sum of the first row. Here 10 is printed.
+      System.out.println(rowSum(a));
+   // (c) Return the smallest element. Here 1 is printed.
+      System.out.println(smallest(b));
+   // (d) Remove the first letter. Here ello is printed.
+      System.out.println(removeFirst(s));
+   // (e) Insert an X at the specified position. Here heXllo is printed.
+      s = addX(s, 2);
+      System.out.println(s);
+   }
+}</code></pre> <div class="part"> <p class="q"><span class="pl">(a)</span> <code>private static boolean positive(int x, int y)</code></p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> "At least one" is <code>||</code>. The whole method is the condition itself, so return it directly rather than writing an <code>if</code> that returns <code>true</code> or <code>false</code>.</p> <pre><code class="language-java">private static boolean positive(int x, int y) {
+    return x &gt; 0 || y &gt; 0;
+}</code></pre> <p>Writing <code>if (x &gt; 0 || y &gt; 0) return true; else return false;</code> is correct but longer, and it is a habit worth breaking: a method returning <code>boolean</code> should usually just return the condition.</p> <p>Note the title line says <code>private</code>, not <code>public</code>. Here that is fine &mdash; <code>main</code> is in the same class, and <code>private</code> only blocks access from <em>outside</em> the class.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> <code>private static int rowSum(int[][] a)</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Row 0 of <code>a</code> is <code>{1, 2, 3, 4}</code>, which sums to 10 &mdash; matching the required output. <code>a[0]</code> is itself an <code>int[]</code>, and <code>a[0].length</code> is how many elements it has.</p> <pre><code class="language-java">private static int rowSum(int[][] a) {
+    int sum = 0;
+    for (int i = 0; i &lt; a[0].length; i++) sum += a[0][i];
+    return sum;
+}</code></pre> <p>The parameter is the whole two-dimensional array even though only the first row is used &mdash; the given title line says so, and you must match it.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(c)</span> <code>private static int smallest(int[] b)</code></p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Start the running minimum at the <em>first element</em>, not at 0 and not at some large constant, then compare the rest against it.</p> <pre><code class="language-java">private static int smallest(int[] b) {
+    int min = b[0];
+    for (int i = 1; i &lt; b.length; i++)
+        if (b[i] &lt; min) min = b[i];
+    return min;
+}</code></pre> <p>Starting from <code>int min = 0;</code> is the classic wrong answer: it returns 0 for any array whose elements are all positive, which is the case here.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(d)</span> <code>private static String removeFirst(String s)</code></p> <details class="soln"><summary></summary><div class="ans"> <p><code>s.substring(1)</code> is everything from index 1 onward &mdash; the string with its first character dropped.</p> <pre><code class="language-java">private static String removeFirst(String s) {
+    return s.substring(1);
+}</code></pre> <p>The parameter <code>s</code> is a copy of the caller's reference, and <code>String</code> objects cannot be modified in place anyway, so the original <code>"hello"</code> in <code>main</code> is untouched. That is why the method has to <em>return</em> the shortened text rather than altering its parameter &mdash; and it is why line (e) of <code>main</code> writes <code>s = addX(s, 2);</code> with an assignment.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(e)</span> <code>private static String addX(String s, int i)</code></p> <details class="soln"><summary></summary><div class="ans"> <p>Cut the string at position <code>i</code>, put an <code>X</code> in the gap, and join the three pieces.</p> <pre><code class="language-java">private static String addX(String s, int i) {
+    return s.substring(0, i) + "X" + s.substring(i);
+}</code></pre> <p>With all five blocks in place the program runs:</p> <pre class="out"><code>Yes
+10
+1
+ello
+heXllo</code></pre> <p><strong>Things to notice across all five parts.</strong> The title lines were given, and that is the point of the question format: the marks are for producing a body that <em>fits</em> a stated contract. Before writing a line, read the title line and answer two questions &mdash; what am I handed, and what type must I return? A <code>boolean</code> method must return a <code>boolean</code> on every path; an <code>int</code> method may not print instead of returning.</p> <p>Every one of these is short, and that is deliberate: her instruction says "a short function of only a few lines". If your answer is running long, you have probably misunderstood what the method is for.</p> </div></details> </div> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 3</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="28" aria-label="Live coding - Practice Problem 3">public class P3 {
+   public static void main(String args[]) {
+      int a[][] = { {1, 2, 3, 4}, {0, 1, 2, 3} };
+      int b[] = {3, 1, 4, 1};
+      int x = 1, y = 2;
+      String s = "hello";
+      if (positive(x, y)) System.out.println( "Yes" );
+      System.out.println(rowSum(a));
+      System.out.println(smallest(b));
+      System.out.println(removeFirst(s));
+      s = addX(s, 2);
+      System.out.println(s);
+   }
+
+   // Write the five blocks below. The title lines are fixed.
+
+   private static boolean positive(int x, int y) {
+   }
+
+   private static int rowSum(int[][] a) {
+   }
+
+   private static int smallest(int[] b) {
+   }
+
+   private static String removeFirst(String s) {
+   }
+
+   private static String addX(String s, int i) {
+   }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 4 &mdash; Two recursive mysteries <span class="muted">(from Exam 1 Practice Problems)</span></h3> <p>In both parts, read the code and predict the output.</p> <div class="part"> <p class="q"><span class="pl">(a)</span> What does this method return?</p> <pre><code class="language-java">public static double mystery(double d[], int l, int r) {
+   if (l == r) return d[l];
+   int m = l + (r-l)/2;
+   double x = mystery(d, l, m);
+   double y = mystery(d, m+1, r);
+   if (x &gt; y) return x;
+   else return y;
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Do not try to trace every call &mdash; there are too many. Read the three parts of the structure instead: what does the base case return, how is the problem split, and how are the two sub-answers combined?</p> <ul> <li><strong>Base case:</strong> when <code>l == r</code> there is one element in the range, and it returns that element.</li> <li><strong>Split:</strong> <code>m</code> is the midpoint, so the range <code>l..r</code> is cut into <code>l..m</code> and <code>m+1..r</code> &mdash; two halves that between them cover everything exactly once.</li> <li><strong>Combine:</strong> return whichever of the two sub-answers is larger.</li> </ul> <p>"Largest of the left half, largest of the right half, take the bigger" is the definition of a maximum. <strong><code>mystery</code> returns the largest element of <code>d</code> in the index range <code>l</code> to <code>r</code> inclusive.</strong></p> <p>Checking it on <code>{3.0, 1.0, 4.0, 1.0, 5.0, 9.0, 2.0}</code> with <code>l</code> = 0 and <code>r</code> = 6:</p> <pre class="out"><code>9.0</code></pre> <p>This shape &mdash; halve, recurse on both halves, combine &mdash; is called <em>divide and conquer</em>, and it is how merge sort and binary search are built. Note <code>m = l + (r-l)/2</code> rather than <code>(l+r)/2</code>; the two agree here, and the first is the form that stays correct when <code>l + r</code> would overflow.</p> </div></details> </div> <div class="part"> <p class="q"><span class="pl">(b)</span> What will be printed by <code>System.out.println(mystery1(2,10));</code>?</p> <pre><code class="language-java">public static int mystery1(int b, int n) {
+   if ( n == 0) return 1;
+   int y = mystery1(b, n/2);
+   int z = y * y;
+   if (n%2 == 0)
+      return z;
+   else
+      return z*b;
+}</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> <code>n</code> halves each time, so the descent is short &mdash; five calls, not ten. Build the table down to <code>n == 0</code>, then come back up squaring as you go.</p> <table class="trace"> <tr><th>Call</th><th><code>n</code></th><th><code>y</code> = result of <code>mystery1(b, n/2)</code></th><th><code>z</code> = <code>y*y</code></th><th><code>n</code> even?</th><th>Returns</th></tr> <tr><td>1</td><td>10</td><td>32</td><td>1024</td><td>yes</td><td>1024</td></tr> <tr><td>2</td><td>5</td><td>4</td><td>16</td><td>no</td><td>16 &times; 2 = 32</td></tr> <tr><td>3</td><td>2</td><td>2</td><td>4</td><td>yes</td><td>4</td></tr> <tr><td>4</td><td>1</td><td>1</td><td>1</td><td>no</td><td>1 &times; 2 = 2</td></tr> <tr><td>5</td><td>0</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>1 (base case)</td></tr> </table> <p>Fill the last column upward from row 5. The answer is <code>1024</code>.</p> <pre class="out"><code>1024</code></pre> <p><strong>What it computes:</strong> <code>mystery1(b, n)</code> is b<sup>n</sup>. The method uses the two facts that b<sup>2k</sup> = (b<sup>k</sup>)<sup>2</sup> and b<sup>2k+1</sup> = (b<sup>k</sup>)<sup>2</sup> &times; b, which is why the odd branch multiplies by one extra <code>b</code>.</p> <p><strong>Things to notice across both parts.</strong> Neither part wants a full trace of every call &mdash; they want you to <em>recognise the pattern</em>. Both methods have the same three landmarks: a base case, a way of shrinking the problem, and a rule for combining. Read those three and the meaning usually falls out, and you can confirm it with a single small input like <code>mystery1(2, 1)</code>.</p> <p>Halving rather than decrementing is what makes this fast: <code>mystery1(2, 10)</code> makes five calls, and <code>mystery1(2, 1000)</code> would make about ten. Problem 5 asks you to write this method from scratch.</p> </div></details> </div> <h3>Problem 5 &mdash; A fast recursive power <span class="muted">(from Exam 1 Practice Problems)</span></h3> <p>Write a fast recursive method for evaluating a<sup>n</sup>, where <code>n</code> is a non-negative integer and <code>a</code> is a positive integer greater than 1. Your method must match this title line:</p> <pre><code class="language-java">public static int fastPower(int a, int n)</code></pre> <p>(Hint: use the equalities a<sup>2k</sup> = (a<sup>k</sup>)<sup>2</sup> and a<sup>2k+1</sup> = a &times; a<sup>2k</sup>. "Fast" means the number of calls should grow with the number of <em>bits</em> of <code>n</code>, not with <code>n</code> itself &mdash; so <code>n</code> must be halved, not decremented.)</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Three cases. If <code>n</code> is 0 the answer is 1 &mdash; that is the base case, and it must come first. If <code>n</code> is even, compute a<sup>n/2</sup> <em>once</em>, store it, and square it. If <code>n</code> is odd, peel off one factor of <code>a</code> and recurse on <code>n - 1</code>, which is now even.</p> <p class="filename">FastPower.java</p>
+<pre><code class="language-java">public class FastPower {
+    public static int fastPower(int a, int n) {
+        if (n == 0) return 1;
+        if (n % 2 == 0) {
+            int half = fastPower(a, n / 2);
+            return half * half;
+        }
+        return a * fastPower(a, n - 1);
+    }
+
+    public static void main(String args[]) {
+        System.out.println(fastPower(2, 10));
+        System.out.println(fastPower(3, 5));
+        System.out.println(fastPower(7, 0));
+    }
+}</code></pre> <pre class="out"><code>1024
+243
+1</code></pre> <p><strong>Things to notice.</strong> The local variable <code>half</code> is not a stylistic nicety, it is the whole point of the exercise. Writing</p> <pre><code class="language-java">return fastPower(a, n / 2) * fastPower(a, n / 2);      // WRONG — not fast at all</code></pre> <p>gives the same answers and calls the method <em>twice</em> at every level, which doubles the work at each step and throws away the speed-up entirely. Compute the sub-answer once and use it twice.</p> <p>The odd branch could also be written <code>int half = fastPower(a, n / 2); return half * half * a;</code>, using the fact that for odd <code>n</code>, <code>n / 2</code> is <code>(n-1)/2</code>. Either is fine; recursing on <code>n - 1</code> is easier to read and the very next call is even, so no efficiency is lost.</p> <p>Two limits worth knowing. The return type is <code>int</code>, so this overflows silently for large results exactly as <code>factorial</code> did in &sect;8 &mdash; <code>fastPower(2, 31)</code> is already wrong. And the base case is <code>n == 0</code>; a negative <code>n</code> would recurse forever, which is why the problem says <code>n</code> is non-negative.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 5</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="17" aria-label="Live coding - Practice Problem 5">public class FastPower {
+
+    public static int fastPower(int a, int n) {
+        // Base case: n == 0.
+        // Even n: compute fastPower(a, n/2) ONCE, then square it.
+        // Odd n:  peel off one factor of a.
+
+    }
+
+    public static void main(String args[]) {
+        System.out.println(fastPower(2, 10));   // should print 1024
+        System.out.println(fastPower(3, 5));    // should print 243
+        System.out.println(fastPower(7, 0));    // should print 1
+    }
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <h3>Problem 6 &mdash; Match the title lines <span class="muted">(added for these notes)</span></h3> <p>In the format of Problem 3, but using only material from this lecture. Write blocks of code to perform the methods used in the following main program. Your blocks must match the given title lines, and each should be only a few lines long.</p> <p class="filename">P3b.java</p>
+<pre><code class="language-java">public class P3b {
+   public static void main(String args[]) {
+      int n = 31415926;
+      double p = 2.5, q = 3.5;
+   // (a) Return true if n is negative. Here No is printed.
+      if (isNegative(n)) System.out.println("Yes");
+      else               System.out.println("No");
+   // (b) Return the sum of the digits of n, recursively. Here 31 is printed.
+      System.out.println(digitSum(n));
+   // (c) Return the larger of two doubles. Here 3.5 is printed.
+      System.out.println(larger(p, q));
+   // (d) The same name again, this time with two ints. Here 4 is printed.
+      System.out.println(larger(2, 4));
+   }
+}</code></pre> <p>The title lines are:</p> <pre><code class="language-java">public static boolean isNegative(int n)
+public static int digitSum(int n)
+public static double larger(double a, double b)
+public static int larger(int a, int b)</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Parts (a) and (b) are single methods; (c) and (d) are a deliberate overload pair. Before writing anything, notice <em>why</em> part (d) needs its own method: if only <code>larger(double, double)</code> existed, the call <code>larger(2, 4)</code> would still compile &mdash; both <code>int</code> arguments would widen &mdash; but it would print <code>4.0</code>, and the required output is <code>4</code>. The exact-match <code>int</code> version is what produces an <code>int</code> result.</p> <p class="filename">P3b.java</p>
+<pre><code class="language-java">public class P3b {
+    public static void main(String args[]) {
+        int n = 31415926;
+        double p = 2.5, q = 3.5;
+        if (isNegative(n)) System.out.println("Yes");
+        else               System.out.println("No");
+        System.out.println(digitSum(n));
+        System.out.println(larger(p, q));
+        System.out.println(larger(2, 4));
+    }
+
+    public static boolean isNegative(int n) {
+        return n &lt; 0;
+    }
+
+    public static int digitSum(int n) {
+        if (n &lt; 10 &amp;&amp; n &gt; -10) return n;
+        return digitSum(n / 10) + n % 10;
+    }
+
+    public static double larger(double a, double b) {
+        if (a &gt; b) return a;
+        return b;
+    }
+
+    public static int larger(int a, int b) {
+        if (a &gt; b) return a;
+        return b;
+    }
+}</code></pre> <pre class="out"><code>No
+31
+3.5
+4</code></pre> <p><strong>Things to notice.</strong> This one problem exercises the three ideas of the lecture at once.</p> <ul> <li><strong>Title lines.</strong> Each body is constrained by a contract you did not choose. <code>isNegative</code> must return a <code>boolean</code>, so it returns the condition directly.</li> <li><strong>Recursion.</strong> <code>digitSum</code> is the class notes' <code>numDigits</code> with <code>+ 1</code> replaced by <code>+ n % 10</code> and the base case returning <code>n</code> instead of <code>1</code>. Once you have seen one recursion over the digits of an integer, you have seen them all.</li> <li><strong>Overloading.</strong> Two methods called <code>larger</code>, distinguished only by their parameter types, and the compiler picks correctly at each call. The two bodies are character-for-character identical apart from the types &mdash; which feels like duplication, and is. Java's answer to that is generics, in Lecture 22.</li> </ul> <p>One thing that would <em>not</em> work: adding a third method <code>public static double larger(int a, int b)</code>. It differs from the <code>int</code> version only in its return type, so it is not an overload at all &mdash; it is a duplicate definition, and the compiler says <code>method larger(int,int) is already defined</code>.</p> </div></details> <div class="editor">
+  <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 6</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
+  <textarea spellcheck="false" rows="20" aria-label="Live coding - Practice Problem 6">public class P3b {
+   public static void main(String args[]) {
+      int n = 31415926;
+      double p = 2.5, q = 3.5;
+      if (isNegative(n)) System.out.println("Yes");
+      else               System.out.println("No");
+      System.out.println(digitSum(n));       // 31
+      System.out.println(larger(p, q));      // 3.5
+      System.out.println(larger(2, 4));      // 4
+   }
+
+   // Write the four methods below. The title lines are fixed:
+   //   public static boolean isNegative(int n)
+   //   public static int digitSum(int n)
+   //   public static double larger(double a, double b)
+   //   public static int larger(int a, int b)
+
+}</textarea>
+  <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
+</div> <div class="box sum" id="summary"> <div class="hd">Lecture Summary</div> <div class="bd"> <ul> <li>A <strong>method</strong> is Java's word for a function, and it always lives inside a class. Order of definition within the class does not matter.</li> <li>The <strong>title line</strong> is <code>public static result_type method_name(define_parameters)</code>. Derive it by asking what the method is handed and what it hands back.</li> <li>Everything is <code>static</code> at this stage, because <code>main</code> is <code>static</code> and a <code>static</code> method has no object. Forget it and you get <code>non-static method ... cannot be referenced from a static context</code>.</li> <li>A <code>void</code> method returns nothing and cannot be used in an expression; a value-returning method must <code>return</code> a value of the declared type on every path.</li> <li>Arguments are evaluated first, innermost call first, then <strong>copied</strong> into the parameters. A method cannot change its caller's primitive variable &mdash; only its return value can.</li> <li>Call a method in the same class by name; in another class as <code>ClassName.method(args)</code> &mdash; exactly how <code>Math.sqrt</code> works.</li> <li><strong>Overloading</strong> is two methods with the same name and different parameter lists. Argument types choose between them; the return type plays no part, and two methods differing only in return type will not compile.</li> <li><strong>Recursion</strong> needs a base case, a step that gets strictly closer to it, and a correct rule for combining the sub-answer. Trace it with a table: down to the base case, then back up. A <code>StackOverflowError</code> means the first two of those went wrong.</li> </ul> <p><strong>Coming up in Lecture 3.</strong> Several of today's exam problems handed methods an <code>int[]</code> or a <code>String[][]</code> and we took the notation on trust. Next time we meet <em>arrays</em> properly &mdash; how to declare them, why <code>length</code> has no parentheses, and what a two-dimensional array really is &mdash; and we learn to read what the user types with the <code>Scanner</code> class.</p>
   </div>
 </div>
 
 <nav class="pagenav">
-<span class="disabled"><div class="dir">&larr; Previous</div><div class="ttl">This is the first class</div></span>
-<span class="disabled next"><div class="dir">Next &rarr;</div><div class="ttl">Lecture 2 &mdash; Methods, Overloading and Recursion</div><div class="pending">posts Thu Sep 3</div></span>
+<a href="lec01_java_overview.html"><div class="dir">&larr; Previous</div><div class="ttl">Lecture 1 &mdash; Welcome to Java: Overview and First Programs</div></a>
+<span class="disabled next"><div class="dir">Next &rarr;</div><div class="ttl">Lecture 3 &mdash; Arrays and Reading Input with Scanner</div><div class="pending">posts Tue Sep 8</div></span>
 </nav>
 <footer class="pf">CSCI 212 &middot; Object-Oriented Programming in Java &middot; Queens College, CUNY</footer>
 </div>
