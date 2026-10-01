@@ -1163,9 +1163,7 @@ class Customer {
 
 }</textarea>
   <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
-</div> <h3>Problem 6 &mdash; A daily fine report <span class="muted">(added for these notes)</span></h3> <p>The city wants a summary at the end of each day: the total dollars collected, and how many tickets were written at each rate. Using the <code>fineFor</code> and <code>hoursOverdue</code> methods from Quick Check 10.9, write a program that takes an array of meter readings (the <code>timeLeft</code> values at the moment each car was ticketed) and prints the total and a breakdown by number of hours overdue.</p> <p>Use this test data:</p> <pre><code class="language-java">int readings[] = {
-    -5, -65, -20, -125, -60, -70, -185, -35, -120, -125}
-;</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> This is the concrete reason &sect;7 argued that <code>getFine</code> should return an <code>int</code>: you cannot add up <code>"$25"</code> and <code>"$35"</code>. With <code>fineFor</code> returning a number, the total is a one-line accumulation.</p> <p>For the breakdown, <code>hoursOverdue</code> already turns a reading into a small positive integer, so it can be used directly as an index into a counting array &mdash; the same tallying pattern as counting letter frequencies. Size the array from the largest value present rather than guessing, and remember that hour 1 lands in slot 1, so the array needs one extra slot.</p> <p class="filename">FineReport.java</p>
+</div> <h3>Problem 6 &mdash; A daily fine report <span class="muted">(added for these notes)</span></h3> <p>The city wants a summary at the end of each day: the total dollars collected, and how many tickets were written at each rate. Using the <code>fineFor</code> and <code>hoursOverdue</code> methods from Quick Check 10.9, write a program that takes an array of meter readings (the <code>timeLeft</code> values at the moment each car was ticketed) and prints the total and a breakdown by number of hours overdue.</p> <p>Use this test data:</p> <pre><code class="language-java">int readings[] = {-5, -65, -20, -125, -60, -70, -185, -35, -120, -125};</code></pre> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> This is the concrete reason &sect;7 argued that <code>getFine</code> should return an <code>int</code>: you cannot add up <code>"$25"</code> and <code>"$35"</code>. With <code>fineFor</code> returning a number, the total is a one-line accumulation.</p> <p>For the breakdown, <code>hoursOverdue</code> already turns a reading into a small positive integer, so it can be used directly as an index into a counting array &mdash; the same tallying pattern as counting letter frequencies. Size the array from the largest value present rather than guessing, and remember that hour 1 lands in slot 1, so the array needs one extra slot.</p> <p class="filename">FineReport.java</p>
 <pre><code class="language-java">public class FineReport {
     public static int hoursOverdue(int timeLeft) {
         int minutesOver = -timeLeft;
@@ -1239,8 +1237,8 @@ Breakdown:
 </div>
 
 <nav class="pagenav">
-<span class="disabled"><div class="dir">&larr; Previous</div><div class="ttl">Lecture 9 &mdash; static Members, equals and toString</div><div class="pending">posts Tue Sep 29</div></span>
-<span class="disabled next"><div class="dir">Next &rarr;</div><div class="ttl">Review 1 &mdash; Exam 1 Review</div><div class="pending">posts Tue Oct 6</div></span>
+<a href="lec09_static_equals.html"><div class="dir">&larr; Previous</div><div class="ttl">Lecture 9 &mdash; static Members, equals and toString</div></a>
+<a class="next" href="rev01_exam1_review.html"><div class="dir">Next &rarr;</div><div class="ttl">Review 1 &mdash; Exam 1 Review</div></a>
 </nav>
 <footer class="pf">CSCI 212 &middot; Object-Oriented Programming in Java &middot; Queens College, CUNY</footer>
 </div>
