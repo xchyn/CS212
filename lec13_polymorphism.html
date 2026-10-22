@@ -811,10 +811,7 @@ This is a rectangle with base 6.0 and height 8.0</code></pre> <p><strong>Things 
 </div> </div> </div> <h2 id="s5"><span class="num">5.</span>One array, many shapes</h2> <p>Everything so far has been about one variable at a time. The payoff arrives when you have many objects of different classes and want to treat them uniformly, because an array of the superclass type will hold any mixture of subclasses.</p> <div class="box key"> <div class="hd">Key Idea<span class="tag">&mdash; the practical payoff</span></div> <div class="bd"> <p><code>Shape[] shapes</code> is an array whose elements are <code>Shape</code> references. Every element may hold a different subclass. Each element's static type is <code>Shape</code>, so you may call anything <code>Shape</code> declares; each element's dynamic type is whatever you stored there, so the right override runs. One loop, any mixture, no <code>if</code> statements about types.</p> </div> </div> <div class="box ex"> <div class="hd">Worked Example<span class="tag">&mdash; four shapes, one loop</span></div> <div class="bd"> <p>The array initialiser stores a <code>Shape</code>, a <code>Rectangle</code>, a <code>Square</code> and a <code>Circle</code> into four <code>Shape</code> slots. The loop body mentions none of those class names.</p> <p class="filename">ShapeArray.java</p>
 <pre><code class="language-java">public class ShapeArray {
     public static void main(String args[]) {
-        Shape[] shapes = { new Shape(10, 20),
-                           new Rectangle(5, 4),
-                           new Square(7),
-                           new Circle(3) };
+        Shape[] shapes = {new Shape(10, 20), new Rectangle(5, 4), new Square(7), new Circle(3)};
 
         double total = 0;
         for (int i = 0; i &lt; shapes.length; i++) {
@@ -835,7 +832,7 @@ Number of shapes: 4
 Total area:       117.27433388230814</code></pre> <p>Four different ones. <code>shapes[i]</code> has static type <code>Shape</code> on every iteration &mdash; there is only one expression, compiled once &mdash; and yet each pass dispatches to a different body, because each pass has a different object in it.</p> <p>The total is 20 + 20 + 49 + 28.274333882308138 = 117.27433388230814. <code>getArea</code> is not overridden anywhere, so the same body ran four times; it just read a different <code>area</code> field each time.</p> <p><strong>Why this matters.</strong> Without polymorphism you would need four arrays, or one array plus a chain of <code>if</code> statements asking what each element is. With it, adding a <code>Triangle</code> class tomorrow requires no change to this loop at all. That is the practical reason object-oriented programs are organised into hierarchies in the first place.</p> 
 </div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 13.7</div> <div class="bd"> <p>Predict both lines. Remember that <code>Square(2)</code> calls <code>Rectangle(2, 2)</code>.</p> <pre><code class="language-java">public class Totals {
     public static void main(String args[]) {
-        Shape[] arr = { new Circle(1), new Square(2), new Rectangle(2, 3) };
+        Shape[] arr = {new Circle(1), new Square(2), new Rectangle(2, 3)};
 
         double t = 0;
         for (int i = 0; i &lt; arr.length; i++) {
@@ -857,19 +854,20 @@ Total area:       117.27433388230814</code></pre> <p>Four different ones. <code>
     }
 
     public static void main(String args[]) {
-        Shape[] shapes = { new Circle(3), new Square(7), new Rectangle(5, 4) };
+        Shape[] shapes = {new Circle(3), new Square(7), new Rectangle(5, 4)};
         System.out.println("Largest by area:");
         System.out.println(largest(shapes));
     }
 }</code></pre> <pre class="out"><code>Largest by area:
 Square with side length: 7.0, area: 49.0, perimeter: 28.0</code></pre> <p><strong>Things to notice.</strong> The method returns a <code>Shape</code>, yet the printed line is a <code>Square</code> line. The return type constrains what the <em>compiler</em> lets the caller do with the result; it does not shrink the object. <code>System.out.println(largest(shapes))</code> calls <code>toString</code> on whatever came back, and dynamic binding does the rest.</p> <p>The areas are 28.27, 49 and 20, so the <code>Square</code> wins. If you had compared with <code>&gt;=</code> instead of <code>&gt;</code> you would get the <em>last</em> maximum rather than the first when there is a tie &mdash; worth deciding deliberately rather than by accident.</p> <p>Note that <code>best = a[i];</code> copies a reference, not a shape. There is exactly one <code>Square</code> object in this program and two variables now point at it.</p> </div></details> <div class="editor">
   <div class="ehd"><span class="etitle">Live coding &mdash; Quick Check 13.8</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
-  <textarea spellcheck="false" rows="13" aria-label="Live coding - Quick Check 13.8">public class Largest {
+  <textarea spellcheck="false" rows="14" aria-label="Live coding - Quick Check 13.8">public class Largest {
 
-    // 1. Write largest(Shape[] a): return the element with the greatest area.
+    // 1. Write largest(Shape[] a):
+    //    return the element with the greatest area.
 
     public static void main(String args[]) {
-        Shape[] shapes = { new Circle(3), new Square(7), new Rectangle(5, 4) };
+        Shape[] shapes = {new Circle(3), new Square(7), new Rectangle(5, 4)};
 
         // 2. Print the winner.
 
@@ -994,7 +992,7 @@ Dog
 Animal</code></pre> <p>They can, and they do.</p> <table class="trace"> <tr><th>Line</th><th>Static type of the expression</th><th>Rule applied</th><th>Result</th></tr> <tr><td>(a) <code>a.name</code></td><td><code>Animal</code></td><td>field access &rarr; static type</td><td><code>Animal</code></td></tr> <tr><td>(b) <code>a.describe()</code></td><td><code>Animal</code></td><td>overridden method &rarr; dynamic type</td><td><code>describe() in Dog</code></td></tr> <tr><td>(c) <code>((Dog) a).name</code></td><td><code>Dog</code></td><td>field access &rarr; static type</td><td><code>Dog</code></td></tr> <tr><td>(d) <code>d.name</code></td><td><code>Dog</code></td><td>field access &rarr; static type</td><td><code>Dog</code></td></tr> <tr><td>(e) <code>((Animal) d).name</code></td><td><code>Animal</code></td><td>field access &rarr; static type</td><td><code>Animal</code></td></tr> </table> <p>Line (b) is worth pausing on. <code>Dog</code>'s <code>describe()</code> ran, and the <code>name</code> it read was <code>Dog</code>'s <code>name</code>, because inside <code>Dog</code>'s code the unqualified word <code>name</code> refers to <code>Dog</code>'s field. So a single object reports <code>"Animal"</code> and <code>"describe() in Dog"</code> in consecutive lines. Both are correct; they are reading different fields of the same object.</p> <p>Line (e) shows this is not about the object at all. <code>d</code> holds a <code>Dog</code> and always has; casting it up to <code>Animal</code> changed nothing on the heap, but it changed which <code>name</code> the compiler resolved to.</p> <p><strong>What to take away.</strong> Field hiding is a trap, not a feature. Real code avoids it by keeping fields <code>private</code> &mdash; which the <code>Shape</code> hierarchy does &mdash; and exposing them through getters, because getters are methods and methods <em>are</em> polymorphic. Learn the rule so you can answer the exam question; then write code where it never comes up.</p> 
 </div></details> </div> </div> <div class="box qc"> <div class="hd">Quick Check 13.11</div> <div class="bd"> <p>Everything on this page in one program. Say what each line does &mdash; and note that one of them does not finish.</p> <pre><code class="language-java">public class Mix {
     public static void main(String args[]) {
-        Shape[] all = { new Circle(3), new Square(3) };
+        Shape[] all = {new Circle(3), new Square(3)};
 
         System.out.println(all[0].getArea());     // line (a)
         System.out.println(all[1]);               // line (b)
@@ -1129,10 +1127,7 @@ Class B: 0
 Class B: 0</code></pre> <p><strong>Things to notice across all four parts.</strong> Every line prints <code>Class B:</code>. <code>A</code>'s <code>toString</code> is never reached, even at line C where the receiver <code>a</code> is declared <code>A</code> and holds an <code>A</code> &mdash; because what gets <em>printed</em> is the returned <code>B</code>, not <code>a</code>. Reading the receiver instead of the argument is the classic way to lose this problem.</p> <p>The only line where the number is not 0 is B, and it is 1 rather than 0 purely because <code>a</code> and <code>b</code> are aliases. Lines C and D each construct a new <code>B</code> and immediately print it, so no <code>increment()</code> has ever touched them.</p> </div></details> </div> <h3>Problem 4 &mdash; A shape report <span class="muted">(added for these notes)</span></h3> <p>Using the <code>Shape</code> / <code>Rectangle</code> / <code>Square</code> / <code>Circle</code> hierarchy from section 1, write a complete program <code>ShapeReport.java</code> that:</p> <ul> <li>builds a <code>Shape[]</code> containing <code>new Circle(3)</code>, <code>new Rectangle(5, 4)</code>, <code>new Square(7)</code> and <code>new Circle(1)</code>, in that order;</li> <li>loops once over the array, printing each shape;</li> <li>for every element that is really a <code>Circle</code>, prints an extra indented line <code>      circle of radius </code> followed by its radius;</li> <li>after the loop, prints the number of shapes, the number of circles, and the total area.</li> </ul> <p>Your loop body must not contain a cast that is not guarded.</p> <details class="soln"><summary></summary><div class="ans"> <p><strong>Plan.</strong> Two different jobs happen in the same loop and they need different tools. Printing the shape and adding its area are <em>general</em> jobs: <code>toString</code> and <code>getArea</code> are both visible from <code>Shape</code>, so they need nothing special and dynamic binding handles the rest. Getting the radius is a <em>specific</em> job: <code>getRadius</code> is not visible from <code>Shape</code>, so it needs <code>instanceof</code> and then a downcast, inside the guarded branch.</p> <p>Keep the counters outside the loop and accumulate as you go, exactly as in CSCI 111.</p> <p class="filename">ShapeReport.java</p>
 <pre><code class="language-java">public class ShapeReport {
     public static void main(String args[]) {
-        Shape[] shapes = { new Circle(3),
-                           new Rectangle(5, 4),
-                           new Square(7),
-                           new Circle(1) };
+        Shape[] shapes = {new Circle(3), new Rectangle(5, 4), new Square(7), new Circle(1)};
 
         double total = 0;
         int circles = 0;
@@ -1164,12 +1159,9 @@ Shapes:      4
 Circles:     2
 Total area:  100.41592653589794</code></pre> <p><strong>Things to notice.</strong> Three of the four lines in the loop body are completely type-blind &mdash; they would work unchanged if someone added a <code>Triangle</code> class. Only the <code>if</code> block knows about a specific class, and that block is where the cast lives. That is the shape of almost all good polymorphic code: a general path, plus a small guarded special case.</p> <p>The <code>Square</code> is not counted as a circle, obviously &mdash; but it <em>would</em> have been counted if the test had been <code>instanceof Rectangle</code>, because a <code>Square</code> is a <code>Rectangle</code>. Whenever you write an <code>instanceof</code> test, ask yourself which subclasses it also catches.</p> <p>The total, 100.41592653589794, is 28.274333882308138 + 20 + 49 + 3.141592653589793. It is not exactly 100.4159265358979 or 100.41592653589795; <code>double</code> addition is not associative and the exact digits depend on the order you add in. Do not be alarmed by the last digit or two.</p> </div></details> <div class="editor">
   <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 4</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
-  <textarea spellcheck="false" rows="21" aria-label="Live coding - Practice Problem 4">public class ShapeReport {
+  <textarea spellcheck="false" rows="18" aria-label="Live coding - Practice Problem 4">public class ShapeReport {
     public static void main(String args[]) {
-        Shape[] shapes = { new Circle(3),
-                           new Rectangle(5, 4),
-                           new Square(7),
-                           new Circle(1) };
+        Shape[] shapes = {new Circle(3), new Rectangle(5, 4), new Square(7), new Circle(1)};
 
         double total = 0;
         int circles = 0;
@@ -1187,7 +1179,7 @@ Total area:  100.41592653589794</code></pre> <p><strong>Things to notice.</stron
 </div> <h3>Problem 5 &mdash; Find the three problems <span class="muted">(added for these notes)</span></h3> <p>The program below is meant to print the areas of two shapes, then the radius of the first, then the base of a square, then the radius of the second shape if it has one. Exactly 3 of the numbered lines are wrong. Two of them are caught by the compiler; one of them compiles and fails at run time. Identify all three, say which kind each is, and give a corrected version of each line.</p> <p class="filename">ShapeInfo.java</p>
 <pre><code class="language-java">public class ShapeInfo {
     public static void main(String args[]) {
-        Shape[] shapes = { new Circle(3), new Square(7) };
+        Shape[] shapes = {new Circle(3), new Square(7)};
 
         for (int i = 0; i &lt; shapes.length; i++) {
             System.out.println("Area: " + shapes[i].getArea());
@@ -1212,7 +1204,7 @@ Total area:  100.41592653589794</code></pre> <p><strong>Things to notice.</stron
 	at ShapeInfo2.main(ShapeInfo2.java:4)</code></pre> <p>Corrected: guard it, and provide something sensible for the other case.</p> <p class="filename">ShapeInfo.java</p>
 <pre><code class="language-java">public class ShapeInfo {
     public static void main(String args[]) {
-        Shape[] shapes = { new Circle(3), new Square(7) };
+        Shape[] shapes = {new Circle(3), new Square(7)};
 
         for (int i = 0; i &lt; shapes.length; i++) {
             System.out.println("Area: " + shapes[i].getArea());
@@ -1239,7 +1231,7 @@ shapes[1] is not a circle</code></pre> <p><strong>Things to notice.</strong> Lin
   <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 5</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
   <textarea spellcheck="false" rows="20" aria-label="Live coding - Practice Problem 5">public class ShapeInfo {
     public static void main(String args[]) {
-        Shape[] shapes = { new Circle(3), new Square(7) };
+        Shape[] shapes = {new Circle(3), new Square(7)};
 
         for (int i = 0; i &lt; shapes.length; i++) {
             System.out.println("Area: " + shapes[i].getArea());
@@ -1263,7 +1255,7 @@ shapes[1] is not a circle</code></pre> <p><strong>Things to notice.</strong> Lin
 </div>
 
 <nav class="pagenav">
-<span class="disabled"><div class="dir">&larr; Previous</div><div class="ttl">Lecture 12 &mdash; Inheritance</div><div class="pending">posts Tue Oct 20</div></span>
+<a href="lec12_inheritance.html"><div class="dir">&larr; Previous</div><div class="ttl">Lecture 12 &mdash; Inheritance</div></a>
 <span class="disabled next"><div class="dir">Next &rarr;</div><div class="ttl">Lecture 14 &mdash; Abstract Classes and Interfaces</div><div class="pending">posts Tue Oct 27</div></span>
 </nav>
 <footer class="pf">CSCI 212 &middot; Object-Oriented Programming in Java &middot; Queens College, CUNY</footer>
