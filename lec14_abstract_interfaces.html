@@ -527,9 +527,9 @@ Perimeter: 16.0</code></pre> <p><strong>Things to notice.</strong> <code>Creatin
 
     // 1. Write a constructor taking base, height, side1, side2.
 
-    // 2. Implement getArea()      -- 0.5 * base * height
+    // 2. Implement getArea()       -- 0.5 * base * height
 
-    // 3. Implement getPerimeter() -- base + side1 + side2
+    // 3. Implement getPerimeter()  -- base + side1 + side2
 
     public static void main(String args[]) {
         // 4. Build a 6 by 4 triangle with two sides of 5, and call printInfo().
@@ -888,13 +888,13 @@ Perimeter: 32.0</code></pre> <p><strong>Things to notice.</strong> The final are
 
     // 1. Constructor: base, height, side1, side2.
 
-    // 2. getArea()      -- required by AbstractShape
+    // 2. getArea()              -- required by AbstractShape
 
-    // 3. getPerimeter() -- required by AbstractShape
+    // 3. getPerimeter()         -- required by AbstractShape
 
-    // 4. draw()         -- required by Drawable
+    // 4. draw()                 -- required by Drawable
 
-    // 5. resize(double factor) -- required by Resizable; scale ALL FOUR fields
+    // 5. resize(double factor)  -- required by Resizable; scale ALL FOUR fields
 
 }</textarea>
   <div class="foot">Type here during class. This box does not compile or run anything &mdash; press Copy and paste it into your IDE to run it. Tab indents; Shift+Tab outdents. Anything you type is lost when the page reloads.</div>
@@ -1131,21 +1131,21 @@ HELLO CSCI 212</code></pre> <p><strong>Things to notice.</strong> <code>Formatte
                                 ^
 1 error</code></pre> <p><code>private</code> means private to the class, not to the family &mdash; a subclass cannot see it, and <code>super.</code> does not change that. The two repairs are the getter shown above, or declaring the field <code>protected String content;</code> in <code>Document</code>, after which plain <code>content.toUpperCase()</code> works in the subclass. Both are accepted; the getter keeps the field private as the question asked.</p> <p>Note also that <code>Printable</code> declares two methods with the same name and different parameter lists. That is ordinary overloading, and an interface may do it. It obliges you to write two separate methods, not one.</p> </div></details> <div class="editor">
   <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 1</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
-  <textarea spellcheck="false" rows="21" aria-label="Live coding - Practice Problem 1">public class Document implements Printable {
+  <textarea spellcheck="false" rows="21" aria-label="Live coding - Practice Problem 1">class Document implements Printable {
     // 1. private String field content
 
     // 2. constructor taking the content
 
-    // 3. printInfo()          -- print the content
+    // 3. printInfo()           -- print the content
 
-    // 4. printInfo(int times) -- print it that many times
+    // 4. printInfo(int times)  -- print it that many times
 
 }
 
 // -------- second file --------
 
 public class FormattedDocument extends Document {
-    // 5. constructor -- remember super(content)
+    // 5. constructor           -- remember super(content)
 
     // 6. override printInfo() to print in ALL CAPS
 
@@ -1483,11 +1483,11 @@ searching for "Chyn"
    found: Chyn
 searching for "Missing Title"</code></pre> <p><strong>Things to notice.</strong> <code>describe()</code> is written once and produces two different lines, because it calls <code>getLateFeePerDay()</code> &mdash; a method it does not implement. That is the <code>printInfo()</code> pattern from section 2, and by now it should look routine.</p> <p><code>LibraryItem implements Searchable</code> and supplies <code>getSearchName()</code> once, so <code>Book</code> and <code>Dvd</code> inherit it and write nothing. An abstract class is allowed to implement an interface on its subclasses' behalf, and doing so is often the tidiest arrangement: the abstract class handles the part that is the same, the interface reaches the classes that are unrelated.</p> <p>The <code>Searchable[]</code> holds a <code>Book</code>, a <code>Dvd</code> and a <code>StaffMember</code>. There is no class type in Java that could hold all three &mdash; their only common ancestor is <code>Object</code>, which has no <code>getSearchName()</code>. Only the interface makes the array possible, and only the interface makes <code>all[i].getSearchName()</code> compile.</p> <p><code>1.5</code> prints where you wrote <code>1.50</code>, because a <code>double</code> has no idea how many zeros you typed. To show money properly you would want <code>DecimalFormat</code> or <code>String.format</code>. And if you are wondering whether a late fee should be a <code>double</code> at all &mdash; it should not, for real money; use cents in an <code>int</code>. That is a Lecture 1 lesson coming back around.</p> </div></details> <div class="editor">
   <div class="ehd"><span class="etitle">Live coding &mdash; Practice Problem 6</span><button type="button" data-act="reset">Reset</button><button type="button" data-act="copy">Copy</button></div>
-  <textarea spellcheck="false" rows="20" aria-label="Live coding - Practice Problem 6">public interface Searchable {
+  <textarea spellcheck="false" rows="20" aria-label="Live coding - Practice Problem 6">interface Searchable {
     // 1. one method: String getSearchName();
 }
 
-public abstract class LibraryItem implements Searchable {
+abstract class LibraryItem implements Searchable {
     // 2. private title and id, a constructor, and getters
 
     // 3. an abstract getLateFeePerDay()
@@ -1511,7 +1511,7 @@ public class BadShape {
 </div>
 
 <nav class="pagenav">
-<span class="disabled"><div class="dir">&larr; Previous</div><div class="ttl">Lecture 13 &mdash; Polymorphism and Dynamic Binding</div><div class="pending">posts Thu Oct 22</div></span>
+<a href="lec13_polymorphism.html"><div class="dir">&larr; Previous</div><div class="ttl">Lecture 13 &mdash; Polymorphism and Dynamic Binding</div></a>
 <span class="disabled next"><div class="dir">Next &rarr;</div><div class="ttl">Lecture 15 &mdash; GUI I: Windows, JFrame and Events</div><div class="pending">posts Thu Oct 29</div></span>
 </nav>
 <footer class="pf">CSCI 212 &middot; Object-Oriented Programming in Java &middot; Queens College, CUNY</footer>
